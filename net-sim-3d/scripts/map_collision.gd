@@ -13,6 +13,10 @@ func _ready() -> void:
 		return
 
 	for entry: Dictionary in parsed:
+		# Door leaves are exported in their open pose; InteractiveDoor nodes in
+		# main.tscn give each leaf its own moving collider instead.
+		if entry.get("kind", "") == "door":
+			continue
 		var collision := CollisionShape3D.new()
 		collision.name = entry["name"]
 		if entry.has("faces"):
