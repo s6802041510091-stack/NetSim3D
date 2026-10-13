@@ -12,7 +12,9 @@ import bpy
 from mathutils import Vector
 
 
-ROOT = r"D:\NetSim3D"
+# Repository root (this file is net-sim-3d/tools/export_blender_assets.py), so the
+# script works wherever the project is cloned.
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PROJECT = os.path.join(ROOT, "net-sim-3d")
 BLEND = os.path.join(ROOT, "3Dmodel", "blend")
 MODELS = os.path.join(PROJECT, "assets", "models")
@@ -61,7 +63,8 @@ def export_map(do_export=True):
     for obj in bpy.data.objects:
         if obj.type != "MESH" or obj.hide_render:
             continue
-        kind = collision_kind(obj.name)
+        # Furniture built by 3Dmodel/scripts/*.py marks itself with collision="box".
+        kind = "furniture" if obj.get("collision") == "box" else collision_kind(obj.name)
         if kind is None:
             continue
         low, high = world_bounds(obj)
