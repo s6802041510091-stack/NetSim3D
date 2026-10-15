@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/teacher_male.tscn" id="5"]
 [ext_resource type="Script" path="res://scripts/interactive_door.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/computer/computer_manager.gd" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/missions/mission_06/data_center_desk.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/missions/mission_06/desk_phone.tscn" id="8"]
 [ext_resource type="Script" path="res://scripts/missions/mission_06/mission_06_controller.gd" id="9"]
 [ext_resource type="Resource" path="res://data/missions/mission_06/mission_06_data.tres" id="10"]
 
@@ -42,7 +42,7 @@ display_name = "ห้องเรียนคอมพิวเตอร์"
 position = Vector3(-9.18951, 0, -8.35152)
 script = ExtResource("6")
 part_prefix = "BackgroundClass_"
-display_name = "ห้องเรียนประกอบฉาก"
+display_name = "ห้องเรียนวิทยาศาสตร์"
 
 [node name="FemaleWCDoor" type="Node3D" parent="Doors"]
 position = Vector3(-9.18951, 0, -15.53437)
@@ -60,7 +60,7 @@ display_name = "ห้องน้ำชาย"
 position = Vector3(-9.18951, 0, -35.5008)
 script = ExtResource("6")
 part_prefix = "ITSupport_"
-display_name = "ห้อง IT Support"
+display_name = "ห้อง IT Support (Data Center)"
 
 [node name="StorageDoor" type="Node3D" parent="Doors"]
 position = Vector3(-12.44092, 0, -36.00708)
@@ -80,17 +80,17 @@ script = ExtResource("6")
 part_prefix = "Server_"
 display_name = "ห้อง Server"
 
-[node name="DataCenterDesk" parent="." instance=ExtResource("8")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.6, 0, -31.0)
+[node name="DeskPhone" parent="." instance=ExtResource("8")]
+position = Vector3(-13.75, 0.758, -43.25)
+rotation = Vector3(0, -1.5708, 0)
 
 [node name="Computers" type="Node3D" parent="."]
 script = ExtResource("7")
-extra_screen_paths = Array[NodePath]([NodePath("../DataCenterDesk/DataCenter_Monitor_Display_Surface")])
 
 [node name="Mission06" type="Node" parent="."]
 script = ExtResource("9")
 data = ExtResource("10")
-phone_path = NodePath("../DataCenterDesk/DeskPhone")
+phone_path = NodePath("../DeskPhone")
 
 [node name="ITSupportPlayer" parent="." instance=ExtResource("3")]
 position = Vector3(-12.47, 0.02, -42.638)
@@ -138,7 +138,57 @@ light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 1.1
 omni_range = 9.0
 
-[node name="DataCenterZoneLight" type="OmniLight3D" parent="."]
+[node name="NOCZoneLight" type="OmniLight3D" parent="."]
 position = Vector3(2.5, 2.6, -33.8)
 light_energy = 1.0
 omni_range = 8.0
+
+[node name="NOCDeskLight" type="OmniLight3D" parent="."]
+position = Vector3(-3.6, 2.6, -32.5)
+light_energy = 1.3
+omni_range = 9.0
+
+[node name="TeachersCubicleLight1" type="OmniLight3D" parent="."]
+position = Vector3(4.6, 2.6, -28.0)
+light_energy = 0.8
+omni_range = 4.5
+
+[node name="TeachersCubicleLight2" type="OmniLight3D" parent="."]
+position = Vector3(4.6, 2.6, -21.4)
+light_energy = 0.8
+omni_range = 4.5
+
+[node name="TeachersCubicleLight3" type="OmniLight3D" parent="."]
+position = Vector3(4.6, 2.6, -16.8)
+light_energy = 0.8
+omni_range = 4.5
+
+[node name="TeachersCubicleLight4" type="OmniLight3D" parent="."]
+position = Vector3(4.6, 2.6, -12.2)
+light_energy = 0.8
+omni_range = 4.5
+
+[node name="ITSupportReturnLight" type="OmniLight3D" parent="."]
+position = Vector3(-10.8, 2.6, -32.6)
+light_energy = 0.9
+omni_range = 6.0
+
+[node name="StorageLight" type="OmniLight3D" parent="."]
+position = Vector3(-16.8, 2.7, -33.8)
+light_energy = 1.0
+omni_range = 7.0
+
+[node name="TeachersRoomLightNorth" type="OmniLight3D" parent="."]
+position = Vector3(0, 2.7, -26.5)
+light_energy = 1.1
+omni_range = 9.0
+
+[node name="TeachersRoomLightMiddle" type="OmniLight3D" parent="."]
+position = Vector3(0, 2.7, -19.5)
+light_energy = 1.1
+omni_range = 9.0
+
+[node name="TeachersRoomLightSouth" type="OmniLight3D" parent="."]
+position = Vector3(0, 2.7, -13.0)
+light_energy = 1.1
+omni_range = 9.0

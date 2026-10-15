@@ -28,7 +28,7 @@ extends CharacterBody3D
 var focused_door: InteractiveDoor = null
 var focused_computer: ComputerStation = null
 ## Any other object with the "interactable" meta and get_prompt_text()/use(player),
-## e.g. the Data Center desk phone (Mission 6).
+## e.g. the desk phone in the IT Support room (Mission 6).
 var focused_interactable: Object = null
 ## True while the player is sitting at a computer.
 var controls_locked := false

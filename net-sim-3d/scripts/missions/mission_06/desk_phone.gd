@@ -1,7 +1,7 @@
 class_name DeskPhone
 extends StaticBody3D
 
-## Desk telephone in the Data Center (Mission 6). While it rings, a red light
+## Desk telephone on the player's desk in the IT Support room (Mission 6). While it rings, a red light
 ## blinks and the player can look at it and press E to answer.
 ## The player finds it through the shared "interactable" meta (like computers).
 

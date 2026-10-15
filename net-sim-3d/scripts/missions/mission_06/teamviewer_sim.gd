@@ -476,7 +476,7 @@ func _build_home() -> void:
 	var left := _panel(380)
 	row.add_child(left.get_parent())
 	left.add_child(_label("Allow Remote Control", 20, RemoteTheme.INK, true))
-	left.add_child(_label("ข้อมูลของคอมพิวเตอร์เครื่องนี้ (DATACENTER-PC)", 14, RemoteTheme.INK_SOFT))
+	left.add_child(_label("ข้อมูลของคอมพิวเตอร์เครื่องนี้ (IT-PC-01)", 14, RemoteTheme.INK_SOFT))
 	left.add_child(_label("Your ID", 14, RemoteTheme.INK_SOFT))
 	left.add_child(_label(data.own_id, 26, RemoteTheme.INK, true))
 	left.add_child(_label("Password", 14, RemoteTheme.INK_SOFT))

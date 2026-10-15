@@ -1,10 +1,11 @@
 class_name Mission06Controller
 extends Node
 
-## Mission 6 in the main scene: the ringing desk phone in the Data Center, the
+## Mission 6 in the main scene: the ringing phone on the player's desk in the
+## IT Support room (the Data Center office of the story), the
 ## phone call with the teacher (TeamViewer ID and password), the
 ## "ได้รับภารกิจ" message, and — once the player has fixed the sound, ended the
-## Remote Session, closed TeamViewer and switched the Data Center computer
+## Remote Session, closed TeamViewer and switched their computer (IT-PC-01)
 ## off — the knowledge summary and "ภารกิจสำเร็จ".
 ## The TeamViewer program itself is TeamViewerSim (opened from DesktopOS).
 
@@ -15,7 +16,7 @@ signal mission_completed(score: int, wrong_id: int, wrong_password: int, close_w
 @export var phone_path: NodePath
 @export var computers_path: NodePath = ^"../Computers"
 ## The computer the player must switch off at the end (it has TeamViewer).
-@export var player_computer: String = "DATACENTER-PC"
+@export var player_computer: String = "IT-PC-01"
 ## Start ringing as soon as the game starts. A future mission system can turn
 ## this off and call start_ringing() when Mission 6 begins.
 @export var ring_on_start: bool = true

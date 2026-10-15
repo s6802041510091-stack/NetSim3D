@@ -10,7 +10,7 @@ extends Node3D
 ## Mesh names that end like this are monitor screens.
 @export var screen_name_suffix: String = "Monitor_Display_Surface"
 ## Computers (hostnames) that have Network Designer installed.
-## Leave empty to install it on every computer, e.g. ["DATACENTER-PC"] for Mission 1.
+## Leave empty to install it on every computer, e.g. ["IT-PC-01"] for Mission 1.
 @export var network_designer_hosts: PackedStringArray = []
 ## Computers (hostnames) that have NetPlan EDU (Mission 1) installed.
 ## IT-PC-01 is the player's own desk computer in the IT Support room.
@@ -18,9 +18,10 @@ extends Node3D
 ## Mission 5: the student computer that shows the security warning and has
 ## Windows Security (simulated) on its desktop.
 @export var windows_security_hosts: PackedStringArray = ["PC-R3-L2"]
-## Mission 6: computers that have TeamViewer (simulated) — the Data Center desk.
-@export var teamviewer_hosts: PackedStringArray = ["DATACENTER-PC"]
-## Screens that are not part of the map model (e.g. the Data Center desk scene).
+## Mission 6: computers that have TeamViewer (simulated) — the player's desk in
+## the IT Support room (= the Data Center office of the mission story).
+@export var teamviewer_hosts: PackedStringArray = ["IT-PC-01"]
+## Screens that are not part of the map model (a MeshInstance3D in another scene).
 @export var extra_screen_paths: Array[NodePath] = []
 ## Where Mission 5 progress is saved (same as Mission05SaveStore.DEFAULT_PATH).
 @export var mission_05_save_path: String = "user://netsim3d/mission_05_save.json"
@@ -31,7 +32,6 @@ const NAMED_SCREENS := {
 	"Monitor_Display_Surface_001": ["IT-PC-01", "192.168.1.101"],
 	"Monitor_Display_Surface_002": ["IT-HEAD-PC", "192.168.1.100"],
 	"Monitor_Display_Surface_003": ["IT-HEAD-PC2", "192.168.1.103"],
-	"DataCenter_Monitor_Display_Surface": ["DATACENTER-PC", "192.168.1.110"],
 }
 
 var stations: Array[ComputerStation] = []
@@ -93,6 +93,8 @@ func _assign_identity(station: ComputerStation, screen_name: String, index: int)
 	# StudentPC_Row03_Left_2__Monitor_Display_Surface -> PC-R3-L2, 192.168.1.19
 	var regex := RegEx.create_from_string("StudentPC_Row(\\d+)_(Left|Right)_(\\d+)")
 	var m := regex.search(screen_name)
+	# StaffPC_3_Monitor_Display_Surface (teachers' room) -> STAFF-PC-03, 192.168.1.53
+	var staff := RegEx.create_from_string("^StaffPC_(\\d+)_").search(screen_name)
 	if m:
 		var row := m.get_string(1).to_int()
 		var side := m.get_string(2)
@@ -100,6 +102,10 @@ func _assign_identity(station: ComputerStation, screen_name: String, index: int)
 		var slot := (seat if side == "Left" else seat + 2)
 		station.hostname = "PC-R%d-%s%d" % [row, side.substr(0, 1), seat]
 		station.ip_address = "192.168.1.%d" % (10 + (row - 1) * 4 + slot)
+	elif staff:
+		var n := staff.get_string(1).to_int()
+		station.hostname = "STAFF-PC-%02d" % n
+		station.ip_address = "192.168.1.%d" % (50 + n)
 	elif NAMED_SCREENS.has(screen_name):
 		station.hostname = NAMED_SCREENS[screen_name][0]
 		station.ip_address = NAMED_SCREENS[screen_name][1]
