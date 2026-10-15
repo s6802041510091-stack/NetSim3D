@@ -1,4 +1,4 @@
-"""Furnish the Science classroom and the Server room (Data Center + Server zones).
+"""Furnish the Science classroom and the Server room (NOC control + Server zones).
 
 Run with Blender 5.2:
     blender -b 3Dmodel/blend/classroom_shell.blend --python 3Dmodel/scripts/build_science_lab_and_server_room.py -- [--save OUT.blend]
@@ -8,10 +8,10 @@ Run with Blender 5.2:
   teacher demonstration bench, whiteboard, fume hood, glassware and chemical
   cabinets, safety shower + eyewash, periodic table, microscopes and glassware.
 * Server room = one room in two zones split by a glass partition:
-  - Data Center zone (by the corridor door): operators work here. The NOC desk
-    with the phone and DATACENTER-PC (Mission 6) is a Godot scene and stays;
-    this script adds the video wall, a second NOC desk, chairs, filing cabinet,
-    repair bench, printer table, whiteboard and wall equipment.
+  - NOC control zone (by the corridor door): operators watch the network here.
+    Video wall, two NOC desks, chairs, filing cabinet, repair bench, printer
+    table, whiteboard and wall equipment. (The Data Center office of the
+    mission story is the IT Support room — see build_it_support_and_staff_room.py.)
   - Server zone (behind the glass): raised floor, two rack rows in a hot/cold
     aisle layout, overhead cable trays, precision air-conditioning, UPS and
     battery cabinets, FM-200 fire suppression, CCTV and an access-controlled door.
@@ -20,7 +20,7 @@ Everything is built from simple meshes (one joined mesh per piece of furniture,
 linked duplicates for repeated items) so the Web export stays light.
 Objects with the custom property collision="box" get a box collider from
 net-sim-3d/tools/export_blender_assets.py. Re-running the script first removes
-what it built before (collections "15 | Science lab" and "16 | Server room").
+what it built before (collections "15 | Science lab" and "16 | Server room ...").
 """
 
 import math
@@ -34,7 +34,8 @@ from mathutils import Matrix, Vector
 ROOT = Path(__file__).resolve().parents[2]
 FONT_PATH = ROOT / "net-sim-3d" / "assets" / "fonts" / "Sarabun-Bold.ttf"
 SCI_NAME = "15 | Science lab"
-SRV_NAME = "16 | Server room - Data Center and Server zones"
+SRV_NAME = "16 | Server room - NOC and Server zones"
+OLD_SRV_NAMES = ("16 | Server room - Data Center and Server zones",)
 
 scene = bpy.context.scene
 
@@ -171,7 +172,10 @@ def text(name, body, coll, loc, size, m, rot=(math.pi / 2, 0, 0), align="CENTER"
     me = bpy.data.meshes.new_from_object(o)
     mesh_obj = bpy.data.objects.new(name, me)
     coll.objects.link(mesh_obj)
-    mesh_obj.matrix_world = o.matrix_world
+    # Copy location/rotation directly: o.matrix_world is only refreshed after a
+    # depsgraph update, so copying it here could put the text at the origin.
+    mesh_obj.location = loc
+    mesh_obj.rotation_euler = rot
     bpy.data.objects.remove(o, do_unlink=True)
     bpy.data.curves.remove(cu)
     mesh_obj.name = name
@@ -250,7 +254,7 @@ SDOOR_Y = 7.83            # corridor door centre on the east wall (x = -9.19)
 RX0, RX1 = -6.00, 6.00
 RY0, RY1 = 30.60, 44.17
 RDOOR_Y = 35.49           # corridor door centre on the west wall (x = -6.075)
-SPLIT_Y = 37.00           # glass partition between Data Center (south) and Server (north) zones
+SPLIT_Y = 37.00           # glass partition between NOC (south) and Server (north) zones
 GDOOR_X0, GDOOR_X1 = 3.20, 4.30   # glass door opening in the partition
 
 
@@ -514,16 +518,15 @@ def build_science_lab(c):
 def retitle_science_room():
     """The plan names this room ห้องเรียนวิทยาศาสตร์ — rebuild the door sign text."""
     navy = bpy.data.materials.get("MAP | Sign white") or SIGN_TEXT
-    for old in ("BackgroundClass_TH", "BackgroundClass_EN"):
+    # Corridor-side door sign (same layout as the other room signs from build_classroom_floor_map.py).
+    signs = {"BackgroundClass_TH": ((-9.076, 7.832, 2.62), 0.12, "ห้องเรียนวิทยาศาสตร์"),
+             "BackgroundClass_EN": ((-9.075, 7.832, 2.48), 0.062, "SCIENCE CLASSROOM")}
+    for old, (loc, size, body) in signs.items():
         o = bpy.data.objects.get(old)
+        coll = o.users_collection[0] if o else bpy.data.collections.get("06 | Room signs") or scene.collection
         if o:
-            loc = o.location.copy()
-            rot = o.rotation_euler.copy()
-            coll = o.users_collection[0]
-            size = 0.12 if old.endswith("TH") else 0.062
-            body = "ห้องเรียนวิทยาศาสตร์" if old.endswith("TH") else "SCIENCE CLASSROOM"
             bpy.data.objects.remove(o, do_unlink=True)
-            text(old, body, coll, loc, size, navy, rot=rot)
+        text(old, body, coll, loc, size, navy, rot=(math.pi / 2, 0, math.pi / 2))
     r = bpy.data.objects.get("Room_BackgroundClass")
     if r:
         r["label_th"] = "ห้องเรียนวิทยาศาสตร์"
@@ -575,7 +578,7 @@ def build_rack(name, coll, with_door_glass=False):
 
 
 def build_server_room(c):
-    dc = collection("16.1 | Data Center zone - operators", c)
+    dc = collection("16.1 | NOC control zone - operators", c)
     sv = collection("16.2 | Server zone - racks and plant", c)
     shell = collection("16.3 | Glass partition, floor and trays", c)
 
@@ -749,9 +752,9 @@ def build_server_room(c):
         cam.cyl(0.07, 0.07, (0, 0, 0.08), mat("DC | smoked dome", (0.1, 0.1, 0.12), 0.1, alpha=0.7), r2=0.04, seg=16)
         cam.build(sv if i < 2 else dc, loc=loc)
 
-    # ================= Data Center zone (operators)
+    # ================= NOC control zone (operators)
     # video wall above the NOC desks on the south wall (2 x 3 screens)
-    vw = Item("DC_Video_Wall")
+    vw = Item("DC_Video_Display")
     screens = [SCREEN_MAP, SCREEN_ON, SCREEN_GRAPH, SCREEN_ON, SCREEN_ALERT, SCREEN_MAP]
     for r in range(2):
         for col in range(3):
@@ -764,9 +767,9 @@ def build_server_room(c):
                 vw.box((0.12, 0.004, 0.05 + b * 0.04), (x - 0.3 + b * 0.16, -0.042, z - 0.2 + (0.05 + b * 0.04) / 2), LED_GREEN if (r + col + b) % 3 else LED_AMBER)
     vw.box((2.9, 0.08, 0.06), (0, 0.03, -0.3), DESK_FRAME)
     vw.build(dc, loc=(-2.85, RY0 + 0.05, 2.0), rz=math.pi)
-    text("DC_Room_Sign", "DATA CENTER - ศูนย์ควบคุมเครือข่าย", dc, (-2.85, RY0 + 0.03, 2.7), 0.1, NAVY, rot=(math.pi / 2, 0, math.pi))
+    text("DC_Room_Sign", "NOC - ห้องควบคุมระบบเครือข่าย", dc, (-2.85, RY0 + 0.03, 2.7), 0.1, NAVY, rot=(math.pi / 2, 0, math.pi))
 
-    # second NOC desk (beside the Godot mission desk at x -3.6) with 2 monitors
+    # two NOC desks under the video wall, each with 2 monitors
     nd = Item("DC_NOC_Desk_2")
     nd.box((1.6, 0.75, 0.04), (0, 0, 0.73), DESK_TOP)
     for sx in (-0.75, 0.75):
@@ -781,7 +784,8 @@ def build_server_room(c):
     nd.box((0.44, 0.14, 0.02), (0, -0.12, 0.76), DARK)
     nd.box((0.06, 0.1, 0.025), (0.32, -0.12, 0.762), DARK)
     nd.box((0.2, 0.15, 0.03), (-0.6, -0.1, 0.765), mat("DC | notebook", (0.85, 0.2, 0.15), 0.6))
-    nd.build(dc, loc=(-1.75, RY0 + 0.4, 0), rz=math.pi, collide=True, note="Second NOC desk")
+    nd_o = nd.build(dc, loc=(-1.75, RY0 + 0.4, 0), rz=math.pi, collide=True, note="NOC desk")
+    dup(nd_o, "DC_NOC_Desk_1", dc, (-3.75, RY0 + 0.4, 0), math.pi)
 
     chair = Item("DC_Chair_Template")
     chair.box((0.48, 0.48, 0.07), (0, 0, 0.48), CHAIR)
@@ -796,7 +800,7 @@ def build_server_room(c):
     ch.name = "DC_Chair_NOC_1"
     ch.location = (-1.75, RY0 + 1.25, 0)
     ch.rotation_euler.z = math.pi
-    dup(ch, "DC_Chair_NOC_2", dc, (-3.05, RY0 + 1.55, 0), math.pi + 0.5)
+    dup(ch, "DC_Chair_NOC_2", dc, (-3.75, RY0 + 1.25, 0), math.pi + 0.15)
 
     # filing cabinet + printer table near the corridor wall (clear of the door swing)
     fc = Item("DC_Filing_Cabinet")
@@ -816,7 +820,7 @@ def build_server_room(c):
     pt.box((0.3, 0.22, 0.01), (0, -0.12, 0.775), WHITE)
     pt.build(dc, loc=(RX0 + 0.4, 32.2, 0), rz=-math.pi / 2, collide=True, note="Network printer")
 
-    # repair / staging bench along the glass partition (Data Center side)
+    # repair / staging bench along the glass partition (NOC side)
     rb = Item("DC_Repair_Bench")
     rb.box((2.2, 0.75, 0.04), (0, 0, 0.9), WOOD)
     for sx in (-1.05, 1.05):
@@ -837,7 +841,7 @@ def build_server_room(c):
     rb.box((0.25, 0.18, 0.12), (0.95, -0.1, 0.98), SIGN_RED)        # tool box
     rb.build(dc, loc=(0.4, SPLIT_Y - 0.45, 0), rz=0.0, collide=True, note="Repair / staging bench")
 
-    # whiteboard with a network diagram on the east wall of the Data Center zone
+    # whiteboard with a network diagram on the east wall of the NOC zone
     wb = Item("DC_Whiteboard")
     wb.box((0.03, 2.0, 1.1), (0, 0, 0), BOARD)
     wb.box((0.05, 2.06, 0.04), (0, 0, 0.57), BOARD_FRAME)
@@ -850,11 +854,11 @@ def build_server_room(c):
     text("DC_Whiteboard_Title", "Network Topology - Star", dc, (RX1 - 0.04, 33.6, 1.95), 0.07, INK, rot=(math.pi / 2, 0, -math.pi / 2))
 
     # wall split-type AC + wall clock + emergency light
-    wac = Item("DC_Wall_AC")
+    wac = Item("DC_Split_AC")
     wac.box((0.25, 1.0, 0.3), (0, 0, 0), WHITE)
     wac.box((0.01, 0.9, 0.04), (-0.13, 0, -0.1), VENT)
     wac.build(dc, loc=(RX1 - 0.13, 35.5, 2.7))
-    clock = Item("DC_Wall_Clock")
+    clock = Item("DC_Clock")
     clock.cyl(0.16, 0.04, (0, 0, 0), WHITE, seg=24, rx=math.pi / 2)
     clock.box((0.012, 0.01, 0.1), (0, -0.025, 0.04), DARK)
     clock.box((0.07, 0.01, 0.012), (0.03, -0.025, 0), DARK)
@@ -867,6 +871,8 @@ def build_server_room(c):
 def main():
     remove_collection(SCI_NAME)
     remove_collection(SRV_NAME)
+    for old in OLD_SRV_NAMES:
+        remove_collection(old)
     sci = collection(SCI_NAME)
     srv = collection(SRV_NAME)
     build_science_lab(sci)

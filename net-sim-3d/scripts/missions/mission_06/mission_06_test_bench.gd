@@ -4,7 +4,7 @@ extends Control
 ## Stand-alone test scene for Mission 6 (no 3D map needed).
 ## "รับสายโทรศัพท์" plays the teacher's call (TeamViewer ID and password), then
 ## the computer opens: Set-up (2 s) -> Desktop -> TeamViewer, using the real
-## DesktopOS and a stand-in for the Data Center computer (DATACENTER-PC).
+## DesktopOS and a stand-in for the player's computer (IT-PC-01).
 ## Open scenes/missions/mission_06/mission_06_test.tscn and press F6.
 
 signal computer_opened
@@ -26,9 +26,9 @@ func _ready() -> void:
 	theme = RemoteTheme.build()
 	data = load(TeamViewerSim.DATA_PATH) as Mission06Data
 	station = ComputerStation.new()
-	station.name = "DataCenterComputer"
-	station.hostname = "DATACENTER-PC"
-	station.ip_address = "192.168.1.110"
+	station.name = "PlayerComputer"
+	station.hostname = "IT-PC-01"
+	station.ip_address = "192.168.1.101"
 	station.installed_apps.append("teamviewer")
 	add_child(station)
 

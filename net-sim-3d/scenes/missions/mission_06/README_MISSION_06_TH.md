@@ -7,10 +7,10 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 
 ## ขั้นตอนในเกม
 
-1. **ห้อง Data Center (ห้อง Server)** มีโต๊ะ คอมพิวเตอร์ **DATACENTER-PC** ตู้ Rack และโทรศัพท์ (ฉาก `data_center_desk.tscn`)
+1. **ห้อง Data Center = ห้อง IT Support** โทรศัพท์วางอยู่บนโต๊ะผู้เล่น ข้างคอมพิวเตอร์ **IT-PC-01** (ฉาก `desk_phone.tscn`)
 2. โทรศัพท์ดัง (ไฟแดงกระพริบ) มองที่โทรศัพท์แล้วกด **E** เพื่อรับสาย
 3. ครูสาวพูดตามบทในเอกสาร และบอก TeamViewer ID กับ Password กด E / Space หรือคลิกเพื่อไปต่อ จบสายแล้วขึ้น "ได้รับภารกิจ: ..."
-4. กด E ที่ DATACENTER-PC เพื่อเข้า Desktop แล้วเปิดไอคอน **TeamViewer**
+4. กด E ที่ IT-PC-01 เพื่อเข้า Desktop แล้วเปิดไอคอน **TeamViewer**
 5. หน้าหลักมีรายการตรวจสอบก่อนเชื่อมต่อ 5 ข้อ พิมพ์ **Partner ID** แล้วกด **Connect** (มีหรือไม่มีช่องว่างก็ได้)
 6. หน้าต่าง **Authentication** พิมพ์ **Password** (แยกตัวพิมพ์เล็ก-ใหญ่) แล้วกด **Log On** จะขึ้น "Connection established" แล้วเปิด Desktop ของครูสาว
 7. แถบด้านบนแสดง `Remote Session | Connected to: TEACHER-PC | Session status: Active | [End Session]`
@@ -39,7 +39,7 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 | ไฟล์ | หน้าที่ |
 |---|---|
 | `scenes/missions/mission_06/teamviewer.tscn` | **Scene หลัก** (โปรแกรม TeamViewer จำลอง) |
-| `scenes/missions/mission_06/data_center_desk.tscn` | โต๊ะ คอมพิวเตอร์ ตู้ Rack และโทรศัพท์ในห้อง Data Center (มี Collision) |
+| `scenes/missions/mission_06/desk_phone.tscn` | โทรศัพท์บนโต๊ะผู้เล่นในห้อง IT Support (Data Center) |
 | `scenes/missions/mission_06/mission_06_test.tscn` | ฉากทดสอบ (กด F6) ไม่ต้องโหลดแผนที่ 3D |
 | `data/missions/mission_06/mission_06_data.tres` | ID, Password, ข้อความทั้งหมด, บทโทรศัพท์, ช่วงเสียง, คะแนน, หน้าสรุป (แก้ใน Inspector) |
 | `scripts/missions/mission_06/teamviewer_sim.gd` | ตัวโปรแกรม: หน้าหลัก, Authentication, Remote Session, ลำโพง, End Session |
@@ -53,11 +53,11 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 | `tools/validate_mission_06.gd` | ทดสอบอัตโนมัติทั้งภารกิจในแผนที่จริง |
 
 ไฟล์เดิมที่แก้:
-- `scenes/main.tscn`: เพิ่ม `DataCenterDesk` และ `Mission06`
-- `scripts/computer/computer_manager.gd`: จอเพิ่มเติมนอกโมเดล และ `teamviewer_hosts`
+- `scenes/main.tscn`: เพิ่ม `DeskPhone` (บนโต๊ะ IT_PlayerDesk) และ `Mission06`
+- `scripts/computer/computer_manager.gd`: `teamviewer_hosts = ["IT-PC-01"]`
 - `scripts/computer/desktop_os.gd`: ไอคอน `open_teamviewer()` และ `request_shutdown()`
 - `scripts/player_controller.gd`: กด E กับวัตถุทั่วไปที่มี meta `interactable` เช่น โทรศัพท์
-- `tools/validate_computers.gd`: จำนวนคอมเป็น 25 เครื่อง
+- `tools/validate_computers.gd`: จำนวนคอมเป็น 29 เครื่อง (รวมคอมห้องพักครู 5 เครื่อง)
 
 ## สัญญาณ (Signals)
 
@@ -68,7 +68,8 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 ## ตั้งค่า
 
 - ไม่ให้โทรศัพท์ดังตอนเริ่มเกม: node `Mission06` → `Ring On Start` = ปิด แล้วให้ระบบภารกิจหลักเรียก `start_ringing()`
-- ย้ายโต๊ะ: node `DataCenterDesk` ใน `main.tscn`
+- ย้ายโทรศัพท์: node `DeskPhone` ใน `main.tscn`
+- เปลี่ยนเครื่องที่มี TeamViewer: node `Computers` → `Teamviewer Hosts` และ node `Mission06` → `Player Computer`
 - เปลี่ยน ID, Password, ข้อความ, ช่วงเสียง, คะแนน: `data/missions/mission_06/mission_06_data.tres`
 
 ## ยังไม่ได้ทำ
@@ -79,5 +80,5 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 ## ทดสอบ
 
 - `scenes/missions/mission_06/mission_06_test.tscn` แล้วกด F6
-- หรือเล่นเกมหลัก (F5) แล้วเดินไปห้อง Server (ประตูฝั่งขวาสุดของทางเดิน ป้าย "ห้อง Server ss.")
+- หรือเล่นเกมหลัก (F5) ผู้เล่นเริ่มในห้อง IT Support ข้างโต๊ะของตัวเอง โทรศัพท์ดังอยู่บนโต๊ะ
 - อัตโนมัติ: `godot --headless --path net-sim-3d -s res://tools/validate_mission_06.gd`

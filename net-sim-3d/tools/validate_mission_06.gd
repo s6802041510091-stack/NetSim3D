@@ -71,11 +71,12 @@ func _run() -> void:
 	player.require_mouse_capture = false
 	mission.mission_completed.connect(func(s, a, b, c): events.append("done:%d:%d:%d:%d" % [s, a, b, c]))
 
-	# The new Data Center computer exists and only it has TeamViewer.
-	var dc := manager.find_host("DATACENTER-PC")
-	_check(dc != null and dc.has_app("teamviewer"), "DATACENTER-PC missing or without TeamViewer")
-	_check(not manager.find_host("IT-PC-01").has_app("teamviewer"), "TeamViewer on another computer")
-	_check(manager.stations.size() == 25, "expected 25 computers, found %d" % manager.stations.size())
+	# The player's own computer in the IT Support (Data Center) room is the only one with TeamViewer.
+	var dc := manager.find_host("IT-PC-01")
+	_check(dc != null and dc.has_app("teamviewer"), "IT-PC-01 missing or without TeamViewer")
+	_check(not manager.find_host("IT-HEAD-PC").has_app("teamviewer"), "TeamViewer on another computer")
+	_check(not manager.find_host("STAFF-PC-01").has_app("teamviewer"), "TeamViewer on a teachers' room computer")
+	_check(manager.stations.size() == 29, "expected 29 computers, found %d" % manager.stations.size())
 	_check(mission.phone != null and mission.phone.ringing, "phone is not ringing")
 
 	# TeamViewer before the call: the partner is not ready, no points lost.
@@ -90,9 +91,9 @@ func _run() -> void:
 	await _leave(manager)
 	_check(not player.controls_locked, "player still locked after leaving the computer")
 
-	# Walk to the desk, look at the phone, press E to answer.
+	# Walk to the player's desk (chair side, west of the phone), look at the phone, press E.
 	var phone_pos := mission.phone.global_position
-	player.global_position = Vector3(phone_pos.x, 0.02, phone_pos.z - 0.95)
+	player.global_position = Vector3(phone_pos.x - 0.95, 0.02, phone_pos.z)
 	for i in 3:
 		await physics_frame
 	player.look_at(Vector3(phone_pos.x, player.global_position.y, phone_pos.z), Vector3.UP)
@@ -169,7 +170,7 @@ func _run() -> void:
 	_check(desktop.visible and app.state.score == 70, "shutdown with TeamViewer open allowed / penalised")
 	_check(app.try_close() and not desktop._windows.has("teamviewer"), "TeamViewer did not close")
 
-	# Switch the Data Center computer off -> summary and mission complete.
+	# Switch the player's computer off -> summary and mission complete.
 	desktop.request_shutdown()
 	await create_timer(manager.zoom_time + 0.8).timeout
 	_check(mission.summary_visible, "summary not shown")

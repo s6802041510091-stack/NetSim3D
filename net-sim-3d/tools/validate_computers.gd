@@ -27,7 +27,10 @@ func _run() -> void:
 	await _frames(3)
 
 	var manager: ComputerManager = map.get_node("Computers")
-	_check(manager.stations.size() == 25, "expected 25 computers (24 in the map + DATACENTER-PC), found %d" % manager.stations.size())
+	_check(manager.stations.size() == 29, "expected 29 computers (24 + 5 in the teachers' room), found %d" % manager.stations.size())
+	for n in range(1, 6):
+		var staff := manager.find_host("STAFF-PC-%02d" % n)
+		_check(staff != null and staff.ip_address == "192.168.1.%d" % (50 + n), "teachers' room computer STAFF-PC-%02d missing / wrong IP" % n)
 	var ips := {}
 	for station in manager.stations:
 		_check(not ips.has(station.ip_address), "duplicate IP " + station.ip_address)
