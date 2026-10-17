@@ -1,7 +1,7 @@
 import bpy,math,shutil,datetime,json
 from pathlib import Path
 from mathutils import Vector
-B=Path('D:/NetSim3D/3Dmodel');P=B/'blend/classroom_shell.blend'
+B=Path('D:/NetSim3D/3Dmodel');P=B/'ใช้ร่วมกัน/blend/classroom_shell.blend'
 backup=P.with_name('classroom_shell_before_power_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend');shutil.copy2(P,backup)
 bpy.ops.wm.open_mainfile(filepath=str(P));bpy.context.preferences.filepaths.save_version=0
 s=bpy.context.scene
@@ -104,6 +104,6 @@ bpy.ops.object.select_all(action='DESELECT');bpy.ops.wm.save_as_mainfile(filepat
 print('SAVED_POWER_21_COMPUTERS_42_DEVICE_LEADS_11_STRIPS_NO_LAN_CABLES',flush=True)
 # Close preview of a two-computer student desk.
 d=bpy.data.cameras.new('Power preview');cam=bpy.data.objects.new('Power preview',d);s.collection.objects.link(cam);cam.location=(5.3,-.05,2.6);target=Vector((2.8,-1.0,.7));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();d.lens=29;s.camera=cam
-s.render.engine='CYCLES';s.cycles.samples=16;s.cycles.use_denoising=True;s.render.resolution_x=1400;s.render.resolution_y=1000;s.render.resolution_percentage=100;s.render.filepath=str(B/'renders/classroom_power_and_lan_routes.png');bpy.ops.render.render(write_still=True)
+s.render.engine='CYCLES';s.cycles.samples=16;s.cycles.use_denoising=True;s.render.resolution_x=1400;s.render.resolution_y=1000;s.render.resolution_percentage=100;s.render.filepath=str(B/'ใช้ร่วมกัน/renders/classroom_power_and_lan_routes.png');bpy.ops.render.render(write_still=True)
 bpy.ops.wm.open_mainfile(filepath=str(P));assert bpy.data.collections.get('14 | Computer room power and empty LAN routes')
 print('REOPENED_OK',flush=True)

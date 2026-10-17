@@ -1,0 +1,63 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://missions/mission_06/scripts/desk_phone.gd" id="1_phone"]
+
+[sub_resource type="StandardMaterial3D" id="mat_phone"]
+albedo_color = Color(0.85, 0.86, 0.88, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_dark"]
+albedo_color = Color(0.08, 0.09, 0.1, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_keys"]
+albedo_color = Color(0.6, 0.62, 0.66, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="mat_ring"]
+albedo_color = Color(1, 0.15, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.15, 0.1, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="box_base"]
+size = Vector3(0.2, 0.06, 0.18)
+
+[sub_resource type="BoxMesh" id="box_handset"]
+size = Vector3(0.2, 0.04, 0.06)
+
+[sub_resource type="BoxMesh" id="box_keypad"]
+size = Vector3(0.1, 0.005, 0.08)
+
+[sub_resource type="BoxMesh" id="box_ring"]
+size = Vector3(0.03, 0.012, 0.03)
+
+[sub_resource type="BoxShape3D" id="shape_phone"]
+size = Vector3(0.24, 0.12, 0.22)
+
+[node name="DeskPhone" type="StaticBody3D"]
+script = ExtResource("1_phone")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("box_base")
+surface_material_override/0 = SubResource("mat_phone")
+
+[node name="Handset" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.075, -0.05)
+mesh = SubResource("box_handset")
+surface_material_override/0 = SubResource("mat_dark")
+
+[node name="Keypad" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03, 0.062, 0.04)
+mesh = SubResource("box_keypad")
+surface_material_override/0 = SubResource("mat_keys")
+
+[node name="RingLight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.07, 0.066, 0.06)
+mesh = SubResource("box_ring")
+surface_material_override/0 = SubResource("mat_ring")
+
+[node name="PhoneShape" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, 0)
+shape = SubResource("shape_phone")

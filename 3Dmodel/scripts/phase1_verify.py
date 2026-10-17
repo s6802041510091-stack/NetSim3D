@@ -2,9 +2,9 @@
 import bpy,json,hashlib,array,math
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'3Dmodel/lookdev/phase1'
-baseline=json.loads((ROOT/'3Dmodel/lookdev/phase0/baseline.json').read_text(encoding='utf-8'))
-bpy.ops.wm.open_mainfile(filepath=str(ROOT/'3Dmodel/lookdev/working/classroom_shell_lookdev.blend'))
+OUT=ROOT/'Preview/โรงเรียนและเมือง/phase1'
+baseline=json.loads((ROOT/'Preview/โรงเรียนและเมือง/phase0/baseline.json').read_text(encoding='utf-8'))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT/'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'))
 def digest(mesh):
     h=hashlib.sha256()
     for collection,attr,width,dtype in [(mesh.vertices,'co',3,'f'),(mesh.loops,'vertex_index',1,'i'),(mesh.polygons,'loop_total',1,'i')]:

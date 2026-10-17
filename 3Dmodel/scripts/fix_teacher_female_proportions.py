@@ -6,7 +6,7 @@ import bmesh
 from mathutils import Vector
 
 ROOT = Path('D:/NetSim3D/3Dmodel')
-bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blend/teacher_female_khaki_160cm_before_proportion_fix.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm_before_proportion_fix.blend'))
 bpy.context.preferences.filepaths.save_version = 0
 scene = bpy.context.scene
 rig = bpy.data.objects['Teacher_Female_Rig']
@@ -118,12 +118,12 @@ def view(location, name):
     camera.rotation_euler = (Vector((0, 0, 0.81)) - camera.location).to_track_quat('-Z', 'Y').to_euler()
     camera.data.type = 'ORTHO'
     camera.data.ortho_scale = 1.83
-    scene.render.filepath = str(ROOT / ('renders/teacher_female_khaki_160cm_' + name + '.png'))
+    scene.render.filepath = str(ROOT / ('ใช้ร่วมกัน/renders/teacher_female_khaki_160cm_' + name + '.png'))
     bpy.ops.render.render(write_still=True)
 
 view((0, -6, 0.95), 'front_corrected')
 view((6, 0, 0.95), 'side_corrected')
 view((1.7, 5.3, 1.4), 'back')
 view((2, -5.6, 1.5), 'preview')
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT / 'blend/teacher_female_khaki_160cm.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(ROOT / 'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm.blend'))
 print('PROPORTIONS_FIXED height_m=', height, flush=True)

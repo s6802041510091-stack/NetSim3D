@@ -18,12 +18,12 @@ ROOT = Path("D:/NetSim3D/3Dmodel")
 SOURCE = ROOT / "temp/teacher_male/source"
 FEMALE = ROOT / "temp/teacher_female/source"
 SYSTEM = ROOT / "temp/teacher_male/system_assets"
-OUTPUT = ROOT / "blend/teacher_female_khaki_160cm.blend"
-PREVIEW = ROOT / "renders/teacher_female_khaki_160cm_preview.png"
-BACK = ROOT / "renders/teacher_female_khaki_160cm_back.png"
+OUTPUT = ROOT / "ใช้ร่วมกัน/blend/teacher_female_khaki_160cm.blend"
+PREVIEW = ROOT / "ใช้ร่วมกัน/renders/teacher_female_khaki_160cm_preview.png"
+BACK = ROOT / "ใช้ร่วมกัน/renders/teacher_female_khaki_160cm_back.png"
 
 random.seed(24)
-bpy.ops.wm.open_mainfile(filepath=str(ROOT / "blend/teacher_male_khaki_180cm.blend"))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT / "ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend"))
 bpy.context.preferences.filepaths.save_version = 0
 scene = bpy.context.scene
 rig = bpy.data.objects["Teacher_Male_Rig"]

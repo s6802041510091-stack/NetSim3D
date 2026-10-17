@@ -10,7 +10,7 @@ BASE = Path('D:/NetSim3D/3Dmodel')
 TMP = BASE / 'temp/teacher_computer_set/v2'
 TMP.mkdir(parents=True, exist_ok=True)
 OUT = TMP / 'teacher_computer_set_v2.blend'
-R = BASE / 'renders'
+R = BASE / 'ใช้ร่วมกัน/renders'
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):

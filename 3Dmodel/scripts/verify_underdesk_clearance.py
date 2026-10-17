@@ -2,7 +2,7 @@ import bpy,json
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-B=Path('D:/NetSim3D/3Dmodel');P=B/'blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=str(P));s=bpy.context.scene
+B=Path('D:/NetSim3D/3Dmodel');P=B/'ใช้ร่วมกัน/blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=str(P));s=bpy.context.scene
 # The vertical supports belong at the front edge of the tray, clear of rear cable lanes.
 fix=bpy.data.collections['16 | Underdesk mounts and open grommets']
 for o in fix.objects:

@@ -4,7 +4,7 @@ from mathutils import Vector,Matrix
 ROOT=Path('D:/NetSim3D/3Dmodel')
 sys.path.insert(0,str(ROOT/'scripts'))
 from rebuild_student_hair_and_arms import anatomy
-bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blend/cleaner_female_apron_160cm.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm.blend'))
 r=bpy.data.objects['Cleaner_Female_Rig'];body=bpy.data.objects['Body | female head arms lower legs']
 vs,uv,fs,groups,co=anatomy('female');byuv={}
 for f,g in zip(fs,groups):
@@ -41,4 +41,4 @@ for v in body.data.vertices:
 scene=bpy.context.scene;scene.cycles.samples=20;scene.cycles.use_denoising=True
 scene.render.resolution_x=850;scene.render.resolution_y=950
 cam=scene.camera;cam.location=(0,-6,1.05);cam.rotation_euler=(Vector((0,0,1.02))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=.87
-scene.render.filepath=str(ROOT/'renders/cleaner/diagnostic_source_arms.png');bpy.ops.render.render(write_still=True)
+scene.render.filepath=str(ROOT/'ใช้ร่วมกัน/renders/cleaner/diagnostic_source_arms.png');bpy.ops.render.render(write_still=True)

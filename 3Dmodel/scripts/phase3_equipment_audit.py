@@ -2,16 +2,16 @@ import bpy, sys, json
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'3Dmodel/lookdev/phase3'; OUT.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/'Preview/โรงเรียนและเมือง/phase3'; OUT.mkdir(parents=True,exist_ok=True)
 SOURCES={
- 'map':'3Dmodel/lookdev/working/classroom_shell_lookdev.blend',
- 'tester':'3Dmodel/DownloadFromWeb/cable_tester/source/cable_tester.blend',
- 'crimper':'3Dmodel/DownloadFromWeb/crimp_tools/source/crimp_tools.blend',
- 'cat6':'3Dmodel/blend/lan_cable_cat6_5m.blend',
- 'router':'3Dmodel/DownloadFromWeb/router_ont/source/router.blend',
- 'switch48':'3Dmodel/DownloadFromWeb/switch_48port/source/switch_48port.blend',
- 'switch8':'3Dmodel/blend/office_switch_8port.blend',
- 'server':'3Dmodel/blend/rack_server_2u.blend',
+ 'map':'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend',
+ 'tester':'3Dmodel/ด่าน_02/cable_tester/source/cable_tester.blend',
+ 'crimper':'3Dmodel/ด่าน_02/crimp_tools/source/crimp_tools.blend',
+ 'cat6':'3Dmodel/ใช้ร่วมกัน/blend/lan_cable_cat6_5m.blend',
+ 'router':'3Dmodel/ใช้ร่วมกัน/network/router_ont/source/router.blend',
+ 'switch48':'3Dmodel/ใช้ร่วมกัน/network/switch_48port/source/switch_48port.blend',
+ 'switch8':'3Dmodel/ใช้ร่วมกัน/blend/office_switch_8port.blend',
+ 'server':'3Dmodel/ใช้ร่วมกัน/blend/rack_server_2u.blend',
 }
 result={}
 for key,path in SOURCES.items():

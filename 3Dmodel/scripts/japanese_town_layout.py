@@ -3,8 +3,8 @@ import bpy, json, math, sys, tempfile
 from pathlib import Path
 from mathutils import Vector, Matrix
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'3Dmodel/lookdev/town'
-SOURCE=Path('C:/Users/Acer/Downloads/stylized_little_japanese_town_street.glb')
+OUT=ROOT/'Preview/โรงเรียนและเมือง/town'
+SOURCE=ROOT/'3Dmodel/ใช้ร่วมกัน/external/japanese_town/stylized_little_japanese_town_street.glb'
 def bounds(o):
     p=[o.matrix_world@Vector(v) for v in o.bound_box]
     return [[min(v[a] for v in p) for a in range(3)],[max(v[a] for v in p) for a in range(3)]]

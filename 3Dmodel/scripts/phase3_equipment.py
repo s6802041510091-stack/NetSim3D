@@ -8,7 +8,7 @@ import phase1_it_corner as p1
 import phase2_architecture as p2
 import phase1_surface_textures as tex
 WORK=p1.WORK
-OUT=ROOT/'3Dmodel/lookdev/phase3'; OUT.mkdir(exist_ok=True,parents=True)
+OUT=ROOT/'Preview/โรงเรียนและเมือง/phase3'; OUT.mkdir(exist_ok=True,parents=True)
 BACKUP=WORK.with_name('classroom_shell_lookdev_before_phase3.blend')
 AUDIT=json.loads((OUT/'audit.json').read_text(encoding='utf-8'))
 PATHS={}
@@ -220,7 +220,7 @@ def render_map(label,only=None):
   for loc,energy,size in [(Vector(pos)+Vector((0,0,.8)),70,1.3),(Vector(aim)+Vector((1,-.5,1.2)),50,1)]:
    d=bpy.data.lights.new('P3 review light','AREA');d.energy=energy;d.shape='DISK';d.size=size
    lamp=bpy.data.objects.new('P3 review light',d);s.collection.objects.link(lamp);lamp.location=loc;lamp.rotation_euler=(Vector(aim)-loc).to_track_quat('-Z','Y').to_euler();lamps.append(lamp)
-  folder=OUT/'renders';folder.mkdir(exist_ok=True);s.render.filepath=str(folder/f'{label}_{name}.png');bpy.ops.render.render(write_still=True)
+  folder=OUT/'ใช้ร่วมกัน/renders';folder.mkdir(exist_ok=True);s.render.filepath=str(folder/f'{label}_{name}.png');bpy.ops.render.render(write_still=True)
   for o in lamps:bpy.data.objects.remove(o,do_unlink=True)
   print('P3_RENDERED',label,name,flush=True)
 def export_map():
@@ -233,7 +233,7 @@ def verify():
  for name in changes['changed_objects']:
   uv=bpy.data.objects[name].data.uv_layers.get('P3_SurfaceUV')
   if not uv or not uv.active_render:errors.append('UV '+name)
- files=json.loads((ROOT/'3Dmodel/lookdev/phase0/baseline.json').read_text(encoding='utf-8'))['file_hashes']
+ files=json.loads((ROOT/'Preview/โรงเรียนและเมือง/phase0/baseline.json').read_text(encoding='utf-8'))['file_hashes']
  for name,h in files.items():
   if p1.sha(ROOT/name)!=h:errors.append('source '+name)
  report={'passed':not errors,'original_objects_checked':len(old),'changed_objects':len(changes['changed_objects']),

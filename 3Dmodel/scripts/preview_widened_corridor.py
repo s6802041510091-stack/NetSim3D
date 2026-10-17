@@ -3,9 +3,9 @@ import bpy
 from pathlib import Path
 from mathutils import Vector
 ROOT = Path('D:/NetSim3D/3Dmodel')
-OUT = ROOT / 'renders/corridor_widened'
+OUT = ROOT / 'ใช้ร่วมกัน/renders/corridor_widened'
 OUT.mkdir(parents=True, exist_ok=True)
-bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blend/classroom_shell.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'ใช้ร่วมกัน/blend/classroom_shell.blend'))
 s = bpy.context.scene
 assert abs(s['map_clear_corridor_width_m'] - 5.929014084507041) < 1e-5
 assert len(s.objects) == 10376

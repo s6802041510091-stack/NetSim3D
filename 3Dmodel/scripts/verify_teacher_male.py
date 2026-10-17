@@ -1,5 +1,5 @@
 import bpy,json
-path='D:/NetSim3D/3Dmodel/blend/teacher_male_khaki_180cm.blend'
+path='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend'
 bpy.ops.wm.open_mainfile(filepath=path)
 col=bpy.data.collections['TEACHER | male · 180 cm']
 rig=bpy.data.objects['Teacher_Male_Rig']

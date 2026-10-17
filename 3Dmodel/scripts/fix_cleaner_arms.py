@@ -106,8 +106,8 @@ def refit_cleaner_arms(body,rig,shirt):
             'non_arm_anatomy_preserved':True,'sleeve_cut_world_z':{k:v['cut_z'] for k,v in cuffs.items()}}
 
 def main():
-    path=ROOT/'blend/cleaner_female_apron_160cm.blend'
-    backup=ROOT/'blend/cleaner_female_apron_160cm_before_arm_alignment.blend'
+    path=ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm.blend'
+    backup=ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm_before_arm_alignment.blend'
     if not backup.exists():shutil.copy2(path,backup)
     bpy.ops.wm.open_mainfile(filepath=str(backup));bpy.context.preferences.filepaths.save_version=0
     asset=bpy.data.collections['CLEANER | female | 160 cm'];rig=bpy.data.objects['Cleaner_Female_Rig']
@@ -121,7 +121,7 @@ def main():
     scene.render.resolution_percentage=100;cam=scene.camera;cam.data.type='ORTHO'
     def view(pos,target,scale,name,w=850,h=1100,render=True):
         cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.ortho_scale=scale
-        scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.filepath=str(ROOT/'renders/cleaner'/(name+'.png'))
+        scene.render.resolution_x=w;scene.render.resolution_y=h;scene.render.filepath=str(ROOT/'ใช้ร่วมกัน/renders/cleaner'/(name+'.png'))
         if render:bpy.ops.render.render(write_still=True)
     view((0,-6,1.05),(0,0,1.02),.87,'cleaner_arms_front_corrected',900,1000)
     view((5,0,1.03),(.21,0,1.01),.58,'cleaner_arm_side_corrected',650,1000)
@@ -133,7 +133,7 @@ def main():
     view((1.8,-6,1.4),(0,0,.81),1.84,'cleaner_female_apron_160cm',render=False)
     note=bpy.data.texts['README | Cleaner'];note.write('\nArm correction: full source upper-arm contour restored; only hidden skin under the short sleeves trimmed. Outfit and other anatomy preserved.\n')
     bpy.ops.wm.save_as_mainfile(filepath=str(path))
-    (ROOT/'renders/cleaner/arm_alignment_validation.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
+    (ROOT/'ใช้ร่วมกัน/renders/cleaner/arm_alignment_validation.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     print('CLEANER_ARM_CORRECTION',json.dumps(report),flush=True)
 
 if __name__=='__main__':main()

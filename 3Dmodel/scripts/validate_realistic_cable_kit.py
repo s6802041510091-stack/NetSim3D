@@ -1,6 +1,6 @@
 import bpy,json
 from mathutils import Vector
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/realistic_computer_cable_kit.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/realistic_computer_cable_kit.blend')
 pads=[o for o in bpy.data.objects if o.name.startswith('Recessed socket face')];assert len(pads)==30
 dg=bpy.context.evaluated_depsgraph_get()
 for o in pads:

@@ -14,7 +14,7 @@ from mathutils import Vector
 
 BASE = Path(__file__).resolve().parents[1]
 assert BASE.drive.upper() == "D:"
-for folder in ("blend", "exports", "renders", "temp/server"):
+for folder in ("ใช้ร่วมกัน/blend", "ใช้ร่วมกัน/exports", "ใช้ร่วมกัน/renders", "temp/server"):
     (BASE / folder).mkdir(parents=True, exist_ok=True)
 bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/server")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
@@ -521,7 +521,7 @@ def export():
     for obj in asset.objects:
         obj.select_set(True)
     bpy.context.view_layer.objects.active = root
-    path = BASE / "exports/rack_server_2u.glb"
+    path = BASE / "ใช้ร่วมกัน/exports/rack_server_2u.glb"
     bpy.ops.export_scene.gltf(filepath=str(path), export_format="GLB", use_selection=True,
         export_extras=True, export_yup=True, export_apply=True, export_animations=False,
         export_cameras=False, export_lights=False, export_materials="EXPORT")
@@ -547,7 +547,7 @@ def export():
               "installed_ram_modules": 2, "storage_drives": 2, "empty_bay_blanks": 2,
               "psu_count": 1, "default_power": "OFF", "scene_integrated": False,
               "note": "Original educational design. Internal connectors/pad patterns are illustrative; no manufacturer fit or electrical certification."}
-    (BASE / "exports/rack_server_2u.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    (BASE / "ใช้ร่วมกัน/exports/rack_server_2u.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print("SERVER_EXPORT", json.dumps(report), flush=True)
 
 
@@ -613,8 +613,8 @@ for screen in bpy.data.screens:
             space.region_3d.view_distance = 0.9
             space.region_3d.view_location = (0, 0, 0.04)
             space.region_3d.view_rotation = camera.rotation_euler.to_quaternion()
-scene.render.filepath = str(BASE / "renders/rack_server_2u_hero.png")
-bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "blend/rack_server_2u.blend"))
+scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders/rack_server_2u_hero.png")
+bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "ใช้ร่วมกัน/blend/rack_server_2u.blend"))
 
 for name, pos, target, scale, resolution in [
     ("hero", (690, -930, 610), (0, -8, 38), 0.91, (1600, 1100)),
@@ -625,7 +625,7 @@ for name, pos, target, scale, resolution in [
     lid = bpy.data.objects["Top_Lid"]
     lid.hide_render = name == "interior"
     pose(pos, target, scale, resolution)
-    scene.render.filepath = str(BASE / "renders" / f"rack_server_2u_{name}.png")
+    scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders" / f"rack_server_2u_{name}.png")
     print("RENDER_START", name, flush=True)
     bpy.ops.render.render(write_still=True)
     print("RENDER_DONE", name, flush=True)

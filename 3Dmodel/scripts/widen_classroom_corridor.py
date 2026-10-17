@@ -11,7 +11,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path('D:/NetSim3D/3Dmodel')
-SOURCE = ROOT / 'blend/classroom_shell.blend'
+SOURCE = ROOT / 'ใช้ร่วมกัน/blend/classroom_shell.blend'
 OUT = ROOT / 'temp/corridor_resize'
 OUT.mkdir(parents=True, exist_ok=True)
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE))

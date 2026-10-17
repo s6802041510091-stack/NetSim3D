@@ -5,7 +5,7 @@ extends SceneTree
 ## Prints one line per test item and MISSION_01_VALID / MISSION_01_INVALID at the end.
 ## Uses its own save file, so it never touches a player's real progress.
 
-const APP_SCENE := "res://scenes/missions/mission_01/netplan_edu.tscn"
+const APP_SCENE := "res://missions/mission_01/scenes/netplan_edu.tscn"
 const TEST_SAVE := "user://test_validate_mission_01.json"
 const FULL_NAMES := ["Router", "Wireless Access Point", "Switched Hub 24 Port", "Shared Hub 24 Port"]
 const FORBIDDEN_WORDS := ["Topology", "Straight-Through", "Crossover", "Half-Duplex", "Full-Duplex",
@@ -479,7 +479,7 @@ func _test_web_safety() -> void:
 
 func _mission_files() -> PackedStringArray:
 	var out := PackedStringArray()
-	for dir in ["res://scripts/missions/mission_01", "res://scenes/missions/mission_01", "res://data/missions/mission_01"]:
+	for dir in ["res://missions/mission_01/scripts", "res://missions/mission_01/scenes", "res://missions/mission_01/data"]:
 		for f in DirAccess.get_files_at(dir):
 			if f.ends_with(".gd") or f.ends_with(".tscn") or f.ends_with(".tres"):
 				out.append(dir + "/" + f)

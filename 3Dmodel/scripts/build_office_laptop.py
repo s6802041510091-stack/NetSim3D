@@ -13,7 +13,7 @@ from mathutils import Vector
 
 BASE = Path(__file__).resolve().parents[1]
 assert BASE.drive.upper() == "D:"
-for folder in ("blend", "exports", "renders", "temp/laptop"):
+for folder in ("ใช้ร่วมกัน/blend", "ใช้ร่วมกัน/exports", "ใช้ร่วมกัน/renders", "temp/laptop"):
     (BASE / folder).mkdir(parents=True, exist_ok=True)
 bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/laptop")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
@@ -463,7 +463,7 @@ bpy.ops.object.select_all(action="DESELECT")
 for obj in asset.objects:
     obj.select_set(True)
 bpy.context.view_layer.objects.active = root
-export_path = BASE / "exports/office_laptop_14.glb"
+export_path = BASE / "ใช้ร่วมกัน/exports/office_laptop_14.glb"
 bpy.ops.export_scene.gltf(filepath=str(export_path), export_format="GLB", use_selection=True,
     export_extras=True, export_yup=True, export_apply=True, export_animations=False,
     export_cameras=False, export_lights=False, export_materials="EXPORT")
@@ -490,7 +490,7 @@ report = {"asset": "office_laptop_14", "result": "PASS: structural GLB validatio
           "power_preview": "ON / internal battery", "network_preview": "disconnected / link LEDs off",
           "front_axis_gltf": "+Z", "up_axis_gltf": "+Y", "scene_integrated": False,
           "note": "Generic original art, not manufacturer CAD. Screen UI is static placeholder geometry."}
-(BASE / "exports/office_laptop_14.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/office_laptop_14.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print("ASSET_VALIDATION", json.dumps(report), flush=True)
 
 # Studio is saved in .blend but excluded from export.
@@ -541,7 +541,7 @@ scene.cycles.max_bounces = 6
 scene.render.resolution_x, scene.render.resolution_y = 1600, 1200
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = "PNG"
-scene.render.filepath = str(BASE / "renders/office_laptop_14_hero.png")
+scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders/office_laptop_14_hero.png")
 scene.view_settings.view_transform = "AgX"
 bpy.ops.object.select_all(action="DESELECT")
 root.select_set(True)
@@ -560,7 +560,7 @@ for screen in bpy.data.screens:
             space.region_3d.view_location = (0, 0.01, 0.1)
             space.region_3d.view_rotation = camera.rotation_euler.to_quaternion()
             space.region_3d.view_perspective = "PERSP"
-bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "blend/office_laptop_14.blend"))
+bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "ใช้ร่วมกัน/blend/office_laptop_14.blend"))
 print("BLEND_SAVED", flush=True)
 for name, pos, target, scale, res in [
     ("hero", (-420, -580, 390), (0, 16, 108), 0.59, (1600, 1200)),
@@ -570,7 +570,7 @@ for name, pos, target, scale, res in [
 ]:
     camera_pose(pos, target, scale)
     scene.render.resolution_x, scene.render.resolution_y = res
-    scene.render.filepath = str(BASE / "renders" / f"office_laptop_14_{name}.png")
+    scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders" / f"office_laptop_14_{name}.png")
     print("RENDER_START", name, flush=True)
     bpy.ops.render.render(write_still=True)
     print("RENDER_DONE", name, flush=True)

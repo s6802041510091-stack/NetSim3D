@@ -159,7 +159,7 @@ def shot(name,pos,target,scale=None):
         camera.data.lens=55
     scene.render.resolution_x=950
     scene.render.resolution_y=1150
-    scene.render.filepath=str(BASE/'renders'/f'teacher_computer_case_fixed_{name}.png')
+    scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders'/f'teacher_computer_case_fixed_{name}.png')
     bpy.ops.render.render(write_still=True)
 shot('front',(0,-.9,.19),(0,-.166,.187),.415)
 shot('angle',(.42,-.85,.48),(0,-.07,.19))

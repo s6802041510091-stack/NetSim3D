@@ -1,7 +1,7 @@
 import bpy,shutil,datetime,json
 from pathlib import Path
 from mathutils import Vector
-BASE=Path('D:/NetSim3D/3Dmodel');path=BASE/'blend/classroom_shell.blend'
+BASE=Path('D:/NetSim3D/3Dmodel');path=BASE/'ใช้ร่วมกัน/blend/classroom_shell.blend'
 backup=path.with_name('classroom_shell_before_student_computers_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend');shutil.copy2(path,backup)
 bpy.ops.wm.open_mainfile(filepath=str(path));bpy.context.preferences.filepaths.save_version=0
 scene=bpy.context.scene
@@ -50,6 +50,6 @@ data=bpy.data.cameras.new('Student PCs preview');cam=bpy.data.objects.new('Stude
 cam.location=(0,-9.0,5.5);target=Vector((0,-.2,.8));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();data.lens=22;scene.camera=cam
 scene.render.engine='CYCLES';scene.cycles.samples=16;scene.cycles.use_denoising=True
 scene.render.resolution_x=1400;scene.render.resolution_y=1000;scene.render.resolution_percentage=100
-scene.render.filepath=str(BASE/'renders/classroom_student_computers.png');bpy.ops.render.render(write_still=True)
+scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders/classroom_student_computers.png');bpy.ops.render.render(write_still=True)
 bpy.ops.wm.open_mainfile(filepath=str(path));assert len(bpy.data.collections['13 | Student computers - 20 sets'].children)==20
 print('REOPEN_VERIFIED',flush=True)

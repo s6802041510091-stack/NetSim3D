@@ -8,8 +8,8 @@ from mathutils import Vector, Matrix
 from mathutils.bvhtree import BVHTree
 
 ROOT=Path('D:/NetSim3D/3Dmodel')
-OUT=ROOT/'blend/students'; OUT.mkdir(exist_ok=True)
-REND=ROOT/'renders/students'; REND.mkdir(exist_ok=True)
+OUT=ROOT/'ใช้ร่วมกัน/blend/students'; OUT.mkdir(exist_ok=True)
+REND=ROOT/'ใช้ร่วมกัน/renders/students'; REND.mkdir(exist_ok=True)
 SRC=ROOT/'temp/teacher_male/source'
 
 def mat(name,color,rough=.65,metal=0):
@@ -141,7 +141,7 @@ def hairstyle(body,rig,asset,style):
     return top
 
 def make(style,sex,height):
-    source=ROOT/('blend/teacher_male_khaki_180cm.blend' if sex=='male' else 'blend/teacher_female_khaki_160cm.blend')
+    source=ROOT/('ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend' if sex=='male' else 'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm.blend')
     digest=hashlib.sha256(source.read_bytes()).hexdigest()
     bpy.ops.wm.open_mainfile(filepath=str(source));bpy.context.preferences.filepaths.save_version=0
     scene=bpy.context.scene;rig=next(o for o in scene.objects if o.type=='ARMATURE');rig.hide_set(False)

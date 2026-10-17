@@ -1,7 +1,7 @@
 import bpy,math,json,shutil
 from pathlib import Path
 from mathutils import Vector
-B=Path('D:/NetSim3D/3Dmodel');OUT=B/'blend/realistic_computer_cable_kit.blend'
+B=Path('D:/NetSim3D/3Dmodel');OUT=B/'ใช้ร่วมกัน/blend/realistic_computer_cable_kit.blend'
 if OUT.exists():shutil.copy2(OUT,OUT.with_name('realistic_computer_cable_kit_first_draft.blend'))
 bpy.ops.wm.read_factory_settings(use_empty=True);s=bpy.context.scene;s.unit_settings.system='METRIC';bpy.context.preferences.filepaths.save_version=0
 def mat(n,c,metal=0,rough=.4):
@@ -179,11 +179,11 @@ d=bpy.data.cameras.new('Kit camera');cam=bpy.data.objects.new('Kit camera',d);cu
 def camera(pos,target,scale):cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();d.type='ORTHO';d.ortho_scale=scale
 camera((0,-.2,6),(0,-.2,0),4.1)
 s.render.engine='CYCLES';s.cycles.samples=32;s.cycles.use_denoising=True;s.render.resolution_x=1800;s.render.resolution_y=1800;s.render.resolution_percentage=100
-s.render.filepath=str(B/'renders/realistic_cable_kit_overview.png')
+s.render.filepath=str(B/'ใช้ร่วมกัน/renders/realistic_cable_kit_overview.png')
 notes=bpy.data.texts.new('README');notes.write('Nine separate asset collections. Geometry in metres. Cable centerline lengths measured on editable POLY curves; excludes connector bodies. Cords are continuous with strain relief, no floating free cable ends. HDMI 19 contacts, USB 4 contacts; visual reference models, not manufacturing CAD or certified electrical products. Studio excluded from game exports. No classroom files modified. Convert curves and text to meshes before game export; no physics or interaction scripts included.')
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT),compress=True);print('SAVED_KIT',flush=True)
 (B/'temp/realistic_cable_kit_validation.json').write_text(json.dumps(reports,indent=2))
 bpy.ops.render.render(write_still=True)
 for name,pos,target,scale in [('ac',(-.85,.85,.5),(-.97,1.06,0),.60),('mouse',(0,.75,.55),(.02,1.02,0),.60),('hdmi',(1,.8,.5),(1.02,1.07,0),.56),('strip',(-1,-1.7,.8),(-.90,-1.35,0),1.0)]:
- camera(pos,target,scale);s.render.resolution_x=1200;s.render.resolution_y=1000;s.render.filepath=str(B/'renders'/f'realistic_cable_kit_{name}.png');bpy.ops.render.render(write_still=True)
+ camera(pos,target,scale);s.render.resolution_x=1200;s.render.resolution_y=1000;s.render.filepath=str(B/'ใช้ร่วมกัน/renders'/f'realistic_cable_kit_{name}.png');bpy.ops.render.render(write_still=True)
 print('COMPLETE_CABLE_KIT',flush=True)

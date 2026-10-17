@@ -7,7 +7,7 @@ BASE=Path('D:/NetSim3D/3Dmodel')
 TMP=BASE/'temp/classroom_floor_map'
 TMP.mkdir(parents=True,exist_ok=True)
 OUT=TMP/'classroom_shell_map.blend'
-RENDERS=BASE/'renders'
+RENDERS=BASE/'ใช้ร่วมกัน/renders'
 scene=bpy.context.scene
 scene.unit_settings.system='METRIC'
 scene.unit_settings.scale_length=1
@@ -237,7 +237,7 @@ box('Classroom_Whiteboard',(3.60,.015,1.25),(0,9.641,1.80),whiteboard,IT,.006)
 box('Classroom_Board_Tray',(3.60,.14,.025),(0,9.59,1.12),metal,IT,.008)
 
 # Append only the computer asset collection. Its studio lights and floor are excluded.
-with bpy.data.libraries.load(str(BASE/'blend/teacher_computer_set.blend'),link=False) as (src,dst):
+with bpy.data.libraries.load(str(BASE/'ใช้ร่วมกัน/blend/teacher_computer_set.blend'),link=False) as (src,dst):
     assert 'ASSET | NetCare Desktop v2' in src.collections
     dst.collections=['ASSET | NetCare Desktop v2']
 computer=dst.collections[0]
@@ -394,7 +394,7 @@ notes.write('Floor map built around the saved 12 x 19.5 m classroom. Original cl
     'IT support has three desks. Other new rooms are shells awaiting furniture and equipment.\n'+
     'Stair UP and DOWN landings terminate at +3.35 and -3.35 m. Adjacent floors are not modeled.\n'+
     'Doors are open with separate hinge pivots. Collision, navigation and runtime door logic are not added.\n')
-report={'original_mesh_objects_preserved':len(originals),'room_regions':room_info,'new_doors':door_info,'clear_corridor_width_m':XR-XC-TH,'extent_m':[XE-XL,YTOP-YB],'computer_bounds':computer_bounds,'student_desks':10,'IT_desks':3,'computer_keys':104,'computer_sockets':18,'source_classroom_sha256':hashlib.sha256((BASE/'blend/classroom_shell.blend').read_bytes()).hexdigest(),'source_computer_sha256':hashlib.sha256((BASE/'blend/teacher_computer_set.blend').read_bytes()).hexdigest()}
+report={'original_mesh_objects_preserved':len(originals),'room_regions':room_info,'new_doors':door_info,'clear_corridor_width_m':XR-XC-TH,'extent_m':[XE-XL,YTOP-YB],'computer_bounds':computer_bounds,'student_desks':10,'IT_desks':3,'computer_keys':104,'computer_sockets':18,'source_classroom_sha256':hashlib.sha256((BASE/'ใช้ร่วมกัน/blend/classroom_shell.blend').read_bytes()).hexdigest(),'source_computer_sha256':hashlib.sha256((BASE/'ใช้ร่วมกัน/blend/teacher_computer_set.blend').read_bytes()).hexdigest()}
 (TMP/'map_validation.json').write_text(json.dumps(report,indent=2,ensure_ascii=False),encoding='utf-8')
 bpy.context.preferences.filepaths.save_version=0
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT),compress=True)

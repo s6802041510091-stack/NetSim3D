@@ -1,0 +1,18 @@
+{
+  "restored_vertices": 450,
+  "maximum_removed_rest_distortion_m": 0.051332374003988865,
+  "hidden_skin_faces_removed": 186,
+  "vertex_count_before": 9789,
+  "vertex_count_after": 9657,
+  "non_arm_anatomy_preserved": true,
+  "sleeve_cut_world_z": {
+    "L": 1.189405502319336,
+    "R": 1.189108790397644
+  },
+  "file": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\cleaner_female_apron_160cm.blend",
+  "backup": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\cleaner_female_apron_160cm_before_arm_alignment.blend",
+  "height_m": 1.5999999046325684,
+  "feet_z": 0.0,
+  "bones": 163,
+  "clothes_apron_hair_unchanged": true
+}

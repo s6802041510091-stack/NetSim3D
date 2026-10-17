@@ -12,8 +12,8 @@ from mathutils.bvhtree import BVHTree
 BASE=Path('D:/NetSim3D/3Dmodel')
 SRC=BASE/'temp/teacher_male/source'
 SYS=BASE/'temp/teacher_male/system_assets'
-OUT=BASE/'blend/teacher_male_khaki_180cm.blend'
-RENDER=BASE/'renders'
+OUT=BASE/'ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend'
+RENDER=BASE/'ใช้ร่วมกัน/renders'
 random.seed(14)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):

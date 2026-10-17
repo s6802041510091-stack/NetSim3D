@@ -3,11 +3,11 @@ import bpy, math, json, sys, hashlib, shutil, array
 from pathlib import Path
 from mathutils import Vector
 ROOT = Path(__file__).resolve().parents[2]
-WORK = ROOT / '3Dmodel/lookdev/working/classroom_shell_lookdev.blend'
-BASELINE = ROOT / '3Dmodel/blend/classroom_shell.blend'
-OUT = ROOT / '3Dmodel/lookdev/phase1'
+WORK = ROOT / 'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'
+BASELINE = ROOT / '3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend'
+OUT = ROOT / 'Preview/โรงเรียนและเมือง/phase1'
 OUT.mkdir(parents=True, exist_ok=True)
-RENDERS = OUT / 'renders'
+RENDERS = OUT / 'ใช้ร่วมกัน/renders'
 RENDERS.mkdir(exist_ok=True)
 sys.path.insert(0,str(Path(__file__).parent))
 

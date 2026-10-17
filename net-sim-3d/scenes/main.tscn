@@ -7,9 +7,9 @@
 [ext_resource type="PackedScene" path="res://scenes/teacher_male.tscn" id="5"]
 [ext_resource type="Script" path="res://scripts/interactive_door.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/computer/computer_manager.gd" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/missions/mission_06/desk_phone.tscn" id="8"]
-[ext_resource type="Script" path="res://scripts/missions/mission_06/mission_06_controller.gd" id="9"]
-[ext_resource type="Resource" path="res://data/missions/mission_06/mission_06_data.tres" id="10"]
+[ext_resource type="PackedScene" path="res://missions/mission_06/scenes/desk_phone.tscn" id="8"]
+[ext_resource type="Script" path="res://missions/mission_06/scripts/mission_06_controller.gd" id="9"]
+[ext_resource type="Resource" path="res://missions/mission_06/data/mission_06_data.tres" id="10"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1

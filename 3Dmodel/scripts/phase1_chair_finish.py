@@ -2,7 +2,7 @@ import bpy, bmesh, sys, math
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
-WORK=ROOT/'3Dmodel/lookdev/working/classroom_shell_lookdev.blend'
+WORK=ROOT/'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'
 bpy.ops.wm.open_mainfile(filepath=str(WORK))
 o=bpy.data.objects['Chair_IT_PlayerDesk_1']
 if '--apply' in sys.argv and o.get('p1_cushions_rounded'):

@@ -1,7 +1,7 @@
 """Furnish the Science classroom and the Server room (NOC control + Server zones).
 
 Run with Blender 5.2:
-    blender -b 3Dmodel/blend/classroom_shell.blend --python 3Dmodel/scripts/build_science_lab_and_server_room.py -- [--save OUT.blend]
+    blender -b 3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend --python 3Dmodel/scripts/build_science_lab_and_server_room.py -- [--save OUT.blend]
 
 * Science classroom = the left-bottom room of the floor plan (Room_BackgroundClass,
   sign "ห้องเรียนวิทยาศาสตร์"): lab islands with sinks and gas taps, stools,

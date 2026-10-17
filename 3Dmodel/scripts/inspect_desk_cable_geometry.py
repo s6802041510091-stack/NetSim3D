@@ -1,6 +1,6 @@
 import bpy,json
 from mathutils import Vector
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/classroom_shell.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend')
 for n in ['StudentDesk_Row01_Left','TeacherDesk']:
  d=bpy.data.objects[n];print('DESK',n,d.type,list(d.location),'verts',len(d.data.vertices))
  print('mats',[m.name for m in d.data.materials]);print('mods',[(m.name,m.type) for m in d.modifiers])

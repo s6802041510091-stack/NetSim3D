@@ -11,7 +11,7 @@ bpy.context.preferences.filepaths.temporary_directory = str(asset_root / "temp")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
-bpy.ops.import_scene.gltf(filepath=str(asset_root / "exports" / "office_switch_8port.glb"))
+bpy.ops.import_scene.gltf(filepath=str(asset_root / "ใช้ร่วมกัน/exports" / "office_switch_8port.glb"))
 
 objects = bpy.context.scene.objects
 expected_names = ["OfficeSwitch_8Port", "LED_Power", "Socket_DC"]
@@ -35,5 +35,5 @@ report = {
     "all_named_ports_leds_and_socket_anchors_present": True,
     "no_studio_cameras_or_lights_exported": True,
 }
-(asset_root / "exports" / "office_switch_8port.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(asset_root / "ใช้ร่วมกัน/exports" / "office_switch_8port.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2))

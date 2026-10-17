@@ -3,7 +3,7 @@ import bpy,bmesh,math,json,shutil,datetime,hashlib
 from pathlib import Path
 from mathutils import Vector,Matrix
 from mathutils.bvhtree import BVHTree
-B=Path('D:/NetSim3D/3Dmodel');P=B/'blend/classroom_shell.blend'
+B=Path('D:/NetSim3D/3Dmodel');P=B/'ใช้ร่วมกัน/blend/classroom_shell.blend'
 backup=P.with_name('classroom_shell_before_underdesk_fix_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend');shutil.copy2(P,backup)
 bpy.ops.wm.open_mainfile(filepath=str(P));s=bpy.context.scene;bpy.context.preferences.filepaths.save_version=0
 C=bpy.data.collections['15 | Realistic connected computer peripherals'];OLD=bpy.data.collections['POWER | outlets strips and cables'];LAN=bpy.data.collections['LAN | empty conduits and sockets - NO CABLES']
@@ -160,5 +160,5 @@ print('SAVED_UNDERDESK_FIX',flush=True)
 camdata=bpy.data.cameras.new('Underdesk QA');cam=bpy.data.objects.new('Underdesk QA',camdata);s.collection.objects.link(cam);s.camera=cam
 s.render.engine='CYCLES';s.cycles.samples=20;s.cycles.use_denoising=True;s.render.resolution_x=1400;s.render.resolution_y=1000;s.render.resolution_percentage=100
 for name,pos,target,lens in [('student_top',(4.55,-.18,2.0),(2.7,-1.14,.76),34),('student_under',(3.15,-2.45,.42),(2.7,-1.07,.575),29),('teacher_top',(5.25,9.05,1.9),(3.8,8,.76),35)]:
- cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();camdata.lens=lens;s.render.filepath=str(B/'renders'/f'classroom_cable_fix_{name}.png');bpy.ops.render.render(write_still=True)
+ cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();camdata.lens=lens;s.render.filepath=str(B/'ใช้ร่วมกัน/renders'/f'classroom_cable_fix_{name}.png');bpy.ops.render.render(write_still=True)
 print('QA_RENDERS_COMPLETE',flush=True)

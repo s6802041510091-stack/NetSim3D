@@ -6,9 +6,9 @@ import bpy,bmesh,math,json,shutil,sys
 from pathlib import Path
 from mathutils import Vector,Matrix
 
-ROOT=Path('D:/NetSim3D/3Dmodel');FOLDER=ROOT/'blend/students'
+ROOT=Path('D:/NetSim3D/3Dmodel');FOLDER=ROOT/'ใช้ร่วมกัน/blend/students'
 BACKUP=FOLDER/'backup_before_simple_hair_v2';BACKUP.mkdir(exist_ok=True)
-RENDER=ROOT/'renders/students';ASSETS=ROOT/'temp/teacher_male/system_assets'
+RENDER=ROOT/'ใช้ร่วมกัน/renders/students';ASSETS=ROOT/'temp/teacher_male/system_assets'
 SOURCE=ROOT/'temp/teacher_male/source';FEMALE=ROOT/'temp/teacher_female/source'
 
 def read_obj(path):

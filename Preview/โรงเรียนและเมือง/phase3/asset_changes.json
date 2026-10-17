@@ -1,0 +1,103 @@
+{
+  "tester": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ด่าน_02\\cable_tester\\source\\cable_tester.blend",
+    "source_sha256": "348a029cfe0f57388b3735a85ede307df5b6889da2d9a8df469429a78afbd578",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\tester_lookdev.blend",
+    "objects": 31,
+    "changed": [
+      "Main_Body",
+      "Remote_Body"
+    ],
+    "preserved_geometry_pivots_ports": true
+  },
+  "crimper": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ด่าน_02\\crimp_tools\\source\\crimp_tools.blend",
+    "source_sha256": "7bbd0f145415b0618ffd05a3afbd0951b8f418665fcb8f831840b434094312bd",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\crimper_lookdev.blend",
+    "objects": 11,
+    "changed": [
+      "Body_Fixed",
+      "Jaw_Lower",
+      "Stripper_Body"
+    ],
+    "preserved_geometry_pivots_ports": true
+  },
+  "cat6": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\lan_cable_cat6_5m.blend",
+    "source_sha256": "d02a39bc87351acf67fa575832e008c883a07cff398a5e16555e11f9e081fd0a",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\cat6_lookdev.blend",
+    "objects": 62,
+    "changed": [
+      "Cable_Jacket",
+      "Contacts_8Pin_A",
+      "Strain_Relief_Boot_A",
+      "Contacts_8Pin_B",
+      "Strain_Relief_Boot_B"
+    ],
+    "preserved_geometry_pivots_ports": true
+  },
+  "router": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\network\\router_ont\\source\\router.blend",
+    "source_sha256": "88f9fad9be53a7aaf453d98f35f1e872a31bac16752a1bf9bd76c5ad1e9c3360",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\router_lookdev.blend",
+    "objects": 29,
+    "changed": [
+      "Router_Body",
+      "Button_Power",
+      "Antenna_1_Mesh",
+      "Antenna_2_Mesh",
+      "Antenna_3_Mesh",
+      "Antenna_4_Mesh"
+    ],
+    "preserved_geometry_pivots_ports": true
+  },
+  "switch8": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\office_switch_8port.blend",
+    "source_sha256": "62f87e85bba521833eace919152b85c73eb640da86adee9403acf204f6f91f6c",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\switch8_lookdev.blend",
+    "objects": 35,
+    "changed": [
+      "Chassis",
+      "RJ45_Port_01",
+      "RJ45_Port_02",
+      "RJ45_Port_03",
+      "RJ45_Port_04",
+      "RJ45_Port_05",
+      "RJ45_Port_06",
+      "RJ45_Port_07",
+      "RJ45_Port_08"
+    ],
+    "preserved_geometry_pivots_ports": true
+  },
+  "server": {
+    "source": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\rack_server_2u.blend",
+    "source_sha256": "09330e16d0402c6e4f2fccc05a7e2ebb64670ba63c1dc671f850d796c0299bdc",
+    "output": "D:\\NetSim3D\\Preview\\โรงเรียนและเมือง\\phase3\\assets\\server_lookdev.blend",
+    "objects": 68,
+    "changed": [
+      "Server_Chassis",
+      "Top_Lid",
+      "Storage_Carrier_01",
+      "Storage_Carrier_02",
+      "Storage_Blank_03",
+      "Storage_Blank_04",
+      "Motherboard_Fixed",
+      "CPU_Heatsink_Fixed",
+      "Memory_Module_A1",
+      "Memory_Module_B1",
+      "Cooling_Fan_Bank_Fixed",
+      "NIC_Card_And_Bracket",
+      "Port_RJ45_LAN1",
+      "Port_RJ45_LAN2",
+      "NIC_Port_Legends",
+      "Ports_USB_A",
+      "Port_VGA_Console",
+      "Power_Supply_Enclosure",
+      "Port_AC_C14",
+      "Internal_Harnesses_Fixed",
+      "Button_Power",
+      "Case_Legends"
+    ],
+    "preserved_geometry_pivots_ports": true
+  }
+}

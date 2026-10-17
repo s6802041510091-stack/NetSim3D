@@ -1,6 +1,6 @@
 import bpy,bmesh,json
 from mathutils import Vector
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/cleaner_female_apron_160cm.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/cleaner_female_apron_160cm.blend')
 o=bpy.data.objects['Workwear | short sleeve blouse']
 for m in o.modifiers:
     if m.type=='SOLIDIFY':m.show_viewport=False

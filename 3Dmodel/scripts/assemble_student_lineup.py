@@ -3,7 +3,7 @@ import bpy, math, json
 from pathlib import Path
 from mathutils import Vector
 
-ROOT=Path('D:/NetSim3D/3Dmodel');folder=ROOT/'blend/students'
+ROOT=Path('D:/NetSim3D/3Dmodel');folder=ROOT/'ใช้ร่วมกัน/blend/students'
 specs=[('male_mullet','SHORT CROP',1.65),('male_two_block','SIDE PART',1.65),('female_bob_cut','SHORT PIXIE',1.60),('female_wendy_cut','PONYTAIL',1.60),('female_layer_cut','TIED BUN',1.60)]
 reports=[]
 for stem,label,height in specs:
@@ -50,7 +50,7 @@ scene.world=bpy.data.worlds.new('Studio world');scene.world.use_nodes=True;scene
 bpy.ops.object.camera_add(location=(0,-9,2.5));cam=bpy.context.object;cam.rotation_euler=(Vector((0,0,.80))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=4.85;scene.camera=cam
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True
 scene.render.resolution_x=1800;scene.render.resolution_y=950;scene.render.resolution_percentage=100
-scene.render.filepath=str(ROOT/'renders/students/students_lineup.png')
+scene.render.filepath=str(ROOT/'ใช้ร่วมกัน/renders/students/students_lineup.png')
 for area in bpy.context.screen.areas:
     if area.type=='VIEW_3D':
         sp=area.spaces.active;sp.overlay.show_overlays=False;sp.shading.type='MATERIAL'

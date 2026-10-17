@@ -13,11 +13,11 @@ signal app_opened(app_id: String, app: Node)
 
 const BOOT_TIME := 2.0
 ## Mission 1 program (NetPlan EDU). Shown only on computers that have "netplan_edu" installed.
-const NETPLAN_EDU_SCENE := "res://scenes/missions/mission_01/netplan_edu.tscn"
+const NETPLAN_EDU_SCENE := "res://missions/mission_01/scenes/netplan_edu.tscn"
 ## Mission 5 program: Windows Security (simulated). Shown only on computers that have "windows_security".
-const WINDOWS_SECURITY_SCENE := "res://scenes/missions/mission_05/windows_security.tscn"
+const WINDOWS_SECURITY_SCENE := "res://missions/mission_05/scenes/windows_security.tscn"
 ## Mission 6 program: TeamViewer (simulated). Shown only on computers that have "teamviewer".
-const TEAMVIEWER_SCENE := "res://scenes/missions/mission_06/teamviewer.tscn"
+const TEAMVIEWER_SCENE := "res://missions/mission_06/scenes/teamviewer.tscn"
 const OS_NAME := "NetSim OS"
 const COLOR_TASKBAR := Color(0.07, 0.09, 0.13, 0.95)
 const COLOR_WINDOW := Color(0.96, 0.97, 0.98)

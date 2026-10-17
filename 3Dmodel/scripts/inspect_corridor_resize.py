@@ -2,7 +2,7 @@ import bpy,json
 from pathlib import Path
 from mathutils import Vector
 root=Path('D:/NetSim3D/3Dmodel')
-bpy.ops.wm.open_mainfile(filepath=str(root/'blend/classroom_shell.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(root/'ใช้ร่วมกัน/blend/classroom_shell.blend'))
 items=[]
 for o in bpy.context.scene.objects:
     p=[o.matrix_world@Vector(v) for v in o.bound_box] if o.type in ('MESH','CURVE','FONT') else [o.matrix_world.translation]

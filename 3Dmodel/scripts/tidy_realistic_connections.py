@@ -1,7 +1,7 @@
 import bpy,math
 from pathlib import Path
 from mathutils import Vector
-B=Path('D:/NetSim3D/3Dmodel');P=B/'blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=str(P));s=bpy.context.scene;c=bpy.data.collections['15 | Realistic connected computer peripherals']
+B=Path('D:/NetSim3D/3Dmodel');P=B/'ใช้ร่วมกัน/blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=str(P));s=bpy.context.scene;c=bpy.data.collections['15 | Realistic connected computer peripherals']
 def smooth(ps):
  out=[]
  for i in range(len(ps)-1):
@@ -43,4 +43,4 @@ assert all(not o.get('occupied',False) for o in s.objects if 'Socket_LAN_RJ45' i
 bpy.context.preferences.filepaths.save_version=0;bpy.ops.wm.save_as_mainfile(filepath=str(P),compress=True)
 print('VALIDATED: 21 PCs, 21 HDMI links, 21 wired mice, 11 strips, 42 measured service loops; LAN unconnected',flush=True)
 d=bpy.data.cameras.new('Connected desk preview');cam=bpy.data.objects.new('Connected desk preview',d);s.collection.objects.link(cam);s.camera=cam;cam.location=(4.9,.15,2.2);target=Vector((2.7,-1.1,.76));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();d.lens=35
-s.render.engine='CYCLES';s.cycles.samples=20;s.cycles.use_denoising=True;s.render.resolution_x=1500;s.render.resolution_y=1100;s.render.resolution_percentage=100;s.render.filepath=str(B/'renders/classroom_realistic_connections.png');bpy.ops.render.render(write_still=True)
+s.render.engine='CYCLES';s.cycles.samples=20;s.cycles.use_denoising=True;s.render.resolution_x=1500;s.render.resolution_y=1100;s.render.resolution_percentage=100;s.render.filepath=str(B/'ใช้ร่วมกัน/renders/classroom_realistic_connections.png');bpy.ops.render.render(write_still=True)

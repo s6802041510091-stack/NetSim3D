@@ -22,7 +22,7 @@ def bounds(meshes):
 
 
 clear_scene()
-bpy.ops.import_scene.gltf(filepath=str(BASE / "exports/office_network_printer.glb"))
+bpy.ops.import_scene.gltf(filepath=str(BASE / "ใช้ร่วมกัน/exports/office_network_printer.glb"))
 objects = bpy.context.scene.objects
 required = ["NetworkPrinter_LP210N", "Printer_Chassis", "Input_Cassette_Slide", "Input_Paper_Cassette",
             "Output_Tray_And_Rollers", "Paper_Output", "Port_RJ45_LAN", "Socket_RJ45_LAN",
@@ -69,7 +69,7 @@ report = {"result": "PASS", "test": "Blender GLB roundtrip; not Godot gameplay v
           "ethernet_and_usb_cavities_clear_of_chassis": True}
 
 clear_scene()
-bpy.ops.import_scene.gltf(filepath=str(BASE / "exports/printer_printed_sheet_a4.glb"))
+bpy.ops.import_scene.gltf(filepath=str(BASE / "ใช้ร่วมกัน/exports/printer_printed_sheet_a4.glb"))
 objects = bpy.context.scene.objects
 assert all(name in objects for name in ("PrintedSheet_A4", "Paper_Sheet", "Paper_Print_Underside"))
 sheet_dimensions = bounds([objects["Paper_Sheet"]])
@@ -78,5 +78,5 @@ assert abs(sheet_dimensions[1] - 0.297) < 0.0001
 assert objects["Paper_Sheet"].parent == objects["PrintedSheet_A4"]
 assert objects["Paper_Print_Underside"].parent == objects["PrintedSheet_A4"]
 report["separate_A4_sheet_valid"] = True
-(BASE / "exports/office_network_printer.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/office_network_printer.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2), flush=True)

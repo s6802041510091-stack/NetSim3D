@@ -1,0 +1,29 @@
+[
+  {
+    "file": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\student_female_bob_cut.blend",
+    "changed_vertices": {
+      "arms": 986,
+      "legs": 708
+    },
+    "max_displacement_m": 0.04300368738015195,
+    "backup": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\backup_before_limb_refit\\student_female_bob_cut.blend"
+  },
+  {
+    "file": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\student_female_wendy_cut.blend",
+    "changed_vertices": {
+      "arms": 986,
+      "legs": 708
+    },
+    "max_displacement_m": 0.04300368738015195,
+    "backup": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\backup_before_limb_refit\\student_female_wendy_cut.blend"
+  },
+  {
+    "file": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\student_female_layer_cut.blend",
+    "changed_vertices": {
+      "arms": 986,
+      "legs": 708
+    },
+    "max_displacement_m": 0.04300368738015195,
+    "backup": "D:\\NetSim3D\\3Dmodel\\ใช้ร่วมกัน\\blend\\students\\backup_before_limb_refit\\student_female_layer_cut.blend"
+  }
+]

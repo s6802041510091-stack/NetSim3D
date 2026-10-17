@@ -1,7 +1,7 @@
 """Refresh embedded asset notes and confirm shoulder/leg preservation."""
 import bpy,json
 from pathlib import Path
-FOLDER=Path('D:/NetSim3D/3Dmodel/blend/students')
+FOLDER=Path('D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/students')
 report=[]
 for stem in ['male_mullet','male_two_block','female_bob_cut','female_wendy_cut','female_layer_cut']:
     path=FOLDER/('student_'+stem+'.blend')

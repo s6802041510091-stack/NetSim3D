@@ -15,7 +15,7 @@ from mathutils import Vector
 
 BASE = Path(__file__).resolve().parents[1]
 assert BASE.drive.upper() == "D:"
-for folder in ("blend", "exports", "renders", "temp/cat6"):
+for folder in ("ใช้ร่วมกัน/blend", "ใช้ร่วมกัน/exports", "ใช้ร่วมกัน/renders", "temp/cat6"):
     (BASE / folder).mkdir(parents=True, exist_ok=True)
 bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/cat6")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
@@ -365,9 +365,9 @@ def export_glb(collection, path, active_root):
 for obj in list(master.objects):
     if obj.type in {"CURVE", "FONT", "MESH"}:
         meshify(obj)
-module_path = BASE / "exports/rj45_cat6_plug.glb"
+module_path = BASE / "ใช้ร่วมกัน/exports/rj45_cat6_plug.glb"
 module_gltf = export_glb(master, module_path, plug_root)
-whole_path = BASE / "exports/lan_cable_cat6_5m.glb"
+whole_path = BASE / "ใช้ร่วมกัน/exports/lan_cable_cat6_5m.glb"
 whole_gltf = export_glb(asset, whole_path, root)
 names = {node.get("name", "") for node in whole_gltf["nodes"]}
 assert all(name in names for name in ("Cat6_PatchCable_5m", "Cable_Jacket", "Plug_A", "Plug_B",
@@ -390,8 +390,8 @@ report = {"asset": "lan_cable_cat6_5m", "result": "PASS: structural GLB and path
           "pin_colors": [item[2] for item in colors], "source_curve_in_blend": "Cable_Path_EDIT",
           "standalone_plug": module_path.name, "scene_integrated": False,
           "note": "Static coiled GLB; transparent polymer is an alpha approximation. No cable physics or game logic."}
-(BASE / "exports/lan_cable_cat6_5m.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-(BASE / "exports/lan_cable_cat6_5m.path.json").write_text(json.dumps({
+(BASE / "ใช้ร่วมกัน/exports/lan_cable_cat6_5m.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/lan_cable_cat6_5m.path.json").write_text(json.dumps({
     "units": "metres", "coordinate_system": "Blender Z-up, not glTF axes",
     "points": (path_mm / 1000).tolist(), "cable_radius": 0.0031,
     "note": "Source polyline, not automatically consumed by Godot."}, indent=2), encoding="utf-8")
@@ -452,7 +452,7 @@ scene.render.image_settings.file_format = "PNG"
 scene.view_settings.view_transform = "AgX"
 scene.view_settings.exposure = -1.6
 camera_fit((630, -820, 870), (0, -35, 5), asset, (1600, 1200))
-scene.render.filepath = str(BASE / "renders/lan_cable_cat6_5m_hero.png")
+scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders/lan_cable_cat6_5m_hero.png")
 bpy.ops.object.select_all(action="DESELECT")
 root.select_set(True)
 bpy.context.view_layer.objects.active = root
@@ -470,7 +470,7 @@ for screen in bpy.data.screens:
             space.region_3d.view_location = (0, -0.04, 0.007)
             space.region_3d.view_rotation = camera.rotation_euler.to_quaternion()
             space.region_3d.view_perspective = "PERSP"
-bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "blend/lan_cable_cat6_5m.blend"))
+bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "ใช้ร่วมกัน/blend/lan_cable_cat6_5m.blend"))
 print("BLEND_SAVED", flush=True)
 for name in ("hero", "connector_closeup", "latch_closeup"):
     macro = name != "hero"
@@ -483,7 +483,7 @@ for name in ("hero", "connector_closeup", "latch_closeup"):
         camera_fit((34, 43, 51), (0, -12, 5), master, (1500, 1100), 1.25)
     else:
         camera_fit((630, -820, 870), (0, -35, 5), asset, (1600, 1200))
-    scene.render.filepath = str(BASE / "renders" / f"lan_cable_cat6_5m_{name}.png")
+    scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders" / f"lan_cable_cat6_5m_{name}.png")
     print("RENDER_START", name, flush=True)
     bpy.ops.render.render(write_still=True)
     print("RENDER_DONE", name, flush=True)

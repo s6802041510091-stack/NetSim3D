@@ -1,6 +1,6 @@
 import bpy
 for file in ['realistic_computer_cable_kit','classroom_shell']:
- bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/'+file+'.blend')
+ bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/'+file+'.blend')
  print('FILE',file)
  if file.startswith('realistic'):
   for c in bpy.data.collections:

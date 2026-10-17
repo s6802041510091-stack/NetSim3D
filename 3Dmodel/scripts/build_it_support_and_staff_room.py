@@ -2,7 +2,7 @@
 and the teachers' room (ห้องพักครู).
 
 Run with Blender 5.2 (after build_science_lab_and_server_room.py):
-    blender -b 3Dmodel/blend/classroom_shell.blend --python 3Dmodel/scripts/build_it_support_and_staff_room.py -- [--save OUT.blend]
+    blender -b 3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend --python 3Dmodel/scripts/build_it_support_and_staff_room.py -- [--save OUT.blend]
 
 * IT Support / Data Center office (left-top L-shaped room). The team's three
   desks (IT_HeadDesk, IT_PlayerDesk, IT_SpareDesk) with their computers stay

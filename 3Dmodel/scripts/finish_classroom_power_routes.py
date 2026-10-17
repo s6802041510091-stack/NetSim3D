@@ -1,6 +1,6 @@
 import bpy
 from mathutils import Vector
-p='D:/NetSim3D/3Dmodel/blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=p)
+p='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend';bpy.ops.wm.open_mainfile(filepath=p)
 c=bpy.data.collections['LAN | empty conduits and sockets - NO CABLES'];m=bpy.data.materials['Electrical | duct cover']
 def joint(n,pos,d):
  vs=[(x*d[0]/2,y*d[1]/2,z*d[2]/2) for x,y,z in [(-1,-1,-1),(-1,-1,1),(-1,1,-1),(-1,1,1),(1,-1,-1),(1,-1,1),(1,1,-1),(1,1,1)]]

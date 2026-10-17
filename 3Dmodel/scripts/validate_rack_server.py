@@ -11,7 +11,7 @@ BASE = Path(__file__).resolve().parents[1]
 assert BASE.drive.upper() == "D:"
 bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/server")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
-path = BASE / "exports/rack_server_2u.glb"
+path = BASE / "ใช้ร่วมกัน/exports/rack_server_2u.glb"
 with path.open("rb") as stream:
     magic, version, size = struct.unpack("<4sII", stream.read(12))
     length, kind = struct.unpack("<II", stream.read(8))
@@ -119,5 +119,5 @@ report = {
     "nic_ports_leds_labels_move_with_card": True,
     "no_external_textures_or_studio_in_export": True, "scene_integrated": False,
 }
-(BASE / "exports/rack_server_2u.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/rack_server_2u.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2), flush=True)

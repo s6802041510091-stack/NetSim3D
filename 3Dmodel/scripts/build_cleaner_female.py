@@ -16,9 +16,9 @@ sys.path.insert(0,str(ROOT/'scripts'))
 from rebuild_student_hair_and_arms import fit_hair, bounds
 from fix_cleaner_arms import refit_cleaner_arms
 
-SOURCE=ROOT/'blend/teacher_female_khaki_160cm.blend'
-OUTPUT=ROOT/'blend/cleaner_female_apron_160cm.blend'
-RENDER=ROOT/'renders/cleaner';RENDER.mkdir(parents=True,exist_ok=True)
+SOURCE=ROOT/'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm.blend'
+OUTPUT=ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm.blend'
+RENDER=ROOT/'ใช้ร่วมกัน/renders/cleaner';RENDER.mkdir(parents=True,exist_ok=True)
 DIGEST=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE))
 bpy.context.preferences.filepaths.save_version=0

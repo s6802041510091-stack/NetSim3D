@@ -4,7 +4,7 @@ from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-OUT=ROOT/'3Dmodel/lookdev/town'
+OUT=ROOT/'Preview/โรงเรียนและเมือง/town'
 random.seed(43)
 G=-7.2
 def mat(name,c):
@@ -166,7 +166,7 @@ def build():
     (OUT/'static_report.json').write_text(json.dumps({'ground_z':G,'eye_height_above_ground':8.85,'material_batches':len(groups),'triangles':sum(len(o.data.loop_triangles) for o in bpy.context.scene.objects if o.type=='MESH'),'school_source_modified':False},indent=2))
 if __name__=='__main__':
     if '--combine' in sys.argv:
-        bpy.ops.wm.open_mainfile(filepath=str(ROOT/'3Dmodel/lookdev/working/classroom_shell_lookdev.blend'))
+        bpy.ops.wm.open_mainfile(filepath=str(ROOT/'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'))
         collection=bpy.data.collections.new('EXTERIOR | Sakura town'); bpy.context.scene.collection.children.link(collection)
         with bpy.data.libraries.load(str(OUT/'town.blend'),link=False) as (source,target): target.objects=source.objects
         for o in target.objects:

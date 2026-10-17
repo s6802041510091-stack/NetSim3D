@@ -14,7 +14,7 @@ import phase1_it_corner as p1
 import phase1_surface_textures as tex
 import phase2_architecture as p2
 WORK = p1.WORK
-OUT = ROOT / '3Dmodel/lookdev/phase4'
+OUT = ROOT / 'Preview/โรงเรียนและเมือง/phase4'
 BACKUP = WORK.with_name('classroom_shell_lookdev_before_phase4.blend')
 VIEWS = {
     'classroom': ((2.6, .0, 1.6), (.25, 4.5, .65), 34),
@@ -385,7 +385,7 @@ def verify():
     for name in changes['changed_objects']+changes['new_details']:
         o=bpy.data.objects[name];uv=o.data.uv_layers.get('P4_SurfaceUV')
         if not uv or not uv.active_render or any(not math.isfinite(x) for q in uv.data for x in q.uv):errors.append('UV '+name)
-    files=json.loads((ROOT/'3Dmodel/lookdev/phase0/baseline.json').read_text())['file_hashes']
+    files=json.loads((ROOT/'Preview/โรงเรียนและเมือง/phase0/baseline.json').read_text())['file_hashes']
     for name,h in files.items():
         if p1.sha(ROOT/name)!=h:errors.append('source '+name)
     oldmeshes={};newmeshes={}
@@ -404,7 +404,7 @@ def render(label,only=None):
         for loc,energy,size in [(Vector(pos)+Vector((0,0,.8)),110,2),(Vector(aim)+Vector((.3,-.3,1.5)),90,1.5)]:
             d=bpy.data.lights.new('P4 review fill','AREA');d.energy=energy;d.shape='DISK';d.size=size
             lamp=bpy.data.objects.new('P4 review fill',d);s.collection.objects.link(lamp);lamp.location=loc;lamp.rotation_euler=(Vector(aim)-loc).to_track_quat('-Z','Y').to_euler();lights.append(lamp)
-        folder=OUT/'renders';folder.mkdir(exist_ok=True);s.render.filepath=str(folder/f'{label}_{name}.png');bpy.ops.render.render(write_still=True)
+        folder=OUT/'ใช้ร่วมกัน/renders';folder.mkdir(exist_ok=True);s.render.filepath=str(folder/f'{label}_{name}.png');bpy.ops.render.render(write_still=True)
         for lamp in lights:bpy.data.objects.remove(lamp,do_unlink=True)
         print('P4_RENDERED',label,name,flush=True)
 

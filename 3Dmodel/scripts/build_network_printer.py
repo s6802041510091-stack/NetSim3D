@@ -14,7 +14,7 @@ from mathutils import Vector
 
 BASE = Path(__file__).resolve().parents[1]
 assert BASE.drive.upper() == "D:"
-for folder in ("blend", "exports", "renders", "temp/printer"):
+for folder in ("ใช้ร่วมกัน/blend", "ใช้ร่วมกัน/exports", "ใช้ร่วมกัน/renders", "temp/printer"):
     (BASE / folder).mkdir(parents=True, exist_ok=True)
 bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/printer")
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
@@ -407,7 +407,7 @@ def export_glb(collection, path, active_root):
     return gltf
 
 
-printer_path = BASE / "exports/office_network_printer.glb"
+printer_path = BASE / "ใช้ร่วมกัน/exports/office_network_printer.glb"
 gltf = export_glb(asset, printer_path, root)
 names = [node.get("name", "") for node in gltf["nodes"]]
 required = ["NetworkPrinter_LP210N", "Printer_Chassis", "Input_Cassette_Slide", "Input_Paper_Cassette",
@@ -415,7 +415,7 @@ required = ["NetworkPrinter_LP210N", "Printer_Chassis", "Input_Cassette_Slide", 
             "Port_AC_C14", "Socket_AC_Power", "Status_LCD", "LED_Ready", "Paper_Output"]
 assert all(name in names for name in required), names
 assert "Paper_Sheet" not in names
-export_glb(paper_collection, BASE / "exports/printer_printed_sheet_a4.glb", paper_root)
+export_glb(paper_collection, BASE / "ใช้ร่วมกัน/exports/printer_printed_sheet_a4.glb", paper_root)
 paper_root.location = mm((0, 122, 230))
 paper_collection.hide_render = True
 paper_collection.hide_viewport = True
@@ -431,7 +431,7 @@ report = {"asset": "office_network_printer", "result": "PASS: structural GLB val
           "usb_connector": "USB Type-B device port", "lan_default": "disconnected / LEDs off",
           "optional_paper_export": "printer_printed_sheet_a4.glb", "scene_integrated": False,
           "note": "Original generic design, not manufacturer CAD; no live printing logic or automatic network state."}
-(BASE / "exports/office_network_printer.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/office_network_printer.validation.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print("ASSET_VALIDATION", json.dumps(report), flush=True)
 
 # Studio excluded from exported assets.
@@ -478,7 +478,7 @@ scene.cycles.max_bounces = 6
 scene.render.resolution_x, scene.render.resolution_y = 1600, 1200
 scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = "PNG"
-scene.render.filepath = str(BASE / "renders/office_network_printer_hero.png")
+scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders/office_network_printer_hero.png")
 scene.view_settings.view_transform = "AgX"
 bpy.ops.object.select_all(action="DESELECT")
 root.select_set(True)
@@ -496,7 +496,7 @@ for screen in bpy.data.screens:
             space.region_3d.view_location = (0, 0, 0.13)
             space.region_3d.view_rotation = camera.rotation_euler.to_quaternion()
             space.region_3d.view_perspective = "PERSP"
-bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "blend/office_network_printer.blend"))
+bpy.ops.wm.save_as_mainfile(filepath=str(BASE / "ใช้ร่วมกัน/blend/office_network_printer.blend"))
 print("BLEND_SAVED", flush=True)
 for name, position, target, scale, resolution, show_paper in [
     ("hero", (470, -650, 455), (0, -6, 131), 0.68, (1600, 1200), False),
@@ -510,7 +510,7 @@ for name, position, target, scale, resolution, show_paper in [
     paper_collection.hide_render = not show_paper
     paper_collection.hide_viewport = not show_paper
     scene.render.resolution_x, scene.render.resolution_y = resolution
-    scene.render.filepath = str(BASE / "renders" / f"office_network_printer_{name}.png")
+    scene.render.filepath = str(BASE / "ใช้ร่วมกัน/renders" / f"office_network_printer_{name}.png")
     print("RENDER_START", name, flush=True)
     bpy.ops.render.render(write_still=True)
     print("RENDER_DONE", name, flush=True)

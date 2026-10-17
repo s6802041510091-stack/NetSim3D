@@ -12,7 +12,7 @@ bpy.context.preferences.filepaths.temporary_directory = str(BASE / "temp/laptop"
 bpy.context.preferences.filepaths.use_auto_save_temporary_files = False
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.object.delete(use_global=False)
-bpy.ops.import_scene.gltf(filepath=str(BASE / "exports/office_laptop_14.glb"))
+bpy.ops.import_scene.gltf(filepath=str(BASE / "ใช้ร่วมกัน/exports/office_laptop_14.glb"))
 objects = bpy.context.scene.objects
 expected = ["OfficeLaptop_14", "Chassis_Base", "Keyboard_Keycaps", "Keyboard_Legends", "Touchpad",
             "Display_Hinge", "Display_Housing", "Screen_Panel", "Screen_Demo_UI", "Port_RJ45_LAN",
@@ -65,5 +65,5 @@ report = {"result": "PASS", "test": "Blender GLB roundtrip, not Godot gameplay t
           "closed_screen_to_keycap_clearance_mm": round(clearance * 1000, 3),
           "ethernet_socket_outward_blender": "-X / left side", "ethernet_contacts": 8,
           "display_hinge_preserved": True, "studio_excluded": True, "led_defaults_correct": True}
-(BASE / "exports/office_laptop_14.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/office_laptop_14.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2), flush=True)

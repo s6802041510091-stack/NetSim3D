@@ -16,7 +16,7 @@ from mathutils import Vector
 # script works wherever the project is cloned.
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 PROJECT = os.path.join(ROOT, "net-sim-3d")
-BLEND = os.path.join(ROOT, "3Dmodel", "blend")
+BLEND = os.path.join(ROOT, "3Dmodel", "ใช้ร่วมกัน", "blend")
 MODELS = os.path.join(PROJECT, "assets", "models")
 DATA = os.path.join(PROJECT, "data")
 

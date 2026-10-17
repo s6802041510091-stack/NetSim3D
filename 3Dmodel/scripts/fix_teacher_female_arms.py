@@ -6,7 +6,7 @@ from mathutils import Vector, Matrix
 ROOT = Path('D:/NetSim3D/3Dmodel')
 SRC = ROOT / 'temp/teacher_male/source'
 FEMALE = ROOT / 'temp/teacher_female/source'
-bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blend/teacher_female_khaki_160cm_before_arm_fix.blend'))
+bpy.ops.wm.open_mainfile(filepath=str(ROOT/'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm_before_arm_fix.blend'))
 bpy.context.preferences.filepaths.save_version = 0
 rig = bpy.data.objects['Teacher_Female_Rig']
 asset = bpy.data.collections['TEACHER | female · 160 cm']
@@ -102,7 +102,7 @@ for loc,name in [((6,0,1.0),'side_corrected'),((0,-6,1.0),'front_corrected'),((2
     camera.location=loc
     camera.rotation_euler=(Vector((0,0,.81))-camera.location).to_track_quat('-Z','Y').to_euler()
     camera.data.ortho_scale=1.83
-    scene.render.filepath=str(ROOT/('renders/teacher_female_khaki_160cm_'+name+'.png'))
+    scene.render.filepath=str(ROOT/('ใช้ร่วมกัน/renders/teacher_female_khaki_160cm_'+name+'.png'))
     bpy.ops.render.render(write_still=True)
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blend/teacher_female_khaki_160cm.blend'))
+bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'ใช้ร่วมกัน/blend/teacher_female_khaki_160cm.blend'))
 print('ARMS_REFITTED',len(arm_names),'bones',len(snapshots),'preserved outfit vertices',flush=True)

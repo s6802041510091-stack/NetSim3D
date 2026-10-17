@@ -13,9 +13,9 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = ROOT / '3Dmodel/lookdev/phase0'
-SOURCE = ROOT / '3Dmodel/blend/classroom_shell.blend'
-WORK = ROOT / '3Dmodel/lookdev/working/classroom_shell_lookdev.blend'
+BASE = ROOT / 'Preview/โรงเรียนและเมือง/phase0'
+SOURCE = ROOT / '3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend'
+WORK = ROOT / 'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'
 STAMP = datetime.now().strftime('%Y%m%d_%H%M%S')
 BACKUP = ROOT / '3Dmodel/temp/lookdev_phase0_backups' / STAMP
 
@@ -100,7 +100,7 @@ with zipfile.ZipFile(archive) as z:
     for name, expected in hashes.items():
         assert hashlib.sha256(z.read(name)).hexdigest() == expected, name
 shutil.copy2(SOURCE, WORK)
-assert sha(WORK) == hashes['3Dmodel/blend/classroom_shell.blend']
+assert sha(WORK) == hashes['3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend']
 print('BACKUP_AND_WORKING_COPY_VERIFIED', flush=True)
 
 bpy.ops.wm.open_mainfile(filepath=str(SOURCE))

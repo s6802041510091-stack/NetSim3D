@@ -2,7 +2,7 @@ import bpy,json
 from collections import defaultdict,deque
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/teacher_male_khaki_180cm.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend')
 eye=bpy.data.objects['Eyes | fitted cornea iris sclera'];me=eye.data
 image=bpy.data.images.get('brown_eye.png');pix=list(image.pixels[:]);w,h=image.size
 for u,v in [(.284,.278),(.717,.719),(.90,.10),(.50,.50)]:

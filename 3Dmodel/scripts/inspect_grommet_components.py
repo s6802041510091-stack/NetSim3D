@@ -1,6 +1,6 @@
 import bpy,json
 from mathutils import Vector
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/classroom_shell.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/classroom_shell.blend')
 for n in ['StudentDesk_Row01_Left','TeacherDesk']:
  o=bpy.data.objects[n];faces=[p for p in o.data.polygons if 'Black_Accent' in o.data.materials[p.material_index].name and min(o.data.vertices[i].co.z for i in p.vertices)>.74]
  ids=set(i for p in faces for i in p.vertices);adj={i:set() for i in ids}

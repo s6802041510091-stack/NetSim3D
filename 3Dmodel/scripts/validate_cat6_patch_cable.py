@@ -20,7 +20,7 @@ COLORS = ["white/orange", "orange", "white/green", "blue", "white/blue", "green"
 
 
 def read_glb(name):
-    path = BASE / "exports" / name
+    path = BASE / "ใช้ร่วมกัน/exports" / name
     with path.open("rb") as handle:
         magic, version, total = struct.unpack("<4sII", handle.read(12))
         length, kind = struct.unpack("<II", handle.read(8))
@@ -37,7 +37,7 @@ def read_glb(name):
 def import_clean(name):
     bpy.ops.object.select_all(action="SELECT")
     bpy.ops.object.delete(use_global=False)
-    bpy.ops.import_scene.gltf(filepath=str(BASE / "exports" / name))
+    bpy.ops.import_scene.gltf(filepath=str(BASE / "ใช้ร่วมกัน/exports" / name))
     bpy.context.view_layer.update()
     objects = bpy.context.scene.objects
     assert not any(obj.type in {"CAMERA", "LIGHT", "CURVE"} for obj in objects)
@@ -74,7 +74,7 @@ def check_pins(objects, suffix, parent_name):
 
 whole_data = read_glb("lan_cable_cat6_5m.glb")
 module_data = read_glb("rj45_cat6_plug.glb")
-path_data = json.loads((BASE / "exports/lan_cable_cat6_5m.path.json").read_text(encoding="utf-8"))
+path_data = json.loads((BASE / "ใช้ร่วมกัน/exports/lan_cable_cat6_5m.path.json").read_text(encoding="utf-8"))
 assert path_data["units"] == "metres"
 points = np.array(path_data["points"], dtype=float)
 assert np.isfinite(points).all() and points.shape[1] == 3
@@ -152,5 +152,5 @@ report = {
     "studio_and_source_curve_excluded": True,
     "scene_integrated": False,
 }
-(BASE / "exports/lan_cable_cat6_5m.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+(BASE / "ใช้ร่วมกัน/exports/lan_cable_cat6_5m.roundtrip.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
 print(json.dumps(report, indent=2), flush=True)

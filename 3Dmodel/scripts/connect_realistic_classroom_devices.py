@@ -1,7 +1,7 @@
 import bpy,math,json,shutil,datetime,hashlib
 from pathlib import Path
 from mathutils import Vector,Matrix
-B=Path('D:/NetSim3D/3Dmodel');P=B/'blend/classroom_shell.blend';KIT=B/'blend/realistic_computer_cable_kit.blend'
+B=Path('D:/NetSim3D/3Dmodel');P=B/'ใช้ร่วมกัน/blend/classroom_shell.blend';KIT=B/'ใช้ร่วมกัน/blend/realistic_computer_cable_kit.blend'
 kit_hash=hashlib.sha256(KIT.read_bytes()).hexdigest()
 backup=P.with_name('classroom_shell_before_realistic_connections_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend');shutil.copy2(P,backup)
 bpy.ops.wm.open_mainfile(filepath=str(P));bpy.context.preferences.filepaths.save_version=0;s=bpy.context.scene
@@ -131,5 +131,5 @@ bpy.ops.object.select_all(action='DESELECT');bpy.ops.wm.save_as_mainfile(filepat
 (B/'temp/realistic_classroom_connections.json').write_text(json.dumps({'backup':str(backup),'computer_sets':21,'strips':11,'connections':records,'source_kit_sha256':kit_hash},indent=2))
 print('SAVED_CONNECTED_CLASSROOM',flush=True)
 d=bpy.data.cameras.new('Connected desk preview');cam=bpy.data.objects.new('Connected desk preview',d);s.collection.objects.link(cam);s.camera=cam;cam.location=(4.9,.15,2.2);target=Vector((2.7,-1.1,.76));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();d.lens=35
-s.render.engine='CYCLES';s.cycles.samples=20;s.cycles.use_denoising=True;s.render.resolution_x=1500;s.render.resolution_y=1100;s.render.resolution_percentage=100;s.render.filepath=str(B/'renders/classroom_realistic_connections.png');bpy.ops.render.render(write_still=True)
+s.render.engine='CYCLES';s.cycles.samples=20;s.cycles.use_denoising=True;s.render.resolution_x=1500;s.render.resolution_y=1100;s.render.resolution_percentage=100;s.render.filepath=str(B/'ใช้ร่วมกัน/renders/classroom_realistic_connections.png');bpy.ops.render.render(write_still=True)
 print('DONE',flush=True)

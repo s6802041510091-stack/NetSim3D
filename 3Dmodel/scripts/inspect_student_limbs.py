@@ -1,6 +1,6 @@
 import bpy,json
 from mathutils import Vector
-bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/blend/students/student_female_bob_cut.blend')
+bpy.ops.wm.open_mainfile(filepath='D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/blend/students/student_female_bob_cut.blend')
 r=next(o for o in bpy.context.scene.objects if o.type=='ARMATURE')
 for b in r.pose.bones:
     if any(s in b.name for s in ['upperarm','lowerarm','wrist','upperleg','lowerleg','foot','shoulder']):

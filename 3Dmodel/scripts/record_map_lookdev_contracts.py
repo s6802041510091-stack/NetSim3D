@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / '3Dmodel/lookdev/phase0'
+OUT = ROOT / 'Preview/โรงเรียนและเมือง/phase0'
 baseline = json.loads((OUT / 'baseline.json').read_text(encoding='utf-8'))
 main = (ROOT / 'net-sim-3d/scenes/main.tscn').read_text(encoding='utf-8')
 prefixes = re.findall(r'^part_prefix = "([^"]+)"', main, re.M)

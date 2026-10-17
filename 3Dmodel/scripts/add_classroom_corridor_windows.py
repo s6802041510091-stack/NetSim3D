@@ -2,8 +2,8 @@ import bpy, shutil, datetime, json
 from pathlib import Path
 from mathutils import Vector
 BASE=Path('D:/NetSim3D/3Dmodel')
-path=BASE/'blend/classroom_shell.blend'
-backup=BASE/'blend'/('classroom_shell_before_windows_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend')
+path=BASE/'ใช้ร่วมกัน/blend/classroom_shell.blend'
+backup=BASE/'ใช้ร่วมกัน/blend'/('classroom_shell_before_windows_'+datetime.datetime.now().strftime('%Y%m%d_%H%M%S')+'.blend')
 shutil.copy2(path,backup)
 bpy.ops.wm.open_mainfile(filepath=str(path))
 bpy.context.preferences.filepaths.save_version=0
@@ -57,7 +57,7 @@ camdata=bpy.data.cameras.new('Window verification camera');cam=bpy.data.objects.
 cam.location=(-7.65,-2.8,1.7);target=Vector((1,-2.0,1.25));cam.rotation_euler=(target-cam.location).to_track_quat('-Z','Y').to_euler();camdata.lens=22;scene.camera=cam
 scene.render.engine='CYCLES';scene.cycles.samples=24;scene.cycles.use_denoising=True
 scene.render.resolution_x=1200;scene.render.resolution_y=800;scene.render.resolution_percentage=100
-scene.render.filepath=str(BASE/'renders/classroom_corridor_windows.png');bpy.ops.render.render(write_still=True)
+scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders/classroom_corridor_windows.png');bpy.ops.render.render(write_still=True)
 bpy.ops.wm.open_mainfile(filepath=str(path))
 assert len([o for o in bpy.data.objects if o.name.startswith('CorridorWindow_') and 'ClearGlass' in o.name])==16
 print('VERIFIED_EIGHT_WINDOWS_AND_REOPENED',flush=True)

@@ -8,7 +8,7 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 BASE=Path('D:/NetSim3D/3Dmodel')
-SOURCE=BASE/'blend/teacher_male_khaki_180cm.blend'
+SOURCE=BASE/'ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend'
 TEMP=BASE/'temp/it_support_characters';TEMP.mkdir(parents=True,exist_ok=True)
 SOURCE_HASH=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
 S=.105; FLOOR=-8.1862
@@ -210,7 +210,7 @@ for this NetSim3D request.
             'bounds':[list(low),list(high)],'bones':len(rig.data.bones),
             'meshes':sum(o.type=='MESH' for o in asset.objects),'animations':len(bpy.data.actions),
             'packed_textures':[i.name for i in bpy.data.images if i.source=='FILE' and i.users and i.packed_file],
-            'source_sha256':SOURCE_HASH,'output':str(BASE/'blend'/f'{stem}.blend')}
+            'source_sha256':SOURCE_HASH,'output':str(BASE/'ใช้ร่วมกัน/blend'/f'{stem}.blend')}
     (TEMP/f'{stem}_validation.json').write_text(json.dumps(report,indent=2),encoding='utf-8')
     print('CHARACTER_VALIDATED',json.dumps(report),flush=True)
     bpy.ops.object.select_all(action='DESELECT');rig.hide_set(True)
@@ -220,19 +220,19 @@ for this NetSim3D request.
     camera((2,-6.5,height+0.24),(0,0,height*.505),height*1.16)
     scene.render.engine='CYCLES';scene.cycles.samples=32;scene.cycles.use_denoising=True
     scene.render.resolution_x=960;scene.render.resolution_y=1280;scene.render.resolution_percentage=100
-    scene.render.filepath=str(BASE/'renders'/f'{stem}_preview.png')
+    scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders'/f'{stem}_preview.png')
     for area in bpy.context.screen.areas:
         if area.type=='VIEW_3D':
             area.spaces.active.region_3d.view_location=(0,0,height/2)
             area.spaces.active.region_3d.view_distance=height*1.50
-    path=BASE/'blend'/f'{stem}.blend'
+    path=BASE/'ใช้ร่วมกัน/blend'/f'{stem}.blend'
     bpy.ops.wm.save_as_mainfile(filepath=str(path))
     bpy.ops.render.render(write_still=True)
     camera((1.8,5,height+.2),(0,0,height*.505),height*1.17)
     scene.render.resolution_x=720;scene.render.resolution_y=960
-    scene.render.filepath=str(BASE/'renders'/f'{stem}_back.png');bpy.ops.render.render(write_still=True)
+    scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders'/f'{stem}_back.png');bpy.ops.render.render(write_still=True)
     camera((2,-6.5,height+0.24),(0,0,height*.505),height*1.16)
-    scene.render.resolution_x=960;scene.render.resolution_y=1280;scene.render.filepath=str(BASE/'renders'/f'{stem}_preview.png')
+    scene.render.resolution_x=960;scene.render.resolution_y=1280;scene.render.filepath=str(BASE/'ใช้ร่วมกัน/renders'/f'{stem}_preview.png')
     bpy.ops.wm.save_as_mainfile(filepath=str(path))
     # Confirm that the complete saved file can be reopened and all textures are embedded.
     saved_rig_name=rig.name

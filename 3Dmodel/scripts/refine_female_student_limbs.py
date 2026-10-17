@@ -3,9 +3,9 @@ import bpy, math, json, shutil
 from pathlib import Path
 from mathutils import Vector, Matrix
 
-ROOT=Path('D:/NetSim3D/3Dmodel');FOLDER=ROOT/'blend/students'
+ROOT=Path('D:/NetSim3D/3Dmodel');FOLDER=ROOT/'ใช้ร่วมกัน/blend/students'
 BACKUP=FOLDER/'backup_before_limb_refit';BACKUP.mkdir(exist_ok=True)
-RENDER=ROOT/'renders/students'
+RENDER=ROOT/'ใช้ร่วมกัน/renders/students'
 REPORT=[]
 
 def smooth(a,b,x):

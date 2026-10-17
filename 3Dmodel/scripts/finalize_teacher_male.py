@@ -3,7 +3,7 @@ import bpy,math,json
 from pathlib import Path
 from mathutils import Vector
 P=Path('D:/NetSim3D/3Dmodel')
-FILE=P/'blend/teacher_male_khaki_180cm.blend'
+FILE=P/'ใช้ร่วมกัน/blend/teacher_male_khaki_180cm.blend'
 bpy.ops.wm.open_mainfile(filepath=str(FILE))
 bpy.context.preferences.filepaths.save_version=0
 scene=bpy.context.scene;rig=bpy.data.objects['Teacher_Male_Rig']
@@ -107,7 +107,7 @@ def camera(pos,target,ortho):
     cam.location=pos;cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.type='ORTHO';cam.data.ortho_scale=ortho
 def render(name,x=1050,y=1400):
     scene.render.resolution_x=x;scene.render.resolution_y=y;scene.render.resolution_percentage=100
-    scene.render.filepath=str(P/'renders'/name);bpy.ops.render.render(write_still=True)
+    scene.render.filepath=str(P/'ใช้ร่วมกัน/renders'/name);bpy.ops.render.render(write_still=True)
 scene.cycles.samples=48
 camera((2.0,-6.5,2.05),(0,0,.91),2.08)
 bpy.ops.wm.save_as_mainfile(filepath=str(FILE))
@@ -118,6 +118,6 @@ camera((.15,-4,1.66),(0,0,1.53),.67)
 render('teacher_male_khaki_detail.png',1100,1100)
 camera((2.0,-6.5,2.05),(0,0,.91),2.08)
 scene.render.resolution_x=1050;scene.render.resolution_y=1400
-scene.render.filepath=str(P/'renders/teacher_male_khaki_180cm_preview.png')
+scene.render.filepath=str(P/'ใช้ร่วมกัน/renders/teacher_male_khaki_180cm_preview.png')
 bpy.ops.wm.save_as_mainfile(filepath=str(FILE))
 print('FINAL_TEACHER_SAVED',str(FILE),flush=True)

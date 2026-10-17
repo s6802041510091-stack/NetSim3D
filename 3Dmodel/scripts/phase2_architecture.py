@@ -3,8 +3,8 @@ import bpy, sys, json, shutil, hashlib, math, array, tempfile
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[2]
-WORK=ROOT/'3Dmodel/lookdev/working/classroom_shell_lookdev.blend'
-OUT=ROOT/'3Dmodel/lookdev/phase2'; OUT.mkdir(parents=True,exist_ok=True)
+WORK=ROOT/'Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend'
+OUT=ROOT/'Preview/โรงเรียนและเมือง/phase2'; OUT.mkdir(parents=True,exist_ok=True)
 BACKUP=WORK.with_name('classroom_shell_lookdev_before_phase2.blend')
 sys.path.insert(0,str(Path(__file__).parent))
 import phase1_it_corner as p1
@@ -170,7 +170,7 @@ def render(label,only=None):
             upper=bpy.data.objects.new('P2 stair review fill',d); s.collection.objects.link(upper)
             upper.location=(-15.5,28.7,5.8)
             upper.rotation_euler=(Vector((-14.5,28.7,2))-upper.location).to_track_quat('-Z','Y').to_euler()
-        folder=OUT/'renders'; folder.mkdir(exist_ok=True)
+        folder=OUT/'ใช้ร่วมกัน/renders'; folder.mkdir(exist_ok=True)
         s.render.filepath=str(folder/f'{label}_{name}.png'); bpy.ops.render.render(write_still=True)
         bpy.data.objects.remove(lamp,do_unlink=True)
         if upper: bpy.data.objects.remove(upper,do_unlink=True)
@@ -198,7 +198,7 @@ def verify():
     for name in changes:
         o=bpy.context.scene.objects[name]; uv=o.data.uv_layers.get('P2_SurfaceUV')
         if not uv or not uv.active_render or any(not math.isfinite(x) for q in uv.data for x in q.uv): errors.append('UV '+name)
-    files=json.loads((ROOT/'3Dmodel/lookdev/phase0/baseline.json').read_text(encoding='utf-8'))['file_hashes']
+    files=json.loads((ROOT/'Preview/โรงเรียนและเมือง/phase0/baseline.json').read_text(encoding='utf-8'))['file_hashes']
     for name,expected in files.items():
         if p1.sha(ROOT/name)!=expected: errors.append('source file '+name)
     report={'passed':not errors,'objects_checked':len(old),'architecture_objects_changed':len(changes),
