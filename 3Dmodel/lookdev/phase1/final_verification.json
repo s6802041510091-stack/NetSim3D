@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "original_objects_checked": 10376,
+  "unmodified_mesh_instances_checked": 8500,
+  "interactive_screens_preserved": 29,
+  "original_files_unchanged": 168,
+  "packed_texture_images": 27,
+  "changed_mesh_instances": 121,
+  "errors": [],
+  "web_performance_tested": false,
+  "main_game_interactions_tested": false
+}

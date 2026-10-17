@@ -1,0 +1,47 @@
+[
+  {
+    "file": "student_male_mullet.blend",
+    "height_m": 1.6499998569488525,
+    "feet_z": 0.0,
+    "bones": 163,
+    "triangles": 186436,
+    "unweighted_vertices": 0,
+    "packed_textures": true
+  },
+  {
+    "file": "student_male_two_block.blend",
+    "height_m": 1.649999976158142,
+    "feet_z": 0.0,
+    "bones": 163,
+    "triangles": 175924,
+    "unweighted_vertices": 0,
+    "packed_textures": true
+  },
+  {
+    "file": "student_female_bob_cut.blend",
+    "height_m": 1.600000023841858,
+    "feet_z": 0.0,
+    "bones": 163,
+    "triangles": 179276,
+    "unweighted_vertices": 0,
+    "packed_textures": true
+  },
+  {
+    "file": "student_female_wendy_cut.blend",
+    "height_m": 1.600000023841858,
+    "feet_z": 0.0,
+    "bones": 163,
+    "triangles": 187308,
+    "unweighted_vertices": 0,
+    "packed_textures": true
+  },
+  {
+    "file": "student_female_layer_cut.blend",
+    "height_m": 1.600000023841858,
+    "feet_z": 0.0,
+    "bones": 163,
+    "triangles": 189516,
+    "unweighted_vertices": 0,
+    "packed_textures": true
+  }
+]

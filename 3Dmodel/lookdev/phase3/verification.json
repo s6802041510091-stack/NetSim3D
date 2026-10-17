@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "original_objects_checked": 10506,
+  "changed_objects": 6720,
+  "shared_detail_instances": 20,
+  "screens_preserved": 29,
+  "source_files_checked": 168,
+  "errors": [],
+  "production_interactions_tested": false,
+  "web_performance_tested": false
+}

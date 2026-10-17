@@ -1,0 +1,14 @@
+config_version=5
+
+[application]
+config/name="NetSim3D Phase 3 — Equipment import validation"
+run/main_scene="res://preview.tscn"
+
+[display]
+window/size/viewport_width=1440
+window/size/viewport_height=960
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+

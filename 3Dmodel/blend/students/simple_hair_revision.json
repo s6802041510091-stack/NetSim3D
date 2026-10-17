@@ -1,0 +1,47 @@
+[
+  {
+    "file": "student_male_mullet.blend",
+    "hairstyle": "Short crop",
+    "head_bound": true,
+    "bones": 163,
+    "leg_mesh_preserved": true,
+    "shirt_mesh_preserved": true,
+    "animations_tested": false
+  },
+  {
+    "file": "student_male_two_block.blend",
+    "hairstyle": "Side part",
+    "head_bound": true,
+    "bones": 163,
+    "leg_mesh_preserved": true,
+    "shirt_mesh_preserved": true,
+    "animations_tested": false
+  },
+  {
+    "file": "student_female_bob_cut.blend",
+    "hairstyle": "Short pixie",
+    "head_bound": true,
+    "bones": 163,
+    "leg_mesh_preserved": true,
+    "shirt_mesh_preserved": true,
+    "animations_tested": false
+  },
+  {
+    "file": "student_female_wendy_cut.blend",
+    "hairstyle": "Ponytail",
+    "head_bound": true,
+    "bones": 163,
+    "leg_mesh_preserved": true,
+    "shirt_mesh_preserved": true,
+    "animations_tested": false
+  },
+  {
+    "file": "student_female_layer_cut.blend",
+    "hairstyle": "Tied bun",
+    "head_bound": true,
+    "bones": 163,
+    "leg_mesh_preserved": true,
+    "shirt_mesh_preserved": true,
+    "animations_tested": false
+  }
+]

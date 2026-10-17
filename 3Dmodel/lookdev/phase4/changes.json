@@ -1,0 +1,891 @@
+{
+  "changed_objects": [
+    "StudentDesk_Row01_Left",
+    "StudentDesk_Row01_Right",
+    "StudentDesk_Row02_Left",
+    "StudentDesk_Row02_Right",
+    "StudentDesk_Row03_Left",
+    "StudentDesk_Row03_Right",
+    "StudentDesk_Row04_Left",
+    "StudentDesk_Row04_Right",
+    "StudentDesk_Row05_Left",
+    "StudentDesk_Row05_Right",
+    "TeacherDesk",
+    "IT_HeadDesk",
+    "IT_SpareDesk",
+    "Chair_StudentDesk_Row01_Left_1",
+    "Chair_StudentDesk_Row01_Left_2",
+    "Chair_StudentDesk_Row01_Right_1",
+    "Chair_StudentDesk_Row01_Right_2",
+    "Chair_StudentDesk_Row02_Left_1",
+    "Chair_StudentDesk_Row02_Left_2",
+    "Chair_StudentDesk_Row02_Right_1",
+    "Chair_StudentDesk_Row02_Right_2",
+    "Chair_StudentDesk_Row03_Left_1",
+    "Chair_StudentDesk_Row03_Left_2",
+    "Chair_StudentDesk_Row03_Right_1",
+    "Chair_StudentDesk_Row03_Right_2",
+    "Chair_StudentDesk_Row04_Left_1",
+    "Chair_StudentDesk_Row04_Left_2",
+    "Chair_StudentDesk_Row04_Right_1",
+    "Chair_StudentDesk_Row04_Right_2",
+    "Chair_StudentDesk_Row05_Left_1",
+    "Chair_StudentDesk_Row05_Left_2",
+    "Chair_StudentDesk_Row05_Right_1",
+    "Chair_StudentDesk_Row05_Right_2",
+    "Chair_TeacherDesk_1",
+    "Chair_IT_HeadDesk_1",
+    "Chair_IT_SpareDesk_1",
+    "SCI_LabBench_1",
+    "SCI_LabStool_1_1",
+    "SCI_LabStool_1_2",
+    "SCI_LabStool_1_3",
+    "SCI_LabStool_1_4",
+    "SCI_LabBench_2",
+    "SCI_LabStool_2_1",
+    "SCI_LabStool_2_2",
+    "SCI_LabStool_2_3",
+    "SCI_LabStool_2_4",
+    "SCI_LabBench_3",
+    "SCI_LabStool_3_1",
+    "SCI_LabStool_3_2",
+    "SCI_LabStool_3_3",
+    "SCI_LabStool_3_4",
+    "SCI_LabBench_4",
+    "SCI_LabStool_4_1",
+    "SCI_LabStool_4_2",
+    "SCI_LabStool_4_3",
+    "SCI_LabStool_4_4",
+    "SCI_LabBench_5",
+    "SCI_LabStool_5_1",
+    "SCI_LabStool_5_2",
+    "SCI_LabStool_5_3",
+    "SCI_LabStool_5_4",
+    "SCI_LabBench_6",
+    "SCI_LabStool_6_1",
+    "SCI_LabStool_6_2",
+    "SCI_LabStool_6_3",
+    "SCI_LabStool_6_4",
+    "SCI_TeacherDemoBench",
+    "SCI_TeacherChair",
+    "SCI_FumeHood",
+    "SCI_GlasswareCabinet",
+    "SCI_GlasswareCabinet_2",
+    "SCI_GlasswareCabinet_3",
+    "SCI_GlasswareCabinet_4",
+    "SCI_ChemCabinet_Flammable",
+    "SCI_ChemCabinet_Corrosive",
+    "SCI_SideCounter",
+    "SCI_SafetyShower_Eyewash",
+    "SCI_Whiteboard",
+    "SCI_FumeHood_Label",
+    "SCI_ChemCabinet_Flammable_Label",
+    "SCI_ChemCabinet_Corrosive_Label",
+    "SCI_ReagentShelf",
+    "SCI_PeriodicTable_Poster",
+    "SCI_PeriodicTable_Title",
+    "SCI_FireExtinguisher",
+    "SCI_FireBlanket",
+    "SCI_FirstAid",
+    "SCI_Microscope_1",
+    "SCI_Glassware_1",
+    "SCI_Microscope_2",
+    "SCI_Glassware_2",
+    "SCI_Microscope_3",
+    "SCI_Glassware_3",
+    "SCI_Microscope_4",
+    "SCI_Glassware_4",
+    "SCI_Microscope_5",
+    "SCI_Glassware_5",
+    "SCI_Microscope_6",
+    "SCI_Glassware_6",
+    "SCI_Glassware_Demo",
+    "DC_NOC_Desk_2",
+    "DC_NOC_Desk_1",
+    "DC_Chair_NOC_1",
+    "DC_Chair_NOC_2",
+    "DC_Filing_Cabinet",
+    "DC_Printer_Table",
+    "DC_Repair_Bench",
+    "DC_Whiteboard",
+    "IT_Credenza_East",
+    "IT_Plant_NE",
+    "IT_Credenza_West",
+    "IT_Bookcase_West",
+    "IT_Plant_SW",
+    "IT_Meeting_Table",
+    "IT_Meeting_Chair_1",
+    "IT_Meeting_Chair_2",
+    "IT_Meeting_Chair_3",
+    "IT_Meeting_Chair_4",
+    "IT_Repair_Bench",
+    "IT_Repair_Stool",
+    "IT_Copier",
+    "IT_Paper_Boxes",
+    "IT_Equipment_Cabinet",
+    "IT_Water_Dispenser",
+    "IT_OnCall_Board",
+    "IT_Cable_Trunking",
+    "IT_Clock",
+    "IT_Split_AC_1",
+    "IT_Split_AC_2",
+    "IT_Network_Plan_Frame",
+    "IT_Certificate_1",
+    "IT_Certificate_2",
+    "IT_Fire_Extinguisher",
+    "IT_Notice_Board",
+    "IT_Credenza_Items",
+    "IT_Plant_Credenza",
+    "IT_Credenza_West_Items",
+    "IT_Plant_West",
+    "IT_HeadDesk_Items",
+    "IT_HeadDesk_NamePlate",
+    "IT_HeadDesk_Phone_Mug",
+    "IT_PlayerDesk_Items",
+    "IT_Meeting_Table_Items",
+    "IT_Repair_Bench_Items",
+    "ST_Cabinet_West_1",
+    "ST_Cabinet_West_2",
+    "ST_Cabinet_West_3",
+    "ST_Cabinet_West_4",
+    "ST_Cabinet_West_5",
+    "ST_Cabinet_North_1",
+    "ST_Cabinet_North_2",
+    "ST_Cabinet_North_3",
+    "ST_Cabinet_North_4",
+    "ST_Cabinet_North_5",
+    "ST_Cabinet_North_6",
+    "ST_Parts_Drawers_1",
+    "ST_Lateral_Drawers_1",
+    "ST_Parts_Drawers_2",
+    "ST_Lateral_Drawers_2",
+    "ST_Parts_Drawers_3",
+    "ST_Lateral_Drawers_3",
+    "ST_Parts_Drawers_4",
+    "ST_Lateral_Drawers_4",
+    "ST_Drawer_Island",
+    "ST_Cable_Reel_Rack",
+    "ST_Boxes_On_Top",
+    "ST_Island_Items",
+    "ST_Fire_Extinguisher",
+    "ST_Clipboard_Log",
+    "TR_Teacher_Desk_1",
+    "TR_Chair_1",
+    "TR_Teacher_Desk_2",
+    "TR_Chair_2",
+    "TR_Teacher_Desk_3",
+    "TR_Chair_3",
+    "TR_Teacher_Desk_4",
+    "TR_Chair_4",
+    "TR_Teacher_Desk_5",
+    "TR_Chair_5",
+    "TR_Partition_Office_Long",
+    "TR_Partition_Office_Front",
+    "TR_Partition_Cubicle_1",
+    "TR_Partition_Cubicle_2",
+    "TR_Partition_Cubicle_3",
+    "TR_Partition_Desk5_Side",
+    "TR_Guest_Chair_1",
+    "TR_Office_Bookcase",
+    "TR_Plant_Office",
+    "TR_Rug",
+    "TR_Sofa_Main",
+    "TR_Sofa_Chaise",
+    "TR_Coffee_Table",
+    "TR_Plant_Lounge",
+    "TR_Pantry_Counter",
+    "TR_Fridge",
+    "TR_Water_Dispenser",
+    "TR_Meeting_Rug",
+    "TR_Meeting_Table",
+    "TR_Meeting_Chair_W1",
+    "TR_Meeting_Chair_W2",
+    "TR_Meeting_Chair_W3",
+    "TR_Meeting_Chair_W4",
+    "TR_Meeting_Chair_E1",
+    "TR_Meeting_Chair_E2",
+    "TR_Meeting_Chair_E3",
+    "TR_Meeting_Chair_E4",
+    "TR_Meeting_Chair_Head",
+    "TR_Lockers",
+    "TR_Mailboxes",
+    "TR_Bookcase_West",
+    "TR_Plant_West",
+    "TR_Copier",
+    "TR_Filing_Cabinet_1",
+    "TR_Filing_Cabinet_2",
+    "TR_Filing_Cabinet_3",
+    "TR_Filing_Cabinet_4",
+    "TR_Plant_Center_1",
+    "TR_Plant_Center_2",
+    "TR_Plant_SW",
+    "TR_Umbrella_Stand",
+    "TR_Office_Certificate",
+    "TR_Lounge_Picture",
+    "TR_Notice_Board",
+    "TR_Timetable_Board",
+    "TR_Clock",
+    "TR_Calendar",
+    "TR_Split_AC_1",
+    "TR_Split_AC_2",
+    "TR_Split_AC_3",
+    "TR_Desk_Items_1",
+    "TR_Desk_Items_2",
+    "TR_Desk_Items_3",
+    "TR_Desk_Items_4",
+    "TR_Desk_Items_5",
+    "TR_Cubicle_Shelf",
+    "TR_Cubicle_Shelf_2",
+    "TR_Cubicle_Shelf_3",
+    "TR_Cubicle_Shelf_4",
+    "TR_Pantry_Appliances",
+    "TR_Meeting_Table_Items"
+  ],
+  "geometry_changes": {
+    "Chair_StudentDesk_Row01_Left_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row01_Left_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row01_Right_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row01_Right_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row02_Left_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row02_Left_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row02_Right_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row02_Right_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row03_Left_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row03_Left_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row03_Right_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row03_Right_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row04_Left_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row04_Left_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row04_Right_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row04_Right_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row05_Left_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row05_Left_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row05_Right_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_StudentDesk_Row05_Right_2": [
+      "rounded upholstery edges"
+    ],
+    "Chair_TeacherDesk_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_IT_HeadDesk_1": [
+      "rounded upholstery edges"
+    ],
+    "Chair_IT_SpareDesk_1": [
+      "rounded upholstery edges"
+    ],
+    "DC_Chair_NOC_1": [
+      "rounded upholstery edges"
+    ],
+    "DC_Chair_NOC_2": [
+      "rounded upholstery edges"
+    ],
+    "IT_Plant_NE": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "IT_Plant_SW": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "IT_Meeting_Chair_1": [
+      "rounded upholstery edges"
+    ],
+    "IT_Meeting_Chair_2": [
+      "rounded upholstery edges"
+    ],
+    "IT_Meeting_Chair_3": [
+      "rounded upholstery edges"
+    ],
+    "IT_Meeting_Chair_4": [
+      "rounded upholstery edges"
+    ],
+    "IT_Plant_Credenza": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "IT_Plant_West": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Chair_1": [
+      "rounded upholstery edges"
+    ],
+    "TR_Chair_2": [
+      "rounded upholstery edges"
+    ],
+    "TR_Chair_3": [
+      "rounded upholstery edges"
+    ],
+    "TR_Chair_4": [
+      "rounded upholstery edges"
+    ],
+    "TR_Chair_5": [
+      "rounded upholstery edges"
+    ],
+    "TR_Guest_Chair_1": [
+      "rounded upholstery edges"
+    ],
+    "TR_Plant_Office": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Sofa_Main": [
+      "rounded upholstery edges"
+    ],
+    "TR_Sofa_Chaise": [
+      "rounded upholstery edges"
+    ],
+    "TR_Plant_Lounge": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Meeting_Chair_W1": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_W2": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_W3": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_W4": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_E1": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_E2": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_E3": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_E4": [
+      "rounded upholstery edges"
+    ],
+    "TR_Meeting_Chair_Head": [
+      "rounded upholstery edges"
+    ],
+    "TR_Plant_West": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Plant_Center_1": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Plant_Center_2": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Plant_SW": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Desk_Items_1": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Desk_Items_3": [
+      "curved pointed leaves replacing cone foliage"
+    ],
+    "TR_Desk_Items_4": [
+      "curved pointed leaves replacing cone foliage"
+    ]
+  },
+  "new_details": [
+    "P4_Print_IT_Bookcase_West",
+    "P4_Print_IT_Equipment_Cabinet",
+    "P4_Print_IT_Credenza_Items",
+    "P4_Print_IT_Credenza_West_Items",
+    "P4_Print_ST_Parts_Drawers_1",
+    "P4_Print_ST_Lateral_Drawers_1",
+    "P4_Print_ST_Parts_Drawers_2",
+    "P4_Print_ST_Lateral_Drawers_2",
+    "P4_Print_ST_Parts_Drawers_3",
+    "P4_Print_ST_Lateral_Drawers_3",
+    "P4_Print_ST_Parts_Drawers_4",
+    "P4_Print_ST_Lateral_Drawers_4",
+    "P4_Print_ST_Drawer_Island",
+    "P4_Print_ST_Boxes_On_Top",
+    "P4_Print_ST_Island_Items",
+    "P4_Print_TR_Office_Bookcase",
+    "P4_Print_TR_Lockers",
+    "P4_Print_TR_Mailboxes",
+    "P4_Print_TR_Bookcase_West",
+    "P4_Print_TR_Desk_Items_1",
+    "P4_Print_TR_Desk_Items_2",
+    "P4_Print_TR_Desk_Items_3",
+    "P4_Print_TR_Desk_Items_4",
+    "P4_Print_TR_Desk_Items_5",
+    "P4_Print_TR_Cubicle_Shelf",
+    "P4_Print_TR_Cubicle_Shelf_2",
+    "P4_Print_TR_Cubicle_Shelf_3",
+    "P4_Print_TR_Cubicle_Shelf_4"
+  ],
+  "bevel_objects": [
+    "StudentDesk_Row01_Left",
+    "StudentDesk_Row01_Right",
+    "StudentDesk_Row02_Left",
+    "StudentDesk_Row02_Right",
+    "StudentDesk_Row03_Left",
+    "StudentDesk_Row03_Right",
+    "StudentDesk_Row04_Left",
+    "StudentDesk_Row04_Right",
+    "StudentDesk_Row05_Left",
+    "StudentDesk_Row05_Right",
+    "TeacherDesk",
+    "IT_HeadDesk",
+    "IT_SpareDesk",
+    "SCI_LabBench_1",
+    "SCI_LabBench_2",
+    "SCI_LabBench_3",
+    "SCI_LabBench_4",
+    "SCI_LabBench_5",
+    "SCI_LabBench_6",
+    "SCI_TeacherDemoBench",
+    "SCI_GlasswareCabinet",
+    "SCI_GlasswareCabinet_2",
+    "SCI_GlasswareCabinet_3",
+    "SCI_GlasswareCabinet_4",
+    "SCI_ChemCabinet_Flammable",
+    "SCI_ChemCabinet_Corrosive",
+    "SCI_SideCounter",
+    "SCI_ChemCabinet_Flammable_Label",
+    "SCI_ChemCabinet_Corrosive_Label",
+    "SCI_ReagentShelf",
+    "SCI_PeriodicTable_Poster",
+    "SCI_PeriodicTable_Title",
+    "DC_NOC_Desk_2",
+    "DC_NOC_Desk_1",
+    "DC_Filing_Cabinet",
+    "DC_Printer_Table",
+    "DC_Repair_Bench",
+    "IT_Credenza_East",
+    "IT_Credenza_West",
+    "IT_Bookcase_West",
+    "IT_Meeting_Table",
+    "IT_Repair_Bench",
+    "IT_Equipment_Cabinet",
+    "IT_Credenza_Items",
+    "IT_Credenza_West_Items",
+    "IT_HeadDesk_Items",
+    "IT_HeadDesk_NamePlate",
+    "IT_HeadDesk_Phone_Mug",
+    "IT_PlayerDesk_Items",
+    "IT_Meeting_Table_Items",
+    "IT_Repair_Bench_Items",
+    "ST_Cabinet_West_1",
+    "ST_Cabinet_West_2",
+    "ST_Cabinet_West_3",
+    "ST_Cabinet_West_4",
+    "ST_Cabinet_West_5",
+    "ST_Cabinet_North_1",
+    "ST_Cabinet_North_2",
+    "ST_Cabinet_North_3",
+    "ST_Cabinet_North_4",
+    "ST_Cabinet_North_5",
+    "ST_Cabinet_North_6",
+    "ST_Parts_Drawers_1",
+    "ST_Lateral_Drawers_1",
+    "ST_Parts_Drawers_2",
+    "ST_Lateral_Drawers_2",
+    "ST_Parts_Drawers_3",
+    "ST_Lateral_Drawers_3",
+    "ST_Parts_Drawers_4",
+    "ST_Lateral_Drawers_4",
+    "ST_Drawer_Island",
+    "TR_Teacher_Desk_1",
+    "TR_Teacher_Desk_2",
+    "TR_Teacher_Desk_3",
+    "TR_Teacher_Desk_4",
+    "TR_Teacher_Desk_5",
+    "TR_Partition_Office_Long",
+    "TR_Partition_Office_Front",
+    "TR_Partition_Cubicle_1",
+    "TR_Partition_Cubicle_2",
+    "TR_Partition_Cubicle_3",
+    "TR_Partition_Desk5_Side",
+    "TR_Office_Bookcase",
+    "TR_Coffee_Table",
+    "TR_Pantry_Counter",
+    "TR_Fridge",
+    "TR_Meeting_Table",
+    "TR_Lockers",
+    "TR_Bookcase_West",
+    "TR_Filing_Cabinet_1",
+    "TR_Filing_Cabinet_2",
+    "TR_Filing_Cabinet_3",
+    "TR_Filing_Cabinet_4",
+    "TR_Desk_Items_2",
+    "TR_Desk_Items_5",
+    "TR_Cubicle_Shelf",
+    "TR_Cubicle_Shelf_2",
+    "TR_Cubicle_Shelf_3",
+    "TR_Cubicle_Shelf_4",
+    "TR_Meeting_Table_Items"
+  ],
+  "unique_processed_meshes": 137,
+  "texture_files": {
+    "P4 | Appliance": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Appliance_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Appliance_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Appliance_Normal_512.png"
+    },
+    "P4 | Beech": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Beech_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Beech_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Beech_Normal_512.png"
+    },
+    "P4 | Book blue": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_blue_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_blue_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_blue_Normal_512.png"
+    },
+    "P4 | Book green": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_green_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_green_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_green_Normal_512.png"
+    },
+    "P4 | Book red": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_red_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_red_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_red_Normal_512.png"
+    },
+    "P4 | Book white": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_white_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_white_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_white_Normal_512.png"
+    },
+    "P4 | Book yellow": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_yellow_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_yellow_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Book_yellow_Normal_512.png"
+    },
+    "P4 | Cabinet blue": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_blue_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_blue_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_blue_Normal_512.png"
+    },
+    "P4 | Cabinet grey": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_grey_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_grey_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_grey_Normal_512.png"
+    },
+    "P4 | Cabinet sage": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_sage_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_sage_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cabinet_sage_Normal_512.png"
+    },
+    "P4 | Cardboard": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cardboard_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cardboard_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cardboard_Normal_512.png"
+    },
+    "P4 | Ceramic": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_Normal_512.png"
+    },
+    "P4 | Ceramic red": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_red_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_red_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Ceramic_red_Normal_512.png"
+    },
+    "P4 | Coat white": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Coat_white_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Coat_white_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Coat_white_Normal_512.png"
+    },
+    "P4 | Cork": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cork_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cork_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Cork_Normal_512.png"
+    },
+    "P4 | Desk grey": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Desk_grey_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Desk_grey_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Desk_grey_Normal_512.png"
+    },
+    "P4 | Drawer red": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Drawer_red_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Drawer_red_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Drawer_red_Normal_512.png"
+    },
+    "P4 | Epoxy": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Epoxy_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Epoxy_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Epoxy_Normal_512.png"
+    },
+    "P4 | Fabric blue grey": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_blue_grey_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_blue_grey_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_blue_grey_Normal_512.png"
+    },
+    "P4 | Fabric burgundy": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_burgundy_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_burgundy_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_burgundy_Normal_512.png"
+    },
+    "P4 | Fabric mustard": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_mustard_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_mustard_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_mustard_Normal_512.png"
+    },
+    "P4 | Fabric navy": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_navy_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_navy_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_navy_Normal_512.png"
+    },
+    "P4 | Fabric teal": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_teal_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_teal_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Fabric_teal_Normal_512.png"
+    },
+    "P4 | Lab cabinet": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_cabinet_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_cabinet_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_cabinet_Normal_512.png"
+    },
+    "P4 | Lab sage": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_sage_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_sage_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Lab_sage_Normal_512.png"
+    },
+    "P4 | Label": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Label_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Label_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Label_Normal_512.png"
+    },
+    "P4 | Leaf green": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_green_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_green_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_green_Normal_512.png"
+    },
+    "P4 | Leaf light": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_light_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_light_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Leaf_light_Normal_512.png"
+    },
+    "P4 | Paper": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Paper_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Paper_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Paper_Normal_512.png"
+    },
+    "P4 | Quartz": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Quartz_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Quartz_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Quartz_Normal_512.png"
+    },
+    "P4 | Rug blue": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_Normal_512.png"
+    },
+    "P4 | Rug blue border": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_border_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_border_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_blue_border_Normal_512.png"
+    },
+    "P4 | Rug border": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_border_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_border_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_border_Normal_512.png"
+    },
+    "P4 | Rug warm": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_warm_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_warm_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Rug_warm_Normal_512.png"
+    },
+    "P4 | Soil": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Soil_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Soil_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Soil_Normal_512.png"
+    },
+    "P4 | Splash tile": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Splash_tile_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Splash_tile_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Splash_tile_Normal_512.png"
+    },
+    "P4 | Stool blue": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Stool_blue_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Stool_blue_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Stool_blue_Normal_512.png"
+    },
+    "P4 | Terracotta": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Terracotta_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Terracotta_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Terracotta_Normal_512.png"
+    },
+    "P4 | Walnut": {
+      "BaseColor": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Walnut_BaseColor_512.png",
+      "Roughness": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Walnut_Roughness_512.png",
+      "Normal": "D:\\NetSim3D\\3Dmodel\\lookdev\\phase4\\textures\\T_Walnut_Normal_512.png"
+    }
+  },
+  "backup": "D:\\NetSim3D\\3Dmodel\\lookdev\\working\\classroom_shell_lookdev_before_phase4.blend",
+  "views": {
+    "classroom": [
+      [
+        2.6,
+        0.0,
+        1.6
+      ],
+      [
+        0.25,
+        4.5,
+        0.65
+      ],
+      34
+    ],
+    "it_office": [
+      [
+        -16.2,
+        39.8,
+        1.65
+      ],
+      [
+        -11.4,
+        43.7,
+        1.05
+      ],
+      30
+    ],
+    "lounge": [
+      [
+        1.6,
+        26.0,
+        1.6
+      ],
+      [
+        -1.0,
+        29.65,
+        0.75
+      ],
+      33
+    ],
+    "pantry": [
+      [
+        1.1,
+        27.5,
+        1.65
+      ],
+      [
+        3.5,
+        30.1,
+        1.2
+      ],
+      34
+    ],
+    "staff": [
+      [
+        4.9,
+        14.8,
+        1.65
+      ],
+      [
+        1.1,
+        19.1,
+        0.9
+      ],
+      29
+    ],
+    "storage": [
+      [
+        -13.7,
+        32,
+        1.65
+      ],
+      [
+        -18.9,
+        35.6,
+        1.1
+      ],
+      27
+    ],
+    "science": [
+      [
+        -10.3,
+        1.1,
+        1.65
+      ],
+      [
+        -14.7,
+        3.2,
+        0.85
+      ],
+      31
+    ],
+    "noc": [
+      [
+        3.0,
+        34.2,
+        1.65
+      ],
+      [
+        -0.5,
+        31.0,
+        1.0
+      ],
+      30
+    ],
+    "plant": [
+      [
+        2.2,
+        28.4,
+        1.55
+      ],
+      [
+        1.02,
+        30,
+        0.9
+      ],
+      50
+    ],
+    "workstation": [
+      [
+        7.6,
+        26.7,
+        1.35
+      ],
+      [
+        8.46,
+        27.32,
+        0.87
+      ],
+      50
+    ]
+  },
+  "excluded_existing_label_owners": [
+    "ST_Cabinet_West_",
+    "ST_Cabinet_North_",
+    "TR_Filing_Cabinet_"
+  ]
+}

@@ -1,0 +1,1511 @@
+{
+  "OfficeSwitch_8Port": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "asset_id": "netcare_gs08_v1",
+      "description": "Original educational desktop Ethernet switch; 8 RJ45 8P8C ports; no wireless antennas.",
+      "port_count": 8,
+      "power_state_preview": "on; cable and external adapter not shown",
+      "link_state_preview": "all off: no connected cables"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Chassis": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.035100001841783524
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {},
+    "geometry": "f96db2b33ff3ace12ace0bd6c4e2a9cd8ad3b40c142c252e3b93a9937218ba0c",
+    "materials": [
+      "Housing | graphite blue powder coat",
+      "Base | anodized charcoal",
+      "Front | satin graphite",
+      "RJ45 | black polymer liner",
+      "Feet | nonslip rubber",
+      "Fasteners | dark steel",
+      "Accent | teal blue",
+      "RJ45 | nickel shield"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Printed_Legends": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.08500000089406967
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.02500000037252903
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.036035001277923584
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {},
+    "geometry": "7d103b539381e5e6f5c5a3fc331d901eed2727f69c634eea0c2fe6427d8e40a4",
+    "materials": [
+      "Legend | warm white",
+      "Legend | cool gray"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Power": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.08900000154972076
+      ],
+      [
+        0.0,
+        -4.371138828673793e-08,
+        -1.0,
+        -0.055649999529123306
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.01899999938905239
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "power_indicator",
+      "default_on": true
+    },
+    "geometry": "71769d75ed5f98e2314988615452e32e85dfd5adb453ce2585ec4c35b81ddc48",
+    "materials": [
+      "Power LED | ON"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_01": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.05999999865889549
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 1,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "a69279a547710e4e7da63c3a5ceab3054119a72988eb2c6dc9a05c9b62a54b5c",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_01": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.05570000037550926
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 1,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_01 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_01": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.05999999865889549
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 1,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_02": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 2,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "e37ef15854dce6d4f0151c813afc3c684f79a8468bcf98cda336efdae0973205",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_02": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.0357000008225441
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 2,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_02 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_02": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 2,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_03": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.019999999552965164
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 3,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "e142e1d50c0e090ec259f718887118afc7351dd041375ed70f0db18832662ac1",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_03": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.015699999406933784
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 3,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_03 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_03": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.019999999552965164
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 3,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_04": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 4,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "3aa9d325397d826cfa64f8ec6ab68afa0a7e891f7dece1b2e386e10b1e490823",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_04": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.00430000014603138
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 4,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_04 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_04": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 4,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_05": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 5,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "6b4bc05e70b04393eb06ee3e551f517539087716b613488029d4e3b7c79c46d2",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_05": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.024299999698996544
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 5,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_05 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_05": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 5,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_06": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 6,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "62dcb5985066f1f9e847cde8a2966a8fc6778cbd8759f83cb4504136f6372ae5",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_06": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.04430000111460686
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 6,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_06 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_06": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 6,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_07": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.05999999865889549
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 7,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "9dfadd45253a207791bc46a6b9386a403f507ba5712cdb9b75930f9cdb083669",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_07": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.06430000066757202
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 7,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_07 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_07": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.05999999865889549
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 7,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Port_08": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.07999999821186066
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.050999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02449999935925007
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 8,
+      "connector": "8P8C modular Ethernet jack (commonly called RJ45)",
+      "contact_count": 8
+    },
+    "geometry": "76bb53d0e84dee511d5ea2db07545db15c455ee99f135474a55aa3f6fdea1810",
+    "materials": [
+      "RJ45 | nickel shield",
+      "RJ45 | black polymer liner",
+      "RJ45 | eight gold contacts"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Link_08": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.08429999649524689
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05565999820828438
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.029400000348687172
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "port_number": 8,
+      "role": "link_activity_indicator",
+      "default_on": false
+    },
+    "geometry": "85c44704f019dec2fe965332996cb617d2958b67596c3e47154679ccc88cbdbf",
+    "materials": [
+      "Link_08 | OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_08": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.07999999821186066
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.05649999901652336
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.017899999395012856
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "cable_attachment",
+      "port_number": 8,
+      "outward_axis_blender": "-Y",
+      "outward_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_DC": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.08100000023841858
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.057999998331069946
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "OfficeSwitch_8Port",
+    "properties": {
+      "role": "dc_power_attachment"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "StudioFloor": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.001019999966956675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": "3c4d51b5b2a325d826393943831466f7fba140e8bdd2d54fe33de57307f1a98a",
+    "materials": [
+      "Studio | warm neutral"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "KeySoftbox": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.6866233944892883,
+        0.531231701374054,
+        -0.4963277280330658,
+        -0.18000000715255737
+      ],
+      [
+        -0.7270132899284363,
+        0.5017186403274536,
+        -0.46875375509262085,
+        -0.17000000178813934
+      ],
+      [
+        1.1008610911744654e-08,
+        0.682694137096405,
+        0.7307042479515076,
+        0.2800000011920929
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "FillSoftbox": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.3363361954689026,
+        -0.42268213629722595,
+        0.8415567278862,
+        0.20999999344348907
+      ],
+      [
+        0.9417420029640198,
+        0.1509578377008438,
+        -0.3005557656288147,
+        -0.10000000149011612
+      ],
+      [
+        -3.782772850513538e-08,
+        0.8936170935630798,
+        0.44883009791374207,
+        0.12999999523162842
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "TopRim": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        -0.9970544576644897,
+        -0.06597954034805298,
+        0.03910309448838234,
+        0.009999999776482582
+      ],
+      [
+        0.0766964927315712,
+        -0.8577341437339783,
+        0.5083402395248413,
+        0.12999999523162842
+      ],
+      [
+        3.5721323676796146e-09,
+        0.5098419785499573,
+        0.8602680563926697,
+        0.23999999463558197
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "FrontPortFill": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.9995825886726379,
+        0.006813009735196829,
+        -0.028074823319911957,
+        -0.004999999888241291
+      ],
+      [
+        -0.028889667242765427,
+        0.23573020100593567,
+        -0.9713890552520752,
+        -0.2199999988079071
+      ],
+      [
+        7.770430965337027e-10,
+        0.9717946648597717,
+        0.23582862317562103,
+        0.05999999865889549
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Camera_Product": {
+    "type": "CAMERA",
+    "matrix": [
+      [
+        0.8247288465499878,
+        -0.26398417353630066,
+        0.5001347064971924,
+        0.23999999463558197
+      ],
+      [
+        0.565528392791748,
+        0.384976863861084,
+        -0.7293630242347717,
+        -0.3499999940395355
+      ],
+      [
+        -6.352010473165137e-09,
+        0.8843671083450317,
+        0.4667920768260956,
+        0.23999999463558197
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  }
+}

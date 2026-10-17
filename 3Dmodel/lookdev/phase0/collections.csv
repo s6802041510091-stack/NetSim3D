@@ -1,0 +1,57 @@
+﻿collection,mesh_objects,unique_mesh_data,triangles_base_instanced
+01 | Walls and frames,79,79,5640
+02 | Floors,11,11,132
+03 | Doors,70,70,7560
+04 | Stairs up and down,153,153,11628
+05 | IT Support desks,6,4,3936
+06 | Room signs,24,24,11254
+07 | Ceilings - toggle for interior,52,52,4656
+08 | Plan labels - not game geometry,15,15,12093
+12 | Classroom corridor windows,64,64,768
+12 | Stair enclosure and adjacent landings,46,46,1192
+13 | Desk chairs,24,1,124416
+15 | Realistic connected computer peripherals,4507,175,525424
+15.1 | Lab benches and stools,41,10,16584
+15.2 | Wall equipment and safety,14,14,10715
+15.3 | Glassware and instruments,13,2,4072
+16 | Underdesk mounts and open grommets,287,287,24444
+16.1 | NOC control zone - operators,15,13,4292
+16.2 | Server zone - racks and plant,63,41,55465
+"16.3 | Glass partition, floor and trays",21,21,5707
+17.1 | Furniture,18,18,8124
+17.2 | Wall equipment and signs,22,22,12292
+17.3 | Desk items,10,10,2999
+18.1 | Cabinets and drawers,21,6,9636
+18.2 | Labels and small items,25,25,16009
+19.1 | Teacher workstations,20,9,3496
+"19.2 | Lounge, pantry and storage",41,38,12996
+19.3 | Wall boards and signs,17,17,9785
+19.4 | Small items,20,17,4966
+ASSET | NetCare Desktop v2,123,123,153460
+ASSET | NetCare Desktop v2.001,125,125,175551
+Classroom_Shell,30,30,520
+Furniture_Desks,11,2,14620
+LAN | empty conduits and sockets - NO CABLES,25,25,300
+POWER | outlets strips and cables,119,119,1428
+ROUTES | separate power raceways,11,11,132
+StudentDesk_Row01_Left | Computer 1,118,118,134108
+StudentDesk_Row01_Left | Computer 2,118,118,134108
+StudentDesk_Row01_Right | Computer 1,118,118,134108
+StudentDesk_Row01_Right | Computer 2,118,118,134108
+StudentDesk_Row02_Left | Computer 1,118,118,134108
+StudentDesk_Row02_Left | Computer 2,118,118,134108
+StudentDesk_Row02_Right | Computer 1,118,118,134108
+StudentDesk_Row02_Right | Computer 2,118,118,134108
+StudentDesk_Row03_Left | Computer 1,118,118,134108
+StudentDesk_Row03_Left | Computer 2,118,118,134108
+StudentDesk_Row03_Right | Computer 1,118,118,134108
+StudentDesk_Row03_Right | Computer 2,118,118,134108
+StudentDesk_Row04_Left | Computer 1,118,118,134108
+StudentDesk_Row04_Left | Computer 2,118,118,134108
+StudentDesk_Row04_Right | Computer 1,118,118,134108
+StudentDesk_Row04_Right | Computer 2,118,118,134108
+StudentDesk_Row05_Left | Computer 1,118,118,134108
+StudentDesk_Row05_Left | Computer 2,118,118,134108
+StudentDesk_Row05_Right | Computer 1,118,118,134108
+StudentDesk_Row05_Right | Computer 2,118,118,134108
+Teacher Computer | On desk,118,118,134108

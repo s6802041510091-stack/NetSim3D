@@ -1,0 +1,13 @@
+{
+  "file": "D:\\NetSim3D\\3Dmodel\\blend\\cleaner_female_apron_160cm.blend",
+  "height_m": 1.5999999046325684,
+  "feet_z": 0.0,
+  "bones": 163,
+  "mesh_objects": 30,
+  "unweighted_vertices": 0,
+  "recovered_arm_vertices": 3938,
+  "source_unchanged": true,
+  "textures_packed": true,
+  "animation_clips": 0,
+  "preview": "D:\\NetSim3D\\3Dmodel\\renders\\cleaner\\cleaner_female_apron_160cm.png"
+}

@@ -1,0 +1,1242 @@
+{
+  "CableTester": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "netlife_model": "cable_tester",
+      "netlife_version": 1
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Main": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CableTester",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Remote": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05779999867081642
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CableTester",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Main_Body": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.013000000268220901
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "5ae80f0e76f433ae2ee6ed88c4e77d8534bf67065c408dc7418bc0a0b79ac73f",
+    "materials": [
+      "Plastic_Body",
+      null,
+      "Plastic_Jack",
+      "Metal_Gold",
+      "Rubber_Grip",
+      "Panel_Label",
+      "Ink_Brand",
+      "Ink_Dark"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_1": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.02319999970495701
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "bf5e044fa20f6cf83de1f02953d741c8c83c908903cc5d65c75a2a8a58e0173e",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_2": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.017400000244379044
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "36d8a241bc356e573ae44d39c73f86697cad4288f21d66ad69efee43725bca98",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_3": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.011599999852478504
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "ae5eebc4c6a1a56a8a6c32b275c1e27a85e49f5418101e4c3077d0a89550e01a",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_4": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.005799999926239252
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "bf5e044fa20f6cf83de1f02953d741c8c83c908903cc5d65c75a2a8a58e0173e",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_5": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "bf5e044fa20f6cf83de1f02953d741c8c83c908903cc5d65c75a2a8a58e0173e",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_6": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.005799999926239252
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "2c3bcb6da96db14f8717673764dfa3bdf508ba2bede7f14cfec49c20a92b98e3",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_7": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.011599999852478504
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "27bd8f8b7276dff485f7ef712c77b6519020abccd9133aa6e11f7320282af0c4",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_8": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.017400000244379044
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "bb193fbb69a5650eb5b294b30645dfc7e7fda94df168ab25ece50216557ae15f",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Main_G": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.02319999970495701
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017500000074505806
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "2ab87d80923025ef544e8390eee02548d87dc9b3a0456d46c1fa83c177bd8034",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Power": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.023000000044703484
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0003000000142492354
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "ce22961203b1b303e51941a94f883a3835b143c149c22846788712de850fd925",
+    "materials": [
+      "LED_Red_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Button_Power": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.012000000104308128
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.017000000923871994
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.027300000190734863
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "af1f20a4c6ce14faef0abe8a62c040a5b4efa246459d8b42b074b5631ad2ade9",
+    "materials": [
+      "Button_Red"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Button_Test": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.012000000104308128
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.017000000923871994
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.027300000190734863
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": "f500f5dd17c1c5dd600a3c34f55e3b8b3a706509ad552adac2ff99559e30807d",
+    "materials": [
+      "Button_Yellow"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Main_PlugPoint": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.012000000104308128
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Main",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Remote_Body": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05779999867081642
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.013000000268220901
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "08839100d067ff5a9313eb6af64a32121f15b5d1b577c824f4f6e52e4d9ae16a",
+    "materials": [
+      "Plastic_Body",
+      null,
+      "Plastic_Jack",
+      "Metal_Gold",
+      "Rubber_Grip",
+      "Panel_Label",
+      "Ink_Dark"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_1": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.02319999970495701
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "bb193fbb69a5650eb5b294b30645dfc7e7fda94df168ab25ece50216557ae15f",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_2": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.017400000244379044
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "bb193fbb69a5650eb5b294b30645dfc7e7fda94df168ab25ece50216557ae15f",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_3": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.011599999852478504
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "bb193fbb69a5650eb5b294b30645dfc7e7fda94df168ab25ece50216557ae15f",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_4": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.005799999926239252
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "bb193fbb69a5650eb5b294b30645dfc7e7fda94df168ab25ece50216557ae15f",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_5": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "a1be48b9a3287aab9a0592a84f54b17bbd5364e3aa28852bbc3b9ca553cc9056",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_6": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.005799999926239252
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "390ead964c6af2cc4a33781041c98e81dac5958fa51d68b2bfbcad8b182e45d8",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_7": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.011599999852478504
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "2c3bcb6da96db14f8717673764dfa3bdf508ba2bede7f14cfec49c20a92b98e3",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_8": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.017400000244379044
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "bf5e044fa20f6cf83de1f02953d741c8c83c908903cc5d65c75a2a8a58e0173e",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Remote_G": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.02319999970495701
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.05480000004172325
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.026599999517202377
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": "36d8a241bc356e573ae44d39c73f86697cad4288f21d66ad69efee43725bca98",
+    "materials": [
+      "LED_Green_Off"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Remote_PlugPoint": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        1.5099580252808664e-07,
+        0.0,
+        0.0
+      ],
+      [
+        -1.5099580252808664e-07,
+        -1.0,
+        0.0,
+        0.07479999959468842
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.012000000104308128
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Remote",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "_Key": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.7071067094802856,
+        -0.4682929217815399,
+        0.5298129916191101,
+        0.20999999344348907
+      ],
+      [
+        0.7071068286895752,
+        0.46829280257225037,
+        -0.5298129320144653,
+        -0.20999999344348907
+      ],
+      [
+        4.9493543485823466e-08,
+        0.7492687106132507,
+        0.6622661352157593,
+        0.2800000011920929
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "_Fill": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.3511234521865845,
+        0.4363315999507904,
+        -0.8284485936164856,
+        -0.2800000011920929
+      ],
+      [
+        -0.936329185962677,
+        0.1636243760585785,
+        -0.3106682300567627,
+        -0.10499999672174454
+      ],
+      [
+        2.8248988925838603e-08,
+        0.8847835063934326,
+        0.46600234508514404,
+        0.17499999701976776
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "_Rim": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        -0.9701425433158875,
+        0.13457722961902618,
+        -0.2017732858657837,
+        -0.07000000029802322
+      ],
+      [
+        -0.2425355464220047,
+        -0.5383093953132629,
+        0.8070932030677795,
+        0.2800000011920929
+      ],
+      [
+        -9.117531618585417e-08,
+        0.8319326639175415,
+        0.5548766255378723,
+        0.20999999344348907
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  }
+}

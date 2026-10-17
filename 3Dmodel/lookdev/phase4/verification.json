@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "errors": [],
+  "original_objects_checked": 10526,
+  "changed_objects": 240,
+  "geometry_refined": 59,
+  "new_print_groups": 28,
+  "screens_preserved": 29,
+  "source_files_checked": 168,
+  "all_original_names_transforms_parents_properties_preserved": true,
+  "refined_geometry_within_original_bounds": true,
+  "unique_base_mesh_triangles": 784404,
+  "production_interactions_tested": false,
+  "web_performance_tested": false
+}

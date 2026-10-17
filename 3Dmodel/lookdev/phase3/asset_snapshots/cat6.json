@@ -1,0 +1,2529 @@
+{
+  "Cat6_PatchCable_5m": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "category_design": "Cat6 U/UTP patch cable, original educational art (not manufacturing CAD)",
+      "wiring": "T568B at both ends, straight-through",
+      "nominal_end_to_end_length_m": 5.0,
+      "jacket_diameter_mm": 6.2,
+      "deformation_note": "GLB is a static coiled mesh; reroute with source Curve or future Godot tube generation."
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cable_Jacket": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {
+      "centerline_length_m": 4.930999999999997,
+      "purpose": "Editable source. After editing, replace/re-export baked Cable_Jacket mesh."
+    },
+    "geometry": "298699bebbc962bfa5eb9b5cdf1914fa038d254425afc4a06341675f05cc8522",
+    "materials": [
+      "Jacket | muted network blue"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Plug_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2816532552242279
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2849772274494171
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {
+      "wiring": "T568B"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Plug_Housing_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2727995216846466
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2798125445842743
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.003470000112429261
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "mating_body_width_mm": 11.6,
+      "mating_body_height_mm": 7.4
+    },
+    "geometry": "7c5ed0a8656880b8bdce9a2ff3ff61441c8b3fef0f40bdaad140c78041b2e3d7",
+    "materials": [
+      "Plug | clear polycarbonate approximation",
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Contacts_8Pin_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2767448425292969
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28624698519706726
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.010870000347495079
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "contact_count": 8
+    },
+    "geometry": "46a4de0d197ac5a148049f85f928e4d2d0cc4ed2e1ec258e1db0df0d4d08e7aa",
+    "materials": [
+      "Contacts | gold finish"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Termination_Conductors_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2816532552242279
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2849772274494171
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {},
+    "geometry": "603b93576b30f57a174f6dcb377818c72a13925cdec383a65ce6b30b05769c0c",
+    "materials": [
+      "Conductor | white insulation",
+      "Conductor | orange",
+      "Conductor | green",
+      "Conductor | blue",
+      "Conductor | brown"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_01_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2767448425292969
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28624698519706726
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 1,
+      "insulation_color": "white/orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_02_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2772587835788727
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2853659391403198
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 2,
+      "insulation_color": "orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_03_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2777727246284485
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28448486328125
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 3,
+      "insulation_color": "white/green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_04_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2782866656780243
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28360381722450256
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 4,
+      "insulation_color": "blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_05_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2788006365299225
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2827227711677551
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 5,
+      "insulation_color": "white/blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_06_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2793145775794983
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2818416953086853
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 6,
+      "insulation_color": "green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_07_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2798285186290741
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28096064925193787
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 7,
+      "insulation_color": "white/brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_08_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2803424596786499
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.28007960319519043
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "pin_number": 8,
+      "insulation_color": "brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Latch_Clip_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        0.8524917960166931,
+        -0.13918238878250122,
+        -0.27288588881492615
+      ],
+      [
+        0.8637788891792297,
+        0.4972868859767914,
+        -0.08118972927331924,
+        -0.2798629403114319
+      ],
+      [
+        0.0,
+        -0.16113196313381195,
+        -0.9869328737258911,
+        0.002199999988079071
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {
+      "role": "release tab; press toward plug body before pulling"
+    },
+    "geometry": "4225a6f217ff63edd98c79b7cd5c714b9d5158f9c66774158b7aa3a36dd57a0c",
+    "materials": [
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Strain_Relief_Boot_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2816532552242279
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2849772274494171
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {},
+    "geometry": "a05f3c13f4198bb76f239007e23c0c6ccdfc27685dbd19e280c5115554b7e118",
+    "materials": [
+      "Boot | flexible blue PVC"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Boot_Legend_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.26265013217926025
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2738920748233795
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011670000851154327
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {},
+    "geometry": "2400290361f7657a90bb8dec5e4aa7f81a0f6a33994668bd0ce18d86916a2deb",
+    "materials": [
+      "Boot legend | white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "MatingTip_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2816532552242279
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2849772274494171
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "CableExit_A": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -0.5038710236549377,
+        -0.8637788891792297,
+        0.0,
+        -0.2518528699874878
+      ],
+      [
+        0.8637788891792297,
+        -0.5038710236549377,
+        0.0,
+        -0.2675936818122864
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_A",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Plug_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28573209047317505
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27681925892829895
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {
+      "wiring": "T568B"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Plug_Housing_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2756665349006653
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27875494956970215
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.003470000112429261
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "mating_body_width_mm": 11.6,
+      "mating_body_height_mm": 7.4
+    },
+    "geometry": "7c5ed0a8656880b8bdce9a2ff3ff61441c8b3fef0f40bdaad140c78041b2e3d7",
+    "materials": [
+      "Plug | clear polycarbonate approximation",
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Contacts_8Pin_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2815226912498474
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2739933431148529
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.010870000347495079
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "contact_count": 8
+    },
+    "geometry": "46a4de0d197ac5a148049f85f928e4d2d0cc4ed2e1ec258e1db0df0d4d08e7aa",
+    "materials": [
+      "Contacts | gold finish"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Termination_Conductors_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28573209047317505
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27681925892829895
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {},
+    "geometry": "603b93576b30f57a174f6dcb377818c72a13925cdec383a65ce6b30b05769c0c",
+    "materials": [
+      "Conductor | white insulation",
+      "Conductor | orange",
+      "Conductor | green",
+      "Conductor | blue",
+      "Conductor | brown"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_01_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2815226912498474
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2739933431148529
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 1,
+      "insulation_color": "white/orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_02_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2817153036594391
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27499499917030334
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 2,
+      "insulation_color": "orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_03_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28190791606903076
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2759966254234314
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 3,
+      "insulation_color": "white/green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_04_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2821005582809448
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27699828147888184
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 4,
+      "insulation_color": "blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_05_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2822931706905365
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2779999375343323
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 5,
+      "insulation_color": "white/blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_06_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28248581290245056
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2790015935897827
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 6,
+      "insulation_color": "green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_07_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28267842531204224
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.28000321984291077
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 7,
+      "insulation_color": "white/brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_08_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2828710675239563
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2810048758983612
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011020000092685223
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "pin_number": 8,
+      "insulation_color": "brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Latch_Clip_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        -0.9691744446754456,
+        0.15823262929916382,
+        0.27576473355293274
+      ],
+      [
+        -0.9820064306259155,
+        -0.18637974560260773,
+        0.030429357662796974,
+        -0.27873605489730835
+      ],
+      [
+        0.0,
+        -0.16113196313381195,
+        -0.9869328737258911,
+        0.002199999988079071
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {
+      "role": "release tab; press toward plug body before pulling"
+    },
+    "geometry": "4225a6f217ff63edd98c79b7cd5c714b9d5158f9c66774158b7aa3a36dd57a0c",
+    "materials": [
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Strain_Relief_Boot_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28573209047317505
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27681925892829895
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {},
+    "geometry": "a05f3c13f4198bb76f239007e23c0c6ccdfc27685dbd19e280c5115554b7e118",
+    "materials": [
+      "Boot | flexible blue PVC"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Boot_Legend_B": {
+    "type": "MESH",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2641279399394989
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.2809739112854004
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.011670000851154327
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {},
+    "geometry": "2400290361f7657a90bb8dec5e4aa7f81a0f6a33994668bd0ce18d86916a2deb",
+    "materials": [
+      "Boot legend | white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "MatingTip_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.28573209047317505
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.27681925892829895
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "CableExit_B": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        0.18884743750095367,
+        0.9820064306259155,
+        0.0,
+        0.2518528699874878
+      ],
+      [
+        -0.9820064306259155,
+        0.18884743750095367,
+        0.0,
+        -0.28333449363708496
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Plug_B",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cable_Start": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.2518528699874878
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.2675936818122864
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cable_End": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.2518528699874878
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.28333449363708496
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cable_Path_EDIT": {
+    "type": "CURVE",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Cat6_PatchCable_5m",
+    "properties": {
+      "centerline_length_m": 4.930999999999997,
+      "purpose": "Editable source. After editing, replace/re-export baked Cable_Jacket mesh."
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RJ45_Plug_Module": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "mating_direction_blender": "+Y",
+      "mating_direction_gltf": "-Z",
+      "nose_origin": "Front mating face; body and cable extend away along glTF +Z",
+      "suggested_initial_insertion_depth_mm": 8.0,
+      "contact_count": 8,
+      "wire_order_pin_1_to_8": "white/orange,orange,white/green,blue,white/blue,green,white/brown,brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Plug_Housing": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "mating_body_width_mm": 11.6,
+      "mating_body_height_mm": 7.4
+    },
+    "geometry": "7c5ed0a8656880b8bdce9a2ff3ff61441c8b3fef0f40bdaad140c78041b2e3d7",
+    "materials": [
+      "Plug | clear polycarbonate approximation",
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Contacts_8Pin": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "contact_count": 8
+    },
+    "geometry": "46a4de0d197ac5a148049f85f928e4d2d0cc4ed2e1ec258e1db0df0d4d08e7aa",
+    "materials": [
+      "Contacts | gold finish"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Termination_Conductors": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": "603b93576b30f57a174f6dcb377818c72a13925cdec383a65ce6b30b05769c0c",
+    "materials": [
+      "Conductor | white insulation",
+      "Conductor | orange",
+      "Conductor | green",
+      "Conductor | blue",
+      "Conductor | brown"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_01": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 1,
+      "insulation_color": "white/orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_02": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 2,
+      "insulation_color": "orange"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_03": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 3,
+      "insulation_color": "white/green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_04": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 4,
+      "insulation_color": "blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_05": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 5,
+      "insulation_color": "white/blue"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_06": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 6,
+      "insulation_color": "green"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_07": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 7,
+      "insulation_color": "white/brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Pin_08": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "pin_number": 8,
+      "insulation_color": "brown"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Latch_Clip": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {
+      "role": "release tab; press toward plug body before pulling"
+    },
+    "geometry": "4225a6f217ff63edd98c79b7cd5c714b9d5158f9c66774158b7aa3a36dd57a0c",
+    "materials": [
+      "Plug edges | translucent polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Strain_Relief_Boot": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": "a05f3c13f4198bb76f239007e23c0c6ccdfc27685dbd19e280c5115554b7e118",
+    "materials": [
+      "Boot | flexible blue PVC"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Boot_Legend": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": "2400290361f7657a90bb8dec5e4aa7f81a0f6a33994668bd0ce18d86916a2deb",
+    "materials": [
+      "Boot legend | white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "MatingTip": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "CableExit": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "StudioFloor": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.001550000044517219
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": "33c882122dbe57bf652562d2dad3bdad8558c485bfa3a2b729eb60202828f80c",
+    "materials": [
+      "Studio | warm gray"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Studio_PlugCableStub": {
+    "type": "CURVE",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RJ45_Plug_Module",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      true,
+      false,
+      false
+    ]
+  },
+  "KeySoftbox": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.6667948961257935,
+        0.5846220850944519,
+        -0.4621705114841461,
+        -0.3799999952316284
+      ],
+      [
+        -0.7452412843704224,
+        0.5230830311775208,
+        -0.4135209918022156,
+        -0.36000001430511475
+      ],
+      [
+        3.620603905574171e-08,
+        0.6201622486114502,
+        0.7844735980033875,
+        0.6499999761581421
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "FillSoftbox": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.10360600799322128,
+        -0.657346785068512,
+        0.7464321851730347,
+        0.47999998927116394
+      ],
+      [
+        0.9946184158325195,
+        0.06847357004880905,
+        -0.07775329798460007,
+        -0.07000000029802322
+      ],
+      [
+        3.3274285549111937e-09,
+        0.7504709362983704,
+        0.6609035134315491,
+        0.4300000071525574
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RimSoftbox": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        -0.9899494647979736,
+        -0.10999443382024765,
+        0.08888892829418182,
+        0.05999999865889549
+      ],
+      [
+        0.14142142236232758,
+        -0.7699606418609619,
+        0.622222363948822,
+        0.41999998688697815
+      ],
+      [
+        -2.025119805182385e-08,
+        0.628539502620697,
+        0.7777776718139648,
+        0.5299999713897705
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Camera_Cable": {
+    "type": "CAMERA",
+    "matrix": [
+      [
+        0.7798985838890076,
+        -0.4079457223415375,
+        0.4746982753276825,
+        0.5867935419082642
+      ],
+      [
+        0.6259058713912964,
+        0.5083132982254028,
+        -0.5914891362190247,
+        -0.8962340950965881
+      ],
+      [
+        3.3836386137409136e-08,
+        0.7584180235862732,
+        0.6517684459686279,
+        0.8322848081588745
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  }
+}

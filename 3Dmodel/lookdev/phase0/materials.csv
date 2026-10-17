@@ -1,0 +1,220 @@
+﻿material,object_slot_references,image_nodes,images,procedural_nodes,node_types,example_object,action
+Chair | graphite powder-coated steel,24,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Chair_StudentDesk_Row01_Left_1,UV and PBR review
+Chair | navy upholstery,24,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Chair_StudentDesk_Row01_Left_1,UV and PBR review
+Chair | rubber floor glides,24,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Chair_StudentDesk_Row01_Left_1,UV and PBR review
+Connector identifier,42,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left PC1 HDMI at computer | Gold identifier band,UV and PBR review
+Contacts | plated gold,63,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Contacts | plated gold.001,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Contacts | plated gold.002,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Contacts | plated gold.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+DC | FM-200 cylinder red,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_FM200_Cylinder_1,UV and PBR review
+DC | LED amber,23,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Video_Display,UV and PBR review
+DC | LED blue,36,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | LED green,30,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Video_Display,UV and PBR review
+DC | UPS charcoal,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_UPS_Cabinet,UV and PBR review
+DC | cable tray yellow,3,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_CableTray_RowA,UV and PBR review
+DC | chair mesh black,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Chair_NOC_1,UV and PBR review
+DC | desk frame graphite,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Video_Display,UV and PBR review
+DC | desk laminate grey,3,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_NOC_Desk_2,UV and PBR review
+DC | electrical panel grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Power_Distribution_Board,UV and PBR review
+DC | filing cabinet grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Filing_Cabinet,UV and PBR review
+DC | frosted band,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Server_Glass_Partition_Panel_1,UV and PBR review
+DC | network port,40,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Repair_Bench,UV and PBR review
+DC | notebook,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_NOC_Desk_2,UV and PBR review
+DC | partition aluminium,17,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Cold_Aisle_Door,UV and PBR review
+DC | patch cable blue,27,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Repair_Bench,UV and PBR review
+DC | patch cable yellow,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | pegboard,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Repair_Bench,UV and PBR review
+DC | perforated tile,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Server_Raised_Floor,UV and PBR review
+DC | precision AC white,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Precision_AC,UV and PBR review
+DC | rack cabinet black,23,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | rack perforated door,22,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | raised floor tile,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Server_Raised_Floor,UV and PBR review
+DC | screen alert panel,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Video_Display,UV and PBR review
+DC | screen dashboard,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_TeacherDemoBench,UV and PBR review
+DC | screen graph,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Video_Display,UV and PBR review
+DC | screen network map,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_FumeHood,UV and PBR review
+DC | server bezel graphite,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | server bezel silver,20,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01,UV and PBR review
+DC | sign navy,18,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Room_Sign,UV and PBR review
+DC | sign white,32,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Rack_A01_Label,UV and PBR review
+DC | smoked dome,3,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_CCTV_Dome_3,UV and PBR review
+DC | suppression pipe,3,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_FM200_Cylinder_1,UV and PBR review
+DC | tile gap,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Server_Raised_Floor,UV and PBR review
+DC | vent grille,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,DC_Split_AC,UV and PBR review
+Display | dark anti-glare,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Monitor_Display_Surface,UV and PBR review
+Display | dark anti-glare.001,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Monitor_Display_Surface.001,UV and PBR review
+Display | dark anti-glare.002,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Monitor_Display_Surface.002,UV and PBR review
+Display | dark anti-glare.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Monitor_Display_Surface.003,UV and PBR review
+Electrical | cable rubber,42,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left 0 DC barrel connector,UV and PBR review
+Electrical | duct cover,25,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,EMPTY LAN perimeter,UV and PBR review
+Electrical | ivory plastic,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left wall outlet,UV and PBR review
+Electrical | socket recess,66,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left outlet slot,UV and PBR review
+FX | clear glass,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_FumeHood,UV and PBR review
+Gold plated connector,924,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left PC1 HDMI at computer | HDMI contact,UV and PBR review
+Ivory ABS housing,119,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | 6-outlet extension housing.001,UV and PBR review
+LAN activity LED | off,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Activity,UV and PBR review
+LAN activity LED | off.001,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Activity.001,UV and PBR review
+LAN activity LED | off.002,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Activity.002,UV and PBR review
+LAN link LED | off,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Link,UV and PBR review
+LAN link LED | off.001,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Link.001,UV and PBR review
+LAN link LED | off.002,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LAN_RJ45_LED_Link.002,UV and PBR review
+LAN | blue identifiers,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left EMPTY LAN floor conduit,UV and PBR review
+MAP | Background classroom,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Background_Classroom_Floor,UV and PBR review
+MAP | Brushed handrails,129,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,BackgroundClass_Kick_Plate,UV and PBR review
+MAP | Corridor stone,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Corridor_Floor,UV and PBR review
+MAP | IT pale warm grey,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Support_North_Floor,UV and PBR review
+MAP | Light diffuser,42,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Light_Panel_Staff,UV and PBR review
+MAP | Plan lettering,15,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Plan_Corridor,UV and PBR review
+MAP | Server cool grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Server_Room_Floor,UV and PBR review
+MAP | Sign midnight blue,8,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,BackgroundClass_Sign,UV and PBR review
+MAP | Sign white,16,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,FemaleWC_TH,UV and PBR review
+MAP | Skirting,50,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Left_Outer_Wall_End_Skirting,UV and PBR review
+MAP | Staff pale sage,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Staff_Room_Floor,UV and PBR review
+MAP | Stair anti-slip edge,40,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Stair_UP_Nosing_01,UV and PBR review
+MAP | Stair concrete,58,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Stair_Main_Landing,UV and PBR review
+MAP | Storage concrete,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Equipment_Storage_Floor,UV and PBR review
+MAP | Washroom pale ceramic,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Female_Washroom_Floor,UV and PBR review
+MAP | Whiteboard,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Classroom_Whiteboard,UV and PBR review
+MAT_Ceiling_White,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Ceiling_Slab_150mm,UV and PBR review
+MAT_Desk_Black_Accent,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,StudentDesk_Row01_Left,UV and PBR review
+MAT_Desk_Frame_Charcoal,91,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,StudentDesk_Row01_Left,UV and PBR review
+MAT_Desk_Light_Wood,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,StudentDesk_Row01_Left,UV and PBR review
+MAT_Door_Warm_Wood,8,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Door_Leaf_Open_63deg,UV and PBR review
+MAT_Floor_Light_Gray,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Floor_Slab_150mm,UV and PBR review
+MAT_Frame_Dark_Gray,88,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Door_Frame_Front_Jamb,UV and PBR review
+MAT_Teacher_Desk_Panel,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TeacherDesk,UV and PBR review
+MAT_Wall_Warm_White,49,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Wall_Front_PositiveY,UV and PBR review
+Markings,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Lower housing seam.004,UV and PBR review
+Metal | anodised dark aluminium,42,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Metal | anodised dark aluminium.001,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Metal | anodised dark aluminium.002,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Metal | anodised dark aluminium.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+Metal | satin nickel,63,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Metal | satin nickel.001,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Metal | satin nickel.002,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Metal | satin nickel.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+Moulded charcoal connector,1634,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Strain relief moulded rib.084,UV and PBR review
+Mouse pale gray cable,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left PC1 mouse USB A | USB A overmould,UV and PBR review
+Nickel plated metal,202,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Housing screw.008,UV and PBR review
+OF | anti-static mat blue,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | appliance steel,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Fridge,UV and PBR review
+OF | appliance white,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Fridge,UV and PBR review
+OF | binder black,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_North,UV and PBR review
+OF | book blue,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_West,UV and PBR review
+OF | book green,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_West,UV and PBR review
+OF | book red,12,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_North,UV and PBR review
+OF | book white,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_West,UV and PBR review
+OF | book yellow,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_North,UV and PBR review
+OF | calendar photo,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Calendar,UV and PBR review
+OF | cardboard,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Paper_Boxes,UV and PBR review
+OF | chair fabric navy,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Chair_1,UV and PBR review
+OF | chair fabric red,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Meeting_Chair_1,UV and PBR review
+OF | copier light grey,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Copier,UV and PBR review
+OF | cork board,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Notice_Board,UV and PBR review
+OF | counter quartz grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Pantry_Counter,UV and PBR review
+OF | cushion mustard,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Sofa_Main,UV and PBR review
+OF | dish rack,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Pantry_Appliances,UV and PBR review
+OF | frame gold,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Certificate_1,UV and PBR review
+OF | handle chrome,34,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Credenza_East,UV and PBR review
+OF | label paper,31,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Bookcase_North,UV and PBR review
+OF | locker sage,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Lockers,UV and PBR review
+OF | monitor screen glass,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | mug red,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_PlayerDesk_Items,UV and PBR review
+OF | mug white,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_HeadDesk_Phone_Mug,UV and PBR review
+OF | note blue,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_OnCall_Board,UV and PBR review
+OF | note green,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_OnCall_Board,UV and PBR review
+OF | note pink,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_OnCall_Board,UV and PBR review
+OF | note yellow,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_OnCall_Board,UV and PBR review
+OF | oak laminate,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench,UV and PBR review
+OF | packing tape,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,ST_Boxes_On_Top,UV and PBR review
+OF | painting landscape,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Lounge_Picture,UV and PBR review
+OF | panel sage,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Welcome_Panel,UV and PBR review
+OF | paper white,19,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Paper_Boxes,UV and PBR review
+OF | partition fabric blue-grey,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Partition_Office_Long,UV and PBR review
+OF | partition trim aluminium,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Partition_Office_Long,UV and PBR review
+OF | parts bin translucent,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | parts drawer red,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | pcb green,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | pegboard,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Repair_Bench_Items,UV and PBR review
+OF | plant leaf green,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Plant_NE,UV and PBR review
+OF | plant leaf light green,13,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Plant_NE,UV and PBR review
+OF | plant pot terracotta,8,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Plant_NE,UV and PBR review
+OF | plant pot white,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Plant_Credenza,UV and PBR review
+OF | powder coat graphite,32,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Meeting_Table,UV and PBR review
+OF | powder coat white,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Teacher_Desk_1,UV and PBR review
+OF | rug blue-grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Meeting_Rug,UV and PBR review
+OF | rug blue-grey inner,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Meeting_Rug,UV and PBR review
+OF | rug inner,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Rug,UV and PBR review
+OF | rug warm grey,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Rug,UV and PBR review
+OF | sofa fabric teal,2,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Sofa_Main,UV and PBR review
+OF | soil,10,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Plant_NE,UV and PBR review
+OF | splashback tile white,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,TR_Pantry_Counter,UV and PBR review
+OF | steel cabinet blue,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,ST_Cabinet_North_1,UV and PBR review
+OF | steel cabinet light grey,14,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,ST_Cabinet_West_1,UV and PBR review
+OF | walnut veneer,18,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Credenza_East,UV and PBR review
+OF | water bottle blue,3,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Water_Dispenser,UV and PBR review
+OF | white laminate,15,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,IT_Credenza_East,UV and PBR review
+Pale blue mouse,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left PC1 wired mouse | Mouse main ergonomic shell,UV and PBR review
+Polymer | charcoal fine grain,2331,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails,Bake/export test
+Polymer | charcoal fine grain.001,113,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails.001,Bake/export test
+Polymer | charcoal fine grain.002,113,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails.002,Bake/export test
+Polymer | charcoal fine grain.003,1,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,02_Monitor_StaticDetails.003,Bake/export test
+Power indicator | off,84,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LED_PC_Power,UV and PBR review
+Power indicator | off.001,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LED_PC_Power.001,UV and PBR review
+Power indicator | off.002,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,LED_PC_Power.002,UV and PBR review
+Printed legends | light grey,2205,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Printed legends | light grey.001,105,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Printed legends | light grey.002,105,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Printed legends | light grey.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+Printed secondary | grey,105,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Printed secondary | grey.001,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Printed secondary | grey.002,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Printed secondary | grey.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+Red rocker switch,66,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Individual red rocker.018,UV and PBR review
+Rubber | grip,63,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Rubber | grip.001,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Rubber | grip.002,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Rubber | grip.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+SCI | acid cabinet blue,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_ChemCabinet_Corrosive,UV and PBR review
+SCI | aluminium frame,6,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Whiteboard,UV and PBR review
+SCI | amber bottle,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_ReagentShelf,UV and PBR review
+SCI | beech wood,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_ReagentShelf,UV and PBR review
+SCI | black epoxy worktop,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | cabinet door sage,11,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | cabinet pale grey,13,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | chrome,16,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | dark plastic,91,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | fire red,25,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_ChemCabinet_Flammable,UV and PBR review
+SCI | flammable yellow,5,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_ChemCabinet_Flammable,UV and PBR review
+SCI | gas tap yellow,8,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | glassware,26,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_GlasswareCabinet,UV and PBR review
+SCI | marker ink blue,37,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Whiteboard_Text1,UV and PBR review
+SCI | poster paper,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | safety green pipe,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_SafetyShower_Eyewash,UV and PBR review
+SCI | safety sign green,9,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_SafetyShower_Eyewash,UV and PBR review
+SCI | solution blue,7,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Glassware_1,UV and PBR review
+SCI | solution green,7,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Glassware_1,UV and PBR review
+SCI | solution orange,7,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Glassware_1,UV and PBR review
+SCI | stainless steel,77,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | stool seat blue,24,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabStool_1_1,UV and PBR review
+SCI | table metalloids,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | table metals,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | table noble gases,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | table nonmetals,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | table transition,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_PeriodicTable_Poster,UV and PBR review
+SCI | white,34,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_LabBench_1,UV and PBR review
+SCI | whiteboard,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,SCI_Whiteboard,UV and PBR review
+Socket cavity,475,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Deep socket insert.054,UV and PBR review
+Socket interior | black,63,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+Socket interior | black.001,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+Socket interior | black.002,4,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Socket interior | black.003,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,02_Monitor_StaticDetails.003,UV and PBR review
+Soft black PVC cable jacket,1202,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,Row01_Left realistic 6-way strip | Flexible strain relief.014,UV and PBR review
+Steel | graphite powder coat,42,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails,Bake/export test
+Steel | graphite powder coat.001,4,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails.001,Bake/export test
+Steel | graphite powder coat.002,4,0,,TEX_NOISE,BSDF_PRINCIPLED | BUMP | OUTPUT_MATERIAL | TEX_NOISE,01_Case_StaticDetails.002,Bake/export test
+USB 3 tongue | blue,21,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails,UV and PBR review
+USB 3 tongue | blue.001,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.001,UV and PBR review
+USB 3 tongue | blue.002,1,0,,,BSDF_PRINCIPLED | OUTPUT_MATERIAL,01_Case_StaticDetails.002,UV and PBR review
+Windows | clear two-sided glass,22,0,,,BSDF_GLASS | BSDF_TRANSPARENT | MIX_SHADER | OUTPUT_MATERIAL,Window_01_Glass_Front,UV and PBR review

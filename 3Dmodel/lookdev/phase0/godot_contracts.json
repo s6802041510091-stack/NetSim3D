@@ -1,0 +1,298 @@
+{
+  "screen_binding": "ComputerManager searches direct MeshInstance3D children of MapVisual whose names contain Monitor_Display_Surface.",
+  "screen_names_blender": [
+    "Monitor_Display_Surface.001",
+    "Monitor_Display_Surface.002",
+    "Monitor_Display_Surface.003",
+    "Monitor_Display_Surface",
+    "StudentPC_Row01_Left_1__Monitor_Display_Surface",
+    "StudentPC_Row01_Left_2__Monitor_Display_Surface",
+    "StudentPC_Row01_Right_1__Monitor_Display_Surface",
+    "StudentPC_Row01_Right_2__Monitor_Display_Surface",
+    "StudentPC_Row02_Left_1__Monitor_Display_Surface",
+    "StudentPC_Row02_Left_2__Monitor_Display_Surface",
+    "StudentPC_Row02_Right_1__Monitor_Display_Surface",
+    "StudentPC_Row02_Right_2__Monitor_Display_Surface",
+    "StudentPC_Row03_Left_1__Monitor_Display_Surface",
+    "StudentPC_Row03_Left_2__Monitor_Display_Surface",
+    "StudentPC_Row03_Right_1__Monitor_Display_Surface",
+    "StudentPC_Row03_Right_2__Monitor_Display_Surface",
+    "StudentPC_Row04_Left_1__Monitor_Display_Surface",
+    "StudentPC_Row04_Left_2__Monitor_Display_Surface",
+    "StudentPC_Row04_Right_1__Monitor_Display_Surface",
+    "StudentPC_Row04_Right_2__Monitor_Display_Surface",
+    "StudentPC_Row05_Left_1__Monitor_Display_Surface",
+    "StudentPC_Row05_Left_2__Monitor_Display_Surface",
+    "StudentPC_Row05_Right_1__Monitor_Display_Surface",
+    "StudentPC_Row05_Right_2__Monitor_Display_Surface",
+    "StaffPC_1_Monitor_Display_Surface",
+    "StaffPC_2_Monitor_Display_Surface",
+    "StaffPC_3_Monitor_Display_Surface",
+    "StaffPC_4_Monitor_Display_Surface",
+    "StaffPC_5_Monitor_Display_Surface"
+  ],
+  "blender_suffix_conversion": "Godot named-screen mapping uses _001, _002, _003 in place of Blender .001, .002, .003; verify exported node names.",
+  "door_prefixes_in_main": [
+    "Door_",
+    "BackgroundClass_",
+    "FemaleWC_",
+    "MaleWC_",
+    "ITSupport_",
+    "Storage_",
+    "Staff_",
+    "Server_"
+  ],
+  "door_part_kinds": [
+    "Leaf",
+    "Kick_Plate",
+    "Handle_Base",
+    "Lever"
+  ],
+  "door_mesh_names": [
+    "Door_Leaf_Open_63deg",
+    "BackgroundClass_Leaf",
+    "BackgroundClass_Kick_Plate",
+    "BackgroundClass_Handle_Base",
+    "BackgroundClass_Lever",
+    "BackgroundClass_Kick_Plate.001",
+    "BackgroundClass_Handle_Base.001",
+    "BackgroundClass_Lever.001",
+    "FemaleWC_Leaf",
+    "FemaleWC_Kick_Plate",
+    "FemaleWC_Handle_Base",
+    "FemaleWC_Lever",
+    "FemaleWC_Kick_Plate.001",
+    "FemaleWC_Handle_Base.001",
+    "FemaleWC_Lever.001",
+    "MaleWC_Leaf",
+    "MaleWC_Kick_Plate",
+    "MaleWC_Handle_Base",
+    "MaleWC_Lever",
+    "MaleWC_Kick_Plate.001",
+    "MaleWC_Handle_Base.001",
+    "MaleWC_Lever.001",
+    "ITSupport_Leaf",
+    "ITSupport_Kick_Plate",
+    "ITSupport_Handle_Base",
+    "ITSupport_Lever",
+    "ITSupport_Kick_Plate.001",
+    "ITSupport_Handle_Base.001",
+    "ITSupport_Lever.001",
+    "Storage_Leaf",
+    "Storage_Kick_Plate",
+    "Storage_Handle_Base",
+    "Storage_Lever",
+    "Storage_Kick_Plate.001",
+    "Storage_Handle_Base.001",
+    "Storage_Lever.001",
+    "Staff_Leaf",
+    "Staff_Kick_Plate",
+    "Staff_Handle_Base",
+    "Staff_Lever",
+    "Staff_Kick_Plate.001",
+    "Staff_Handle_Base.001",
+    "Staff_Lever.001",
+    "Server_Leaf",
+    "Server_Kick_Plate",
+    "Server_Handle_Base",
+    "Server_Lever",
+    "Server_Kick_Plate.001",
+    "Server_Handle_Base.001",
+    "Server_Lever.001"
+  ],
+  "godot_static_transforms": [
+    {
+      "header": "[node name=\"ClassroomDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -6.10363, 0, -8.93)",
+        "part_prefix = \"Door_\""
+      ]
+    },
+    {
+      "header": "[node name=\"BackgroundClassDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-9.18951, 0, -8.35152)",
+        "part_prefix = \"BackgroundClass_\""
+      ]
+    },
+    {
+      "header": "[node name=\"FemaleWCDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-9.18951, 0, -15.53437)",
+        "part_prefix = \"FemaleWC_\""
+      ]
+    },
+    {
+      "header": "[node name=\"MaleWCDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-9.18951, 0, -23.31843)",
+        "part_prefix = \"MaleWC_\""
+      ]
+    },
+    {
+      "header": "[node name=\"ITSupportDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-9.18951, 0, -35.5008)",
+        "part_prefix = \"ITSupport_\""
+      ]
+    },
+    {
+      "header": "[node name=\"StorageDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-12.44092, 0, -36.00708)",
+        "part_prefix = \"Storage_\""
+      ]
+    },
+    {
+      "header": "[node name=\"StaffDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-6.075, 0, -26.22954)",
+        "part_prefix = \"Staff_\""
+      ]
+    },
+    {
+      "header": "[node name=\"ServerDoor\" type=\"Node3D\" parent=\"Doors\"]",
+      "properties": [
+        "position = Vector3(-6.075, 0, -36.00708)",
+        "part_prefix = \"Server_\""
+      ]
+    },
+    {
+      "header": "[node name=\"DeskPhone\" parent=\".\" instance=ExtResource(\"8\")]",
+      "properties": [
+        "position = Vector3(-13.75, 0.758, -43.25)",
+        "rotation = Vector3(0, -1.5708, 0)"
+      ]
+    },
+    {
+      "header": "[node name=\"ITSupportPlayer\" parent=\".\" instance=ExtResource(\"3\")]",
+      "properties": [
+        "position = Vector3(-12.47, 0.02, -42.638)",
+        "rotation = Vector3(0, -1.5708, 0)"
+      ]
+    },
+    {
+      "header": "[node name=\"ITSupportSupervisor\" parent=\".\" instance=ExtResource(\"4\")]",
+      "properties": [
+        "position = Vector3(-16.885, 0.02, -42.512)",
+        "rotation = Vector3(0, -1.5708, 0)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeacherMale\" parent=\".\" instance=ExtResource(\"5\")]",
+      "properties": [
+        "position = Vector3(5.15, 0.02, -8)",
+        "rotation = Vector3(0, -1.5708, 0)"
+      ]
+    },
+    {
+      "header": "[node name=\"ClassroomAmbient\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(0, 2.7, 0)"
+      ]
+    },
+    {
+      "header": "[node name=\"ITSupportAmbient\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-15.2, 2.7, -40.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"CorridorAmbient\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-7.6, 2.7, -17.2)"
+      ]
+    },
+    {
+      "header": "[node name=\"ScienceLabLightFront\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-15.2, 2.7, -4.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"ScienceLabLightBack\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-15.2, 2.7, 4.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"ServerZoneLight\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-1.5, 2.6, -40.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"NOCZoneLight\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(2.5, 2.6, -33.8)"
+      ]
+    },
+    {
+      "header": "[node name=\"NOCDeskLight\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-3.6, 2.6, -32.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersCubicleLight1\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(4.6, 2.6, -28.0)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersCubicleLight2\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(4.6, 2.6, -21.4)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersCubicleLight3\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(4.6, 2.6, -16.8)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersCubicleLight4\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(4.6, 2.6, -12.2)"
+      ]
+    },
+    {
+      "header": "[node name=\"ITSupportReturnLight\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-10.8, 2.6, -32.6)"
+      ]
+    },
+    {
+      "header": "[node name=\"StorageLight\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(-16.8, 2.7, -33.8)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersRoomLightNorth\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(0, 2.7, -26.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersRoomLightMiddle\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(0, 2.7, -19.5)"
+      ]
+    },
+    {
+      "header": "[node name=\"TeachersRoomLightSouth\" type=\"OmniLight3D\" parent=\".\"]",
+      "properties": [
+        "position = Vector3(0, 2.7, -13.0)"
+      ]
+    }
+  ],
+  "coordinate_conversion": "Blender (x,y,z) => Godot (x,z,-y).",
+  "pending_corridor_sync": {
+    "right_wing_offset_x_m": 2.9645070422535205,
+    "corridor_center_offset_x_m": 1.4822535211267602,
+    "scope": "Only associated right-wing placements move; do not add offset to all nodes. Regenerate collisions with the updated GLB in the same integration step."
+  },
+  "warning": "Snapshot only, not runtime verification. Do not rename/reparent/join interactive screen or door meshes without updating and testing bindings."
+}

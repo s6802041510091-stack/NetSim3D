@@ -1,0 +1,110 @@
+{
+	"errors": [],
+	"glass_alpha_and_two_sided_verified": true,
+	"interactive_screen_meshes": 29,
+	"mesh_instances": 8736,
+	"p2_materials": [
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | Ceiling",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": false,
+			"alpha": 1.0,
+			"name": "P2 | Skirting",
+			"normal": false,
+			"roughness": false,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": false,
+			"alpha": 0.0700000002980232,
+			"name": "P2 | Clear glass",
+			"normal": false,
+			"roughness": false,
+			"transparency": 4,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | Stone",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | WashTile",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | Aluminium",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": false,
+			"alpha": 0.479999989271164,
+			"name": "P2 | Frosted band",
+			"normal": false,
+			"roughness": false,
+			"transparency": 4,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | ServerFloor",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | ServerFloor",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | Aluminium",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		},
+		{
+			"albedo": true,
+			"alpha": 1.0,
+			"name": "P2 | Stone",
+			"normal": true,
+			"roughness": true,
+			"transparency": 0,
+			"two_sided": true
+		}
+	],
+	"passed": true,
+	"renderer": "gl_compatibility",
+	"scope": "Visual import only; production interactions and web performance not tested."
+}

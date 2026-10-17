@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "objects_checked": 10506,
+  "architecture_objects_changed": 478,
+  "base_geometry_unchanged": true,
+  "source_files_checked": 168,
+  "screen_objects_preserved": 29,
+  "corridor_clear_width_m": 5.929014084507041,
+  "errors": [],
+  "web_performance_tested": false,
+  "production_interactions_tested": false
+}

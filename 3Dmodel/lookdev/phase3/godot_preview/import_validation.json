@@ -1,0 +1,101 @@
+{
+	"errors": [],
+	"interactive_screen_meshes": 29,
+	"mesh_instances": 8756,
+	"p3_materials": [
+		{
+			"albedo": true,
+			"name": "P3 | Rack perforation",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Satin metal",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Anodised graphite",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Network blue PVC",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Network yellow PVC",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": false,
+			"name": "P3 | Plated contacts",
+			"normal": false,
+			"roughness": false
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Flexible black PVC",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Ivory ABS",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Cable pale grey",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Mouse pale blue",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Red switch polymer",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Anodised graphite",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Satin metal",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Anodised graphite",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P3 | Satin metal",
+			"normal": true,
+			"roughness": true
+		}
+	],
+	"passed": true,
+	"rack_detail_instances": 20,
+	"renderer": "gl_compatibility",
+	"scope": "Visual GLB import; production interactions and web performance are separate Phase 5 checks."
+}

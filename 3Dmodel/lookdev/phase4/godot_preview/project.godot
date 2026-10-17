@@ -1,0 +1,13 @@
+config_version=5
+[application]
+config/name="NetSim3D Phase 4 - Furniture preview"
+run/main_scene="res://preview.tscn"
+[display]
+window/size/viewport_width=1440
+window/size/viewport_height=960
+window/size/window_width_override=1080
+window/size/window_height_override=720
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+anti_aliasing/quality/msaa_3d=2

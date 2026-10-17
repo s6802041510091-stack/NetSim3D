@@ -1,0 +1,2798 @@
+{
+  "RackServer_FS220_2U": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "description": "Original single-socket 2U server with removable lid, ECC DIMMs, SSD carriers, NIC and enclosed PSU",
+      "power_state": "OFF; no mains cable attached; all status LEDs off",
+      "rack_units": 2,
+      "chassis_height_mm": 87.5,
+      "role": "Hardware can host File Server software; no file service or quest code included",
+      "electrical_detail": "Illustrative board, sockets and harnesses, not manufacturing CAD or an electrical schematic"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Server_Chassis": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0006000000284984708
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "7de0dca549a0ac7c9e5766fb66230710d7fc3bddc4c778fe3545f735004aac6a",
+    "materials": [
+      "Case | satin galvanized steel",
+      "Bezel | graphite powder coat",
+      null,
+      "Ports | nickel shield",
+      "Recess | black polymer",
+      "PCB | forest green soldermask"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Lid_Remove": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "removal_note": "Disconnect AC first. Slide back (+Y) then lift (+Z) in Blender; no animation included."
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Top_Lid": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0869000032544136
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Lid_Remove",
+    "properties": {},
+    "geometry": "6e31d237a991c8fcdbd41180622ccf1908699422a01ac60ee9f3c3e0e0bc9a12",
+    "materials": [
+      "Case | satin galvanized steel",
+      null,
+      "Recess | black polymer",
+      "Bezel | graphite powder coat",
+      "Ports | nickel shield"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Drive_01_Carrier": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "occupied": true,
+      "removal_axis_blender": "-Y",
+      "removal_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Storage_Carrier_01": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.257999986410141
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.030000001192092896
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Drive_01_Carrier",
+    "properties": {},
+    "geometry": "78fa9c240cd4326e98d87878a340e244949674878be755a7de7a403a60db8762",
+    "materials": [
+      "Bezel | graphite powder coat",
+      null,
+      "Touch points | muted blue",
+      "Markings | warm white",
+      "Case | satin galvanized steel",
+      "Recess | black polymer",
+      "Ports | nickel shield",
+      "PCB | forest green soldermask",
+      "Contacts | gold plating"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Drive_01": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.12700000405311584
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.26319998502731323
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03800000250339508
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Drive_01_Carrier",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "1fc21720e1fb861f61b789d3da5310a47512844f5032cf5704eed867b616209e",
+    "materials": [
+      "LED | green OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_Storage_01": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "SSD carrier"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Drive_02_Carrier": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "occupied": true,
+      "removal_axis_blender": "-Y",
+      "removal_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Storage_Carrier_02": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.257999986410141
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.030000001192092896
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Drive_02_Carrier",
+    "properties": {},
+    "geometry": "ea42c610feaae76fcf172f9b84ca886656be34e972e2d92a2d74930d113553ac",
+    "materials": [
+      "Bezel | graphite powder coat",
+      null,
+      "Touch points | muted blue",
+      "Markings | warm white",
+      "Case | satin galvanized steel",
+      "Recess | black polymer",
+      "Ports | nickel shield",
+      "PCB | forest green soldermask",
+      "Contacts | gold plating"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Drive_02": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.023000001907348633
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.26319998502731323
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03800000250339508
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Drive_02_Carrier",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "1fc21720e1fb861f61b789d3da5310a47512844f5032cf5704eed867b616209e",
+    "materials": [
+      "LED | green OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_Storage_02": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "SSD carrier"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Bay_03_Blank": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "occupied": false,
+      "removal_axis_blender": "-Y",
+      "removal_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Storage_Blank_03": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.257999986410141
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.030000001192092896
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Bay_03_Blank",
+    "properties": {},
+    "geometry": "3cd3d127a5b0150929aa91a3cdfba04b5075765f84f2d80a15856a57d4adc2d1",
+    "materials": [
+      "Bezel | graphite powder coat",
+      null,
+      "Markings | warm white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_Storage_03": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.052000001072883606
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "blank bay"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Bay_04_Blank": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "occupied": false,
+      "removal_axis_blender": "-Y",
+      "removal_axis_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Storage_Blank_04": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.257999986410141
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.030000001192092896
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Bay_04_Blank",
+    "properties": {},
+    "geometry": "1274ca6eae174089c96b5c5600179fca0bcdd9a904e2e56d791990a46b3a233b",
+    "materials": [
+      "Bezel | graphite powder coat",
+      null,
+      "Markings | warm white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_Storage_04": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.24799999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "blank bay"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Motherboard_Fixed": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.0560000017285347
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0949999988079071
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.008799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "b906b04f8fd57f1fa543bffe1437e1749482a1690633ce9f96cdbabb8f7b9c93",
+    "materials": [
+      "PCB | forest green soldermask",
+      "Ports | nickel shield",
+      "Recess | black polymer",
+      "IC | matte black",
+      "Markings | warm white",
+      "Touch points | muted blue"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_RAM_A1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.00800000037997961
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM; simplified keyed socket"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_RAM_A2": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.004000000189989805
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM; simplified keyed socket"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_RAM_B1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.01600000075995922
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM; simplified keyed socket"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_RAM_B2": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.02800000086426735
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM; simplified keyed socket"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "CPU_Heatsink_Fixed": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.06599999964237213
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.09399999678134918
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.012299999594688416
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "18d8c12784b99cc6048f127070d62a1959da27bc3df3e5d3f93834430017307c",
+    "materials": [
+      "Recess | black polymer",
+      "Ports | nickel shield",
+      "Heat spreader | copper",
+      "Case | satin galvanized steel"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RAM_A1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.00800000037997961
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM visual approximation",
+      "capacity_gb": 16,
+      "remove_direction_gltf": "+Y"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Memory_Module_A1": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.00800000037997961
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03060000017285347
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RAM_A1",
+    "properties": {},
+    "geometry": "1b319e7617531f0bbe923953d3bca79ae0e0e414dc367ae1dbe0f9b4a759b65a",
+    "materials": [
+      "PCB | forest green soldermask",
+      null,
+      "Contacts | gold plating",
+      "IC | matte black",
+      "Markings | warm white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RAM_B1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.01600000075995922
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "kind": "ECC DIMM visual approximation",
+      "capacity_gb": 16,
+      "remove_direction_gltf": "+Y"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Memory_Module_B1": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.01600000075995922
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.08799999952316284
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03060000017285347
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RAM_B1",
+    "properties": {},
+    "geometry": "5d3ec38069708fd4f243257ba35352341bd4edf8655172ac9d0e53ef2d2775f2",
+    "materials": [
+      "PCB | forest green soldermask",
+      null,
+      "Contacts | gold plating",
+      "IC | matte black",
+      "Markings | warm white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cooling_Fan_Bank_Fixed": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.15000000596046448
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.04800000041723251
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0430000014603138
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "cdcdf3a4b324d26913bf313ee756af1f94110ae3a581de82c9ea6370febbc4da",
+    "materials": [
+      "Recess | black polymer",
+      null,
+      "Bezel | graphite powder coat",
+      "Ports | nickel shield"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "NIC_PCIe_DualLAN": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.25
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "role": "Dual-port Ethernet NIC, not router or switch",
+      "removal_axis_gltf": "+Y"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_NIC_PCIe": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.25
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.014000000432133675
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "NIC_Card_And_Bracket": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.14820000529289246
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.18700000643730164
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.04200000315904617
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "NIC_PCIe_DualLAN",
+    "properties": {},
+    "geometry": "b8ed9d28d57079705de75896de406b4345cd915a3705959908ff6bcdaedb4d99",
+    "materials": [
+      "PCB | forest green soldermask",
+      "IC | matte black",
+      "Contacts | gold plating",
+      "Case | satin galvanized steel",
+      "Ports | nickel shield",
+      null,
+      "Recess | black polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LAN_1_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26179999113082886
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03100000135600567
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "NIC_PCIe_DualLAN",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Port_RJ45_LAN1": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.13324999809265137
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.25599998235702515
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03100000135600567
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_1_Mount",
+    "properties": {
+      "contact_count": 8
+    },
+    "geometry": "02024cd1ec1216aa0d411da293b453b748b692b1abac6398e1bc79b242dde0d6",
+    "materials": [
+      "Ports | nickel shield",
+      "Recess | black polymer",
+      "Contacts | gold plating"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_LAN1_Link": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.13529999554157257
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26203998923301697
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03660000115633011
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_1_Mount",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "6811e0a184cd4107a434666c292b8fde05b953a63d053df71c57679dc03dcaa1",
+    "materials": [
+      "LED | green OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_LAN1_Activity": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14670000970363617
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26203998923301697
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03660000115633011
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_1_Mount",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "6811e0a184cd4107a434666c292b8fde05b953a63d053df71c57679dc03dcaa1",
+    "materials": [
+      "LED | amber OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_LAN1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26260000467300415
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.03100000135600567
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_1_Mount",
+    "properties": {
+      "outward_local_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LAN_2_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26179999113082886
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.053999997675418854
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "NIC_PCIe_DualLAN",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Port_RJ45_LAN2": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.13324999809265137
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.25599998235702515
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.053999997675418854
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_2_Mount",
+    "properties": {
+      "contact_count": 8
+    },
+    "geometry": "81918f7ae603bc040375f7225cda933c1750baf6693142ea433b2b5f251c1588",
+    "materials": [
+      "Ports | nickel shield",
+      "Recess | black polymer",
+      "Contacts | gold plating"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_LAN2_Link": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.13529999554157257
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26203998923301697
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.059599995613098145
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_2_Mount",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "6811e0a184cd4107a434666c292b8fde05b953a63d053df71c57679dc03dcaa1",
+    "materials": [
+      "LED | green OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_LAN2_Activity": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14670000970363617
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26203998923301697
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.059599995613098145
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_2_Mount",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "6811e0a184cd4107a434666c292b8fde05b953a63d053df71c57679dc03dcaa1",
+    "materials": [
+      "LED | amber OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_RJ45_LAN2": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.14100000262260437
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26260000467300415
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.053999997675418854
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "LAN_2_Mount",
+    "properties": {
+      "outward_local_gltf": "+Z"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "NIC_Port_Legends": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        -3.821371353845884e-15,
+        -8.742277657347586e-08,
+        -0.14100000262260437
+      ],
+      [
+        -8.742277657347586e-08,
+        4.371138828673793e-08,
+        1.0,
+        0.2619999945163727
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.04100000113248825
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "NIC_PCIe_DualLAN",
+    "properties": {},
+    "geometry": "9f2990dd3a6260ce1be8aa17f01f6f083118b795dd45334cdc66b4bf6c72136a",
+    "materials": [
+      "Recess | black polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "USB_A_1_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.2605000138282776
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Ports_USB_A": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        1.5099580252808664e-07,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        -1.5099580252808664e-07,
+        -1.0,
+        0.0,
+        0.2605000138282776
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "22cac41e65ec6ad80a382f3fdb0231ffab664964f9bcce15eec1948914a80b90",
+    "materials": [
+      "Ports | nickel shield",
+      "Recess | black polymer",
+      "Contacts | gold plating"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_USB_A1": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26100000739097595
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.019999999552965164
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "USB_A_1_Mount",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "USB_A_2_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.2605000138282776
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.028999999165534973
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_USB_A2": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        -0.03999999910593033
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26100000739097595
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.028999999165534973
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "USB_A_2_Mount",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "VGA_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.006000000052154064
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.260699987411499
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02500000037252903
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Port_VGA_Console": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.006000000052154064
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.260699987411499
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02500000037252903
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "VGA_Mount",
+    "properties": {},
+    "geometry": "bba4e330b1d93b9fc26cd3cba044f00a1e20edbd67e0ff6d3ebda7194cd63640",
+    "materials": [
+      "Ports | nickel shield",
+      "Touch points | muted blue",
+      "Recess | black polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_VGA": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.006000000052154064
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26109999418258667
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.02500000037252903
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "VGA_Mount",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "PSU_Module": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.25999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.00800000037997961
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "role": "Single AC PSU; not a UPS; no battery and no redundant second supply",
+      "removal_axis_gltf": "-Z",
+      "safety": "Disconnect mains before service. PSU internals are intentionally not modeled."
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Slot_PSU": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.25999999046325684
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.00800000037997961
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Power_Supply_Enclosure": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.14299999177455902
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.04000000283122063
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "PSU_Module",
+    "properties": {},
+    "geometry": "87ba1b7d64287e3162ef40cc6e9d57f1cbee054041ef804a81f18bb056a8b8bb",
+    "materials": [
+      "Case | satin galvanized steel",
+      null,
+      "Recess | black polymer",
+      "Touch points | muted blue",
+      "Ports | nickel shield",
+      "Markings | warm white"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "AC_Inlet_Mount": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.13899999856948853
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26099997758865356
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.039000000804662704
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "PSU_Module",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Port_AC_C14": {
+    "type": "MESH",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.13899999856948853
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26099997758865356
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.039000000804662704
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "AC_Inlet_Mount",
+    "properties": {},
+    "geometry": "5eee9083b28d2b7766b49d962454ba873f2aa97add58e5095e0b371eb2ccc3ed",
+    "materials": [
+      "Recess | black polymer",
+      "Ports | nickel shield"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Socket_AC_Power": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        -1.0,
+        8.742277657347586e-08,
+        0.0,
+        0.13899999856948853
+      ],
+      [
+        -8.742277657347586e-08,
+        -1.0,
+        0.0,
+        0.26179999113082886
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.039000000804662704
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "AC_Inlet_Mount",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Internal_Harnesses_Fixed": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15600000321865082
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.017000000923871994
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.024000000208616257
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "61f8e482916eb5035e0e76eff3136e588c74f75feaf26ea08194cce145302056",
+    "materials": [
+      "Recess | black polymer",
+      "Touch points | muted blue"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Button_Power": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.1809999942779541
+      ],
+      [
+        0.0,
+        -4.371138828673793e-08,
+        -1.0,
+        -0.2619999945163727
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.06800000369548798
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "a662887a2090254f17b176bde017a471f06536ff09b0b59d53555575da7f3336",
+    "materials": [
+      "Bezel | graphite powder coat"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Power": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.164000004529953
+      ],
+      [
+        0.0,
+        -4.371138828673793e-08,
+        -1.0,
+        -0.2612999975681305
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.06800000369548798
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "669238c5c18652f7e21c43a47d1b467fb5fc48f7bf8610247ec404976d3e7f75",
+    "materials": [
+      "LED | green OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "LED_Health": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.15399999916553497
+      ],
+      [
+        0.0,
+        -4.371138828673793e-08,
+        -1.0,
+        -0.2612999975681305
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.06800000369548798
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {
+      "default_on": false
+    },
+    "geometry": "aa63189a1f44ee2002473eb0df6cd190fb211ab83084d983cbee5b7dbc4be99a",
+    "materials": [
+      "LED | amber OFF"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Case_Legends": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.15199999511241913
+      ],
+      [
+        0.0,
+        -4.371138828673793e-08,
+        -1.0,
+        -0.2611500024795532
+      ],
+      [
+        0.0,
+        1.0,
+        -4.371138828673793e-08,
+        0.07000000029802322
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "RackServer_FS220_2U",
+    "properties": {},
+    "geometry": "63abb3afe8c3e5fd656508c7e1db9a20db6dde5cba24dafc309e63fa85bb3606",
+    "materials": [
+      "Markings | warm white",
+      "Recess | black polymer"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "StudioFloor": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        -0.001550000044517219
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": "75d2c1e246250a9cfd1bbfc867a2ee3ebd7562eccb57452eca687bec25abbf8e",
+    "materials": [
+      "Studio | neutral gray"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Key": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.7498377561569214,
+        0.4986658990383148,
+        -0.4348283112049103,
+        -0.44999998807907104
+      ],
+      [
+        -0.6616217494010925,
+        0.5651544332504272,
+        -0.4928053617477417,
+        -0.5099999904632568
+      ],
+      [
+        -7.931960510632052e-08,
+        0.65721595287323,
+        0.7537023425102234,
+        0.8100000023841858
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Fill": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        0.11400577425956726,
+        -0.5786898136138916,
+        0.8075399398803711,
+        0.6100000143051147
+      ],
+      [
+        0.9934800863265991,
+        0.06640710681676865,
+        -0.09266829490661621,
+        -0.07000000029802322
+      ],
+      [
+        -1.9392022920783347e-07,
+        0.8128395676612854,
+        0.5824875831604004,
+        0.4699999988079071
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Rim": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        -0.9982048273086548,
+        -0.04796871542930603,
+        0.03586197271943092,
+        0.029999999329447746
+      ],
+      [
+        0.05989222601056099,
+        -0.7994797825813293,
+        0.597699761390686,
+        0.5
+      ],
+      [
+        3.442820784016476e-08,
+        0.5987746119499207,
+        0.8009175658226013,
+        0.699999988079071
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "RearPortsFill": {
+    "type": "LIGHT",
+    "matrix": [
+      [
+        -0.9998779296875,
+        -0.007395923137664795,
+        0.013761580921709538,
+        -0.07000000029802322
+      ],
+      [
+        0.01562308520078659,
+        -0.47334024310112,
+        0.8807411193847656,
+        0.5699999928474426
+      ],
+      [
+        1.6210167430585898e-08,
+        0.8808486461639404,
+        0.47339802980422974,
+        0.20999999344348907
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Camera_Server": {
+    "type": "CAMERA",
+    "matrix": [
+      [
+        0.8006247878074646,
+        -0.2665375769138336,
+        0.536616861820221,
+        0.6899999976158142
+      ],
+      [
+        0.5991660356521606,
+        0.35615602135658264,
+        -0.7170445919036865,
+        -0.9300000071525574
+      ],
+      [
+        5.835048000335519e-10,
+        0.895606279373169,
+        0.44484761357307434,
+        0.6100000143051147
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  }
+}

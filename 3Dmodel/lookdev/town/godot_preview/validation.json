@@ -1,0 +1,13 @@
+{
+	"animated_petals": 80,
+	"cycling_loop_length_m": 433,
+	"cyclists": 6,
+	"horizon_ground_blend_count": 1,
+	"japanese_building_instances": 72,
+	"painted_2d_background": true,
+	"passed": true,
+	"production_integration": false,
+	"third_floor_eye_height_m": 8.85,
+	"walkers": 14,
+	"walking_loop_length_m": 406
+}

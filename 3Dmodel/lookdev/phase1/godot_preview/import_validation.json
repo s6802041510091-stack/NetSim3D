@@ -1,0 +1,93 @@
+{
+	"materials": 107,
+	"meshes": 431,
+	"p1_materials": [
+		{
+			"albedo": true,
+			"name": "P1 | Fabric",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | PowderCoat",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Rubber",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | CoatedWhite",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Binder",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Oak",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | PowderCoat",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Rubber",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Tile",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Paint",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": false,
+			"name": "P1 | archive ink",
+			"normal": false,
+			"roughness": false
+		},
+		{
+			"albedo": true,
+			"name": "P1 | PowderCoat",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Polymer",
+			"normal": true,
+			"roughness": true
+		},
+		{
+			"albedo": true,
+			"name": "P1 | Rubber",
+			"normal": true,
+			"roughness": true
+		}
+	],
+	"player_screen_found": true,
+	"renderer": "gl_compatibility",
+	"scope": "Isolated material import only. Main-game interaction and web performance not tested."
+}

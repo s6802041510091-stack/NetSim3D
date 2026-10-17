@@ -1,0 +1,168 @@
+{
+	"errors": [],
+	"mesh_instances": 8784,
+	"passed": true,
+	"pbr_materials": [
+		{
+			"material": "P4 | Cabinet grey",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Desk grey",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Beech",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Walnut",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Book red",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Book blue",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Book green",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Book yellow",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Book white",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Label",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Paper",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Appliance",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Cardboard",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Ceramic",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Fabric burgundy",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Cork",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Soil",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Leaf light",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Leaf green",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Terracotta",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Ceramic red",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Drawer red",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Cabinet blue",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Lab cabinet",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Epoxy",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Lab sage",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Stool blue",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Fabric navy",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Coat white",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Cabinet sage",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Rug blue border",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Rug blue",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Quartz",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Splash tile",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Fabric blue grey",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Rug border",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Rug warm",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Fabric teal",
+			"pbr_textures_present": true
+		},
+		{
+			"material": "P4 | Fabric mustard",
+			"pbr_textures_present": true
+		}
+	],
+	"phase3_rack_details": 20,
+	"printed_label_groups": 28,
+	"renderer": "gl_compatibility",
+	"scope": "Isolated visual import; production gameplay and web performance deferred to Phase 5.",
+	"screens": 29
+}

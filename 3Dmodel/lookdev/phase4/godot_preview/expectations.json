@@ -1,0 +1,176 @@
+{
+  "materials": [
+    "P4 | Appliance",
+    "P4 | Beech",
+    "P4 | Book blue",
+    "P4 | Book green",
+    "P4 | Book red",
+    "P4 | Book white",
+    "P4 | Book yellow",
+    "P4 | Cabinet blue",
+    "P4 | Cabinet grey",
+    "P4 | Cabinet sage",
+    "P4 | Cardboard",
+    "P4 | Ceramic",
+    "P4 | Ceramic red",
+    "P4 | Coat white",
+    "P4 | Cork",
+    "P4 | Desk grey",
+    "P4 | Drawer red",
+    "P4 | Epoxy",
+    "P4 | Fabric blue grey",
+    "P4 | Fabric burgundy",
+    "P4 | Fabric mustard",
+    "P4 | Fabric navy",
+    "P4 | Fabric teal",
+    "P4 | Lab cabinet",
+    "P4 | Lab sage",
+    "P4 | Label",
+    "P4 | Leaf green",
+    "P4 | Leaf light",
+    "P4 | Paper",
+    "P4 | Quartz",
+    "P4 | Rug blue",
+    "P4 | Rug blue border",
+    "P4 | Rug border",
+    "P4 | Rug warm",
+    "P4 | Soil",
+    "P4 | Splash tile",
+    "P4 | Stool blue",
+    "P4 | Terracotta",
+    "P4 | Walnut"
+  ],
+  "print_groups": 28,
+  "views": {
+    "classroom": [
+      [
+        2.6,
+        0.0,
+        1.6
+      ],
+      [
+        0.25,
+        4.5,
+        0.65
+      ],
+      34
+    ],
+    "it_office": [
+      [
+        -16.2,
+        39.8,
+        1.65
+      ],
+      [
+        -11.4,
+        43.7,
+        1.05
+      ],
+      30
+    ],
+    "lounge": [
+      [
+        1.6,
+        26.0,
+        1.6
+      ],
+      [
+        -1.0,
+        29.65,
+        0.75
+      ],
+      33
+    ],
+    "pantry": [
+      [
+        1.1,
+        27.5,
+        1.65
+      ],
+      [
+        3.5,
+        30.1,
+        1.2
+      ],
+      34
+    ],
+    "staff": [
+      [
+        4.9,
+        14.8,
+        1.65
+      ],
+      [
+        1.1,
+        19.1,
+        0.9
+      ],
+      29
+    ],
+    "storage": [
+      [
+        -13.7,
+        32,
+        1.65
+      ],
+      [
+        -18.9,
+        35.6,
+        1.1
+      ],
+      27
+    ],
+    "science": [
+      [
+        -10.3,
+        1.1,
+        1.65
+      ],
+      [
+        -14.7,
+        3.2,
+        0.85
+      ],
+      31
+    ],
+    "noc": [
+      [
+        3.0,
+        34.2,
+        1.65
+      ],
+      [
+        -0.5,
+        31.0,
+        1.0
+      ],
+      30
+    ],
+    "plant": [
+      [
+        2.2,
+        28.4,
+        1.55
+      ],
+      [
+        1.02,
+        30,
+        0.9
+      ],
+      50
+    ],
+    "workstation": [
+      [
+        7.6,
+        26.7,
+        1.35
+      ],
+      [
+        8.46,
+        27.32,
+        0.87
+      ],
+      50
+    ]
+  }
+}

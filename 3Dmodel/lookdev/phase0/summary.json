@@ -1,0 +1,20 @@
+{
+  "scene_objects": 10376,
+  "mesh_objects": 8621,
+  "unique_mesh_data": 1793,
+  "used_materials": 219,
+  "materials_with_images": 0,
+  "procedural_materials": 7,
+  "unique_meshes_without_uv": 799,
+  "mesh_objects_without_uv": 5256,
+  "unique_meshes_with_collapsed_uv": 0,
+  "shared_mesh_groups": 319,
+  "screen_meshes": 29,
+  "triangles_base_instanced": 4072560,
+  "triangles_base_unique": 685928,
+  "protected_objects": 304,
+  "corridor_clear_width_m": 5.929014084507041,
+  "godot_sync_status": "NOT_SYNCED: Blender corridor widened; existing Godot GLB and placements unchanged",
+  "uv_audit_limit": "Layer presence/ranges/collapse only; overlap, texel density and bake suitability require visual checks.",
+  "triangle_audit_limit": "Base meshes, all scene mesh instances, before modifiers and export splitting; not runtime visible triangle count."
+}

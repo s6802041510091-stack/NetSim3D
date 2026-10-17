@@ -1,0 +1,785 @@
+{
+  "scale_from_source": 0.018,
+  "source_license": "CC-BY-4.0",
+  "prototype_count": 7,
+  "instance_count": 72,
+  "prototypes": [
+    {
+      "name": "JP_DomekRdy_1",
+      "bounds": [
+        [
+          -3.030245304107666,
+          -3.5972390174865723,
+          0.0
+        ],
+        [
+          3.030245542526245,
+          3.5972397327423096,
+          9.223410606384277
+        ]
+      ],
+      "triangles": 21073
+    },
+    {
+      "name": "JP_DomekRdy_2",
+      "bounds": [
+        [
+          -2.679776430130005,
+          -3.2401533126831055,
+          9.763240171878351e-08
+        ],
+        [
+          2.679776430130005,
+          3.2401530742645264,
+          9.65263557434082
+        ]
+      ],
+      "triangles": 21335
+    },
+    {
+      "name": "JP_DomekRdy_Ksiegarnia",
+      "bounds": [
+        [
+          -3.932337999343872,
+          -3.4749176502227783,
+          0.0
+        ],
+        [
+          3.9323384761810303,
+          3.4749183654785156,
+          9.131804466247559
+        ]
+      ],
+      "triangles": 30869
+    },
+    {
+      "name": "JP_DomekRdy_Kwiaciarnia",
+      "bounds": [
+        [
+          -3.161060333251953,
+          -3.5887868404388428,
+          1.845359776098121e-07
+        ],
+        [
+          3.161060094833374,
+          3.5887866020202637,
+          7.367744445800781
+        ]
+      ],
+      "triangles": 73586
+    },
+    {
+      "name": "JP_DomekRdy_4",
+      "bounds": [
+        [
+          -2.699831485748291,
+          -2.332413673400879,
+          1.351833276430625e-07
+        ],
+        [
+          2.699831485748291,
+          2.332413911819458,
+          9.065488815307617
+        ]
+      ],
+      "triangles": 14997
+    },
+    {
+      "name": "JP_DomekRdy_5",
+      "bounds": [
+        [
+          -2.5986037254333496,
+          -2.3058204650878906,
+          1.6522406554031477e-07
+        ],
+        [
+          2.5986039638519287,
+          2.3058199882507324,
+          6.65117883682251
+        ]
+      ],
+      "triangles": 5578
+    },
+    {
+      "name": "JP_DomekRdy_3",
+      "bounds": [
+        [
+          -4.017107963562012,
+          -3.2802629470825195,
+          1.5234947170483792e-07
+        ],
+        [
+          4.017107009887695,
+          3.2802627086639404,
+          11.371258735656738
+        ]
+      ],
+      "triangles": 45005
+    }
+  ],
+  "placements": [
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        -65,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -65,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -54,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        -54,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        -43,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        -43,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -32,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        -32,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -21,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        -21,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -10,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -10,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        1,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        1,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        12,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        12,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        23,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        23,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        34,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        34,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        45,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        45,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        56,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        56,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        67,
+        -55,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        67,
+        91,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -65,
+        -29,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        70,
+        -29,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -65,
+        -18,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        70,
+        -18,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -65,
+        -7,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        70,
+        -7,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        -65,
+        4,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        70,
+        4,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        -65,
+        15,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        70,
+        15,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        -65,
+        26,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        70,
+        26,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        -65,
+        37,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        70,
+        37,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -65,
+        48,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        70,
+        48,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -65,
+        59,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        70,
+        59,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        -65,
+        70,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        70,
+        70,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -79,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        -79,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -50,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        -50,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -21,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -21,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        8,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        8,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        37,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        37,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        66,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        66,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        89,
+        -76,
+        -7.2
+      ],
+      "rotation": 3.141592653589793
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        89,
+        109,
+        -7.2
+      ],
+      "rotation": 0
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        -91,
+        -43,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        94,
+        -43,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        -91,
+        -15,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Ksiegarnia",
+      "position": [
+        94,
+        -15,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_5",
+      "position": [
+        -91,
+        13,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_2",
+      "position": [
+        94,
+        13,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_4",
+      "position": [
+        -91,
+        41,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_1",
+      "position": [
+        94,
+        41,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -91,
+        69,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        94,
+        69,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_Kwiaciarnia",
+      "position": [
+        -91,
+        97,
+        -7.2
+      ],
+      "rotation": -1.5707963267948966
+    },
+    {
+      "prototype": "JP_DomekRdy_3",
+      "position": [
+        94,
+        97,
+        -7.2
+      ],
+      "rotation": 1.5707963267948966
+    }
+  ],
+  "production_integration": false,
+  "layout_bounds": [
+    [
+      -95.01710510253906,
+      -79.59723663330078,
+      -7.199999809265137
+    ],
+    [
+      98.01710510253906,
+      112.59723663330078,
+      4.171258926391602
+    ]
+  ],
+  "errors": [],
+  "passed": true
+}

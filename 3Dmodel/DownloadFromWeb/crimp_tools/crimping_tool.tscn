@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://models/crimp_tools/crimping_tool.glb" id="1_glb"]
+[ext_resource type="Script" path="res://models/crimp_tools/crimping_tool.gd" id="2_script"]
+
+[node name="CrimpingTool" instance=ExtResource("1_glb")]
+script = ExtResource("2_script")

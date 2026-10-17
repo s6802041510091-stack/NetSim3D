@@ -1,0 +1,442 @@
+{
+  "CrimpingTool": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "netlife_model": "crimping_tool",
+      "open_deg": 16
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Jaw_Moving": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Body_Fixed": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": "f02857c253f6f637378126c83eaa5676ccf2b1418d4693583c3a60adb7d0bde3",
+    "materials": [
+      "Steel_Dark",
+      null,
+      "Grip_Blue",
+      "Steel_Blade",
+      "Steel",
+      "Ink_White"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Jaw_Lower": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "Jaw_Moving",
+    "properties": {},
+    "geometry": "0430276e272f0deec2d6464508c7a78e50cd256fbfe6e5ec8009c2c23ff0233d",
+    "materials": [
+      "Steel_Dark",
+      "Grip_Black",
+      "Steel_Blade"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Crimp_Slot": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.05400000140070915
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.005499999970197678
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cut_Point": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.020999999716877937
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Strip_Point": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.035999998450279236
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.007000000216066837
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0020000000949949026
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Hand_Grip": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        -0.10999999940395355
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CrimpingTool",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "CableStripper": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.09000000357627869
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": null,
+    "properties": {
+      "netlife_model": "cable_stripper"
+    },
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Stripper_Body": {
+    "type": "MESH",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.03999999910593033
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.09000000357627869
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CableStripper",
+    "properties": {},
+    "geometry": "36513de545f60e27b6fd305c2a02901500f0ae428ce396dfcfb9b97385d3c951",
+    "materials": [
+      "Plastic_StripperBlue",
+      null,
+      "Steel_Blade",
+      "Steel",
+      "Plastic_Yellow"
+    ],
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  },
+  "Cable_Hole": {
+    "type": "EMPTY",
+    "matrix": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.057999998331069946
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        -0.0990000069141388
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.010999999940395355
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "parent": "CableStripper",
+    "properties": {},
+    "geometry": null,
+    "materials": null,
+    "hidden": [
+      false,
+      false,
+      false
+    ]
+  }
+}
