@@ -36,6 +36,8 @@ func _run() -> void:
 
 	var visual := map.get_node("MapVisual")
 	var space := map.get_world_3d().direct_space_state
+	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
+	player.require_mouse_capture = false
 	for door_name: String in DOORWAYS:
 		var door: InteractiveDoor = map.get_node("Doors/" + door_name)
 		var swing := door.get_node_or_null("Swing")
@@ -59,6 +61,9 @@ func _run() -> void:
 		var leaf_center := leaf.global_transform * leaf.get_aabb().get_center()
 		var offset := Vector2(leaf_center.x - doorway.x, leaf_center.z - doorway.z).length()
 		_check(offset < 0.06, door_name + " closed leaf is %.3f m from the doorway centre" % offset)
+		var leaf_bounds: AABB = leaf.global_transform * leaf.get_aabb()
+		_check(leaf_bounds.position.y >= -0.005 and leaf_bounds.position.y < 0.025,
+			door_name + " leaf is floating or sunk into the floor: " + str(leaf_bounds.position.y))
 
 		# Closed door blocks a chest-high ray through the doorway; open does not.
 		var chest := Vector3(doorway.x, 1.3, doorway.z)
@@ -70,15 +75,43 @@ func _run() -> void:
 		var hit := space.intersect_ray(ray)
 		_check(hit.is_empty(), door_name + " open door still blocks the doorway: " + (str(hit.collider.name, " ", hit.position) if not hit.is_empty() else ""))
 
-		# Open: the leaf is back exactly where the Blender model put it.
+		# Open: preserve Blender's hinge/height, extending narrow presentation
+		# poses to the runtime minimum angle (90 degrees by default).
 		var original: Node3D = reference.get_node(String(leaf.name))
-		var drift := original.transform.origin.distance_to(leaf.global_transform.origin)
+		var authored_angle := (door.global_basis.inverse() * original.basis).orthonormalized().get_euler().y
+		var extra_swing := Transform3D(Basis(Vector3.UP, door._open_angle - authored_angle), Vector3.ZERO)
+		var expected := door.global_transform * extra_swing * door.global_transform.affine_inverse() * original.transform
+		var drift := expected.origin.distance_to(leaf.global_transform.origin)
 		_check(drift < 0.002, door_name + " open pose drifted %.4f m from the model" % drift)
+		_check(expected.basis.is_equal_approx(leaf.global_basis), door_name + " open rotation differs from expected hinge swing")
+
+		# Real capsule + keyboard movement, both directions, for EVERY doorway.
+		# A ray alone can miss a blocker at knee height or on the approach.
+		for direction in [-1.0, 1.0]:
+			player.global_position = Vector3(doorway.x - direction * 1.4, 0.02, doorway.z)
+			player.velocity = Vector3.ZERO
+			player.rotation.y = -direction * PI / 2.0
+			for i in range(3):
+				await physics_frame
+			Input.action_press("move_forward")
+			for i in range(65):
+				await physics_frame
+			Input.action_release("move_forward")
+			var crossed: float = (player.global_position.x - doorway.x) * direction
+			if crossed <= 0.75:
+				for i in range(player.get_slide_collision_count()):
+					var contact := player.get_slide_collision(i)
+					print("DOOR_WALK_CONTACT ", door_name, " ", contact.get_collider_shape().get_path(), " normal=", contact.get_normal())
+			_check(crossed > 0.75, door_name + " cannot walk through (direction %.0f): %s" % [direction, player.global_position])
+			_check(absf(player.global_position.y) < 0.03, door_name + " doorway floor is not level: " + str(player.global_position))
+		# Keep the player outside every swing while changing the next door's state.
+		player.global_position = Vector3(-7.0, 0.02, -40.0)
+		player.velocity = Vector3.ZERO
+		await physics_frame
 		door.set_open(false, false)
 		await physics_frame
 
 	# Player walks up to the IT Support door, presses E and walks through.
-	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
 	var it_door: InteractiveDoor = map.get_node("Doors/ITSupportDoor")
 	player.require_mouse_capture = false
 	player.global_position = Vector3(-8.2, 0.02, -34.98)
@@ -126,7 +159,7 @@ func _run() -> void:
 
 	reference.free()
 	if failures == 0:
-		print("DOORS_VALID doors=", DOORWAYS.size(), " walked_to=", inside)
+		print("DOORS_VALID doors=", DOORWAYS.size(), " bidirectional_walks=16 floor_and_open_pose=valid walked_to=", inside)
 		quit()
 	else:
 		print("DOORS_INVALID failures=", failures)

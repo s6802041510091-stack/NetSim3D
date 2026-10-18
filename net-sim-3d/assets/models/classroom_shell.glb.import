@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://bbyjih4f450ip"
+uid="uid://c0vvls0p5upsf"
 path="res://.godot/imported/classroom_shell.glb-e27e9303bd44a0137fb85da49e0063bb.scn"
 
 [deps]
@@ -41,5 +41,5 @@ materials/extract_format=0
 materials/extract_path=""
 _subresources={}
 gltf/naming_version=2
-gltf/embedded_image_handling=1
+gltf/embedded_image_handling=2
 gltf/texture_map_mode=1

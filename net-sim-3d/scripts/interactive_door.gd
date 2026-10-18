@@ -25,6 +25,9 @@ const GROUP := &"interactive_doors"
 @export var display_name: String = ""
 @export var start_open: bool = false
 @export_range(0.1, 3.0, 0.05) var swing_time: float = 0.55
+## The Blender presentation pose may be only 65 degrees. Open at least square
+## to the wall so a player capsule can enter AND leave without snagging the tip.
+@export_range(90.0, 120.0, 1.0) var minimum_open_degrees: float = 90.0
 
 var is_open := false
 var is_moving := false
@@ -56,12 +59,15 @@ func _ready() -> void:
 
 	# How far the model's leaf is swung from this node's closed pose.
 	var relative := (global_basis.inverse() * leaf.global_basis).orthonormalized()
-	_open_angle = relative.get_euler().y
+	var authored_angle := relative.get_euler().y
+	_open_angle = signf(authored_angle) * maxf(absf(authored_angle), deg_to_rad(minimum_open_degrees))
 
 	_swing = Node3D.new()
 	_swing.name = "Swing"
 	add_child(_swing)
-	_swing.rotation.y = _open_angle
+	# Capture the authored pose before extending its swing; using the extended
+	# angle here would offset the leaf from its jamb when we close it again.
+	_swing.rotation.y = authored_angle
 	for part in parts:
 		part.reparent(_swing, true)
 

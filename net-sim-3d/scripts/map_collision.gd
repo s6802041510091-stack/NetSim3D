@@ -3,7 +3,7 @@ extends StaticBody3D
 
 ## Collision is authored from the Blender source's major architectural pieces.
 ## Decorative computer parts, wires and lettering remain visual-only.
-const COLLISION_DATA := "res://data/map_collisions.json"
+const COLLISION_DATA := "res://data/map_collisions_phase5.json"
 
 
 func _ready() -> void:
