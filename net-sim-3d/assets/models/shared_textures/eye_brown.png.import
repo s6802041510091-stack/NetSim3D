@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c5wukd2p5eksh"
-path.s3tc="res://.godot/imported/teacher_male_khaki_180cm_short04_diffuse.png-c2f1efd01c8f9042aca45405cf33b566.s3tc.ctex"
+uid="uid://tabs4ndtr47g"
+path.s3tc="res://.godot/imported/eye_brown.png-335b5fcbb7e11d6c429bbe9b04e8f85b.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "6af398029006676655e45e3c925b82e4"
-}
 
 [deps]
 
-source_file="res://assets/models/teacher_male_khaki_180cm_short04_diffuse.png"
-dest_files=["res://.godot/imported/teacher_male_khaki_180cm_short04_diffuse.png-c2f1efd01c8f9042aca45405cf33b566.s3tc.ctex"]
+source_file="res://assets/models/shared_textures/eye_brown.png"
+dest_files=["res://.godot/imported/eye_brown.png-335b5fcbb7e11d6c429bbe9b04e8f85b.s3tc.ctex"]
 
 [params]
 
@@ -41,4 +38,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

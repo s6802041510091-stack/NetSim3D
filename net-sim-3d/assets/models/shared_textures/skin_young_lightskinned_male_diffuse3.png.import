@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bc4u0vse5j6v3"
-path.s3tc="res://.godot/imported/it_support_supervisor_male_170cm_shoes04_normal.png-c8dc8a566d3b96eebde774dd13a99117.s3tc.ctex"
+uid="uid://bmsxx52dtycby"
+path.s3tc="res://.godot/imported/skin_young_lightskinned_male_diffuse3.png-4f2047115d61f5a28100132137b20b4b.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "ddc222212a99fbf88ea2da90d83c475f"
-}
 
 [deps]
 
-source_file="res://assets/models/it_support_supervisor_male_170cm_shoes04_normal.png"
-dest_files=["res://.godot/imported/it_support_supervisor_male_170cm_shoes04_normal.png-c8dc8a566d3b96eebde774dd13a99117.s3tc.ctex"]
+source_file="res://assets/models/shared_textures/skin_young_lightskinned_male_diffuse3.png"
+dest_files=["res://.godot/imported/skin_young_lightskinned_male_diffuse3.png-4f2047115d61f5a28100132137b20b4b.s3tc.ctex"]
 
 [params]
 
@@ -25,12 +22,12 @@ compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=1
+compress/normal_map=0
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
-roughness/mode=1
-roughness/src_normal="res://assets/models/it_support_supervisor_male_170cm_shoes04_normal.png"
+roughness/mode=0
+roughness/src_normal=""
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2
@@ -40,5 +37,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=0
+process/size_limit=1024
+detect_3d/compress_to=1

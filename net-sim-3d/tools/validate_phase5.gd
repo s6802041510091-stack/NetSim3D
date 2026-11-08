@@ -43,7 +43,9 @@ func _run() -> void:
 		station.set_screen_on(true)
 		screen_works = station.screen.material_override != null
 		station.set_screen_on(false)
-	var passed := visual.get_child_count() >= 8900 \
+	# Phase B web budget: the school is built by 3Dmodel/scripts/optimize_school_for_web.py
+	# (about 2.3k nodes, was 8.9k+). A big jump means the full-detail export came back.
+	var passed := visual.get_child_count() >= 1500 and visual.get_child_count() <= 3000 \
 		and moving_door_count == 8 and door_works \
 		and computers.stations.size() == 29 and screen_works \
 		and colliders.get_child_count() == 396 \

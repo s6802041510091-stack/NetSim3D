@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpv1rgq5fte7m"
-path.s3tc="res://.godot/imported/it_support_supervisor_male_170cm_young_lightskinned_male_diffuse3.png-cd39f64ea8bd1cba298272654786a45f.s3tc.ctex"
+uid="uid://q7sqhxer0tqw"
+path.s3tc="res://.godot/imported/shirt_short04_diffuse.png-0733f5ea9dd0dcaaf0919898ba123ff1.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "347b8056d571ab29c74b17b345d05d68"
-}
 
 [deps]
 
-source_file="res://assets/models/it_support_supervisor_male_170cm_young_lightskinned_male_diffuse3.png"
-dest_files=["res://.godot/imported/it_support_supervisor_male_170cm_young_lightskinned_male_diffuse3.png-cd39f64ea8bd1cba298272654786a45f.s3tc.ctex"]
+source_file="res://assets/models/shared_textures/shirt_short04_diffuse.png"
+dest_files=["res://.godot/imported/shirt_short04_diffuse.png-0733f5ea9dd0dcaaf0919898ba123ff1.s3tc.ctex"]
 
 [params]
 
@@ -40,5 +37,5 @@ process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
-process/size_limit=0
-detect_3d/compress_to=0
+process/size_limit=1024
+detect_3d/compress_to=1

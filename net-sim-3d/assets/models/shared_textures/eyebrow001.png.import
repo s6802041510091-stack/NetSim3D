@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://t6fo7vlaewyx"
-path.s3tc="res://.godot/imported/it_support_male_180cm_young_lightskinned_male_diffuse3.png-761d7b6658a23df95412dc7080fce7ca.s3tc.ctex"
+uid="uid://cd2dpvxm2bwer"
+path.s3tc="res://.godot/imported/eyebrow001.png-d234c36f56280e74103b14cdd43ff983.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "347b8056d571ab29c74b17b345d05d68"
-}
 
 [deps]
 
-source_file="res://assets/models/it_support_male_180cm_young_lightskinned_male_diffuse3.png"
-dest_files=["res://.godot/imported/it_support_male_180cm_young_lightskinned_male_diffuse3.png-761d7b6658a23df95412dc7080fce7ca.s3tc.ctex"]
+source_file="res://assets/models/shared_textures/eyebrow001.png"
+dest_files=["res://.godot/imported/eyebrow001.png-d234c36f56280e74103b14cdd43ff983.s3tc.ctex"]
 
 [params]
 
@@ -41,4 +38,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

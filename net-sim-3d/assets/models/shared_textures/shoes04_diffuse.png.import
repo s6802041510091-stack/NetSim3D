@@ -2,20 +2,17 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://4qlfq4528vvy"
-path.s3tc="res://.godot/imported/it_support_male_180cm_short04_diffuse.png-2f61cd78fe143c91af7d98d0a1799f30.s3tc.ctex"
+uid="uid://d3htnfkt73jc3"
+path.s3tc="res://.godot/imported/shoes04_diffuse.png-a61499715c61cf0427741a92c62086f6.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
-generator_parameters={
-"md5": "6af398029006676655e45e3c925b82e4"
-}
 
 [deps]
 
-source_file="res://assets/models/it_support_male_180cm_short04_diffuse.png"
-dest_files=["res://.godot/imported/it_support_male_180cm_short04_diffuse.png-2f61cd78fe143c91af7d98d0a1799f30.s3tc.ctex"]
+source_file="res://assets/models/shared_textures/shoes04_diffuse.png"
+dest_files=["res://.godot/imported/shoes04_diffuse.png-a61499715c61cf0427741a92c62086f6.s3tc.ctex"]
 
 [params]
 
@@ -41,4 +38,4 @@ process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1
