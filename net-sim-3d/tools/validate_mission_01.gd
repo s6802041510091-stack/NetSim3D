@@ -347,7 +347,7 @@ func _test_in_game() -> void:
 	player.camera.rotation.x = atan2(screen_center.y - eye.y, Vector2(screen_center.x - eye.x, screen_center.z - eye.z).length())
 	for i in 3:
 		await physics_frame
-	_check(3, player.focused_computer == pc and player._prompt.text.contains("กด E เพื่อใช้งานคอมพิวเตอร์"), "prompt: " + player._prompt.text)
+	_check(3, player.focused_computer == pc and player._prompt.text.contains("กด F เพื่อใช้งานคอมพิวเตอร์"), "prompt: " + player._prompt.text)
 
 	# Press E (the "interact" input action).
 	var start_pos := player.global_position

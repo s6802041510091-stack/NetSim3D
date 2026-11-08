@@ -47,6 +47,14 @@ func _run() -> void:
 			bounds = bounds.merge(part.global_transform * part.get_aabb())
 		var center := Vector3(entry.center[0], entry.center[1], entry.center[2])
 		var size := Vector3(entry.size[0], entry.size[1], entry.size[2])
+		if entry.name == "StairShell_Lower_EastWall":
+			# The visible wall ends underneath the entrance slab to avoid duplicate
+			# surfaces. Its existing solid collider may extend inside that slab.
+			var slab: MeshInstance3D = visual.get_node("StairShell_Entrance_Threshold")
+			var slab_bounds: AABB = slab.global_transform * slab.get_aabb()
+			_check(bounds.end.y <= slab_bounds.position.y - 0.001,
+				"stair wall still overlaps the visible threshold edge")
+			bounds.size.y = slab_bounds.end.y - bounds.position.y
 		var expected_size := bounds.size.max(Vector3.ONE * 0.02)
 		_check(center.distance_to(bounds.get_center()) < 0.015, entry.name + " collider centre differs from visual: " + str(center - bounds.get_center()))
 		_check(size.distance_to(expected_size) < 0.03, entry.name + " collider size differs from visual: " + str(size - expected_size))

@@ -1,16 +1,17 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene format=3 uid="uid://du1dkyv1ujy21"]
 
 [ext_resource type="PackedScene" uid="uid://c0vvls0p5upsf" path="res://assets/models/classroom_shell.glb" id="1"]
-[ext_resource type="Script" path="res://scripts/map_collision.gd" id="2"]
+[ext_resource type="Script" uid="uid://dmp2oor84qmyb" path="res://scripts/map_collision.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/it_support_player.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/it_support_supervisor.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://scenes/teacher_male.tscn" id="5"]
-[ext_resource type="Script" path="res://scripts/interactive_door.gd" id="6"]
-[ext_resource type="Script" path="res://scripts/computer/computer_manager.gd" id="7"]
+[ext_resource type="Script" uid="uid://bmqucwf6km2sy" path="res://scripts/interactive_door.gd" id="6"]
+[ext_resource type="Script" uid="uid://clne5es3eckv0" path="res://scripts/computer/computer_manager.gd" id="7"]
 [ext_resource type="PackedScene" path="res://missions/mission_06/scenes/desk_phone.tscn" id="8"]
-[ext_resource type="Script" path="res://missions/mission_06/scripts/mission_06_controller.gd" id="9"]
+[ext_resource type="Script" uid="uid://ra0fo5s1yu75" path="res://missions/mission_06/scripts/mission_06_controller.gd" id="9"]
 [ext_resource type="Resource" path="res://missions/mission_06/data/mission_06_data.tres" id="10"]
-[ext_resource type="Script" path="res://scripts/exterior_town.gd" id="11"]
+[ext_resource type="Script" uid="uid://dg7iqk7lkhndc" path="res://scripts/exterior_town.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/school_visual_fixes.gd" id="12_visual_fixes"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -19,180 +20,170 @@ ambient_light_source = 1
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.8
 
-[node name="NetSim3D" type="Node3D"]
+[node name="NetSim3D" type="Node3D" unique_id=504980413]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1318191250]
 environment = SubResource("Environment")
 
-[node name="ExteriorTown" type="Node3D" parent="."]
+[node name="ExteriorTown" type="Node3D" parent="." unique_id=1236236852]
 script = ExtResource("11")
 
-[node name="MapVisual" parent="." instance=ExtResource("1")]
+[node name="MapVisual" parent="." unique_id=666571263 instance=ExtResource("1")]
+script = ExtResource("12_visual_fixes")
 
-[node name="MapCollision" type="StaticBody3D" parent="."]
-collision_layer = 1
+[node name="MapCollision" type="StaticBody3D" parent="." unique_id=1418392378]
 collision_mask = 0
 script = ExtResource("2")
 
-[node name="Doors" type="Node3D" parent="."]
+[node name="Doors" type="Node3D" parent="." unique_id=1627901788]
 
-[node name="ClassroomDoor" type="Node3D" parent="Doors"]
+[node name="ClassroomDoor" type="Node3D" parent="Doors" unique_id=587903242]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -3.110493, 0, -8.95)
 script = ExtResource("6")
 part_prefix = "Door_"
 display_name = "ห้องเรียนคอมพิวเตอร์"
 
-[node name="BackgroundClassDoor" type="Node3D" parent="Doors"]
-position = Vector3(-9.18951, 0, -8.35152)
+[node name="BackgroundClassDoor" type="Node3D" parent="Doors" unique_id=1497979060]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.18951, 0, -8.35152)
 script = ExtResource("6")
 part_prefix = "BackgroundClass_"
 display_name = "ห้องเรียนวิทยาศาสตร์"
 
-[node name="FemaleWCDoor" type="Node3D" parent="Doors"]
-position = Vector3(-9.18951, 0, -15.53437)
+[node name="FemaleWCDoor" type="Node3D" parent="Doors" unique_id=1509453459]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.18951, 0, -15.53437)
 script = ExtResource("6")
 part_prefix = "FemaleWC_"
 display_name = "ห้องน้ำหญิง"
 
-[node name="MaleWCDoor" type="Node3D" parent="Doors"]
-position = Vector3(-9.18951, 0, -23.31843)
+[node name="MaleWCDoor" type="Node3D" parent="Doors" unique_id=913324944]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.18951, 0, -23.31843)
 script = ExtResource("6")
 part_prefix = "MaleWC_"
 display_name = "ห้องน้ำชาย"
 
-[node name="ITSupportDoor" type="Node3D" parent="Doors"]
-position = Vector3(-9.18951, 0, -35.5008)
+[node name="ITSupportDoor" type="Node3D" parent="Doors" unique_id=1745213544]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.18951, 0, -35.5008)
 script = ExtResource("6")
 part_prefix = "ITSupport_"
 display_name = "ห้อง IT Support (Data Center)"
 
-[node name="StorageDoor" type="Node3D" parent="Doors"]
-position = Vector3(-12.44092, 0, -36.00708)
+[node name="StorageDoor" type="Node3D" parent="Doors" unique_id=837332867]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.44092, 0, -36.00708)
 script = ExtResource("6")
 part_prefix = "Storage_"
 display_name = "ห้องเก็บอุปกรณ์"
 
-[node name="StaffDoor" type="Node3D" parent="Doors"]
-position = Vector3(-3.110493, 0, -26.22954)
+[node name="StaffDoor" type="Node3D" parent="Doors" unique_id=1276661560]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.110493, 0, -26.22954)
 script = ExtResource("6")
 part_prefix = "Staff_"
 display_name = "ห้องพักครู"
 
-[node name="ServerDoor" type="Node3D" parent="Doors"]
-position = Vector3(-3.110493, 0, -36.00708)
+[node name="ServerDoor" type="Node3D" parent="Doors" unique_id=655081582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.110493, 0, -36.00708)
 script = ExtResource("6")
 part_prefix = "Server_"
 display_name = "ห้อง Server"
 
-[node name="DeskPhone" parent="." instance=ExtResource("8")]
-position = Vector3(-13.75, 0.758, -43.25)
-rotation = Vector3(0, -1.5708, 0)
+[node name="DeskPhone" parent="." unique_id=1245524682 instance=ExtResource("8")]
+transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, -13.75, 0.758, -43.25)
 
-[node name="Computers" type="Node3D" parent="."]
+[node name="Computers" type="Node3D" parent="." unique_id=1066177538]
 script = ExtResource("7")
 
-[node name="Mission06" type="Node" parent="."]
+[node name="Mission06" type="Node" parent="." unique_id=1658331753]
 script = ExtResource("9")
 data = ExtResource("10")
 phone_path = NodePath("../DeskPhone")
 
-[node name="ITSupportPlayer" parent="." instance=ExtResource("3")]
-position = Vector3(-12.47, 0.02, -42.638)
-rotation = Vector3(0, -1.5708, 0)
+[node name="ITSupportPlayer" parent="." unique_id=1764601264 instance=ExtResource("3")]
+transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, -12.47, 0.02, -42.638)
 
-[node name="ITSupportSupervisor" parent="." instance=ExtResource("4")]
-position = Vector3(-16.885, 0.02, -42.512)
-rotation = Vector3(0, -1.5708, 0)
+[node name="ITSupportSupervisor" parent="." unique_id=1226104441 instance=ExtResource("4")]
+transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, -16.885, 0.02, -42.512)
 
-[node name="TeacherMale" parent="." instance=ExtResource("5")]
-position = Vector3(5.15, 0.02, -8)
-rotation = Vector3(0, -1.5708, 0)
+[node name="TeacherMale" parent="." unique_id=1067835740 instance=ExtResource("5")]
+transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, 5.15, 0.02, -8)
 
-[node name="ClassroomAmbient" type="OmniLight3D" parent="."]
-position = Vector3(0, 2.7, 0)
-light_energy = 1.5
+[node name="ClassroomAmbient" type="OmniLight3D" parent="." unique_id=1064863800]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
 omni_range = 20.0
-shadow_enabled = false
 
-[node name="ITSupportAmbient" type="OmniLight3D" parent="."]
-position = Vector3(-15.2, 2.7, -40.5)
+[node name="ITSupportAmbient" type="OmniLight3D" parent="." unique_id=248374956]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 2.7, -40.5)
 light_energy = 1.5
 omni_range = 12.0
-shadow_enabled = false
 
-[node name="CorridorAmbient" type="OmniLight3D" parent="."]
-position = Vector3(-7.6, 2.7, -17.2)
-light_energy = 1.0
+[node name="CorridorAmbient" type="OmniLight3D" parent="." unique_id=135499316]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 2.7, -17.2)
+light_energy = 0.7
 omni_range = 35.0
-shadow_enabled = false
 
-[node name="ScienceLabLightFront" type="OmniLight3D" parent="."]
-position = Vector3(-15.2, 2.7, -4.5)
+[node name="ScienceLabLightFront" type="OmniLight3D" parent="." unique_id=1787673997]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 2.7, -4.5)
 light_energy = 1.3
 omni_range = 10.0
 
-[node name="ScienceLabLightBack" type="OmniLight3D" parent="."]
-position = Vector3(-15.2, 2.7, 4.5)
+[node name="ScienceLabLightBack" type="OmniLight3D" parent="." unique_id=1210891309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 2.7, 4.5)
 light_energy = 1.3
 omni_range = 10.0
 
-[node name="ServerZoneLight" type="OmniLight3D" parent="."]
-position = Vector3(-1.5, 2.6, -40.5)
+[node name="ServerZoneLight" type="OmniLight3D" parent="." unique_id=1203043169]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 2.6, -40.5)
 light_color = Color(0.85, 0.92, 1, 1)
 light_energy = 1.1
 omni_range = 9.0
 
-[node name="NOCZoneLight" type="OmniLight3D" parent="."]
-position = Vector3(2.5, 2.6, -33.8)
-light_energy = 1.0
+[node name="NOCZoneLight" type="OmniLight3D" parent="." unique_id=669530484]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 2.6, -33.8)
 omni_range = 8.0
 
-[node name="NOCDeskLight" type="OmniLight3D" parent="."]
-position = Vector3(-3.6, 2.6, -32.5)
-light_energy = 1.3
+[node name="NOCDeskLight" type="OmniLight3D" parent="." unique_id=1414210247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.2635336, 2.9199626, -32.72535)
+light_energy = 0.453
 omni_range = 9.0
 
-[node name="TeachersCubicleLight1" type="OmniLight3D" parent="."]
-position = Vector3(4.6, 2.6, -28.0)
+[node name="TeachersCubicleLight1" type="OmniLight3D" parent="." unique_id=1249303210]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 2.6, -28)
 light_energy = 0.8
 omni_range = 4.5
 
-[node name="TeachersCubicleLight2" type="OmniLight3D" parent="."]
-position = Vector3(4.6, 2.6, -21.4)
+[node name="TeachersCubicleLight2" type="OmniLight3D" parent="." unique_id=915111454]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 2.6, -21.4)
 light_energy = 0.8
 omni_range = 4.5
 
-[node name="TeachersCubicleLight3" type="OmniLight3D" parent="."]
-position = Vector3(4.6, 2.6, -16.8)
+[node name="TeachersCubicleLight3" type="OmniLight3D" parent="." unique_id=1329294359]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 2.6, -16.8)
 light_energy = 0.8
 omni_range = 4.5
 
-[node name="TeachersCubicleLight4" type="OmniLight3D" parent="."]
-position = Vector3(4.6, 2.6, -12.2)
+[node name="TeachersCubicleLight4" type="OmniLight3D" parent="." unique_id=647719143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.6, 2.6, -12.2)
 light_energy = 0.8
 omni_range = 4.5
 
-[node name="ITSupportReturnLight" type="OmniLight3D" parent="."]
-position = Vector3(-10.8, 2.6, -32.6)
+[node name="ITSupportReturnLight" type="OmniLight3D" parent="." unique_id=1676236435]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.8, 2.6, -32.6)
 light_energy = 0.9
 omni_range = 6.0
 
-[node name="StorageLight" type="OmniLight3D" parent="."]
-position = Vector3(-16.8, 2.7, -33.8)
-light_energy = 1.0
+[node name="StorageLight" type="OmniLight3D" parent="." unique_id=1712793022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.8, 2.7, -33.8)
 omni_range = 7.0
 
-[node name="TeachersRoomLightNorth" type="OmniLight3D" parent="."]
-position = Vector3(0, 2.7, -26.5)
+[node name="TeachersRoomLightNorth" type="OmniLight3D" parent="." unique_id=1285050939]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -26.5)
 light_energy = 1.1
 omni_range = 9.0
 
-[node name="TeachersRoomLightMiddle" type="OmniLight3D" parent="."]
-position = Vector3(0, 2.7, -19.5)
+[node name="TeachersRoomLightMiddle" type="OmniLight3D" parent="." unique_id=901547954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -19.5)
 light_energy = 1.1
 omni_range = 9.0
 
-[node name="TeachersRoomLightSouth" type="OmniLight3D" parent="."]
-position = Vector3(0, 2.7, -13.0)
+[node name="TeachersRoomLightSouth" type="OmniLight3D" parent="." unique_id=1883221363]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -13)
 light_energy = 1.1
 omni_range = 9.0

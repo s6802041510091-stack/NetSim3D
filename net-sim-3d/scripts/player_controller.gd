@@ -46,6 +46,10 @@ func _ready() -> void:
 	# hands or polo shirt block the first-person camera.
 	_set_first_person_layers(visual)
 	_create_interaction()
+	var presentation := Node.new()
+	presentation.set_script(preload("res://scripts/player_presentation.gd"))
+	presentation.name = "Presentation"
+	add_child(presentation)
 
 
 func _create_interaction() -> void:
@@ -136,6 +140,8 @@ func _find_doorway_in_view() -> InteractiveDoor:
 func interact() -> void:
 	if controls_locked:
 		return
+	if focused_computer != null or focused_interactable != null or focused_door != null:
+		get_node("Presentation").play_use()
 	if focused_computer != null:
 		focused_computer.use(self)
 	elif focused_interactable != null:

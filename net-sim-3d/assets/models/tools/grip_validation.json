@@ -1,0 +1,17 @@
+{
+  "cable_stripper": {
+    "surface_intersection_pairs": 0,
+    "nearest_contact_mm": 0.06624304660363123,
+    "passed": true
+  },
+  "cable_tester": {
+    "surface_intersection_pairs": 0,
+    "nearest_contact_mm": 0.08205413178075105,
+    "passed": true
+  },
+  "crimping_tool": {
+    "surface_intersection_pairs": 0,
+    "nearest_contact_mm": 0.13175538333598524,
+    "passed": true
+  }
+}

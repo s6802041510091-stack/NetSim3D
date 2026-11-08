@@ -51,7 +51,7 @@ func has_app(app_id: String) -> bool:
 
 
 func get_prompt_text() -> String:
-	return "กด E เพื่อใช้งานคอมพิวเตอร์ (%s)" % hostname
+	return "กด F เพื่อใช้งานคอมพิวเตอร์ (%s)" % hostname
 
 
 func use(player: Node) -> void:

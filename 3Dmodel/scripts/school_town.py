@@ -22,6 +22,18 @@ def ball(n,loc,size,m):
     if not hasattr(ball,'mesh'):
         bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1); t=bpy.context.object; ball.mesh=t.data.copy(); bpy.data.objects.remove(t,do_unlink=True)
     o=bpy.data.objects.new(n,ball.mesh.copy()); bpy.context.collection.objects.link(o); o.location=loc; o.scale=size; o.data.materials.append(m); return o
+
+def open_stairwell(objects):
+    # Blender XY = Godot X/-Z. Keep the existing school stairwell shell and
+    # lower landing; remove only backdrop infill inside that shell, down to
+    # just below its -3.50 m floor slab. Never edit playable school geometry.
+    cutter=box('TEMP stairwell opening',(-15.213,27.307,-1.70),(11.897,6.273,3.80),objects[0].data.materials[0])
+    for obj in objects:
+        modifier=obj.modifiers.new('Playable stairwell clearance','BOOLEAN')
+        modifier.operation='DIFFERENCE'; modifier.solver='EXACT'; modifier.object=cutter
+        bpy.context.view_layer.objects.active=obj
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    bpy.data.objects.remove(cutter,do_unlink=True)
 def rod(n,a,b,r,m):
     d=Vector(b)-Vector(a); verts=[(r*math.cos(i*math.tau/8),r*math.sin(i*math.tau/8),z) for z in [-d.length/2,d.length/2] for i in range(8)]; faces=[tuple(reversed(range(8))),tuple(range(8,16))]+[(i,(i+1)%8,(i+1)%8+8,i+8) for i in range(8)]
     mesh=bpy.data.meshes.new(n); mesh.from_pydata(verts,[],faces); o=bpy.data.objects.new(n,mesh); bpy.context.collection.objects.link(o); o.location=(Vector(a)+Vector(b))/2; o.rotation_euler=d.to_track_quat('Z','Y').to_euler(); mesh.materials.append(m)
@@ -61,8 +73,10 @@ def build():
     for y in [-44,-42,-40]:
         for x in [-9,-7,-5,-3,-1]: box('Crosswalk',(x,y,G+.05),(1.1,1.5,.02),white)
     # Two supporting floors below the unchanged playable third-floor coordinate origin.
-    box('Lower school storeys',(-6.061,17.21,G+3.6),(30.426,54.227,7.18),cream)
-    for z in [G+3.55,-.10]: box('School floor belt',(-6.061,17.21,z),(30.8,54.6,.22),white)
+    infill=[box('Lower school storeys',(-6.061,17.21,G+3.6),(30.426,54.227,7.18),cream)]
+    # Upper belt must stay below the playable slab, not cover its tile texture.
+    for z in [G+3.55,-.27]: infill.append(box('School floor belt',(-6.061,17.21,z),(30.8,54.6,.22),white))
+    open_stairwell(infill)
     for z in [G+1.9,G+5.5]:
         for y in range(-7,44,4):
             for x in [-21.30,9.18]:

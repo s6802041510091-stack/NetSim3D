@@ -176,7 +176,7 @@ func get_doorway_center() -> Vector3:
 func get_prompt_text() -> String:
 	var action := "ปิด" if is_open else "เปิด"
 	var room := (" " + display_name) if display_name != "" else ""
-	return "[E] %sประตู%s" % [action, room]
+	return "[F] %sประตู%s" % [action, room]
 
 
 ## Returns the door that owns this collider, or null.

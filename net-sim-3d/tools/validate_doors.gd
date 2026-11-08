@@ -1,6 +1,6 @@
 extends SceneTree
 
-## Headless check for the E-to-open doors.
+## Frame fit, animated open/close and real player traversal for all F-to-open doors.
 ## Run: godot --headless --path net-sim-3d -s res://tools/validate_doors.gd
 
 const DOORWAYS := {
@@ -62,6 +62,19 @@ func _run() -> void:
 		var offset := Vector2(leaf_center.x - doorway.x, leaf_center.z - doorway.z).length()
 		_check(offset < 0.06, door_name + " closed leaf is %.3f m from the doorway centre" % offset)
 		var leaf_bounds: AABB = leaf.global_transform * leaf.get_aabb()
+		# Check both edges and the frame plane: a centre-only check can miss a
+		# visible jamb gap or a shifted map rotating around an unshifted hinge.
+		var jamb_a: AABB = visual.get_node(jambs[0]).global_transform * visual.get_node(jambs[0]).get_aabb()
+		var jamb_b: AABB = visual.get_node(jambs[1]).global_transform * visual.get_node(jambs[1]).get_aabb()
+		var low: AABB = jamb_a if jamb_a.position.z < jamb_b.position.z else jamb_b
+		var high: AABB = jamb_b if jamb_a.position.z < jamb_b.position.z else jamb_a
+		var expected_gap := 0.004 if door_name == "ClassroomDoor" else 0.0
+		var low_gap := leaf_bounds.position.z - low.end.z
+		var high_gap := high.position.z - leaf_bounds.end.z
+		var depth := leaf_bounds.get_center().x - (jamb_a.get_center().x + jamb_b.get_center().x) / 2.0
+		_check(absf(low_gap - expected_gap) < 0.001 and absf(high_gap - expected_gap) < 0.001,
+			door_name + " jamb gaps do not fit: " + str(low_gap, ", ", high_gap))
+		_check(absf(depth) < 0.001, door_name + " leaf is outside the frame plane: " + str(depth))
 		_check(leaf_bounds.position.y >= -0.005 and leaf_bounds.position.y < 0.025,
 			door_name + " leaf is floating or sunk into the floor: " + str(leaf_bounds.position.y))
 
@@ -69,7 +82,10 @@ func _run() -> void:
 		var chest := Vector3(doorway.x, 1.3, doorway.z)
 		var ray := PhysicsRayQueryParameters3D.create(chest + Vector3(-0.6, 0, 0), chest + Vector3(0.6, 0, 0), 1)
 		_check(not space.intersect_ray(ray).is_empty(), door_name + " closed door does not block the doorway")
-		door.set_open(true, false)
+		_check(door.set_open(true), door_name + " animated opening refused")
+		for i in range(40):
+			await physics_frame
+		_check(door.is_open and not door.is_moving, door_name + " animated opening did not finish")
 		await physics_frame
 		await physics_frame
 		var hit := space.intersect_ray(ray)
@@ -108,8 +124,18 @@ func _run() -> void:
 		player.global_position = Vector3(-7.0, 0.02, -40.0)
 		player.velocity = Vector3.ZERO
 		await physics_frame
-		door.set_open(false, false)
-		await physics_frame
+		_check(door.set_open(false), door_name + " animated closing refused")
+		for i in range(40):
+			await physics_frame
+		_check(not door.is_open and not door.is_moving, door_name + " animated closing did not finish")
+		var returned: AABB = leaf.global_transform * leaf.get_aabb()
+		_check(returned.position.distance_to(leaf_bounds.position) < 0.001 and returned.size.distance_to(leaf_bounds.size) < 0.001,
+			door_name + " did not return to its original frame fit")
+		var collider_bounds: AABB = door._shape.global_transform * door._shape.shape.get_debug_mesh().get_aabb()
+		_check(collider_bounds.position.distance_to(returned.position) < 0.001 and collider_bounds.size.distance_to(returned.size) < 0.001,
+			door_name + " collider does not match the closed leaf")
+		print("DOOR_FIT ", door_name, " gaps_mm=", Vector2(low_gap, high_gap) * 1000,
+			" depth_mm=", depth * 1000, " animated_cycle=complete bidirectional_walk=complete")
 
 	# Player walks up to the IT Support door, presses E and walks through.
 	var it_door: InteractiveDoor = map.get_node("Doors/ITSupportDoor")

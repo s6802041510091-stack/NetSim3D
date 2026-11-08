@@ -46,7 +46,7 @@ func _ready() -> void:
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(_text)
-	_hint = _label("คลิก หรือกด E / Space เพื่อไปต่อ", 13, Color(0.7, 0.74, 0.8), false)
+	_hint = _label("คลิก หรือกด F / Space เพื่อไปต่อ", 13, Color(0.7, 0.74, 0.8), false)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	col.add_child(_hint)
 
@@ -74,7 +74,7 @@ func advance(force: bool = false) -> void:
 	var parts := lines[index].split("|", true, 1)
 	_speaker.text = parts[0] if parts.size() > 1 else ""
 	_text.text = parts[1] if parts.size() > 1 else parts[0]
-	_hint.text = "คลิก หรือกด E / Space เพื่อวางสาย" if index == lines.size() - 1 else "คลิก หรือกด E / Space เพื่อไปต่อ"
+	_hint.text = "คลิก หรือกด F / Space เพื่อวางสาย" if index == lines.size() - 1 else "คลิก หรือกด F / Space เพื่อไปต่อ"
 
 
 func is_open() -> bool:

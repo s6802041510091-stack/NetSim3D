@@ -1,0 +1,23 @@
+{
+  "source": "net-sim-3d\\assets\\models\\it_support_male_180cm.glb",
+  "source_sha256": "49f3cadd2010c7c39794012f62d258633445e948a7649c264fdd0a87b9e28501",
+  "method": "right-arm skin weights >= 0.5; original topology/UV/materials; original finger bones posed into relaxed grip; wrist-centered transform; no replacement geometry",
+  "meshes": [
+    {
+      "source_mesh": "Body | head neck arms hands",
+      "vertices": 2381,
+      "faces": 4225,
+      "materials": [
+        "Skin | warm natural complexion"
+      ]
+    },
+    {
+      "source_mesh": "Polo | short sleeve blue",
+      "vertices": 321,
+      "faces": 501,
+      "materials": [
+        "Polo | blue pique knit"
+      ]
+    }
+  ]
+}
