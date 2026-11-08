@@ -3,6 +3,9 @@
 **/.import/
 **/export_templates/
 
+# Local game saves when running from the Godot editor (see scripts/save_paths.gd)
+net-sim-3d/.saves/
+
 # Blender automatic backups and generated safety copies
 *.blend1
 *.blend2

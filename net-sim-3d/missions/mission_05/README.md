@@ -33,7 +33,7 @@ Esc: ปิดโปรแกรม แล้วกด Esc อีกครั้
 | `missions/mission_05/scripts/security_choice.gd` | Resource ของปุ่มตัวเลือก 1 ปุ่ม (ข้อความ ถูก/ผิด คำใบ้) |
 | `missions/mission_05/scripts/mission_05_data.gd` | Resource ข้อมูลภารกิจทั้งหมด |
 | `missions/mission_05/scripts/mission_05_state.gd` | สถานะผู้เล่น (ทำส่วนไหนแล้ว คะแนน ตัวเลือกที่ผิด ส่งผลแล้วหรือยัง) |
-| `missions/mission_05/scripts/mission_05_save_store.gd` | บันทึก/โหลด JSON ใน `user://netsim3d/mission_05_save.json` |
+| `missions/mission_05/scripts/mission_05_save_store.gd` | บันทึก/โหลด JSON ใน `mission_05_save.json` (โฟลเดอร์จาก `SavePaths`: Editor = `net-sim-3d/.saves/`, เว็บ = `user://netsim3d/`) |
 | `missions/mission_05/scripts/security_theme.gd` | สี ฟอนต์ Sarabun และไอคอนที่วาดเอง (โล่ เครื่องหมายถูก) |
 | `missions/mission_05/scripts/mission_05_test_bench.gd` | ฉากทดสอบ: `open_computer()`, `open_mission()`, `exit_computer()` |
 | `tools/validate_mission_05.gd` | ทดสอบอัตโนมัติทั้งภารกิจในแผนที่จริง |

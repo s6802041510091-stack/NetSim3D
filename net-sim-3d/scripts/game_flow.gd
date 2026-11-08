@@ -5,7 +5,7 @@ extends Node
 ## programs retain their existing independent autosave files.
 const MAP := "res://scenes/main.tscn"
 const MENU := "res://scenes/start_menu.tscn"
-const SAVE := "user://netsim3d/menu.cfg"
+var save_file := SavePaths.file("menu.cfg")
 const AVAILABLE := [1, 5, 6]
 const TITLES := ["ออกแบบเครือข่าย", "ประกอบและเชื่อมต่อสาย LAN", "ตรวจรับระบบเครือข่าย", "ตรวจสอบและเปลี่ยนการ์ดเครือข่าย", "ความปลอดภัยของคอมพิวเตอร์", "ช่วยเหลือผ่าน Remote Desktop"]
 const AUDIO := {"Music": "เสียงเพลงประกอบ", "SoundEffect": "เสียงภารกิจ / โทรศัพท์ / คอมพิวเตอร์ / เสียงพูด", "Sound": "เสียงบรรยากาศ / เดิน / เปิด–ปิดประตู"}
@@ -35,7 +35,7 @@ func _show_initial_menu() -> void:
 		show_home()
 
 func load_preferences() -> void:
-	_config.load(SAVE)
+	_config.load(save_file)
 	var saved: Variant = _config.get_value("session", "last_level", 0)
 	last_level = int(saved) if saved is int and saved in AVAILABLE else 0
 	for bus: String in AUDIO:
@@ -60,8 +60,8 @@ func set_volume(bus: String, value: float, persist := true) -> void:
 		_save_preferences()
 
 func _save_preferences() -> bool:
-	DirAccess.make_dir_recursive_absolute(SAVE.get_base_dir())
-	var error := _config.save(SAVE)
+	DirAccess.make_dir_recursive_absolute(save_file.get_base_dir())
+	var error := _config.save(save_file)
 	if error != OK:
 		push_warning("Menu settings could not be saved: " + error_string(error))
 	return error == OK

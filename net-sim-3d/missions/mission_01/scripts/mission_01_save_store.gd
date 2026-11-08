@@ -1,15 +1,13 @@
 class_name Mission01SaveStore
 extends RefCounted
 
-## Saves Mission 1 progress as JSON in user:// (works on desktop and in the
-## Web export, where user:// is kept in the browser's IndexedDB).
+## Saves Mission 1 progress as JSON in the folder given by SavePaths
+## (<project>/.saves/ in the editor, browser storage on the Web).
 ## The project has no shared save system yet; when one is added, call
 ## Mission01State.to_dict()/from_dict() from it and stop using this class.
 
-const DEFAULT_PATH := "user://netsim3d/mission_01_save.json"
-
 ## Tests and other profiles can point this somewhere else.
-static var save_path: String = DEFAULT_PATH
+static var save_path: String = SavePaths.file("mission_01_save.json")
 
 
 static func save(state: Mission01State) -> bool:

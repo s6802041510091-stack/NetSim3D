@@ -23,8 +23,9 @@ extends Node3D
 @export var teamviewer_hosts: PackedStringArray = ["IT-PC-01"]
 ## Screens that are not part of the map model (a MeshInstance3D in another scene).
 @export var extra_screen_paths: Array[NodePath] = []
-## Where Mission 5 progress is saved (same as Mission05SaveStore.DEFAULT_PATH).
-@export var mission_05_save_path: String = "user://netsim3d/mission_05_save.json"
+## Where Mission 5 progress is saved. Empty = the default file from SavePaths
+## (the same file Mission05SaveStore uses).
+@export var mission_05_save_path: String = ""
 
 ## Names for the computers that are not student PCs (Godot turns ".001" into "_001").
 const NAMED_SCREENS := {
@@ -83,9 +84,10 @@ func _ready() -> void:
 ## True when the saved Mission 5 progress says the target computer is already fixed.
 ## Read by path (no class dependency) so the computers still work without the mission files.
 func _mission_05_protected() -> bool:
-	if not FileAccess.file_exists(mission_05_save_path):
+	var path := mission_05_save_path if not mission_05_save_path.is_empty() else SavePaths.file("mission_05_save.json")
+	if not FileAccess.file_exists(path):
 		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(mission_05_save_path))
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	return parsed is Dictionary and bool(parsed.get("protected", false))
 
 

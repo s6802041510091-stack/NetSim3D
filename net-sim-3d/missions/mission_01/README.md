@@ -26,7 +26,7 @@
 | `missions/mission_01/scripts/mission_01_data.gd` | Resource ข้อมูลภารกิจทั้งหมด |
 | `missions/mission_01/scripts/mission_01_state.gd` | สถานะผู้เล่น (คำตอบ คะแนน จำนวนครั้งที่ตรวจ ฯลฯ) |
 | `missions/mission_01/scripts/mission_01_validator.gd` | ตรวจแบบและคิดคะแนน |
-| `missions/mission_01/scripts/mission_01_save_store.gd` | บันทึก/โหลดไฟล์ JSON ใน `user://netsim3d/mission_01_save.json` |
+| `missions/mission_01/scripts/mission_01_save_store.gd` | บันทึก/โหลดไฟล์ JSON ใน `mission_01_save.json` (โฟลเดอร์จาก `SavePaths`: Editor = `net-sim-3d/.saves/`, เว็บ = `user://netsim3d/`) |
 | `missions/mission_01/scripts/room_plan_view.gd` | วาดผังห้อง เส้นสาย LAN (ดูได้อย่างเดียว) |
 | `missions/mission_01/scripts/netplan_edu.gd` | เชื่อม UI ทั้งหมดเข้าด้วยกัน |
 | `missions/mission_01/scripts/netplan_theme.gd` | สี ฟอนต์ และ Theme |

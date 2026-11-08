@@ -47,7 +47,7 @@ TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อม
 | `missions/mission_06/scripts/desk_phone.gd` | โทรศัพท์บนโต๊ะ (ดัง/รับสาย) |
 | `missions/mission_06/scripts/call_dialog.gd` | กล่องบทสนทนาทางโทรศัพท์ |
 | `missions/mission_06/scripts/mission_06_state.gd` | สถานะผู้เล่น |
-| `missions/mission_06/scripts/mission_06_save_store.gd` | บันทึก/โหลด JSON ใน `user://netsim3d/mission_06_save.json` |
+| `missions/mission_06/scripts/mission_06_save_store.gd` | บันทึก/โหลด JSON ใน `mission_06_save.json` (โฟลเดอร์จาก `SavePaths`: Editor = `net-sim-3d/.saves/`, เว็บ = `user://netsim3d/`) |
 | `missions/mission_06/scripts/remote_theme.gd` | สี ฟอนต์ Sarabun และไอคอนที่วาดเอง |
 | `missions/mission_06/scripts/mission_06_test_bench.gd` | ฉากทดสอบ |
 | `tools/validate_mission_06.gd` | ทดสอบอัตโนมัติทั้งภารกิจในแผนที่จริง |
