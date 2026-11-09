@@ -50,13 +50,17 @@ const PAUSE_BEFORE_TURN := 0.2
 ## Hand pose on a target, in skeleton space (+X = the character's left, +Z forward):
 ## where the fingers point, where the elbow bends, which way the thumb faces,
 ## how much the four fingers close together (0-1) and curl (degrees per joint).
+## The model's fingers are already bent ~26 degrees at rest, so a negative first
+## curl straightens them: knuckles stay ~2.5 cm over the keys / on the mouse's
+## back and only the fingertips reach down (tools/capture_supervisor_pose.gd
+## prints the heights).
 const HAND_POSE := {
-	"L": {"dir": Vector3(-0.12, -0.2, 1.0), "elbow": Vector3(0.45, -1.0, -0.25), "thumb": Vector3(-1, 0, 0),
-		"close": 0.3, "curl": [0.0, 8.0, 5.0]},
-	"R_mouse": {"dir": Vector3(0.03, -0.08, 1.0), "elbow": Vector3(-0.45, -1.0, -0.25), "thumb": Vector3(1, 0, 0),
-		"close": 0.65, "curl": [18.0, 25.0, 15.0]},
-	"R_keys": {"dir": Vector3(0.2, -0.2, 1.0), "elbow": Vector3(-0.45, -1.0, -0.25), "thumb": Vector3(1, 0, 0),
-		"close": 0.3, "curl": [0.0, 8.0, 5.0]},
+	"L": {"dir": Vector3(-0.12, -0.09, 1.0), "elbow": Vector3(0.45, -1.0, -0.25), "thumb": Vector3(-1, 0, 0),
+		"close": 0.3, "curl": [-22.0, 8.0, 8.0]},
+	"R_mouse": {"dir": Vector3(0.03, -0.05, 1.0), "elbow": Vector3(-0.45, -1.0, -0.25), "thumb": Vector3(1, 0, 0),
+		"close": 0.65, "curl": [-18.0, 16.0, 18.0]},
+	"R_keys": {"dir": Vector3(0.2, -0.09, 1.0), "elbow": Vector3(-0.45, -1.0, -0.25), "thumb": Vector3(1, 0, 0),
+		"close": 0.3, "curl": [-22.0, 8.0, 8.0]},
 }
 
 # --- Working at the desk -----------------------------------------------------
@@ -65,8 +69,9 @@ const TRAVEL_TIME := 0.45
 const TRAVEL_LIFT := 0.05
 ## One key press (seconds) and how far a pressing finger bends (degrees).
 const TAP_TIME := 0.16
-const TAP_CURL := 24.0
-const TAP_JOINT_SHARE := [1.0, 0.6, 0.3]
+const TAP_CURL := 5.0 # fingertip ~0.8 cm down, about a key's travel
+const TAP_JOINT_SHARE := [1.0, 0.5, 0.3]
+const PRESS_DIP := 0.0015 # the whole hand dips this much (m) on a press
 ## Only animate while the camera is this close (metres), this many times a second.
 const WORK_RANGE := 14.0
 const WORK_FPS := 30.0
@@ -298,14 +303,14 @@ func _update_hands() -> void:
 	var drift := Vector3(sin(_clock * 0.7) * 0.006, 0, sin(_clock * 0.45) * 0.004)
 	if _hand_goals.has("L"):
 		var presses := _presses("L")
-		var goal: Vector3 = _hand_goals["L"] + drift + Vector3.DOWN * 0.004 * float(presses.max())
+		var goal: Vector3 = _hand_goals["L"] + drift + Vector3.DOWN * PRESS_DIP * float(presses.max())
 		_pose_hand("L", goal, HAND_POSE["L"], HAND_POSE["L"], 0.0, presses)
 	if _hand_goals.has("R_mouse"):
 		var keys := _keys_blend()
 		var presses := _presses("R")
 		var mouse_move := Vector3(sin(_clock * 1.7) * 0.008 + sin(_clock * 0.53) * 0.01, 0, sin(_clock * 1.1 + 1.0) * 0.01)
 		var on_mouse: Vector3 = _hand_goals["R_mouse"] + mouse_move
-		var on_keys: Vector3 = _hand_goals.get("R_keys", on_mouse) + drift + Vector3.DOWN * 0.004 * float(presses.max())
+		var on_keys: Vector3 = _hand_goals.get("R_keys", on_mouse) + drift + Vector3.DOWN * PRESS_DIP * float(presses.max())
 		var lift := sin(PI * _travel) * TRAVEL_LIFT if _travel >= 0.0 else 0.0
 		_pose_hand("R", on_mouse.lerp(on_keys, keys) + Vector3.UP * lift,
 			HAND_POSE["R_mouse"], HAND_POSE["R_keys"], keys, presses)

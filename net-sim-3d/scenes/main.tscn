@@ -114,13 +114,13 @@ right_hand_target = NodePath("MouseHand")
 right_typing_target = NodePath("KeyboardRightHand")
 
 [node name="KeyboardHand" type="Marker3D" parent="ITSupportSupervisor" unique_id=1530462817]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0.55)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.788, 0.55)
 
 [node name="MouseHand" type="Marker3D" parent="ITSupportSupervisor" unique_id=1530462818]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0.785, 0.595)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0.79, 0.565)
 
 [node name="KeyboardRightHand" type="Marker3D" parent="ITSupportSupervisor" unique_id=1530462819]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.785, 0.52)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0.788, 0.52)
 
 [node name="TeacherMale" parent="." unique_id=1067835740 instance=ExtResource("5")]
 transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, 5.15, 0.02, -8)

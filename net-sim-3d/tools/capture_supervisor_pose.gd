@@ -47,6 +47,9 @@ func _run() -> void:
 		"pose_side_left": [Vector3(-18.45, 1.1, -43.5), Vector3(-18.45, 0.85, -42.6)],
 		"pose_over_desk": [Vector3(-17.75, 1.35, -42.5), Vector3(-18.45, 0.85, -42.55)],
 		"pose_top": [Vector3(-18.35, 1.9, -42.55), Vector3(-18.34, 0.78, -42.56)],
+		# Low close-ups: do the hands sink into the mouse / keyboard?
+		"close_mouse": [Vector3(-18.12, 0.84, -42.12), Vector3(-18.21, 0.785, -42.36)],
+		"close_keys": [Vector3(-18.02, 0.86, -42.98), Vector3(-18.24, 0.78, -42.74)],
 	}
 	supervisor.work_at_desk = false
 	for name: String in views:
@@ -56,10 +59,37 @@ func _run() -> void:
 	# Right hand typing on the keyboard instead of holding the mouse.
 	supervisor._right_on_keys = true
 	supervisor._update_hands()
-	for name: String in ["pose_side_right", "pose_top"]:
+	for name: String in ["pose_side_right", "pose_top", "close_keys"]:
 		camera.global_position = views[name][0]
 		camera.look_at(views[name][1])
-		await _shot(name.replace("pose_", "typing_"))
+		await _shot("typing_" + name.trim_prefix("pose_"))
+	# How high the hand joints sit over the keyboard (key tops 0.774 m) and
+	# the mouse (top 0.788 m): finger bones need ~0.8 cm, the palm ~1.5 cm.
+	for state in ["keys", "keys_pressed", "mouse", "mouse_click"]:
+		supervisor._right_on_keys = state.begins_with("keys")
+		for side in supervisor._taps:
+			supervisor._taps[side] = [0.0, 0.0, 0.0, 0.0]
+		if state == "keys_pressed":
+			supervisor._taps["L"].fill(supervisor.TAP_TIME * 0.5)
+			supervisor._taps["R"].fill(supervisor.TAP_TIME * 0.5)
+		if state == "mouse_click":
+			supervisor._taps["R"][0] = supervisor.TAP_TIME * 0.5
+		supervisor._update_hands()
+		for side in ["L", "R"]:
+			var line := "HEIGHT %s %s" % [state, side]
+			for bone_name in ["wrist", "finger2-1", "finger3-1", "finger5-1", "finger2-3", "finger3-3", "finger4-3", "finger5-3"]:
+				var bone := sk.find_bone(bone_name + "." + side)
+				var pose := sk.get_bone_global_pose(bone)
+				var p := sk.global_transform * pose.origin
+				line += "  %s=%.3f" % [bone_name, p.y]
+				if bone_name.ends_with("-3"):
+					var tip := sk.global_transform * (pose.origin + pose.basis.y.normalized() * 0.02)
+					line += "(tip %.3f x%.3f)" % [tip.y, tip.x]
+			print(line)
+	for side in supervisor._taps:
+		supervisor._taps[side] = [0.0, 0.0, 0.0, 0.0]
+	supervisor._right_on_keys = true
+	supervisor._update_hands()
 	# Cost of one hand update (the game runs it up to 30 times a second).
 	var start := Time.get_ticks_usec()
 	for i in 30:
