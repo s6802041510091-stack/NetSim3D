@@ -107,6 +107,16 @@ transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, -1
 [node name="ITSupportSupervisor" parent="." unique_id=1226104441 instance=ExtResource("4")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -18.88, 0.02, -42.51)
 seated = true
+seat_forward = 0.1
+lean_degrees = 16.0
+left_hand_target = NodePath("KeyboardHand")
+right_hand_target = NodePath("MouseHand")
+
+[node name="KeyboardHand" type="Marker3D" parent="ITSupportSupervisor" unique_id=1530462817]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.29, 0.78, 0.55)
+
+[node name="MouseHand" type="Marker3D" parent="ITSupportSupervisor" unique_id=1530462818]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.155, 0.785, 0.595)
 
 [node name="TeacherMale" parent="." unique_id=1067835740 instance=ExtResource("5")]
 transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, 5.15, 0.02, -8)
