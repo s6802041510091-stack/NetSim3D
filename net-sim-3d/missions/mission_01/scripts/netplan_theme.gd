@@ -23,6 +23,10 @@ const SELECTED := Color(0.27, 0.66, 0.38)  ## green with a check mark: chosen, n
 const CORRECT := Color(0.09, 0.50, 0.24)   ## green: correct after a check
 const WRONG := Color(0.85, 0.18, 0.17)     ## red: wrong after a check
 const LAN := Color(0.16, 0.45, 0.82)
+## The point to work on next (same gold as the in-game objective arrow).
+const NEXT := Color(0.96, 0.66, 0.08)
+## Points still waiting their turn.
+const WAITING := Color(0.62, 0.65, 0.70)
 
 
 static func build() -> Theme:

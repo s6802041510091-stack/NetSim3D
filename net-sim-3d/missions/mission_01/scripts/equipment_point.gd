@@ -15,6 +15,8 @@ const MARKER_RADIUS := 21.0
 @export var point_id: int = 1
 
 var status: Mission01State.PointStatus = Mission01State.PointStatus.EMPTY
+## Marker fill: gold for the next point, grey while waiting, status colours after.
+var color := NetPlanTheme.EMPTY
 var _pulse := 0.0
 
 @onready var _caption: Label = %Caption
@@ -33,12 +35,14 @@ func _ready() -> void:
 
 
 ## Updates colour, caption and tooltip. `device` is "" when nothing is chosen.
-func set_status(new_status: Mission01State.PointStatus, title: String, device: String) -> void:
+## The caption only appears once a device is chosen (the number is on the marker).
+func set_status(new_status: Mission01State.PointStatus, title: String, device: String, fill: Color = NetPlanTheme.EMPTY) -> void:
 	status = new_status
-	var second := device if device != "" else "ยังไม่เลือก"
+	color = fill
 	if _caption:
-		_caption.text = "จุดที่ %d\n%s" % [point_id, second]
-		_caption.add_theme_color_override("font_color", NetPlanTheme.status_color(status).darkened(0.3))
+		_caption.visible = device != ""
+		_caption.text = device
+		_caption.add_theme_color_override("font_color", color.darkened(0.35))
 		# Fit the caption to its text and centre it under the marker.
 		_caption.size = _caption.get_minimum_size()
 		_caption.position = Vector2((size.x - _caption.size.x) * 0.5, size.y - 2.0)
@@ -46,23 +50,28 @@ func set_status(new_status: Mission01State.PointStatus, title: String, device: S
 	queue_redraw()
 
 
+## Only the gold "next" point pulses, so the eye goes to one place.
+func is_pulsing() -> bool:
+	return status == Mission01State.PointStatus.EMPTY and color == NetPlanTheme.NEXT
+
+
 func _process(delta: float) -> void:
-	if status == Mission01State.PointStatus.EMPTY:
+	if is_pulsing():
 		_pulse = fmod(_pulse + delta * 0.9, 1.0)
 		queue_redraw()
 
 
 func _draw() -> void:
 	var c := size * 0.5
-	var color := NetPlanTheme.status_color(status)
+	var fill := color
 	if is_hovered():
-		color = color.lightened(0.12)
-	if status == Mission01State.PointStatus.EMPTY:
-		draw_arc(c, MARKER_RADIUS + 3.0 + _pulse * 9.0, 0, TAU, 40, Color(color, 0.55 * (1.0 - _pulse)), 3.0, true)
+		fill = fill.lightened(0.12)
+	if is_pulsing():
+		draw_arc(c, MARKER_RADIUS + 3.0 + _pulse * 11.0, 0, TAU, 40, Color(fill, 0.7 * (1.0 - _pulse)), 3.5, true)
 	if status == Mission01State.PointStatus.CORRECT:
-		draw_arc(c, MARKER_RADIUS + 3.5, 0, TAU, 40, color, 2.5, true)
+		draw_arc(c, MARKER_RADIUS + 3.5, 0, TAU, 40, fill, 2.5, true)
 	draw_circle(c, MARKER_RADIUS + 1.5, Color(0, 0, 0, 0.18))
-	draw_circle(c, MARKER_RADIUS, color)
+	draw_circle(c, MARKER_RADIUS, fill)
 	draw_arc(c, MARKER_RADIUS - 1.0, 0, TAU, 40, Color(1, 1, 1, 0.9), 2.0, true)
 
 	var font := get_theme_font("font", "Label")
@@ -76,7 +85,7 @@ func _draw() -> void:
 	match status:
 		Mission01State.PointStatus.SELECTED, Mission01State.PointStatus.CORRECT:
 			draw_circle(badge, 9.0, Color.WHITE)
-			NetPlanTheme.draw_check(self, badge, 12.0, color, 2.5)
+			NetPlanTheme.draw_check(self, badge, 12.0, fill, 2.5)
 		Mission01State.PointStatus.WRONG:
 			draw_circle(badge, 9.0, Color.WHITE)
-			NetPlanTheme.draw_cross(self, badge, 12.0, color, 2.5)
+			NetPlanTheme.draw_cross(self, badge, 12.0, fill, 2.5)

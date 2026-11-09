@@ -152,12 +152,13 @@ func _run() -> void:
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
 		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน", 24: "แถบภารกิจพับ/เปิดด้วย Tab และพับเองตอนใช้คอม",
 		25: "หัวหน้านั่งที่โต๊ะ หันมามองก่อนพูด แล้วหันกลับ", 26: "คำสำคัญในบทสนทนาเป็นสีทอง",
+		27: "NetPlan EDU แบบเรียบ: จุดถัดไปสีทอง ขั้นตอน 1-2-3",
 	}
-	for i in range(1, 27):
+	for i in range(1, 28):
 		var ok: bool = results.get(i, false)
 		print("%s [%02d] %s" % ["PASS" if ok else "FAIL", i, names[i]])
 	if failures == 0:
-		print("MISSION_01_VALID items=26")
+		print("MISSION_01_VALID items=27")
 		quit()
 	else:
 		print("MISSION_01_INVALID failures=", failures)
@@ -286,6 +287,12 @@ func _test_program() -> void:
 	_check(5, app.get_node("%FileName").text.contains(data.project_file_name), "project file name missing in the title bar")
 	_check(9, app.get_node("%ProgressLabel").text == "0/3 จุด", "progress should start at 0/3: " + app.get_node("%ProgressLabel").text)
 	_check(10, app.status_message == NetPlanEdu.MSG_READY, "first status should be พร้อมทำภารกิจ")
+	# Simplified layout: one title bar, the plan, and the step list with one check button.
+	for hidden in ["MenuPanel", "ToolbarPanel", "ProjectPanel", "StatusBar"]:
+		_check(27, not (app.get_node("%" + hidden) as Control).visible, hidden + " should be hidden")
+	_check(27, app.find_child("TitleRequirementsButton", true, false) != null and app.find_child("TitleBriefButton", true, false) != null, "title bar reference buttons")
+	_check(27, app.next_point_id() == 1 and app._plan.get_point(1).is_pulsing() and not app._plan.get_point(2).is_pulsing(), "only the next point (1) should pulse gold")
+	_check(27, (app._rows[1].device as Label).text.contains("ทำต่อที่จุดนี้"), "step card 1 should say to work here next")
 
 	# Plan: exactly 3 clickable markers; LAN routes are drawn, not nodes.
 	var markers := 0
@@ -342,6 +349,7 @@ func _test_program() -> void:
 	_check(7, app.choose_answer(2, "Shared Hub 24 Port"), "could not choose it again")
 	app.choose_answer(1, "Router")
 	_check(9, app.get_node("%ProgressLabel").text == "2/3 จุด", "progress should be 2/3")
+	_check(27, app.next_point_id() == 3 and app._plan.get_point(3).is_pulsing(), "after points 1-2 the gold point moves to 3")
 
 	# Nothing is revealed before checking.
 	for id in [1, 2]:
@@ -359,8 +367,8 @@ func _test_program() -> void:
 	_check(9, app.get_node("%ProgressLabel").text == "3/3 จุด", "progress should be 3/3")
 	_check(11, app.get_point_status(3) == Mission01State.PointStatus.SELECTED, "point 3 revealed before check")
 
-	# First check: 1 correct, 2 and 3 wrong.
-	await _click(app.get_node("%CheckDesignButton"))
+	# First check (the single "ตรวจสอบแบบ" in the step list): 1 correct, 2 and 3 wrong.
+	await _click(app.get_node("%SideCheckButton"))
 	r = app.last_result
 	_check(12, r != null and r.checked and r.wrong == [2, 3], "check button result")
 	_check(12, app.get_point_status(1) == Mission01State.PointStatus.CORRECT and app.get_point_status(2) == Mission01State.PointStatus.WRONG and app.get_point_status(3) == Mission01State.PointStatus.WRONG, "states after check")

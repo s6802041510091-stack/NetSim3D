@@ -8,8 +8,13 @@ extends Control
 
 ## Plan units; all positions below use this space.
 const DESIGN_SIZE := Vector2(1000, 700)
-## Pixels kept at the bottom for the legend (drawn unscaled so it stays readable).
-const LEGEND_HEIGHT := 30.0
+## Pixels kept at the bottom for a legend. 0: the step cards already name each
+## state, so the plan has no legend any more.
+const LEGEND_HEIGHT := 0.0
+## The room is background information: desks, PCs and LAN routes are drawn
+## faded so the install points stand out (LAN routes return to full colour
+## when `lan_highlight` is on).
+const FADE := 0.45
 
 const ROOM := Rect2(20, 40, 840, 640)
 const WHITEBOARD := Rect2(200, 42, 330, 16)
@@ -106,23 +111,18 @@ func _text(text: String, at: Vector2, font_size: float, color: Color, align := H
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), NetPlanTheme.PLAN_BG)
-	var grid := 20.0 * _scale
-	if grid >= 6.0:
-		var x := fmod(_origin.x, grid)
-		while x < size.x:
-			draw_line(Vector2(x, 0), Vector2(x, size.y), Color(0.84, 0.89, 0.96, 0.55), 1.0)
-			x += grid
-		var y := fmod(_origin.y, grid)
-		while y < size.y:
-			draw_line(Vector2(0, y), Vector2(size.x, y), Color(0.84, 0.89, 0.96, 0.55), 1.0)
-			y += grid
-
 	_draw_room()
 	_draw_external()
 	_draw_rack_and_teacher()
 	_draw_student_desks()
 	_draw_lan()
-	_draw_legend()
+	if LEGEND_HEIGHT > 0.0:
+		_draw_legend()
+
+
+## A colour faded toward the plan background.
+static func _faded(color: Color) -> Color:
+	return NetPlanTheme.PLAN_BG.lerp(color, FADE)
 
 
 func _draw_room() -> void:
@@ -139,7 +139,7 @@ func _draw_room() -> void:
 	# Whiteboard on the front wall.
 	draw_rect(_r(WHITEBOARD), Color(0.50, 0.57, 0.68))
 	_text("กระดาน (หน้าห้อง)", WHITEBOARD.get_center() + Vector2(0, 6), 13, Color.WHITE)
-	_text("ห้องปฏิบัติการคอมพิวเตอร์ · คอมพิวเตอร์ครู 1 เครื่อง · คอมพิวเตอร์นักเรียน 20 เครื่อง", Vector2(ROOM.get_center().x, ROOM.end.y - 14), 16, NetPlanTheme.INK_SOFT)
+	_text("ห้องคอม · ครู 1 เครื่อง · นักเรียน 20 เครื่อง", Vector2(ROOM.get_center().x, ROOM.end.y - 14), 16, _faded(NetPlanTheme.INK_SOFT).darkened(0.15))
 
 
 func _draw_external() -> void:
@@ -157,42 +157,36 @@ func _draw_rack_and_teacher() -> void:
 		var y := RACK.position.y + 4 + i * 4.8
 		draw_line(plan_to_local(Vector2(RACK.position.x + 5, y)), plan_to_local(Vector2(RACK.end.x - 5, y)), Color(0.36, 0.39, 0.45), 1.0)
 	draw_rect(rack, Color(0.55, 0.6, 0.68), false, 1.5)
-	_text("Wall Rack 9U", Vector2(RACK.position.x - 40, RACK.position.y + 17), 16, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_RIGHT, true)
-	_text("หลังโต๊ะครู", Vector2(RACK.position.x - 40, RACK.position.y + 35), 13, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT)
+	# Label sits left of the rack, clear of point 2 (on the rack) and its caption.
+	_text("Wall Rack 9U", Vector2(RACK.position.x - 48, RACK.position.y + 28), 15, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT, true)
 
 	# Teacher desk, teacher PC and chair.
-	draw_rect(_r(TEACHER_DESK), Color(0.80, 0.68, 0.52))
-	draw_rect(_r(TEACHER_DESK), Color(0.55, 0.43, 0.30), false, 1.5)
+	draw_rect(_r(TEACHER_DESK), _faded(Color(0.80, 0.68, 0.52)))
 	_draw_pc(TEACHER_DESK.position + Vector2(36, 12), Color(0.35, 0.25, 0.60))
-	draw_circle(plan_to_local(TEACHER_DESK.get_center() + Vector2(0, 34)), 9 * _scale, Color(0.45, 0.48, 0.55))
-	_text("โต๊ะครู", TEACHER_DESK.position + Vector2(100, 30), 14, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
-	_text("คอมพิวเตอร์ครู", TEACHER_DESK.get_center() + Vector2(0, 68), 13, NetPlanTheme.INK_SOFT)
+	draw_circle(plan_to_local(TEACHER_DESK.get_center() + Vector2(0, 34)), 9 * _scale, _faded(Color(0.45, 0.48, 0.55)))
+	_text("โต๊ะครู", TEACHER_DESK.position + Vector2(100, 30), 14, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER, true)
 
 
 func _draw_pc(center_plan: Vector2, color: Color) -> void:
 	var r := _r(Rect2(center_plan - Vector2(15, 5), Vector2(30, 10)))
-	draw_rect(r, color)
-	draw_rect(r.grow(-1.5 * _scale), color.lightened(0.45))
+	draw_rect(r, _faded(color))
 
 
 func _draw_student_desks() -> void:
 	for row in ROW_Y.size():
 		var y: float = ROW_Y[row]
-		_text("แถว %d" % (row + 1), Vector2(LEFT_DESK_X.x - 8, y - 20), 12, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_RIGHT)
 		for side in 2:
 			var span: Vector2 = LEFT_DESK_X if side == 0 else RIGHT_DESK_X
 			var desk := Rect2(span.x, y - DESK_DEPTH * 0.5, span.y - span.x, DESK_DEPTH)
-			draw_rect(_r(desk), Color(0.86, 0.80, 0.70))
-			draw_rect(_r(desk), Color(0.62, 0.55, 0.45), false, 1.2)
+			draw_rect(_r(desk), _faded(Color(0.86, 0.80, 0.70)))
 			for seat in 2:
 				var cx := span.x + (span.y - span.x) * (0.27 + seat * 0.46)
 				_draw_pc(Vector2(cx, y - 4), Color(0.18, 0.35, 0.62))
-				draw_circle(plan_to_local(Vector2(cx, y + DESK_DEPTH * 0.5 + 10)), 7 * _scale, Color(0.55, 0.58, 0.64))
 
 
 func _draw_lan() -> void:
-	var color := NetPlanTheme.LAN if not lan_highlight else Color(0.0, 0.55, 0.95)
-	var width := maxf(2.0, (5.0 if lan_highlight else 3.0) * _scale)
+	var color := _faded(NetPlanTheme.LAN) if not lan_highlight else Color(0.0, 0.55, 0.95)
+	var width := maxf(1.5, (5.0 if lan_highlight else 2.0) * _scale)
 	var routes: Array = LAN_ROUTES.duplicate()
 	for y in ROW_Y:
 		routes.append([Vector2(LEFT_TRUNK_X, y), Vector2(LEFT_DESK_X.x, y)])
@@ -202,10 +196,6 @@ func _draw_lan() -> void:
 			draw_polyline(_local_line(route), Color(0.3, 0.7, 1.0, 0.28), width * 3.2, true)
 	for route in routes:
 		draw_polyline(_local_line(route), color, width, true)
-	for y in ROW_Y:
-		draw_circle(plan_to_local(Vector2(LEFT_DESK_X.x, y)), 3.5 * _scale + 1.0, color)
-		draw_circle(plan_to_local(Vector2(RIGHT_DESK_X.y, y)), 3.5 * _scale + 1.0, color)
-	draw_circle(plan_to_local(Vector2(712, 282)), 3.5 * _scale + 1.0, color)
 
 
 func _local_line(route: Array) -> PackedVector2Array:
