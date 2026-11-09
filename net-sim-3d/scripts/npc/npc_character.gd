@@ -272,12 +272,14 @@ func _step_work(delta: float) -> void:
 		# Typing: quick presses from either hand, now and then a short pause.
 		var side := "L" if _rng.randf() < 0.5 or not _hand_goals.has("R_keys") else "R"
 		_taps[side][_rng.randi_range(0, 3)] = TAP_TIME
+		_hand_sound(side, "key_tap")
 		_next_tap = _rng.randf_range(0.07, 0.2)
 		if _rng.randf() < 0.06:
 			_next_tap += _rng.randf_range(0.4, 0.9)
 	else:
 		# Using the mouse: a click with the index finger now and then.
 		_taps["R"][0] = TAP_TIME
+		_hand_sound("R", "mouse_click")
 		_next_tap = _rng.randf_range(0.8, 2.5)
 
 
@@ -422,3 +424,10 @@ func _roll(bone: int, axis: Vector3, from: Vector3, to: Vector3, weight := 1.0) 
 	if f.length_squared() < 1e-10 or t.length_squared() < 1e-10:
 		return
 	_rotate_bone(bone, axis, atan2(axis.dot(f.cross(t)), f.dot(t)) * weight)
+
+
+## Plays a key press / mouse click from hand `side`.
+func _hand_sound(side: String, id: String) -> void:
+	var wrist := skeleton.find_bone("wrist." + side)
+	if wrist >= 0:
+		Sound.play(id, skeleton.global_transform * _bone_pos(wrist))

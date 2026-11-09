@@ -55,6 +55,7 @@ func _ready() -> void:
 	col.add_child(_objective_label)
 	_toggle = Button.new()
 	_toggle.name = "ToggleButton"
+	_toggle.set_meta("sound", "") # toggle() plays the fold sound
 	_toggle.custom_minimum_size = Vector2(26, 26)
 	_toggle.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_toggle.focus_mode = Control.FOCUS_NONE
@@ -92,6 +93,8 @@ func _ready() -> void:
 
 
 func set_objective(text: String, title: String = "ภารกิจตอนนี้") -> void:
+	if text != objective_text and text != "":
+		Sound.play("objective")
 	objective_text = text
 	_objective_title.set_meta("title", title)
 	# Keep names such as "IT-PC-01" on one line (word joiner after each hyphen).
@@ -100,6 +103,7 @@ func set_objective(text: String, title: String = "ภารกิจตอนน
 
 
 func toggle() -> void:
+	Sound.play("toggle_on" if collapsed else "toggle_off")
 	set_collapsed(not collapsed)
 
 

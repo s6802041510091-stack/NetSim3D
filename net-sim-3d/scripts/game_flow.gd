@@ -122,6 +122,7 @@ func _button(text: String, action: Callable, disabled := false) -> Button:
 	return button
 
 func show_home() -> void:
+	Sound.music("menu")
 	_page("NetSim3D", "เรียนรู้เครือข่าย ผ่านภารกิจในโรงเรียน")
 	_button("Play  /  เลือกด่าน", show_levels).grab_focus()
 	_button("Continue  /  Level %d" % last_level if last_level else "Continue  /  ยังไม่มีด่านล่าสุด", func(): start_level(last_level), last_level == 0)
@@ -186,10 +187,11 @@ func show_settings() -> void:
 		slider.value_changed.connect(func(value: float):
 			set_volume(bus, value)
 			percent.text = "%d%%" % value)
-	_label("เตรียมช่องเสียงแล้ว — ยังไม่มีเพลงหรือเสียงประกอบจริงในรุ่นนี้", 14, Color("b3c5db"))
+	_label("เสียงประกอบ: Kenney.nl (CC0) และเสียงที่สร้างในโปรแกรม • เพลง: OpenGameArt.org (CC0)", 14, Color("b3c5db"))
 	_button("← Back", show_pause if paused_menu else show_home)
 
 func configure_level(world: Node, level: int) -> void:
+	Sound.music("level")
 	# Before _ready: don't start another mission's phone or install its apps.
 	var computers := world.get_node("Computers")
 	computers.netplan_edu_hosts = PackedStringArray(["IT-PC-01"]) if level == 1 else PackedStringArray()

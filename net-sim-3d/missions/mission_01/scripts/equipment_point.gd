@@ -23,6 +23,7 @@ var _pulse := 0.0
 
 
 func _ready() -> void:
+	set_meta("sound", "") # opening the pop-up plays its own sound
 	focus_mode = Control.FOCUS_NONE
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	for state in ["normal", "hover", "pressed", "disabled", "focus", "hover_pressed"]:

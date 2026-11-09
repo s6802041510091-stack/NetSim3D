@@ -11,6 +11,9 @@ signal finished
 const INPUT_GRACE_MS := 250
 ## Colour of "**highlighted**" words (same gold as the objective arrow).
 const HIGHLIGHT := Color(1.0, 0.78, 0.2)
+## Typewriter: characters per second; a soft tick every few characters.
+const CHARS_PER_SEC := 45.0
+const TICK_EVERY := 2
 
 var lines: PackedStringArray = PackedStringArray()
 var index := -1
@@ -20,6 +23,7 @@ var _speaker: Label
 var _text: RichTextLabel
 var _hint: Label
 var _header: Label
+var _reveal := -1.0 # characters shown so far while typing, -1 = whole line shown
 
 
 func _ready() -> void:
@@ -78,20 +82,52 @@ func show_lines(dialogue_lines: PackedStringArray, header: String = "") -> void:
 	advance(true)
 
 
+## Next line. While a line is still typing, the first press shows all of it.
 func advance(force: bool = false) -> void:
 	if not visible:
 		return
 	if not force and Time.get_ticks_msec() - _opened_at < INPUT_GRACE_MS:
+		return
+	if is_typing():
+		_finish_typing()
 		return
 	index += 1
 	if index >= lines.size():
 		visible = false
 		finished.emit()
 		return
+	if index > 0:
+		Sound.play("click")
 	var parts := lines[index].split("|", true, 1)
 	_speaker.text = parts[0] if parts.size() > 1 else ""
 	_text.text = highlight(keep_together(parts[1] if parts.size() > 1 else parts[0]))
 	_hint.text = "คลิก หรือกด F / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
+	_reveal = 0.0
+	_text.visible_characters = 0
+
+
+## True while the current line is still appearing letter by letter.
+func is_typing() -> bool:
+	return _reveal >= 0.0
+
+
+func _finish_typing() -> void:
+	_reveal = -1.0
+	_text.visible_characters = -1
+
+
+func _process(delta: float) -> void:
+	if not visible or _reveal < 0.0:
+		return
+	var before := int(_reveal)
+	_reveal += delta * CHARS_PER_SEC
+	var shown := int(_reveal)
+	if shown >= _text.get_total_character_count():
+		_finish_typing()
+		return
+	_text.visible_characters = shown
+	if shown / TICK_EVERY != before / TICK_EVERY:
+		Sound.play("type_tick")
 
 
 ## Thai line breaking may leave "1" at the end of a line and "เครื่อง" alone on

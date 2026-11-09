@@ -87,6 +87,15 @@ func show_result(title: String, score: MissionScore, record: Dictionary, next_av
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	(next_button if next_available else replay_button).grab_focus()
+	_play_result(score)
+
+
+## Pass / fail jingle, then a rising chime for each star.
+func _play_result(score: MissionScore) -> void:
+	Sound.play("jingle_pass" if score.passed() else "jingle_fail")
+	for i in mini(score.stars(), 4):
+		var pitch := 1.0 + i * 0.12
+		get_tree().create_timer(0.9 + i * 0.28, true).timeout.connect(func(): Sound.play("star", null, 0.0, pitch))
 
 
 func _part(name_text: String, points: int, max_points: int, detail: String) -> void:

@@ -149,6 +149,7 @@ func request_validation() -> Mission01Validator.Result:
 	var was_passed := state.passed
 	var result := Mission01Validator.check(state, data)
 	last_result = result
+	Sound.play("correct" if result.completed else ("back" if not result.checked else "wrong"))
 	if not result.checked:
 		_set_status("%s (ยังไม่ได้เลือก: %s)" % [MSG_MISSING, _join_points(result.missing)], NetPlanTheme.EMPTY.darkened(0.15))
 		_hint.text = "ยังเลือกอุปกรณ์ไม่ครบ จุดที่ยังไม่ได้เลือก: %s" % _join_points(result.missing)
@@ -360,6 +361,9 @@ func _connect_ui() -> void:
 	_popup.cancelled.connect(func(): _hint.text = GENERAL_HINT)
 	%CheckDesignButton.pressed.connect(request_validation)
 	%SideCheckButton.pressed.connect(request_validation)
+	for b: Button in [%CheckDesignButton, %SideCheckButton]:
+		b.set_meta("sound", "") # the result sound plays instead
+	%CloseButton.set_meta("sound", "") # the desktop plays the window sound
 	%SaveButton.pressed.connect(_on_save_pressed)
 	%CloseButton.pressed.connect(close_mission)
 	%MinimizeButton.pressed.connect(func(): minimize_requested.emit())
@@ -404,6 +408,7 @@ func _on_point_opened(point_id: int) -> void:
 	if q == null:
 		return
 	equipment_point_opened.emit(point_id)
+	Sound.play("popup_open")
 	_popup.open_for(q, state, data, state.is_locked(point_id))
 	_hint.text = "จุดที่ %d: %s" % [point_id, q.hint]
 

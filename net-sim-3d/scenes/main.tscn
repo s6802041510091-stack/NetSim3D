@@ -13,6 +13,10 @@
 [ext_resource type="Script" uid="uid://dg7iqk7lkhndc" path="res://scripts/exterior_town.gd" id="11"]
 [ext_resource type="Script" path="res://scripts/school_visual_fixes.gd" id="12_visual_fixes"]
 [ext_resource type="Script" path="res://scripts/props/wall_rack_9u.gd" id="13_wall_rack"]
+[ext_resource type="Script" path="res://scripts/audio/ambience_zone.gd" id="14_ambience"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/amb_outdoor.wav" id="15_outdoor"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/amb_aircon.wav" id="16_aircon"]
+[ext_resource type="AudioStream" path="res://assets/audio/generated/amb_pc_fans.wav" id="17_fans"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -207,3 +211,56 @@ omni_range = 9.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, -13)
 light_energy = 1.1
 omni_range = 9.0
+
+[node name="Ambience" type="Node" parent="." unique_id=1774100001]
+
+[node name="Outdoors" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100002]
+stream = ExtResource("15_outdoor")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-9.1, -1, -44.4, 5.9, 5, 54.3)])
+inside_db = -18.0
+outside_db = -28.0
+
+[node name="ComputerRoomFans" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100003]
+stream = ExtResource("17_fans")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-3.2, -1, -9.8, 12.8, 5, 20.3)])
+inside_db = -16.0
+
+[node name="ComputerRoomAircon" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100004]
+stream = ExtResource("16_aircon")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-3.2, -1, -9.8, 12.8, 5, 20.3)])
+inside_db = -20.0
+
+[node name="ServerRacks" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100005]
+stream = ExtResource("17_fans")
+pitch_scale = 0.8
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-3.2, -1, -44.5, 12.8, 5, 13.9)])
+inside_db = -9.0
+
+[node name="ServerAircon" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100006]
+stream = ExtResource("16_aircon")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-3.2, -1, -44.5, 12.8, 5, 13.9)])
+inside_db = -13.0
+
+[node name="ITRoomAircon" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100007]
+stream = ExtResource("16_aircon")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-21.3, -1, -44.4, 12.2, 5, 13.9)])
+inside_db = -21.0
+
+[node name="ITRoomComputers" type="AudioStreamPlayer" parent="Ambience" unique_id=1774100008]
+stream = ExtResource("17_fans")
+bus = &"Sound"
+script = ExtResource("14_ambience")
+zones = Array[AABB]([AABB(-21.3, -1, -44.4, 12.2, 5, 13.9)])
+inside_db = -27.0

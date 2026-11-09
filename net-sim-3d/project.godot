@@ -19,6 +19,7 @@ web_lobby_url="../"
 [autoload]
 
 GameFlow="*res://scripts/game_flow.gd"
+SoundManager="*res://scripts/audio/sound.gd"
 
 [display]
 

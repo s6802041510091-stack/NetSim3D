@@ -73,6 +73,7 @@ func power_on(target: ComputerStation) -> void:
 	_boot_bar.value = 0.0
 	_boot_status.text = "กำลังตั้งค่าระบบ (Set-up)..."
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Sound.play("pc_boot")
 
 	if _tween:
 		_tween.kill()
@@ -86,6 +87,8 @@ func power_on(target: ComputerStation) -> void:
 
 
 func power_off() -> void:
+	if visible:
+		Sound.play("pc_off")
 	_session += 1
 	if _tween:
 		_tween.kill()
@@ -373,6 +376,7 @@ func _open_window(id: String, title: String, size: Vector2, build_content: Calla
 		var offset := _windows.size() * 28.0
 		window.position = Vector2(maxf(140.0, (view.x - size.x) * 0.5 + offset), maxf(20.0, (view.y - size.y) * 0.4 + offset))
 	window.custom_minimum_size = size
+	Sound.play("window_open")
 	_window_layer.add_child(window)
 	_windows[id] = window
 	window.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: window.move_to_front())
@@ -403,6 +407,7 @@ func _open_window(id: String, title: String, size: Vector2, build_content: Calla
 	close.text = " ✕ "
 	close.flat = true
 	close.add_theme_color_override("font_color", Color.WHITE)
+	close.set_meta("sound", "") # _close_window plays it
 	close.pressed.connect(func(): _close_window(id))
 	title_row.add_child(close)
 
@@ -415,7 +420,9 @@ func _open_window(id: String, title: String, size: Vector2, build_content: Calla
 	return window
 
 
-func _close_window(id: String) -> void:
+func _close_window(id: String, quiet: bool = false) -> void:
+	if _windows.has(id) and not quiet:
+		Sound.play("window_close")
 	if _windows.has(id):
 		_windows[id].queue_free()
 		_windows.erase(id)
@@ -432,7 +439,7 @@ func _close_window(id: String) -> void:
 
 func _close_all_windows() -> void:
 	for id in _windows.keys():
-		_close_window(id)
+		_close_window(id, true)
 
 
 func _info_rows(parent: Control, rows: Array) -> void:

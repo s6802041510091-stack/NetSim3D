@@ -138,6 +138,7 @@ func open_computer(station: ComputerStation, player: Node) -> void:
 	_busy = true
 	active_station = station
 	active_player = player
+	Sound.play("chair")
 	player.set_controls_locked(true)
 	await player.move_camera_to(station.get_view_transform(player.camera.fov), zoom_time)
 	station.set_screen_on(true)
@@ -151,6 +152,7 @@ func close_computer() -> void:
 	_busy = true
 	desktop.power_off()
 	active_station.set_screen_on(false)
+	Sound.play("chair")
 	await active_player.return_camera(zoom_time)
 	active_player.set_controls_locked(false)
 	active_station = null

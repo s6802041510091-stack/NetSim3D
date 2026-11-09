@@ -37,6 +37,10 @@ var _camera_tween: Tween
 var _interact_ray: RayCast3D
 var _prompt: Label
 var _blocked_message_time := 0.0
+## Footsteps: one step sound per this many metres walked (longer when running).
+const STEP_LENGTH := 0.75
+const RUN_STEP_LENGTH := 1.0
+var _step_distance := 0.0
 
 
 func _ready() -> void:
@@ -231,12 +235,25 @@ func _physics_process(delta: float) -> void:
 	velocity.z = move_toward(velocity.z, target_velocity.z, rate * delta)
 
 	var horizontal_motion := Vector3(velocity.x, 0.0, velocity.z) * delta
+	var before := global_position
 	move_and_slide()
 	if was_on_floor and is_on_wall():
 		_try_step_up(horizontal_motion)
+	_footsteps(Vector2(global_position.x - before.x, global_position.z - before.z).length())
 
 	_blocked_message_time = maxf(_blocked_message_time - delta, 0.0)
 	_update_interaction()
+
+
+func _footsteps(moved: float) -> void:
+	if not is_on_floor() or moved < 0.0005:
+		_step_distance = minf(_step_distance, STEP_LENGTH * 0.5) # first step comes soon after starting
+		return
+	_step_distance += moved
+	var running := Vector2(velocity.x, velocity.z).length() > walk_speed * 1.2
+	if _step_distance >= (RUN_STEP_LENGTH if running else STEP_LENGTH):
+		_step_distance = 0.0
+		Sound.play("step", null, 2.0 if running else 0.0)
 
 
 func _try_step_up(horizontal_motion: Vector3) -> void:

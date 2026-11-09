@@ -431,7 +431,7 @@ func _look_at(player: CharacterBody3D, target: Vector3) -> void:
 
 func _finish_dialogue(dialogue: DialogueBox) -> void:
 	var guard := 0
-	while dialogue.is_open() and guard < 20:
+	while dialogue.is_open() and guard < 60:
 		dialogue.advance(true)
 		guard += 1
 	await _frames(2)

@@ -125,9 +125,13 @@ func set_open(value: bool, animate: bool = true) -> bool:
 		return true
 	var target := _open_angle if value else 0.0
 	if _is_path_blocked(target):
+		if animate:
+			Sound.play("door_blocked", _swing)
 		return false
 
 	is_open = value
+	if animate and value:
+		Sound.play("door_open", _swing)
 	if _tween:
 		_tween.kill()
 	if not animate:
@@ -147,6 +151,8 @@ func set_open(value: bool, animate: bool = true) -> bool:
 
 func _on_swing_finished() -> void:
 	is_moving = false
+	if not is_open:
+		Sound.play("door_close", _swing) # the latch clicks shut
 	state_changed.emit(is_open)
 
 

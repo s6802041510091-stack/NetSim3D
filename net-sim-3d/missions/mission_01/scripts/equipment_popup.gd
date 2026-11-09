@@ -60,6 +60,8 @@ func _ready() -> void:
 	_confirm.text = "ยืนยันจุดนี้"
 	_confirm.pressed.connect(confirm)
 	_cancel.pressed.connect(cancel)
+	_confirm.set_meta("sound", "confirm")
+	_cancel.set_meta("sound", "back")
 	_style_primary(_confirm)
 	_devices = GridContainer.new()
 	_devices.name = "Devices"
