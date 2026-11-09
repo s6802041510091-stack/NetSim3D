@@ -20,12 +20,14 @@ func _ready() -> void:
 	collision_mask = 0
 	set_meta(&"interactable", self)
 	if get_child_count() == 0:
+		# A seated NPC is lower: head at about 1.3 m instead of 1.7 m.
+		var is_seated := bool(get_parent().get("seated")) if get_parent() else false
 		var shape := CollisionShape3D.new()
 		var capsule := CapsuleShape3D.new()
 		capsule.radius = 0.4
-		capsule.height = 1.75
+		capsule.height = 1.35 if is_seated else 1.75
 		shape.shape = capsule
-		shape.position = Vector3(0, 0.9, 0)
+		shape.position = Vector3(0, 0.7 if is_seated else 0.9, 0)
 		add_child(shape)
 
 

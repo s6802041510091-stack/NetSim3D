@@ -9,13 +9,15 @@ signal finished
 
 ## Ignore the same key press that opened the dialogue.
 const INPUT_GRACE_MS := 250
+## Colour of "**highlighted**" words (same gold as the objective arrow).
+const HIGHLIGHT := Color(1.0, 0.78, 0.2)
 
 var lines: PackedStringArray = PackedStringArray()
 var index := -1
 var _opened_at := 0
 var _panel: PanelContainer
 var _speaker: Label
-var _text: Label
+var _text: RichTextLabel
 var _hint: Label
 var _header: Label
 
@@ -46,9 +48,18 @@ func _ready() -> void:
 	col.add_child(_header)
 	_speaker = GameUI.label("", 20, Color(1.0, 0.85, 0.45), true)
 	col.add_child(_speaker)
-	_text = GameUI.label("", 19, Color.WHITE)
+	_text = RichTextLabel.new()
+	_text.name = "Text"
+	_text.bbcode_enabled = true
+	_text.fit_content = true
+	_text.scroll_active = false
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_text.add_theme_font_size_override("normal_font_size", 19)
+	_text.add_theme_font_size_override("bold_font_size", 19)
+	_text.add_theme_font_override("bold_font", GameUI.FONT_BOLD)
+	_text.add_theme_color_override("default_color", Color.WHITE)
 	col.add_child(_text)
 	_hint = GameUI.label("", 13, Color(0.7, 0.74, 0.8))
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -79,7 +90,7 @@ func advance(force: bool = false) -> void:
 		return
 	var parts := lines[index].split("|", true, 1)
 	_speaker.text = parts[0] if parts.size() > 1 else ""
-	_text.text = keep_together(parts[1] if parts.size() > 1 else parts[0])
+	_text.text = highlight(keep_together(parts[1] if parts.size() > 1 else parts[0]))
 	_hint.text = "คลิก หรือกด F / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
 
 
@@ -88,6 +99,19 @@ func advance(force: bool = false) -> void:
 static func keep_together(text: String) -> String:
 	var re := RegEx.create_from_string("(\\d) ")
 	return re.sub(text, "$1 ", true)
+
+
+## "**สำคัญ**" in a line becomes bold gold text. Square brackets in the line are
+## escaped first, so only this markup is interpreted as BBCode.
+static func highlight(text: String) -> String:
+	var safe := text.replace("[", "[lb]")
+	var re := RegEx.create_from_string("\\*\\*(.+?)\\*\\*")
+	return re.sub(safe, "[b][color=#%s]$1[/color][/b]" % HIGHLIGHT.to_html(false), true)
+
+
+## Plain text of the line on screen (tests, accessibility).
+func current_text() -> String:
+	return _text.get_parsed_text()
 
 
 func is_open() -> bool:

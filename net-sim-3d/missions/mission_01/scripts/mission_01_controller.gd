@@ -19,18 +19,19 @@ signal next_requested
 const LEVEL := 1
 const PLAYER_COMPUTER := "IT-PC-01"
 
+## "**...**" marks the important words, shown in gold by DialogueBox.
 const BRIEFING := [
-	"หัวหน้างาน Data Center|มีงานใหม่เข้ามาพอดี โรงเรียนกำลังเตรียมห้องคอมพิวเตอร์ห้องใหม่ มีเครื่องนักเรียน 20 เครื่อง และเครื่องครูอีก 1 เครื่อง",
-	"หัวหน้างาน Data Center|ตำแหน่งโต๊ะ จุดติดตั้ง และเส้นทางเดินสาย LAN ถูกกำหนดไว้เรียบร้อยแล้ว แต่เรายังต้องเลือกอุปกรณ์เครือข่ายให้เหมาะสมกับการใช้งาน",
-	"หัวหน้างาน Data Center|ช่วยไปที่คอมพิวเตอร์ของคุณ เปิดไฟล์ Project ของห้องคอมใหม่ใน NetPlan EDU แล้วเลือกอุปกรณ์ให้ถูกต้องทั้ง 3 จุดด้วยนะ",
+	"หัวหน้างาน Data Center|มีงานใหม่เข้ามาพอดี โรงเรียนกำลังเตรียมห้องคอมพิวเตอร์ห้องใหม่ มี**เครื่องนักเรียน 20 เครื่อง** และ**เครื่องครูอีก 1 เครื่อง**",
+	"หัวหน้างาน Data Center|ตำแหน่งโต๊ะ จุดติดตั้ง และเส้นทางเดินสาย LAN ถูกกำหนดไว้เรียบร้อยแล้ว แต่เรายังต้อง**เลือกอุปกรณ์เครือข่าย**ให้เหมาะสมกับการใช้งาน",
+	"หัวหน้างาน Data Center|ช่วยไปที่**คอมพิวเตอร์ของคุณ** เปิดไฟล์ Project ของห้องคอมใหม่ใน **NetPlan EDU** แล้วเลือกอุปกรณ์ให้ถูกต้อง**ทั้ง 3 จุด**ด้วยนะ",
 	"คุณ|รับทราบครับ ผมจะตรวจสอบความต้องการและเลือกอุปกรณ์ให้เหมาะสมกับแต่ละจุด",
 ]
 const REPORT := [
 	"คุณ|ผมตรวจสอบและเลือกอุปกรณ์สำหรับห้องคอมใหม่เรียบร้อยแล้วครับ",
-	"หัวหน้างาน Data Center|ดีมาก การเลือกอุปกรณ์ให้ตรงกับหน้าที่เป็นพื้นฐานสำคัญของการวางแผนระบบเครือข่าย แบบที่เลือกสามารถนำไปใช้เตรียมการติดตั้งในขั้นตอนต่อไปได้",
+	"หัวหน้างาน Data Center|ดีมาก **การเลือกอุปกรณ์ให้ตรงกับหน้าที่**เป็นพื้นฐานสำคัญของการวางแผนระบบเครือข่าย แบบที่เลือกสามารถนำไปใช้เตรียมการติดตั้งในขั้นตอนต่อไปได้",
 ]
 const NOT_DONE := [
-	"หัวหน้างาน Data Center|ยังเลือกอุปกรณ์ไม่ครบหรือยังไม่ถูกต้องนะ กลับไปตรวจสอบใน NetPlan EDU ที่คอมพิวเตอร์ของคุณก่อน",
+	"หัวหน้างาน Data Center|ยังเลือกอุปกรณ์ไม่ครบหรือยังไม่ถูกต้องนะ กลับไปตรวจสอบใน **NetPlan EDU** ที่คอมพิวเตอร์ของคุณก่อน",
 ]
 const RECEIVED := "ได้รับภารกิจ: เลือกอุปกรณ์เครือข่ายห้องคอมใหม่"
 
@@ -115,7 +116,8 @@ func _enter(next: Stage) -> void:
 
 func _point_at_supervisor() -> void:
 	if supervisor:
-		marker.point_at(supervisor, 2.25)
+		var seated: bool = supervisor is NpcCharacter and (supervisor as NpcCharacter).seated
+		marker.point_at(supervisor, 1.75 if seated else 2.25)
 	else:
 		marker.clear()
 
@@ -167,8 +169,13 @@ func _on_talked(player: Node) -> void:
 func _say(player: Node, lines: PackedStringArray, unlock_after: bool = true) -> void:
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)
+	# The supervisor turns to the player first, then speaks.
+	if supervisor is NpcCharacter and player is Node3D:
+		await (supervisor as NpcCharacter).turn_to(player)
 	dialogue.show_lines(lines)
 	await dialogue.finished
+	if supervisor is NpcCharacter:
+		(supervisor as NpcCharacter).turn_back()
 	if unlock_after and player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(false)
 

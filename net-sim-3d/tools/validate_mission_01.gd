@@ -151,12 +151,13 @@ func _run() -> void:
 		18: "Esc ปิด Popup → โปรแกรม → ออกจากคอม", 19: "ไม่มีส่วนที่ขัดกับ Web Export",
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
 		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน", 24: "แถบภารกิจพับ/เปิดด้วย Tab และพับเองตอนใช้คอม",
+		25: "หัวหน้านั่งที่โต๊ะ หันมามองก่อนพูด แล้วหันกลับ", 26: "คำสำคัญในบทสนทนาเป็นสีทอง",
 	}
-	for i in range(1, 25):
+	for i in range(1, 27):
 		var ok: bool = results.get(i, false)
 		print("%s [%02d] %s" % ["PASS" if ok else "FAIL", i, names[i]])
 	if failures == 0:
-		print("MISSION_01_VALID items=24")
+		print("MISSION_01_VALID items=26")
 		quit()
 	else:
 		print("MISSION_01_INVALID failures=", failures)
@@ -440,6 +441,7 @@ func _test_in_game() -> void:
 		return
 	_check(20, mission.hud.objective_text.contains("หัวหน้างาน"), "first objective: " + mission.hud.objective_text)
 	var supervisor_node: Node3D = map.get_node("ITSupportSupervisor")
+	_check(26, DialogueBox.highlight("มี**20 เครื่อง**").contains("[b][color=") and DialogueBox.highlight("a [b] b") == "a [lb]b] b", "highlight markup")
 	_check(23, mission.marker.is_active() and mission.marker.target == supervisor_node, "gold arrow should point at the supervisor first")
 	_check(4, not pc.has_app("netplan_edu"), "NetPlan EDU must appear only after the briefing")
 	_check(4, not manager.find_host("PC-R1-L1").has_app("netplan_edu"), "student PCs should not have NetPlan EDU")
@@ -448,15 +450,24 @@ func _test_in_game() -> void:
 
 	# Talk to the supervisor with the real prompt and F.
 	player.require_mouse_capture = false
-	var supervisor: Node3D = map.get_node("ITSupportSupervisor")
-	player.global_position = supervisor.global_position + Vector3(1.4, 0, 0)
+	var supervisor: NpcCharacter = map.get_node("ITSupportSupervisor")
+	_check(25, supervisor.seated and supervisor.global_position.distance_to(Vector3(-18.88, 0.02, -42.51)) < 0.05, "supervisor should sit at the head desk")
+	_check(25, not manager.find_host("IT-HEAD-PC").collision_layer, "the supervisor's own computer must not block talking to him")
+	# Stand off to one side so the supervisor has to turn to face the player.
+	player.global_position = supervisor.global_position + Vector3(2.3, 0, 0.9)
 	for i in 2:
 		await physics_frame
-	await _look_at(player, supervisor.global_position + Vector3(0, 1.2, 0))
+	await _look_at(player, supervisor.global_position + Vector3(0, 1.0, 0))
 	_check(20, player.focused_interactable == mission.talk and player._prompt.text.contains("หัวหน้างาน"), "supervisor prompt: " + player._prompt.text)
 	await _press_interact()
+	_check(25, not mission.dialogue.is_open() and player.controls_locked, "the supervisor should turn before speaking")
+	await create_timer(supervisor.turn_time + 0.3).timeout
+	_check(25, absf(supervisor.turn_amount) > 0.01, "the supervisor did not turn toward the player")
 	_check(20, mission.dialogue.is_open() and player.controls_locked, "talking did not open the dialogue")
+	_check(26, mission.dialogue.current_text().replace(" ", " ").contains("20 เครื่อง") and mission.dialogue._text.text.contains("[color="), "important words should be highlighted: " + mission.dialogue._text.text)
 	await _finish_dialogue(mission.dialogue)
+	await create_timer(supervisor.turn_time + 0.2).timeout
+	_check(25, absf(supervisor.turn_amount) < 0.01, "the supervisor should turn back to his desk after talking")
 	_check(20, mission.stage == Mission01Controller.Stage.DESIGN and pc.has_app("netplan_edu") and not player.controls_locked, "briefing did not start the mission")
 	_check(20, mission.hud.objective_text.contains("IT-PC-01"), "objective after briefing: " + mission.hud.objective_text)
 	var pc_screen: Vector3 = pc.screen.global_transform * pc.screen.get_aabb().get_center()
@@ -559,12 +570,13 @@ func _test_in_game() -> void:
 	_check(16, Mission01SaveStore.load_into(saved, data) and saved.passed and saved.final_score == 25 and saved.check_count == 2 and saved.ever_wrong == [2], "saved result: %s" % saved.to_dict())
 
 	# Report to the supervisor -> summary.
-	player.global_position = supervisor.global_position + Vector3(1.4, 0, 0)
+	player.global_position = supervisor.global_position + Vector3(2.3, 0, 0)
 	for i in 2:
 		await physics_frame
-	await _look_at(player, supervisor.global_position + Vector3(0, 1.2, 0))
+	await _look_at(player, supervisor.global_position + Vector3(0, 1.0, 0))
 	_check(20, player._prompt.text.contains("รายงานผล"), "report prompt: " + player._prompt.text)
 	await _press_interact()
+	await create_timer(supervisor.turn_time + 0.3).timeout
 	await _finish_dialogue(mission.dialogue)
 	await _frames(3)
 	var score := mission.score

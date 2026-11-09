@@ -21,6 +21,10 @@ extends Node3D
 ## Mission 6: computers that have TeamViewer (simulated) — the player's desk in
 ## the IT Support room (= the Data Center office of the mission story).
 @export var teamviewer_hosts: PackedStringArray = ["IT-PC-01"]
+## Computers an NPC is sitting at (the supervisor at IT-HEAD-PC): the player
+## cannot use them, and their screen collider would otherwise block the
+## player's look/talk ray toward that NPC.
+@export var npc_used_hosts: PackedStringArray = ["IT-HEAD-PC"]
 ## Screens that are not part of the map model (a MeshInstance3D in another scene).
 @export var extra_screen_paths: Array[NodePath] = []
 ## Where Mission 5 progress is saved. Empty = the default file from SavePaths
@@ -78,6 +82,8 @@ func _ready() -> void:
 		if station.hostname in windows_security_hosts:
 			station.installed_apps.append("windows_security")
 			station.set_screen_alert(not _mission_05_protected())
+		if station.hostname in npc_used_hosts:
+			station.collision_layer = 0
 		stations.append(station)
 
 

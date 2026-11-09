@@ -54,13 +54,14 @@ func _run() -> void:
 	var mission: Mission01Controller = map.get_node("Mission01")
 	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
 	var supervisor: Node3D = map.get_node("ITSupportSupervisor")
-	player.global_position = supervisor.global_position + Vector3(1.6, 0, 0)
+	player.global_position = supervisor.global_position + Vector3(2.3, 0, 0.9)
 	player.look_at(Vector3(supervisor.global_position.x, player.global_position.y, supervisor.global_position.z), Vector3.UP)
-	player.camera.rotation.x = -0.12
+	player.camera.rotation.x = -0.28
 	for i in 5:
 		await physics_frame
 	await _shot("m1_supervisor_prompt")
 	mission._on_talked(player)
+	await create_timer(0.8).timeout
 	await _shot("m1_dialogue")
 	while mission.dialogue.is_open():
 		mission.dialogue.advance(true)
@@ -87,6 +88,11 @@ func _run() -> void:
 	var camera := Camera3D.new()
 	camera.fov = 70.0
 	map.add_child(camera)
+	# Side view of the seated supervisor (legs, chair, arms).
+	camera.global_position = supervisor.global_position + Vector3(0.6, 1.2, 1.9)
+	camera.look_at(supervisor.global_position + Vector3(0.3, 0.6, 0))
+	camera.make_current()
+	await _shot("m1_supervisor_side")
 	camera.global_position = Vector3(6.2, 1.65, -6.6)
 	camera.look_at(Vector3(8.2, 1.6, -9.5))
 	camera.make_current()
