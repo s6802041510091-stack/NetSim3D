@@ -32,7 +32,7 @@ const MSG_SELECTED := "เลือกอุปกรณ์จุดที่ %d
 const MSG_MISSING := "กรุณาเลือกอุปกรณ์ให้ครบทั้ง 3 จุด"
 const MSG_FIX := "พบจุดที่ต้องแก้ไข"
 const MSG_DONE := "ภารกิจสำเร็จ"
-const GENERAL_HINT := "คลิกจุดสีทองบนผังห้อง (หรือการ์ดด้านบน) พิจารณาอุปกรณ์พร้อมเหตุผล ระบุจำนวน แล้วกด \"ยืนยันจุดนี้\" เมื่อครบ 3 จุดให้กด \"ตรวจสอบแบบ\""
+const GENERAL_HINT := "คลิกจุดสีทองบนผังห้อง (หรือการ์ดด้านบน) เลือกอุปกรณ์ ตอบเหตุผล แล้วกด \"ยืนยันจุดนี้\" เมื่อครบ 3 จุดให้กด \"ตรวจสอบแบบ\""
 
 enum MenuId { SAVE, CLOSE, UNDO, REDO, VIEW_PLAN, VIEW_REQUIREMENTS, VIEW_LAN, CHECK, HELP }
 
@@ -127,34 +127,20 @@ func open_point(point_id: int) -> void:
 		point.pressed.emit()
 
 
-## Opens the pop-up, marks `option` as "เลือก" with a reason, types the
-## quantity and confirms — exactly what the player does.
-## reason_index -1 = the right reason when there is one, otherwise the first.
-func choose_answer(point_id: int, option: String, quantity: int = 1, reason_index: int = -1) -> bool:
-	if not answer_device(point_id, option, Mission01Data.DECISION_CHOOSE, reason_index):
-		return false
-	_popup.set_quantity(quantity)
-	_popup.confirm()
-	return state.get_answer(point_id) == option and state.get_quantity(point_id) == quantity
-
-
-## Opens the pop-up (if needed), clicks `device`, decides and saves a reason.
-func answer_device(point_id: int, device: String, decision: String, reason_index: int = -1) -> bool:
+## Opens the pop-up, clicks the `option` card, picks a reason and confirms —
+## exactly what the player does. reason_index -1 = the right reason when the
+## device has one, otherwise the first option.
+func choose_answer(point_id: int, option: String, reason_index: int = -1) -> bool:
 	if not _popup.visible or _popup.point_id != point_id:
 		open_point(point_id)
 	if not _popup.visible or _popup.locked:
 		return false
 	if reason_index < 0:
-		reason_index = 0
-		var options := data.reason_options(point_id, device, decision)
-		for i in options.size():
-			if bool(options[i].get("correct", false)):
-				reason_index = i
-	_popup.choose(device)
-	_popup.decide(decision)
+		reason_index = maxi(data.correct_reason(point_id, option), 0)
+	_popup.choose(option)
 	_popup.pick_reason(reason_index)
-	_popup.save_reason()
-	return state.get_mark(point_id, device) == decision
+	_popup.confirm()
+	return state.get_answer(point_id) == option and state.get_reason(point_id) == reason_index
 
 
 ## "ตรวจสอบแบบ". Returns the result (see Mission01Validator.Result).
@@ -370,7 +356,6 @@ func _marker_color(point_id: int) -> Color:
 
 func _connect_ui() -> void:
 	_popup.equipment_selected.connect(func(id: int, option: String): equipment_selected.emit(id, option))
-	_popup.reason_answered.connect(_on_reason_answered)
 	_popup.answer_confirmed.connect(_on_answer_confirmed)
 	_popup.cancelled.connect(func(): _hint.text = GENERAL_HINT)
 	%CheckDesignButton.pressed.connect(request_validation)
@@ -423,15 +408,8 @@ func _on_point_opened(point_id: int) -> void:
 	_hint.text = "จุดที่ %d: %s" % [point_id, q.hint]
 
 
-func _on_reason_answered(point_id: int, device: String, decision: String, option_index: int) -> void:
-	if state.record_reason(point_id, device, decision, option_index, data):
-		_hint.text = "บันทึกการตัดสินใจเรื่อง %s แล้ว" % device
-		_save()
-		_refresh()
-
-
-func _on_answer_confirmed(point_id: int, option: String, quantity: int) -> void:
-	if not state.set_answer(point_id, option, quantity):
+func _on_answer_confirmed(point_id: int, option: String, reason_index: int) -> void:
+	if not state.set_answer(point_id, option, reason_index, data):
 		return
 	_set_status(MSG_SELECTED % point_id)
 	_hint.text = GENERAL_HINT if state.answered_count(data) < data.questions.size() else "เลือกครบ 3 จุดแล้ว กด \"ตรวจสอบแบบ\" เพื่อตรวจคำตอบ"
@@ -460,7 +438,7 @@ func _on_menu(id: int) -> void:
 		MenuId.CHECK:
 			request_validation()
 		MenuId.HELP:
-			_show_info("วิธีทำภารกิจ", "1. คลิกจุดที่ 1, 2 หรือ 3 บนผังห้อง\n2. คลิกอุปกรณ์ที่ต้องการพิจารณา แล้วกด \"เลือกอุปกรณ์นี้\" หรือ \"ไม่เลือกอุปกรณ์นี้\"\n3. เลือกเหตุผล แล้วกด \"บันทึกคำตอบ\" (ระบบนับเหตุผลครั้งแรกของแต่ละอุปกรณ์)\n4. ระบุจำนวนอุปกรณ์ที่เลือก แล้วกด \"ยืนยันจุดนี้\"\n5. ทำครบ 3 จุดแล้วกด \"ตรวจสอบแบบ\" จุดสีแดงคือจุดที่ต้องแก้ไข\n\nคะแนนความถูกต้องเต็ม %d คะแนน — จุดที่ตรวจแล้วผิด (อุปกรณ์หรือจำนวน) ถูกหักจุดละ %d คะแนนทุกครั้งที่ตรวจ\nคะแนนกระบวนการมาจากการตัดสินใจและเหตุผล ส่วนคะแนนเวลามาจากเวลาที่ใช้ทั้งภารกิจ\n\nEsc: ปิดหน้าต่างเลือกอุปกรณ์ → ปิดโปรแกรม" % [data.start_score, data.penalty_per_wrong])
+			_show_info("วิธีทำภารกิจ", "1. คลิกจุดสีทองบนผังห้อง (หรือการ์ดด้านขวา)\n2. คลิกรูปอุปกรณ์ที่ต้องการเลือก\n3. ตอบว่าเลือกอุปกรณ์นี้เพราะอะไร (4 ตัวเลือก) แล้วกด \"ยืนยันจุดนี้\"\n4. ทำครบ 3 จุดแล้วกด \"ตรวจสอบแบบ\" จุดสีแดงคือจุดที่ต้องแก้ไข\n\nคะแนนความถูกต้องเต็ม %d คะแนน — จุดที่ตรวจแล้วเลือกอุปกรณ์ผิด ถูกหักจุดละ %d คะแนนทุกครั้งที่ตรวจ\nคะแนนกระบวนการมาจากอุปกรณ์และเหตุผลที่ยืนยันครั้งแรก ส่วนคะแนนเวลามาจากเวลาที่ใช้ทั้งภารกิจ\n\nEsc: ปิดหน้าต่างเลือกอุปกรณ์ → ปิดโปรแกรม" % [data.start_score, data.penalty_per_wrong])
 	_sync_view_menu()
 
 
@@ -527,7 +505,7 @@ func _refresh() -> void:
 		var is_next := id == next
 		_plan.get_point(id).set_status(status, q.title, answer, _marker_color(id))
 		var row: Dictionary = _rows[id]
-		var chosen := "%s × %d" % [answer, state.get_quantity(id)]
+		var chosen := answer
 		var text := ""
 		var color := NetPlanTheme.INK_SOFT
 		match status:

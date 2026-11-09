@@ -2,10 +2,9 @@ class_name Mission01Validator
 extends RefCounted
 
 ## "ตรวจสอบแบบ" — checks all three points at once and applies the scoring rules:
-##   * every point must have a device (and quantity) first, otherwise nothing is checked
-##   * a point is right when the device AND the quantity are right
+##   * every point must have a device (with its reason) first, otherwise nothing is checked
+##   * a point is right when the chosen device is right
 ##   * each wrong point loses `penalty_per_wrong` (5) on every check while it stays wrong
-##   * a point's quantity counts once, as a process decision, at its first check
 ##   * point scores and the total never go below 0
 ##   * all correct = design passed, the correctness score is final
 ## The whole mission score (30/50/20) is built by Mission01Validator.mission_score().
@@ -23,7 +22,7 @@ class Result:
 
 
 static func is_point_correct(state: Mission01State, q: EquipmentQuestion) -> bool:
-	return q.is_correct(state.get_answer(q.point_id)) and state.get_quantity(q.point_id) == q.correct_quantity
+	return q.is_correct(state.get_answer(q.point_id))
 
 
 static func check(state: Mission01State, data: Mission01Data) -> Result:
@@ -44,8 +43,6 @@ static func check(state: Mission01State, data: Mission01Data) -> Result:
 	state.check_count += 1
 	for q in data.questions:
 		var id := q.point_id
-		if not state.quantity_results.has(id):
-			state.quantity_results[id] = state.get_quantity(id) == q.correct_quantity
 		if state.get_status(id) == Mission01State.PointStatus.CORRECT:
 			result.correct.append(id)
 			continue
@@ -75,19 +72,14 @@ static func mission_score(state: Mission01State, data: Mission01Data, elapsed_se
 	for q in data.questions:
 		var id := q.point_id
 		if id in state.ever_wrong:
-			score.mistakes.append("จุดที่ %d: ตรวจแล้วพบว่าเลือกอุปกรณ์หรือจำนวนไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)" % id)
-		if not bool(state.quantity_results.get(id, true)):
-			score.mistakes.append("จุดที่ %d: ระบุจำนวน %s ไม่ถูกต้องในการตรวจครั้งแรก (ต้องใช้ %d ตัว)" % [id, q.correct_option, q.correct_quantity])
+			score.mistakes.append("จุดที่ %d: ตรวจแล้วพบว่าเลือกอุปกรณ์ไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)" % id)
 		var point_scored: Dictionary = state.scored_reasons.get(id, {})
 		for device in point_scored:
 			var entry: Dictionary = point_scored[device]
 			if bool(entry.get("correct", false)):
 				continue
-			var decided := "เลือก" if entry.get("decision", "") == Mission01Data.DECISION_CHOOSE else "ไม่เลือก"
-			var right_decision := "เลือก" if device == q.correct_option else "ไม่เลือก"
-			var line := "จุดที่ %d: %s %s" % [id, decided, device]
-			if decided != right_decision:
-				line += " — ควร%s" % right_decision
+			var line := "จุดที่ %d: เลือก %s" % [id, device]
+			line += " — อุปกรณ์นี้ไม่เหมาะกับจุดนี้" if device != q.correct_option else " — อุปกรณ์ถูก แต่เหตุผลไม่ถูก"
 			var misconception := String(entry.get("misconception", ""))
 			if misconception != "":
 				line += " (เข้าใจผิดว่า: %s)" % misconception

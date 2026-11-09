@@ -19,8 +19,6 @@ extends Resource
 @export var options: PackedStringArray = PackedStringArray()
 ## Must be one of `options`.
 @export var correct_option: String = ""
-## How many of the device the room needs (the player types it; starts at 0).
-@export var correct_quantity: int = 1
 ## This point's share of the 30-point correctness score.
 @export var max_score: int = 10
 ## Short hint for the side panel. It must not give the answer away.

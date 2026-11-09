@@ -12,8 +12,6 @@ const FULL_NAMES := ["Router", "Wireless Access Point", "Switched Hub 24 Port", 
 	"Switched Hub 16 Port", "Switched Hub 8 Port", "Repeater", "Bridge"]
 const FORBIDDEN_WORDS := ["Topology", "Straight-Through", "Crossover", "Half-Duplex", "Full-Duplex",
 	"IP Address", "Subnet", "Server", "Firewall", "Load Balancer", "Patch Panel"]
-const CHOOSE := Mission01Data.DECISION_CHOOSE
-const REJECT := Mission01Data.DECISION_REJECT
 
 
 ## Collects every engine/script error printed while the test runs.
@@ -106,20 +104,12 @@ func _press_interact() -> void:
 	await _frames(1)
 
 
-## Index of the right reason (or the first one when there is none).
-func _reason(point: int, device: String, decision: String, right: bool = true) -> int:
-	var options := data.reason_options(point, device, decision)
-	for i in options.size():
-		if bool(options[i].get("correct", false)) == right:
-			return i
-	return 0
-
-
-## Rule-level answer: decide + reason, then (for "choose") set the device and quantity.
-func _answer(s: Mission01State, point: int, device: String, quantity: int = 1, right_reason: bool = true) -> bool:
-	if not s.record_reason(point, device, CHOOSE, _reason(point, device, CHOOSE, right_reason), data):
-		return false
-	return s.set_answer(point, device, quantity)
+## Rule-level answer: choose `device` with its right reason (or a wrong one).
+func _answer(s: Mission01State, point: int, device: String, right_reason: bool = true) -> bool:
+	var index := data.correct_reason(point, device) if right_reason else -1
+	if index < 0:
+		index = 0 if data.correct_reason(point, device) != 0 else 1
+	return s.set_answer(point, device, index, data)
 
 
 func _run() -> void:
@@ -144,9 +134,9 @@ func _run() -> void:
 
 	var names := {
 		1: "ไม่มี error", 2: "เปิด Scene ภารกิจได้ และพอดีจอ 1280x720", 3: "Setup ประมาณ 2 วินาที", 4: "NetPlan EDU ติดตั้งหลังรับภารกิจเท่านั้น",
-		5: "เปิด NetPlan EDU + ไฟล์ Project", 6: "คลิกจุดที่ 1–3 ได้ แต่ละจุดมี 4 อุปกรณ์", 7: "เลือก/ไม่เลือก + เหตุผล + จำนวน",
+		5: "เปิด NetPlan EDU + ไฟล์ Project", 6: "คลิกจุดที่ 1–3 ได้ แต่ละจุดมี 4 อุปกรณ์พร้อมรูป", 7: "คลิกอุปกรณ์ = เลือก แล้วตอบเหตุผล 4 ตัวเลือก",
 		8: "เส้นทาง LAN แสดงและแก้ไขไม่ได้", 9: "ความคืบหน้า 0/3 → 3/3", 10: "แจ้งเตือนเมื่อเลือกไม่ครบ",
-		11: "ไม่เฉลยก่อนตรวจ", 12: "สถานะถูก/ผิดหลังตรวจ (อุปกรณ์ + จำนวน)", 13: "คะแนนความถูกต้อง 30 หักถูกต้อง", 14: "คะแนนไม่ติดลบ",
+		11: "ไม่เฉลยก่อนตรวจ", 12: "สถานะถูก/ผิดหลังตรวจ", 13: "คะแนนความถูกต้อง 30 หักถูกต้อง", 14: "คะแนนไม่ติดลบ",
 		15: "คะแนนรวม 30/50/20 ดาว และจุดที่ผิดพลาด", 16: "บันทึกข้อมูลได้", 17: "ออกจากคอมแล้วผู้เล่นควบคุมได้",
 		18: "Esc ปิด Popup → โปรแกรม → ออกจากคอม", 19: "ไม่มีส่วนที่ขัดกับ Web Export",
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
@@ -171,9 +161,18 @@ func _test_data_and_rules() -> void:
 	_check(13, data.validate_data() == "", "mission data invalid: " + data.validate_data())
 	for q in data.questions:
 		_check(6, q.options.size() == 4, "point %d should have 4 devices" % q.point_id)
-		_check(7, q.correct_quantity == 1, "point %d quantity" % q.point_id)
 		for option in q.options:
 			_check(11, option in FULL_NAMES, "option is not a full device name: " + option)
+			_check(6, Mission01Data.device_icon(option) != null, "no picture for " + option)
+			var options := data.reason_options(q.point_id, option)
+			_check(7, options.size() == 4, "point %d %s should have 4 reasons" % [q.point_id, option])
+			# Distractors about as long as the right answer, so length gives nothing away.
+			var shortest := 9999
+			var longest := 0
+			for o in options:
+				shortest = mini(shortest, String(o.text).length())
+				longest = maxi(longest, String(o.text).length())
+			_check(7, longest <= shortest * 1.5, "point %d %s: reasons %d..%d characters" % [q.point_id, option, shortest, longest])
 	_check(13, data.get_question(1).correct_option == "Router" and data.get_question(1).max_score == 10, "point 1 data")
 	_check(13, data.get_question(2).correct_option == "Switched Hub 24 Port" and data.get_question(2).max_score == 10, "point 2 data")
 	_check(13, data.get_question(3).correct_option == "Wireless Access Point" and data.get_question(3).max_score == 10, "point 3 data")
@@ -182,49 +181,41 @@ func _test_data_and_rules() -> void:
 	var s := Mission01State.new()
 	s.reset(data)
 	_check(13, s.total_score() == 30, "start correctness should be 30")
-	_check(7, not s.set_answer(1, "Router", 1), "a device must be decided as 'choose' with a reason first")
+	_check(7, not s.set_answer(1, "Router", 7, data), "an answer needs one of the 4 reasons")
 	_check(7, _answer(s, 1, "Router"), "choose Router")
-	_check(7, _answer(s, 2, "Shared Hub 24 Port", 1, false), "choose Shared Hub")
+	_check(7, _answer(s, 2, "Shared Hub 24 Port", false), "choose Shared Hub")
 	var r := Mission01Validator.check(s, data)
 	_check(10, not r.checked and r.missing == [3] and s.check_count == 0 and s.total_score() == 30, "incomplete check must not count or cost points")
 	# Changing answers before a check is free; only the first reason per device is scored.
 	_check(7, _answer(s, 2, "Switched Hub 24 Port"), "change to Switched Hub 24 Port")
-	_check(7, s.get_mark(2, "Shared Hub 24 Port") == "", "choosing another device clears the old 'choose' mark")
-	_check(7, _answer(s, 2, "Shared Hub 24 Port", 1, true), "change back to Shared Hub")
-	_check(7, not bool(s.scored_reasons[2]["Shared Hub 24 Port"].correct), "the first (wrong) answer for a device stays the scored one")
+	_check(7, _answer(s, 2, "Shared Hub 24 Port", true), "change back to Shared Hub")
+	_check(7, s.scored_reasons[2].size() == 2 and not bool(s.scored_reasons[2]["Shared Hub 24 Port"].correct), "each device is scored once, on its first answer")
 	_check(13, s.total_score() == 30, "changing an answer cost points")
-	# Rejecting a distractor with the right reason is a right decision.
-	_check(7, s.record_reason(3, "Bridge", REJECT, _reason(3, "Bridge", REJECT), data) and bool(s.scored_reasons[3]["Bridge"].correct), "reject Bridge with the right reason")
-	_check(7, s.record_reason(3, "Switched Hub 8 Port", REJECT, _reason(3, "Switched Hub 8 Port", REJECT, false), data) and not bool(s.scored_reasons[3]["Switched Hub 8 Port"].correct), "reject with a wrong reason is a wrong decision")
 	_answer(s, 3, "Router")
 	r = Mission01Validator.check(s, data)                      # P2, P3 wrong
 	_check(12, r.checked and r.wrong == [2, 3] and r.correct == [1], "first check result")
 	_check(13, s.get_point_score(2) == 5 and s.get_point_score(3) == 5 and s.total_score() == 20, "first check score %d" % s.total_score())
 	_check(12, s.get_status(1) == Mission01State.PointStatus.CORRECT and s.get_status(2) == Mission01State.PointStatus.WRONG, "states after check")
 	_check(12, not _answer(s, 1, "Wireless Access Point"), "a point already checked correct must stay locked")
-	_check(12, s.quantity_results.size() == 3 and bool(s.quantity_results[1]), "quantities scored at the first check")
 	_answer(s, 2, "Switched Hub 24 Port")
 	_check(12, s.get_status(2) == Mission01State.PointStatus.SELECTED, "changed wrong point should be 'selected' again")
 	r = Mission01Validator.check(s, data)                      # only P3 wrong, again
 	_check(13, s.get_point_score(2) == 5 and s.get_point_score(3) == 0 and s.total_score() == 15, "second check score %d" % s.total_score())
-	_answer(s, 3, "Wireless Access Point", 2)                   # right device, wrong quantity
-	r = Mission01Validator.check(s, data)
-	_check(12, r.wrong == [3] and s.get_status(3) == Mission01State.PointStatus.WRONG, "a wrong quantity makes the point wrong")
 	_check(14, s.get_point_score(3) == 0, "point score went below 0")
-	s.set_answer(3, "Wireless Access Point", 1)
+	_answer(s, 3, "Wireless Access Point", false)             # right device, wrong reason
 	r = Mission01Validator.check(s, data)
-	_check(13, r.completed and s.passed and s.final_score == 15 and s.check_count == 4, "pass: final %d checks %d" % [s.final_score, s.check_count])
+	_check(13, r.completed and s.passed and s.final_score == 15 and s.check_count == 3, "pass: final %d checks %d" % [s.final_score, s.check_count])
 	_check(13, s.ever_wrong_count() == 2 and 2 in s.ever_wrong and 3 in s.ever_wrong, "ever-wrong points")
 	r = Mission01Validator.check(s, data)
-	_check(13, s.check_count == 4 and s.final_score == 15, "checking after passing must not change anything")
+	_check(13, s.check_count == 3 and s.final_score == 15, "checking after passing must not change anything")
 	_check(13, not _answer(s, 2, "Shared Hub 24 Port"), "answers must be locked after passing")
-	# Decisions: P1 Router ok; P2 Shared x, Switched24 ok; P3 Bridge ok, 8 Port x, Router x, AP ok; 3 quantities ok.
+	# Decisions: P1 Router ok; P2 Shared x, Switched24 ok; P3 Router x, AP (wrong reason) x.
 	var counts := s.decision_counts()
-	_check(15, counts == Vector2i(7, 10), "decision counts %s" % counts)
+	_check(15, counts == Vector2i(2, 5), "decision counts %s" % counts)
 	var score := Mission01Validator.mission_score(s, data, 200.0)
-	_check(15, score.correctness == 15 and score.process == 35 and score.time == 20 and score.total() == 70 and score.stars() == 3, "mission score %s" % score.to_dict())
+	_check(15, score.correctness == 15 and score.process == 20 and score.time == 20 and score.total() == 55 and score.stars() == 1, "mission score %s" % score.to_dict())
 	var joined := "\n".join(score.mistakes)
-	_check(15, joined.contains("จุดที่ 2: เลือก Shared Hub 24 Port — ควรไม่เลือก") and joined.contains("เข้าใจผิดว่า"), "mistakes list:\n" + joined)
+	_check(15, joined.contains("จุดที่ 2: เลือก Shared Hub 24 Port — อุปกรณ์นี้ไม่เหมาะกับจุดนี้") and joined.contains("จุดที่ 3: เลือก Wireless Access Point — อุปกรณ์ถูก แต่เหตุผลไม่ถูก") and joined.contains("เข้าใจผิดว่า"), "mistakes list:\n" + joined)
 
 	# Never below zero.
 	var z := Mission01State.new()
@@ -244,11 +235,11 @@ func _test_data_and_rules() -> void:
 	var a := s.to_dict()
 	var b := loaded.to_dict()
 	_check(16, JSON.stringify(a) == JSON.stringify(b), "save round trip differs:\n%s\n%s" % [a, b])
-	for key in ["answers", "quantities", "marks", "scored_reasons", "quantity_results", "current_score", "check_count", "ever_wrong", "passed", "final_score"]:
+	for key in ["answers", "reasons", "scored_reasons", "current_score", "check_count", "ever_wrong", "passed", "final_score"]:
 		_check(16, b.has(key), "save is missing " + key)
-	# A version-1 save (2-option mission) starts fresh instead of crashing.
+	# Saves from earlier versions start fresh instead of crashing.
 	var old := Mission01State.new()
-	old.from_dict({"version": 1, "answers": {"1": "Router"}, "passed": true}, data)
+	old.from_dict({"version": 2, "answers": {"1": "Router"}, "passed": true}, data)
 	_check(16, old.get_answer(1) == "" and not old.passed, "old save should start fresh")
 	Mission01SaveStore.clear()
 
@@ -309,7 +300,10 @@ func _test_program() -> void:
 		await _click(plan.get_point(id))
 		_check(6, popup.visible and popup.point_id == id, "clicking point %d did not open its pop-up" % id)
 		_check(6, popup._devices.get_child_count() == 4, "point %d should offer 4 devices" % id)
-		_check(7, popup.get_node("%ConfirmButton").disabled and not popup._decision_box.visible and not popup._quantity_row.visible, "nothing to confirm before a decision")
+		_check(7, popup.get_node("%ConfirmButton").disabled and not popup._reasons.visible, "nothing to confirm before a device is chosen")
+		_check(6, popup.find_child("RejectButton", true, false) == null and popup.find_child("Quantity", true, false) == null, "no 'ไม่เลือก' button and no quantity field")
+		for card in popup._devices.get_children():
+			_check(6, (card.find_child("Picture", true, false) as TextureRect).texture != null, "device card without a picture: " + card.name)
 		await _click(popup.get_node("%CancelButton"))
 		_check(7, not popup.visible and app.state.get_answer(id) == "", "cancel should close without saving")
 
@@ -323,30 +317,25 @@ func _test_program() -> void:
 	_check(8, plan.lan_highlight and RoomPlanView.LAN_ROUTES.size() >= 4, "LAN route view did not highlight")
 	_check(8, not plan.has_method("_can_drop_data") and not plan.has_method("_get_drag_data"), "plan must not support drag and drop")
 
-	# The whole decision with real clicks: device, "เลือก", reason, save, quantity, confirm.
+	# The whole answer with real clicks: device card, reason, confirm.
 	await _click(plan.get_point(2))
 	var shared := popup._devices.get_node("Option_Shared_Hub_24_Port") as Button
 	await _click(shared)
-	_check(7, popup.active_device == "Shared Hub 24 Port" and popup._decision_box.visible, "device click did not open the decision")
-	await _click(popup._choose_button)
-	_check(7, popup._reasons.get_child_count() == 3 and popup._reason_title.text.contains("เพราะ"), "choose did not show 3 reasons")
-	_check(7, popup._save_reason.disabled, "saving needs a reason first")
-	# The pop-up must fit the smallest screen with a long reason list open.
+	_check(7, popup.selected_option == "Shared Hub 24 Port" and popup._reasons.visible, "device click did not ask for the reason")
+	_check(7, popup._reasons.get_child_count() == 4 and popup._reason_title.text.contains("เลือก Shared Hub 24 Port เพราะ"), "choosing should show 4 reasons")
+	_check(7, popup.get_node("%ConfirmButton").disabled, "confirming needs a reason first")
+	# The pop-up must fit the smallest screen with the reason list open.
 	_check(2, popup.get_node("%Card").size.y <= 672.0, "pop-up is %d px tall" % popup.get_node("%Card").size.y)
 	await _click(popup._reasons.get_child(0))
-	await _click(popup._save_reason)
-	_check(7, app.state.get_mark(2, "Shared Hub 24 Port") == CHOOSE and app.state.scored_reasons[2].has("Shared Hub 24 Port"), "reason not recorded")
-	_check(7, popup._quantity_row.visible and popup._quantity.value == 0 and popup.get_node("%ConfirmButton").disabled, "quantity starts at 0 and blocks confirming")
-	popup.set_quantity(1)
-	await _frames(1)
+	_check(7, not popup.get_node("%ConfirmButton").disabled, "a reason should enable confirming")
 	await _click(popup.get_node("%ConfirmButton"))
-	_check(7, not popup.visible and app.state.get_answer(2) == "Shared Hub 24 Port" and app.state.get_quantity(2) == 1, "confirm did not save the answer")
+	_check(7, not popup.visible and app.state.get_answer(2) == "Shared Hub 24 Port" and app.state.scored_reasons[2].has("Shared Hub 24 Port"), "confirm did not save the answer")
 	_check(10, app.status_message == NetPlanEdu.MSG_SELECTED % 2, "status after choosing: " + app.status_message)
 	_check(9, app.get_node("%ProgressLabel").text == "1/3 จุด", "progress should be 1/3")
-	# Rejecting the chosen device removes the answer.
-	_check(7, app.answer_device(2, "Shared Hub 24 Port", REJECT) and app.state.get_answer(2) == "", "rejecting the chosen device should clear the answer")
+	# Reopening shows the saved device and reason.
+	app.open_point(2)
+	_check(7, popup.selected_option == "Shared Hub 24 Port" and popup.selected_reason == app.state.get_reason(2), "pop-up does not show the saved answer")
 	popup.cancel()
-	_check(7, app.choose_answer(2, "Shared Hub 24 Port"), "could not choose it again")
 	app.choose_answer(1, "Router")
 	_check(9, app.get_node("%ProgressLabel").text == "2/3 จุด", "progress should be 2/3")
 	_check(27, app.next_point_id() == 3 and app._plan.get_point(3).is_pulsing(), "after points 1-2 the gold point moves to 3")

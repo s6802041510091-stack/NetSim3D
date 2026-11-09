@@ -5,26 +5,22 @@ extends Resource
 ## Mission01Validator changes the score, Mission01SaveStore writes it to disk.
 ## to_dict()/from_dict() let another save system store it later.
 ##
+## A point is answered by choosing a device AND the reason for choosing it.
 ## Scoring data (see MissionScore):
-##   point_scores      correctness, 10 per point, -5 per wrong check
-##   scored_reasons    the FIRST choose/reject + reason the player gave for each
-##                     device they clicked (later changes are allowed but not re-scored)
-##   quantity_results  whether the quantity of each point was right at its first check
+##   point_scores    correctness, 10 per point, -5 per wrong check
+##   scored_reasons  the FIRST device+reason confirmed for each device at each
+##                   point (later changes are allowed but not re-scored)
 
 enum PointStatus { EMPTY, SELECTED, WRONG, CORRECT }
 
-const SAVE_VERSION := 2
+const SAVE_VERSION := 3
 
 ## point_id -> chosen device (full name). Missing = not chosen.
 @export var answers: Dictionary = {}
-## point_id -> quantity typed for the chosen device.
-@export var quantities: Dictionary = {}
-## point_id -> { device -> "choose" | "reject" }: the latest decision per device (UI marks).
-@export var marks: Dictionary = {}
-## point_id -> { device -> {decision, option, correct, misconception, text} }: first answer, scored.
+## point_id -> index of the chosen reason (into the data's options for that device).
+@export var reasons: Dictionary = {}
+## point_id -> { device -> {option, correct, misconception, text} }: first answer, scored.
 @export var scored_reasons: Dictionary = {}
-## point_id -> true/false: quantity right at the point's first check.
-@export var quantity_results: Dictionary = {}
 ## point_id -> current correctness score of that point.
 @export var point_scores: Dictionary = {}
 ## point_id -> result of the last check for the current answer: "correct" or "wrong".
@@ -43,10 +39,8 @@ const SAVE_VERSION := 2
 ## Fresh start: every point at full score, nothing chosen.
 func reset(data: Mission01Data) -> void:
 	answers.clear()
-	quantities.clear()
-	marks.clear()
+	reasons.clear()
 	scored_reasons.clear()
-	quantity_results.clear()
 	point_results.clear()
 	point_scores.clear()
 	for q in data.questions:
@@ -63,32 +57,25 @@ func is_locked(point_id: int) -> bool:
 	return passed or get_status(point_id) == PointStatus.CORRECT
 
 
-## Records "choose"/"reject" + the reason (index into the data's 3 options).
-## The first answer for a device is the scored one. Returns false when locked.
-func record_reason(point_id: int, device: String, decision: String, option_index: int, data: Mission01Data) -> bool:
+## Stores the chosen device and the reason (index into the data's options).
+## The first reason given for a device at a point is the scored one.
+## Changing an answer is free (no penalty). Returns false when locked or invalid.
+func set_answer(point_id: int, device: String, reason_index: int, data: Mission01Data) -> bool:
 	if is_locked(point_id):
 		return false
-	var options := data.reason_options(point_id, device, decision)
-	if option_index < 0 or option_index >= options.size():
+	var q := data.get_question(point_id)
+	var options := data.reason_options(point_id, device)
+	if q == null or not q.has_option(device) or reason_index < 0 or reason_index >= options.size():
 		return false
-	var point_marks: Dictionary = marks.get(point_id, {})
-	point_marks[device] = decision
-	if decision == Mission01Data.DECISION_CHOOSE:
-		# Only one device can be the chosen one: the others lose their "choose" mark.
-		for other in point_marks.keys():
-			if other != device and point_marks[other] == Mission01Data.DECISION_CHOOSE:
-				point_marks.erase(other)
-	elif get_answer(point_id) == device:
-		answers.erase(point_id)
-		point_results.erase(point_id)
-	marks[point_id] = point_marks
+	answers[point_id] = device
+	reasons[point_id] = reason_index
+	point_results.erase(point_id)
 	var point_scored: Dictionary = scored_reasons.get(point_id, {})
 	if not point_scored.has(device):
-		var option: Dictionary = options[option_index]
+		var option: Dictionary = options[reason_index]
 		point_scored[device] = {
-			"decision": decision,
-			"option": option_index,
-			"correct": data.is_right_decision(point_id, device, decision) and bool(option.get("correct", false)),
+			"option": reason_index,
+			"correct": device == q.correct_option and bool(option.get("correct", false)),
 			"misconception": String(option.get("misconception", "")),
 			"text": String(option.get("text", "")),
 		}
@@ -97,29 +84,12 @@ func record_reason(point_id: int, device: String, decision: String, option_index
 	return true
 
 
-func get_mark(point_id: int, device: String) -> String:
-	return String((marks.get(point_id, {}) as Dictionary).get(device, ""))
-
-
-## Stores the chosen device and quantity. The device must already be marked
-## "choose". Changing an answer is free (no penalty).
-## Returns false when the point is locked (already correct or mission passed).
-func set_answer(point_id: int, option: String, quantity: int = 1) -> bool:
-	if is_locked(point_id) or get_mark(point_id, option) != Mission01Data.DECISION_CHOOSE:
-		return false
-	answers[point_id] = option
-	quantities[point_id] = maxi(quantity, 0)
-	point_results.erase(point_id)
-	emit_changed()
-	return true
-
-
 func get_answer(point_id: int) -> String:
 	return String(answers.get(point_id, ""))
 
 
-func get_quantity(point_id: int) -> int:
-	return int(quantities.get(point_id, 0))
+func get_reason(point_id: int) -> int:
+	return int(reasons.get(point_id, -1))
 
 
 func get_status(point_id: int) -> PointStatus:
@@ -164,7 +134,7 @@ func ever_wrong_count() -> int:
 	return ever_wrong.size()
 
 
-## Decisions for the process score: every scored reason plus each point's quantity.
+## Decisions for the process score: every scored device+reason.
 func decision_counts() -> Vector2i:
 	var ok := 0
 	var all := 0
@@ -173,10 +143,6 @@ func decision_counts() -> Vector2i:
 			all += 1
 			if bool(scored_reasons[id][device].get("correct", false)):
 				ok += 1
-	for id in quantity_results:
-		all += 1
-		if bool(quantity_results[id]):
-			ok += 1
 	return Vector2i(ok, all)
 
 
@@ -191,10 +157,8 @@ func to_dict() -> Dictionary:
 	return {
 		"version": SAVE_VERSION,
 		"answers": keyed.call(answers),
-		"quantities": keyed.call(quantities),
-		"marks": keyed.call(marks),
+		"reasons": keyed.call(reasons),
 		"scored_reasons": keyed.call(scored_reasons),
-		"quantity_results": keyed.call(quantity_results),
 		"point_scores": keyed.call(point_scores),
 		"point_results": keyed.call(point_results),
 		"current_score": total_score(),
@@ -211,19 +175,8 @@ func to_dict() -> Dictionary:
 func from_dict(d: Dictionary, data: Mission01Data) -> void:
 	reset(data)
 	if int(d.get("version", 1)) != SAVE_VERSION:
-		return # Saves from the 2-option version of the mission start fresh.
+		return # Saves from earlier versions of the mission start fresh.
 	var valid_ids := data.point_ids()
-	for key in _dict(d, "marks"):
-		var id := str(key).to_int()
-		var q := data.get_question(id)
-		var point_marks: Variant = d.marks[key]
-		if q == null or not point_marks is Dictionary:
-			continue
-		var clean := {}
-		for device in point_marks:
-			if q.has_option(str(device)) and str(point_marks[device]) in [Mission01Data.DECISION_CHOOSE, Mission01Data.DECISION_REJECT]:
-				clean[str(device)] = str(point_marks[device])
-		marks[id] = clean
 	for key in _dict(d, "scored_reasons"):
 		var id := str(key).to_int()
 		var q := data.get_question(id)
@@ -234,9 +187,8 @@ func from_dict(d: Dictionary, data: Mission01Data) -> void:
 		for device in point_scored:
 			var entry: Variant = point_scored[device]
 			if q.has_option(str(device)) and entry is Dictionary:
-				# JSON gives floats back; keep the same types as record_reason().
+				# JSON gives floats back; keep the same types as set_answer().
 				clean[str(device)] = {
-					"decision": str(entry.get("decision", "")),
 					"option": int(entry.get("option", 0)),
 					"correct": bool(entry.get("correct", false)),
 					"misconception": str(entry.get("misconception", "")),
@@ -248,14 +200,10 @@ func from_dict(d: Dictionary, data: Mission01Data) -> void:
 		var q := data.get_question(id)
 		if q != null and q.has_option(str(d.answers[key])):
 			answers[id] = str(d.answers[key])
-	for key in _dict(d, "quantities"):
+	for key in _dict(d, "reasons"):
 		var id := str(key).to_int()
-		if id in valid_ids:
-			quantities[id] = clampi(int(d.quantities[key]), 0, 99)
-	for key in _dict(d, "quantity_results"):
-		var id := str(key).to_int()
-		if id in valid_ids:
-			quantity_results[id] = bool(d.quantity_results[key])
+		if id in valid_ids and answers.has(id):
+			reasons[id] = clampi(int(d.reasons[key]), 0, Mission01Data.REASON_COUNT - 1)
 	for key in _dict(d, "point_scores"):
 		var id := str(key).to_int()
 		var q := data.get_question(id)

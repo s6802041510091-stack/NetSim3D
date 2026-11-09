@@ -35,12 +35,18 @@ func _run() -> void:
 	root.add_child(app)
 	await process_frame
 	app.choose_answer(1, "Router")
-	app.answer_device(2, "Switched Hub 8 Port", Mission01Data.DECISION_REJECT)
+	app.open_point(2)
 	var popup: EquipmentPopup = app._popup
 	popup.choose("Shared Hub 24 Port")
-	popup.decide(Mission01Data.DECISION_REJECT)
 	popup.pick_reason(1)
 	await _shot("m1_popup_reason")
+	popup.cancel()
+	app.open_point(1)
+	popup.choose("Repeater")
+	await _shot("m1_popup_point1")
+	popup.cancel()
+	app.open_point(3)
+	await _shot("m1_popup_point3")
 	popup.cancel()
 	await _shot("m1_netplan_plan")
 	app.queue_free()
@@ -102,16 +108,11 @@ func _run() -> void:
 	var state := Mission01State.new()
 	var data := mission.data
 	state.reset(data)
-	for device in ["Router"]:
-		state.record_reason(1, device, Mission01Data.DECISION_CHOOSE, 0, data)
-		state.set_answer(1, device, 1)
-	state.record_reason(2, "Shared Hub 24 Port", Mission01Data.DECISION_CHOOSE, 0, data)
-	state.set_answer(2, "Shared Hub 24 Port", 1)
-	state.record_reason(3, "Wireless Access Point", Mission01Data.DECISION_CHOOSE, 0, data)
-	state.set_answer(3, "Wireless Access Point", 1)
+	state.set_answer(1, "Router", data.correct_reason(1, "Router"), data)
+	state.set_answer(2, "Shared Hub 24 Port", 0, data)
+	state.set_answer(3, "Wireless Access Point", data.correct_reason(3, "Wireless Access Point"), data)
 	Mission01Validator.check(state, data)
-	state.record_reason(2, "Switched Hub 24 Port", Mission01Data.DECISION_CHOOSE, 0, data)
-	state.set_answer(2, "Switched Hub 24 Port", 1)
+	state.set_answer(2, "Switched Hub 24 Port", data.correct_reason(2, "Switched Hub 24 Port"), data)
 	Mission01Validator.check(state, data)
 	mission.state = state
 	mission.elapsed_sec = 412.0
