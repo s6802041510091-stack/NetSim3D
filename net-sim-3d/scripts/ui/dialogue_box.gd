@@ -30,9 +30,9 @@ func _ready() -> void:
 	_panel.anchor_right = 0.5
 	_panel.anchor_top = 1.0
 	_panel.anchor_bottom = 1.0
-	_panel.offset_left = -460
-	_panel.offset_right = 460
-	_panel.offset_top = -230
+	_panel.offset_left = -500
+	_panel.offset_right = 500
+	_panel.offset_top = -200
 	_panel.offset_bottom = -40
 	_panel.add_theme_stylebox_override("panel", GameUI.box(GameUI.PANEL_DARK, Color(0.35, 0.55, 0.95, 0.8), 10, 24, 16))
 	_panel.gui_input.connect(func(e: InputEvent):
@@ -55,9 +55,11 @@ func _ready() -> void:
 	col.add_child(_hint)
 
 
+## `header` is an optional small line above the speaker (hidden when empty).
 func show_lines(dialogue_lines: PackedStringArray, header: String = "") -> void:
 	lines = dialogue_lines
 	_header.text = header
+	_header.visible = header != ""
 	index = -1
 	visible = true
 	_opened_at = Time.get_ticks_msec()
@@ -77,8 +79,15 @@ func advance(force: bool = false) -> void:
 		return
 	var parts := lines[index].split("|", true, 1)
 	_speaker.text = parts[0] if parts.size() > 1 else ""
-	_text.text = parts[1] if parts.size() > 1 else parts[0]
+	_text.text = keep_together(parts[1] if parts.size() > 1 else parts[0])
 	_hint.text = "คลิก หรือกด F / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
+
+
+## Thai line breaking may leave "1" at the end of a line and "เครื่อง" alone on
+## the next. A no-break space keeps a number with the word after it.
+static func keep_together(text: String) -> String:
+	var re := RegEx.create_from_string("(\\d) ")
+	return re.sub(text, "$1 ", true)
 
 
 func is_open() -> bool:

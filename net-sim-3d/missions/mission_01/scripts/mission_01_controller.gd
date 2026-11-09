@@ -139,7 +139,7 @@ func _on_talked(player: Node) -> void:
 func _say(player: Node, lines: PackedStringArray, unlock_after: bool = true) -> void:
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)
-	dialogue.show_lines(lines, "หัวหน้างาน Data Center — ห้อง IT Support")
+	dialogue.show_lines(lines)
 	await dialogue.finished
 	if unlock_after and player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(false)
