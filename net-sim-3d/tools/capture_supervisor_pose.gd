@@ -48,10 +48,26 @@ func _run() -> void:
 		"pose_over_desk": [Vector3(-17.75, 1.35, -42.5), Vector3(-18.45, 0.85, -42.55)],
 		"pose_top": [Vector3(-18.35, 1.9, -42.55), Vector3(-18.34, 0.78, -42.56)],
 	}
+	supervisor.work_at_desk = false
 	for name: String in views:
 		camera.global_position = views[name][0]
 		camera.look_at(views[name][1])
 		await _shot(name)
+	# Right hand typing on the keyboard instead of holding the mouse.
+	supervisor._right_on_keys = true
+	supervisor._update_hands()
+	for name: String in ["pose_side_right", "pose_top"]:
+		camera.global_position = views[name][0]
+		camera.look_at(views[name][1])
+		await _shot(name.replace("pose_", "typing_"))
+	# Cost of one hand update (the game runs it up to 30 times a second).
+	var start := Time.get_ticks_usec()
+	for i in 30:
+		supervisor._update_hands()
+	print("HAND_UPDATE_US ", (Time.get_ticks_usec() - start) / 30)
+	supervisor._right_on_keys = false
+	supervisor._update_hands()
+	supervisor.work_at_desk = true
 	# Turned toward a player standing to the side, as when talking.
 	var stand := Node3D.new()
 	map.add_child(stand)
@@ -61,5 +77,8 @@ func _run() -> void:
 	camera.global_position = supervisor.global_position + Vector3(1.8, 1.5, 1.2)
 	camera.look_at(supervisor.global_position + Vector3(0.2, 0.9, 0))
 	await _shot("pose_turned")
+	camera.global_position = Vector3(-18.55, 1.05, -41.55)
+	camera.look_at(Vector3(-18.45, 0.85, -42.45))
+	await _shot("pose_turned_side")
 	print("CAPTURE_DONE ", out_dir)
 	quit()

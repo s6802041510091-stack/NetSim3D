@@ -141,7 +141,7 @@ func _run() -> void:
 		18: "Esc ปิด Popup → โปรแกรม → ออกจากคอม", 19: "ไม่มีส่วนที่ขัดกับ Web Export",
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
 		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน", 24: "แถบภารกิจพับ/เปิดด้วย Tab และพับเองตอนใช้คอม",
-		25: "หัวหน้านั่งที่โต๊ะ หันมามองก่อนพูด แล้วหันกลับ", 26: "คำสำคัญในบทสนทนาเป็นสีทอง",
+		25: "หัวหน้านั่งพิมพ์/ใช้เมาส์ หยุดแล้วหันแค่หัวมาคุย แล้วกลับไปทำงาน", 26: "คำสำคัญในบทสนทนาเป็นสีทอง",
 		27: "NetPlan EDU แบบเรียบ: จุดถัดไปสีทอง ขั้นตอน 1-2-3",
 	}
 	for i in range(1, 28):
@@ -402,6 +402,25 @@ func _test_program() -> void:
 
 # ================================================================ inside the game (main.tscn, Level 1)
 
+## World positions of an NPC's shoulders, wrists and fingertips.
+func _hand_snapshot(npc: NpcCharacter) -> Dictionary:
+	var out := {}
+	for side in ["L", "R"]:
+		for bone_name in ["upperarm01", "wrist", "finger2-3", "finger3-3", "finger4-3", "finger5-3"]:
+			var bone := npc.skeleton.find_bone(bone_name + "." + side)
+			out[bone_name + "." + side] = npc.skeleton.global_transform * npc.skeleton.get_bone_global_pose(bone).origin
+	return out
+
+
+## Largest move between two snapshots, for bones whose name starts with `prefix`.
+func _snapshot_moved(a: Dictionary, b: Dictionary, prefix: String) -> float:
+	var most := 0.0
+	for key: String in a:
+		if key.begins_with(prefix):
+			most = maxf(most, (a[key] as Vector3).distance_to(b[key]))
+	return most
+
+
 func _look_at(player: CharacterBody3D, target: Vector3) -> void:
 	player.look_at(Vector3(target.x, player.global_position.y, target.z), Vector3.UP)
 	var eye: Vector3 = player.camera.global_position
@@ -456,10 +475,26 @@ func _test_in_game() -> void:
 		await physics_frame
 	await _look_at(player, supervisor.global_position + Vector3(0, 1.0, 0))
 	_check(20, player.focused_interactable == mission.talk and player._prompt.text.contains("หัวหน้างาน"), "supervisor prompt: " + player._prompt.text)
+	# Working at the desk: the hands keep moving (typing or using the mouse).
+	var work_a := _hand_snapshot(supervisor)
+	await create_timer(0.6).timeout
+	var work_b := _hand_snapshot(supervisor)
+	_check(25, _snapshot_moved(work_a, work_b, "wrist") > 0.001 or _snapshot_moved(work_a, work_b, "finger") > 0.002, "the supervisor's hands should keep working while not talking")
 	await _press_interact()
 	_check(25, not mission.dialogue.is_open() and player.controls_locked, "the supervisor should turn before speaking")
 	await create_timer(supervisor.turn_time + 0.3).timeout
 	_check(25, absf(supervisor.turn_amount) > 0.01, "the supervisor did not turn toward the player")
+	var talk_a := _hand_snapshot(supervisor)
+	await create_timer(0.3).timeout
+	var talk_b := _hand_snapshot(supervisor)
+	_check(25, _snapshot_moved(talk_a, talk_b, "") < 0.0005, "the supervisor's hands should stop while talking")
+	_check(25, _snapshot_moved(work_b, talk_a, "upperarm") < 0.001, "only the head should turn (the shoulders moved)")
+	var on_keys: Vector3 = supervisor.get_node("KeyboardHand").global_position
+	var on_mouse: Vector3 = supervisor.get_node("MouseHand").global_position
+	var right_keys: Vector3 = supervisor.get_node("KeyboardRightHand").global_position
+	var wrist_r: Vector3 = talk_a["wrist.R"]
+	_check(25, (talk_a["wrist.L"] as Vector3).distance_to(on_keys) < 0.04 and minf(wrist_r.distance_to(on_mouse), wrist_r.distance_to(right_keys)) < 0.04,
+		"hands should stay on the keyboard / mouse while talking")
 	_check(20, mission.dialogue.is_open() and player.controls_locked, "talking did not open the dialogue")
 	_check(26, mission.dialogue.current_text().replace(" ", " ").contains("20 เครื่อง") and mission.dialogue._text.text.contains("[color="), "important words should be highlighted: " + mission.dialogue._text.text)
 	await _finish_dialogue(mission.dialogue)
