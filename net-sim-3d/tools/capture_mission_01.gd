@@ -74,6 +74,15 @@ func _run() -> void:
 	for i in 5:
 		await physics_frame
 	await _shot("m1_arrow_on_computer")
+	# Sitting at the computer folds the objective panel to a small tab.
+	var computers: ComputerManager = map.get_node("Computers")
+	computers.open_computer(pc, player)
+	await create_timer(computers.zoom_time + DesktopOS.BOOT_TIME + 0.5).timeout
+	await _shot("m1_desktop_objective_folded")
+	mission.hud.toggle()
+	await _shot("m1_desktop_objective_opened")
+	computers.close_computer()
+	await create_timer(computers.zoom_time + 0.3).timeout
 
 	var camera := Camera3D.new()
 	camera.fov = 70.0

@@ -150,13 +150,13 @@ func _run() -> void:
 		15: "คะแนนรวม 30/50/20 ดาว และจุดที่ผิดพลาด", 16: "บันทึกข้อมูลได้", 17: "ออกจากคอมแล้วผู้เล่นควบคุมได้",
 		18: "Esc ปิด Popup → โปรแกรม → ออกจากคอม", 19: "ไม่มีส่วนที่ขัดกับ Web Export",
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
-		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน",
+		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน", 24: "แถบภารกิจพับ/เปิดด้วย Tab และพับเองตอนใช้คอม",
 	}
-	for i in range(1, 24):
+	for i in range(1, 25):
 		var ok: bool = results.get(i, false)
 		print("%s [%02d] %s" % ["PASS" if ok else "FAIL", i, names[i]])
 	if failures == 0:
-		print("MISSION_01_VALID items=23")
+		print("MISSION_01_VALID items=24")
 		quit()
 	else:
 		print("MISSION_01_INVALID failures=", failures)
@@ -477,6 +477,11 @@ func _test_in_game() -> void:
 	await create_timer(1.35).timeout
 	_check(3, not desktop.is_booting, "Set-up lasted longer than about 2 seconds")
 	_check(4, desktop._desktop.visible and desktop._netplan_icon.visible, "Desktop / NetPlan EDU icon not shown")
+	_check(24, mission.hud.collapsed and mission.hud.auto_collapsed, "objective panel should fold while using the computer")
+	await _press_key(KEY_TAB)
+	_check(24, not mission.hud.collapsed, "Tab should open the objective panel")
+	await _press_key(KEY_TAB)
+	_check(24, mission.hud.collapsed, "Tab should fold the objective panel again")
 
 	# No walking, running or looking around while seated.
 	var yaw := player.rotation.y
@@ -535,6 +540,7 @@ func _test_in_game() -> void:
 	await _click(app.get_node("%ExitComputerButton"))
 	await create_timer(manager.zoom_time + 0.2).timeout
 	_check(17, not desktop.visible and not player.controls_locked, "player still locked after leaving the computer")
+	_check(24, not mission.hud.collapsed and not mission.hud.auto_collapsed, "objective panel should open again after leaving the computer")
 	if DisplayServer.get_name() == "headless":
 		print("  note [17] mouse capture cannot be observed with --headless; run under a display to check it")
 	else:

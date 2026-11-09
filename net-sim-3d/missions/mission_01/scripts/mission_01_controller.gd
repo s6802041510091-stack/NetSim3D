@@ -81,6 +81,9 @@ func _ready() -> void:
 	_set_app_installed(false)
 	if manager and manager.desktop:
 		manager.desktop.app_opened.connect(_on_app_opened)
+		# Fold the objective panel while the player sits at a computer.
+		var desktop := manager.desktop
+		desktop.visibility_changed.connect(func(): hud.set_auto_collapsed(desktop.visible))
 	_enter(Stage.BRIEFING)
 
 
