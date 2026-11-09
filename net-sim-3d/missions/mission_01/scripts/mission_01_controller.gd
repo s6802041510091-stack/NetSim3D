@@ -210,6 +210,11 @@ func finish(player: Node = null) -> MissionScore:
 		player.set_controls_locked(true)
 	var flow := get_tree().root.get_node_or_null("GameFlow")
 	var next_available: bool = flow != null and flow.call("next_level_available", LEVEL)
-	summary.show_result("สรุปผล — ภารกิจที่ 1 เลือกอุปกรณ์เครือข่ายห้องคอมใหม่", score, record, next_available)
+	var wrong_checks := data.start_score - state.total_score()
+	summary.show_result("ด่านที่ 1  ·  ออกแบบเครือข่าย — เลือกอุปกรณ์เครือข่ายห้องคอม", score, record, next_available, [
+		["ตรวจสอบแบบ", "%d ครั้ง" % state.check_count],
+		["จุดที่ตรวจแล้วเคยผิด", "%d จาก %d จุด" % [state.ever_wrong_count(), data.questions.size()]],
+		["ถูกหักคะแนนเพราะตรวจแล้วผิด", "%d คะแนน (ครั้งละ %d)" % [wrong_checks, data.penalty_per_wrong]],
+	])
 	finished.emit(score)
 	return score

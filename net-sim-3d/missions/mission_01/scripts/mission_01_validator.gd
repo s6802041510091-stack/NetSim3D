@@ -3,7 +3,8 @@ extends RefCounted
 
 ## "ตรวจสอบแบบ" — checks all three points at once and applies the scoring rules:
 ##   * every point must have a device (with its reason) first, otherwise nothing is checked
-##   * a point is right when the chosen device is right
+##   * a point is right only when the chosen device AND its reason are right;
+##     a wrong point is marked "wrong" (device) or "wrong_reason" (right device)
 ##   * each wrong point loses `penalty_per_wrong` (5) on every check while it stays wrong
 ##   * point scores and the total never go below 0
 ##   * all correct = design passed, the correctness score is final
@@ -17,12 +18,20 @@ class Result:
 	var missing: Array[int] = []
 	var correct: Array[int] = []
 	var wrong: Array[int] = []
+	## Wrong points where the device was right and only the reason was wrong.
+	var wrong_reason: Array[int] = []
 	var completed: bool = false
 	var total_score: int = 0
 
 
-static func is_point_correct(state: Mission01State, q: EquipmentQuestion) -> bool:
+static func is_device_correct(state: Mission01State, q: EquipmentQuestion) -> bool:
 	return q.is_correct(state.get_answer(q.point_id))
+
+
+## Right device with its right reason.
+static func is_point_correct(state: Mission01State, q: EquipmentQuestion, data: Mission01Data) -> bool:
+	var device := state.get_answer(q.point_id)
+	return q.is_correct(device) and state.get_reason(q.point_id) == data.correct_reason(q.point_id, device)
 
 
 static func check(state: Mission01State, data: Mission01Data) -> Result:
@@ -46,11 +55,14 @@ static func check(state: Mission01State, data: Mission01Data) -> Result:
 		if state.get_status(id) == Mission01State.PointStatus.CORRECT:
 			result.correct.append(id)
 			continue
-		if is_point_correct(state, q):
+		if is_point_correct(state, q, data):
 			state.point_results[id] = "correct"
 			result.correct.append(id)
 		else:
-			state.point_results[id] = "wrong"
+			var reason_only := is_device_correct(state, q)
+			state.point_results[id] = "wrong_reason" if reason_only else "wrong"
+			if reason_only:
+				result.wrong_reason.append(id)
 			state.point_scores[id] = maxi(0, state.get_point_score(id) - data.penalty_per_wrong)
 			if not id in state.ever_wrong:
 				state.ever_wrong.append(id)
@@ -72,7 +84,7 @@ static func mission_score(state: Mission01State, data: Mission01Data, elapsed_se
 	for q in data.questions:
 		var id := q.point_id
 		if id in state.ever_wrong:
-			score.mistakes.append("จุดที่ %d: ตรวจแล้วพบว่าเลือกอุปกรณ์ไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)" % id)
+			score.mistakes.append("จุดที่ %d: ตรวจแบบแล้วยังไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)" % id)
 		var point_scored: Dictionary = state.scored_reasons.get(id, {})
 		for device in point_scored:
 			var entry: Dictionary = point_scored[device]

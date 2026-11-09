@@ -117,7 +117,17 @@ func _run() -> void:
 	mission.state = state
 	mission.elapsed_sec = 412.0
 	mission.finish(player)
+	await create_timer(1.8).timeout # stars pop in
 	await _shot("m1_summary")
+	mission.summary.show_details()
+	await _shot("m1_summary_details")
+	mission.summary.show_main()
+	# A rainbow result (80+) and a failed one.
+	for case in [[30, 3, 3, 120.0, "m1_summary_rainbow"], [5, 1, 4, 800.0, "m1_summary_fail"]]:
+		var s := MissionScore.compute(case[0], case[1], case[2], case[3], data.time_full_sec, data.time_zero_sec)
+		mission.summary.show_result("ด่านที่ 1  ·  ออกแบบเครือข่าย — เลือกอุปกรณ์เครือข่ายห้องคอม", s, {"best_total": 90, "attempts": 3}, case[0] >= 30)
+		await create_timer(2.0).timeout
+		await _shot(case[4])
 	Mission01SaveStore.clear()
 	GameProgress.clear()
 	print("CAPTURE_DONE ", out_dir)

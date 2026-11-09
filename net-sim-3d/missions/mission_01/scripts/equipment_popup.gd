@@ -105,8 +105,13 @@ func open_for(question: EquipmentQuestion, state: Mission01State, data: Mission0
 		pick_reason(state.get_reason(point_id))
 	if locked:
 		_note.text = "จุดนี้ผ่านการตรวจสอบแล้ว เปลี่ยนอุปกรณ์ไม่ได้"
+	elif state.get_status(point_id) == Mission01State.PointStatus.WRONG:
+		_note.text = ("ตรวจแล้ว: อุปกรณ์ถูก แต่เหตุผลยังไม่ถูก — เลือกเหตุผลใหม่" if state.is_reason_wrong(point_id)
+			else "ตรวจแล้ว: อุปกรณ์นี้ไม่เหมาะกับจุดนี้ — เลือกอุปกรณ์ใหม่")
 	else:
 		_note.text = "เปลี่ยนอุปกรณ์หรือเหตุผลภายหลังได้ แต่ระบบนับเหตุผลครั้งแรกที่ยืนยันของแต่ละอุปกรณ์"
+	var found_wrong := not locked and state.get_status(point_id) == Mission01State.PointStatus.WRONG
+	_note.add_theme_color_override("font_color", NetPlanTheme.WRONG if found_wrong else NetPlanTheme.INK_SOFT)
 	_confirm.visible = not locked
 	_cancel.text = "ปิด" if locked else "ยกเลิก"
 	_refresh_confirm()

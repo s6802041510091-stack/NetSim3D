@@ -23,8 +23,9 @@ const SAVE_VERSION := 3
 @export var scored_reasons: Dictionary = {}
 ## point_id -> current correctness score of that point.
 @export var point_scores: Dictionary = {}
-## point_id -> result of the last check for the current answer: "correct" or "wrong".
-## Cleared when the player changes that answer.
+## point_id -> result of the last check for the current answer: "correct",
+## "wrong" (the device does not fit) or "wrong_reason" (right device, wrong
+## reason). Cleared when the player changes that answer.
 @export var point_results: Dictionary = {}
 @export var check_count: int = 0
 ## Every point that was ever found wrong by a check.
@@ -98,9 +99,15 @@ func get_status(point_id: int) -> PointStatus:
 	match String(point_results.get(point_id, "")):
 		"correct":
 			return PointStatus.CORRECT
-		"wrong":
+		"wrong", "wrong_reason":
 			return PointStatus.WRONG
 	return PointStatus.SELECTED
+
+
+## After a check found point `point_id` wrong: true when the device was right
+## and only the reason was wrong.
+func is_reason_wrong(point_id: int) -> bool:
+	return String(point_results.get(point_id, "")) == "wrong_reason"
 
 
 func answered_count(data: Mission01Data) -> int:
@@ -212,7 +219,7 @@ func from_dict(d: Dictionary, data: Mission01Data) -> void:
 	for key in _dict(d, "point_results"):
 		var id := str(key).to_int()
 		var value := str(d.point_results[key])
-		if id in valid_ids and answers.has(id) and value in ["correct", "wrong"]:
+		if id in valid_ids and answers.has(id) and value in ["correct", "wrong", "wrong_reason"]:
 			point_results[id] = value
 	check_count = maxi(0, int(d.get("check_count", 0)))
 	var w: Variant = d.get("ever_wrong", [])

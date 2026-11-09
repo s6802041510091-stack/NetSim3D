@@ -202,12 +202,18 @@ func _test_data_and_rules() -> void:
 	r = Mission01Validator.check(s, data)                      # only P3 wrong, again
 	_check(13, s.get_point_score(2) == 5 and s.get_point_score(3) == 0 and s.total_score() == 15, "second check score %d" % s.total_score())
 	_check(14, s.get_point_score(3) == 0, "point score went below 0")
+	_check(12, not s.is_reason_wrong(3), "a wrong device must not be reported as a wrong reason")
 	_answer(s, 3, "Wireless Access Point", false)             # right device, wrong reason
 	r = Mission01Validator.check(s, data)
-	_check(13, r.completed and s.passed and s.final_score == 15 and s.check_count == 3, "pass: final %d checks %d" % [s.final_score, s.check_count])
+	_check(12, not r.completed and r.wrong == [3] and r.wrong_reason == [3] and s.is_reason_wrong(3) and s.get_status(3) == Mission01State.PointStatus.WRONG,
+		"right device with a wrong reason must not pass")
+	_check(13, s.get_point_score(3) == 0 and s.total_score() == 15, "wrong reason check score %d" % s.total_score())
+	_answer(s, 3, "Wireless Access Point")                    # same device, now the right reason
+	r = Mission01Validator.check(s, data)
+	_check(13, r.completed and s.passed and s.final_score == 15 and s.check_count == 4, "pass: final %d checks %d" % [s.final_score, s.check_count])
 	_check(13, s.ever_wrong_count() == 2 and 2 in s.ever_wrong and 3 in s.ever_wrong, "ever-wrong points")
 	r = Mission01Validator.check(s, data)
-	_check(13, s.check_count == 3 and s.final_score == 15, "checking after passing must not change anything")
+	_check(13, s.check_count == 4 and s.final_score == 15, "checking after passing must not change anything")
 	_check(13, not _answer(s, 2, "Shared Hub 24 Port"), "answers must be locked after passing")
 	# Decisions: P1 Router ok; P2 Shared x, Switched24 ok; P3 Router x, AP (wrong reason) x.
 	var counts := s.decision_counts()
@@ -362,6 +368,10 @@ func _test_program() -> void:
 	_check(12, r != null and r.checked and r.wrong == [2, 3], "check button result")
 	_check(12, app.get_point_status(1) == Mission01State.PointStatus.CORRECT and app.get_point_status(2) == Mission01State.PointStatus.WRONG and app.get_point_status(3) == Mission01State.PointStatus.WRONG, "states after check")
 	_check(12, plan.get_point(2).status == Mission01State.PointStatus.WRONG and plan.get_point(1).status == Mission01State.PointStatus.CORRECT, "marker colours after check")
+	_check(12, (app._rows[2].device as Label).text.contains("อุปกรณ์ไม่เหมาะกับจุดนี้"), "side card should say the device is wrong: " + (app._rows[2].device as Label).text)
+	app.open_point(2)
+	_check(12, popup.get_node("%NoteLabel").text.contains("อุปกรณ์นี้ไม่เหมาะ"), "pop-up note after a wrong check: " + popup.get_node("%NoteLabel").text)
+	popup.cancel()
 	_check(10, app.status_message.begins_with(NetPlanEdu.MSG_FIX), "status should be พบจุดที่ต้องแก้ไข: " + app.status_message)
 	_check(11, not app.get_node("%HintLabel").text.contains("Switched") and not app.get_node("%HintLabel").text.contains("Wireless"), "hint gave the answer away")
 	_check(13, app.state.total_score() == 20 and app.get_node("%ScoreLabel").text.contains("20 / 30"), "correctness after first check")
@@ -617,7 +627,19 @@ func _test_in_game() -> void:
 	if score:
 		_check(21, score.correctness == 25 and score.time == 20 and score.process > 0 and score.total() == score.correctness + score.process + score.time, "summary score %s" % score.to_dict())
 		_check(21, GameProgress.best_score(1) == score.total() and int(GameProgress.level_record(1).attempts) == 1, "progress not recorded")
-		_check(21, mission.summary.replay_button != null and mission.summary.menu_button != null and mission.summary.next_button != null, "summary buttons")
+		var summary := mission.summary
+		_check(21, summary.replay_button.text == "Play again" and summary.menu_button.text == "Exit" and summary.next_button.text == "Next Level", "summary buttons")
+		_check(21, summary.stars != null and summary.stars.earned == score.stars(), "big stars show %d" % score.stars())
+		_check(21, (summary._main.find_child("LevelName", true, false) as Label).text.begins_with("ด่านที่ 1"), "level name top left")
+		_check(21, (summary._main.find_child("TotalLabel", true, false) as Label).text == "%d คะแนน" % score.total(), "total under the stars")
+		summary.details_button.pressed.emit()
+		_check(21, summary.is_details_shown() and not summary._main.visible, "ดูรายละเอียด opens the details window")
+		var details_text := ""
+		for l in summary._details.find_children("*", "Label", true, false):
+			details_text += (l as Label).text + "\n"
+		_check(21, details_text.contains("ตรวจสอบแบบ") and details_text.contains("2 ครั้ง") and details_text.contains("เวลาที่ใช้") and details_text.contains("ถูกหักคะแนน") and details_text.contains("จุดที่ผิดพลาด"), "details page:\n" + details_text)
+		summary.back_button.pressed.emit()
+		_check(21, summary._main.visible and not summary.is_details_shown(), "ย้อนกลับ returns to the summary")
 	map.queue_free()
 	await _frames(2)
 
