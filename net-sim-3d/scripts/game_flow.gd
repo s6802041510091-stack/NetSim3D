@@ -130,11 +130,40 @@ func show_home() -> void:
 	_label("Continue: เริ่มที่จุดเกิดของด่านล่าสุด\nใช้ความคืบหน้าภารกิจที่บันทึกไว้ ไม่ใช่ตำแหน่งยืนล่าสุด", 14, Color("b3c5db"))
 
 func show_levels() -> void:
-	_page("Play", "เลือกด่าน • ความคืบหน้าเดิมของแต่ละด่านยังคงอยู่")
+	_page("Play", "เลือกด่าน • ผ่านด่าน (50 คะแนนขึ้นไป) เพื่อปลดล็อกด่านถัดไป")
 	for level in range(1, 7):
-		var enabled: bool = level in AVAILABLE
-		_button("Level %d  —  %s%s" % [level, TITLES[level - 1], "" if enabled else "  [กำลังพัฒนา]"], start_level.bind(level), not enabled)
+		var suffix := ""
+		if not level in AVAILABLE:
+			suffix = "  [กำลังพัฒนา]"
+		elif not is_level_unlocked(level):
+			suffix = "  [ล็อก — ผ่านด่านก่อนหน้าก่อน]"
+		else:
+			var best := GameProgress.best_score(level)
+			if best >= 0:
+				suffix = "  %s  สูงสุด %d" % [MissionScore.star_text(MissionScore.stars_for(best)), best]
+		_button("Level %d  —  %s%s" % [level, TITLES[level - 1], suffix], start_level.bind(level), not is_level_unlocked(level))
+	if OS.has_feature("editor"):
+		_label("โหมดทดสอบใน Editor: เปิดทุกด่านที่สร้างแล้ว (บนเว็บต้องผ่านด่านก่อนหน้า)", 13, Color("b3c5db"))
 	_button("← Back", show_home)
+
+
+## Built and (outside the editor) unlocked by passing the previous built level.
+func is_level_unlocked(level: int) -> bool:
+	if not level in AVAILABLE:
+		return false
+	return OS.has_feature("editor") or GameProgress.is_unlocked(level, AVAILABLE)
+
+
+## The next built level after `level` that the player may start (0 = none).
+func next_level(level: int) -> int:
+	for candidate in AVAILABLE:
+		if candidate > level and is_level_unlocked(candidate):
+			return candidate
+	return 0
+
+
+func next_level_available(level: int) -> bool:
+	return next_level(level) != 0
 
 func show_settings() -> void:
 	_page("Sound Volume", "แยกระดับเสียงแต่ละกลุ่ม • บันทึกอัตโนมัติ")
@@ -166,14 +195,34 @@ func configure_level(world: Node, level: int) -> void:
 	computers.netplan_edu_hosts = PackedStringArray(["IT-PC-01"]) if level == 1 else PackedStringArray()
 	computers.windows_security_hosts = PackedStringArray(["PC-R3-L2"]) if level == 5 else PackedStringArray()
 	computers.teamviewer_hosts = PackedStringArray(["IT-PC-01"]) if level == 6 else PackedStringArray()
+	# Installed equipment follows the story: empty in Level 1, installed but not
+	# cabled in Level 2, cabled from Level 3 on.
+	var rack := world.get_node_or_null("ComputerRoomRack")
+	if rack:
+		rack.stage = WallRack9U.Stage.EMPTY if level == 1 else (WallRack9U.Stage.INSTALLED if level == 2 else WallRack9U.Stage.CABLED)
+	if level == 1:
+		var mission: Node = load("res://missions/mission_01/scripts/mission_01_controller.gd").new()
+		mission.name = "Mission01"
+		world.add_child(mission)
+		_connect_level_end(mission, level)
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)
 		controller.free()
 		world.get_node("DeskPhone").ringing = false
 
+## Summary buttons of a mission controller: replay / main menu / next level.
+func _connect_level_end(mission: Node, level: int) -> void:
+	mission.connect("replay_requested", func(): start_level(level))
+	mission.connect("menu_requested", return_to_menu)
+	mission.connect("next_requested", func():
+		var next := next_level(level)
+		if next != 0:
+			start_level(next))
+
+
 func start_level(level: int) -> void:
-	if loading or level not in AVAILABLE:
+	if loading or not is_level_unlocked(level):
 		return
 	current_level = level
 	_page("Level %d" % level, "กำลังโหลดโรงเรียน… ครั้งแรกอาจใช้เวลาสักครู่")
@@ -223,7 +272,7 @@ func _enter_loaded_level() -> void:
 	var saved := _save_preferences()
 	get_tree().paused = true
 	_page("Level %d  /  พร้อมแล้ว" % current_level, TITLES[current_level - 1])
-	var hints := {1: "ใช้ NetPlan EDU บนคอม IT-PC-01 ในห้อง IT Support", 5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
+	var hints := {1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
 	_label(hints[current_level], 16)
 	_label("WASD เดิน • เมาส์มอง • F โต้ตอบ\nE กระเป๋า • F1 เปิดเมนูพักได้ทุกเวลา", 16)
 	if not saved:

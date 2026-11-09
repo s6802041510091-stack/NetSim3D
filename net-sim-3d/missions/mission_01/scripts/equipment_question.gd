@@ -13,13 +13,16 @@ extends Resource
 @export var location: String = ""
 ## The question shown in the pop-up.
 @export_multiline var question: String = ""
-## Exactly two full device names. Never shorten them
-## (Shared Hub, Switched Hub, Router, Wireless Access Point).
+## Four full device names: the right one and three distractors. Never shorten
+## them (Shared Hub, Switched Hub, Router, Wireless Access Point ...).
+## The pop-up shows them in a shuffled order.
 @export var options: PackedStringArray = PackedStringArray()
 ## Must be one of `options`.
 @export var correct_option: String = ""
-## Full score of this point.
-@export var max_score: int = 30
+## How many of the device the room needs (the player types it; starts at 0).
+@export var correct_quantity: int = 1
+## This point's share of the 30-point correctness score.
+@export var max_score: int = 10
 ## Short hint for the side panel. It must not give the answer away.
 @export_multiline var hint: String = ""
 ## Marker position on the room plan, in plan units (see RoomPlanView.DESIGN_SIZE).

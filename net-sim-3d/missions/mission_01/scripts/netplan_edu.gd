@@ -32,7 +32,7 @@ const MSG_SELECTED := "เลือกอุปกรณ์จุดที่ %d
 const MSG_MISSING := "กรุณาเลือกอุปกรณ์ให้ครบทั้ง 3 จุด"
 const MSG_FIX := "พบจุดที่ต้องแก้ไข"
 const MSG_DONE := "ภารกิจสำเร็จ"
-const GENERAL_HINT := "คลิกจุดสีส้มบนผังห้อง เลือกอุปกรณ์ แล้วกด \"ยืนยันการเลือก\" เมื่อเลือกครบ 3 จุดให้กด \"ตรวจสอบแบบ\""
+const GENERAL_HINT := "คลิกจุดสีส้มบนผังห้อง พิจารณาอุปกรณ์พร้อมเหตุผล ระบุจำนวน แล้วกด \"ยืนยันจุดนี้\" เมื่อครบ 3 จุดให้กด \"ตรวจสอบแบบ\""
 
 enum MenuId { SAVE, CLOSE, UNDO, REDO, VIEW_PLAN, VIEW_REQUIREMENTS, VIEW_LAN, CHECK, HELP }
 
@@ -125,14 +125,34 @@ func open_point(point_id: int) -> void:
 		point.pressed.emit()
 
 
-## Opens the pop-up, picks `option` and confirms — exactly what the player does.
-func choose_answer(point_id: int, option: String) -> bool:
-	open_point(point_id)
+## Opens the pop-up, marks `option` as "เลือก" with a reason, types the
+## quantity and confirms — exactly what the player does.
+## reason_index -1 = the right reason when there is one, otherwise the first.
+func choose_answer(point_id: int, option: String, quantity: int = 1, reason_index: int = -1) -> bool:
+	if not answer_device(point_id, option, Mission01Data.DECISION_CHOOSE, reason_index):
+		return false
+	_popup.set_quantity(quantity)
+	_popup.confirm()
+	return state.get_answer(point_id) == option and state.get_quantity(point_id) == quantity
+
+
+## Opens the pop-up (if needed), clicks `device`, decides and saves a reason.
+func answer_device(point_id: int, device: String, decision: String, reason_index: int = -1) -> bool:
+	if not _popup.visible or _popup.point_id != point_id:
+		open_point(point_id)
 	if not _popup.visible or _popup.locked:
 		return false
-	_popup.choose(option)
-	_popup.confirm()
-	return state.get_answer(point_id) == option
+	if reason_index < 0:
+		reason_index = 0
+		var options := data.reason_options(point_id, device, decision)
+		for i in options.size():
+			if bool(options[i].get("correct", false)):
+				reason_index = i
+	_popup.choose(device)
+	_popup.decide(decision)
+	_popup.pick_reason(reason_index)
+	_popup.save_reason()
+	return state.get_mark(point_id, device) == decision
 
 
 ## "ตรวจสอบแบบ". Returns the result (see Mission01Validator.Result).
@@ -268,6 +288,7 @@ func _build_point_rows() -> void:
 
 func _connect_ui() -> void:
 	_popup.equipment_selected.connect(func(id: int, option: String): equipment_selected.emit(id, option))
+	_popup.reason_answered.connect(_on_reason_answered)
 	_popup.answer_confirmed.connect(_on_answer_confirmed)
 	_popup.cancelled.connect(func(): _hint.text = GENERAL_HINT)
 	%CheckDesignButton.pressed.connect(request_validation)
@@ -316,13 +337,19 @@ func _on_point_opened(point_id: int) -> void:
 	if q == null:
 		return
 	equipment_point_opened.emit(point_id)
-	var locked := state.passed or state.get_status(point_id) == Mission01State.PointStatus.CORRECT
-	_popup.open_for(q, state.get_answer(point_id), locked)
+	_popup.open_for(q, state, data, state.is_locked(point_id))
 	_hint.text = "จุดที่ %d: %s" % [point_id, q.hint]
 
 
-func _on_answer_confirmed(point_id: int, option: String) -> void:
-	if not state.set_answer(point_id, option):
+func _on_reason_answered(point_id: int, device: String, decision: String, option_index: int) -> void:
+	if state.record_reason(point_id, device, decision, option_index, data):
+		_hint.text = "บันทึกการตัดสินใจเรื่อง %s แล้ว" % device
+		_save()
+		_refresh()
+
+
+func _on_answer_confirmed(point_id: int, option: String, quantity: int) -> void:
+	if not state.set_answer(point_id, option, quantity):
 		return
 	_set_status(MSG_SELECTED % point_id)
 	_hint.text = GENERAL_HINT if state.answered_count(data) < data.questions.size() else "เลือกครบ 3 จุดแล้ว กด \"ตรวจสอบแบบ\" เพื่อตรวจคำตอบ"
@@ -351,7 +378,7 @@ func _on_menu(id: int) -> void:
 		MenuId.CHECK:
 			request_validation()
 		MenuId.HELP:
-			_show_info("วิธีทำภารกิจ", "1. คลิกจุดที่ 1, 2 หรือ 3 บนผังห้อง\n2. อ่านคำถาม เลือกอุปกรณ์ 1 ตัวเลือก แล้วกด \"ยืนยันการเลือก\"\n3. เปลี่ยนอุปกรณ์ได้โดยคลิกที่จุดเดิมอีกครั้ง (ก่อนตรวจไม่เสียคะแนน)\n4. เลือกครบ 3 จุดแล้วกด \"ตรวจสอบแบบ\"\n5. จุดสีแดงคือจุดที่ต้องแก้ไข แก้แล้วตรวจอีกครั้ง\n\nคะแนนเต็ม %d คะแนน — จุดที่ตรวจแล้วผิด จะถูกหักจุดละ %d คะแนนทุกครั้งที่ตรวจ\n\nEsc: ปิดหน้าต่างเลือกอุปกรณ์ → ปิดโปรแกรม" % [data.start_score, data.penalty_per_wrong])
+			_show_info("วิธีทำภารกิจ", "1. คลิกจุดที่ 1, 2 หรือ 3 บนผังห้อง\n2. คลิกอุปกรณ์ที่ต้องการพิจารณา แล้วกด \"เลือกอุปกรณ์นี้\" หรือ \"ไม่เลือกอุปกรณ์นี้\"\n3. เลือกเหตุผล แล้วกด \"บันทึกคำตอบ\" (ระบบนับเหตุผลครั้งแรกของแต่ละอุปกรณ์)\n4. ระบุจำนวนอุปกรณ์ที่เลือก แล้วกด \"ยืนยันจุดนี้\"\n5. ทำครบ 3 จุดแล้วกด \"ตรวจสอบแบบ\" จุดสีแดงคือจุดที่ต้องแก้ไข\n\nคะแนนความถูกต้องเต็ม %d คะแนน — จุดที่ตรวจแล้วผิด (อุปกรณ์หรือจำนวน) ถูกหักจุดละ %d คะแนนทุกครั้งที่ตรวจ\nคะแนนกระบวนการมาจากการตัดสินใจและเหตุผล ส่วนคะแนนเวลามาจากเวลาที่ใช้ทั้งภารกิจ\n\nEsc: ปิดหน้าต่างเลือกอุปกรณ์ → ปิดโปรแกรม" % [data.start_score, data.penalty_per_wrong])
 	_sync_view_menu()
 
 
@@ -395,7 +422,7 @@ func _show_info(title: String, body: String) -> void:
 
 
 func _show_completion() -> void:
-	%CompleteScore.text = "คะแนนรวม %d / %d" % [state.final_score, data.start_score]
+	%CompleteScore.text = "เลือกอุปกรณ์ถูกต้องครบ 3 จุด — ออกจากคอมพิวเตอร์แล้วกลับไปรายงานหัวหน้างาน"
 	%CompleteChecks.text = "จำนวนครั้งที่ตรวจสอบ: %d ครั้ง" % state.check_count
 	%CompleteWrong.text = "จำนวนจุดที่เคยผิด: %d จุด" % state.ever_wrong_count()
 	_completion.visible = true
@@ -416,7 +443,7 @@ func _refresh() -> void:
 		var answer := state.get_answer(id)
 		_plan.get_point(id).set_status(status, q.title, answer)
 		var row: Dictionary = _rows[id]
-		var text := answer if answer != "" else "ยังไม่เลือก"
+		var text := "%s × %d" % [answer, state.get_quantity(id)] if answer != "" else "ยังไม่เลือก"
 		match status:
 			Mission01State.PointStatus.WRONG:
 				text += "  — ต้องแก้ไข"
@@ -426,9 +453,9 @@ func _refresh() -> void:
 		(row.device as Label).add_theme_color_override("font_color", NetPlanTheme.INK if status != Mission01State.PointStatus.WRONG else NetPlanTheme.WRONG)
 		(row.dot as Control).queue_redraw()
 	if state.check_count == 0:
-		_score.text = "คะแนน: ยังไม่ได้ตรวจสอบ (คะแนนเต็ม %d)" % data.start_score
+		_score.text = "ความถูกต้อง: ยังไม่ได้ตรวจสอบ (เต็ม %d)" % data.start_score
 	else:
-		_score.text = "คะแนน: %d / %d" % [state.total_score(), data.start_score]
+		_score.text = "ความถูกต้อง: %d / %d" % [state.total_score(), data.start_score]
 	_check_count.text = "ตรวจสอบแล้ว: %d ครั้ง" % state.check_count
 	var can_check := not state.passed
 	%CheckDesignButton.disabled = not can_check

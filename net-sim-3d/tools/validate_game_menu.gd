@@ -54,7 +54,11 @@ func run() -> void:
 			for app in counts:
 				if station.has_app(app):
 					counts[app] += 1
-		check(counts.netplan_edu == (1 if level == 1 else 0), "only level 1 installs NetPlan")
+		# Level 1 installs NetPlan EDU after the supervisor's briefing, not at load.
+		check(counts.netplan_edu == 0, "NetPlan waits for the level 1 briefing")
+		check(current_scene.has_node("Mission01") == (level == 1), "level 1 controller isolated")
+		var rack: WallRack9U = current_scene.get_node("ComputerRoomRack")
+		check(rack.stage == (WallRack9U.Stage.EMPTY if level == 1 else WallRack9U.Stage.CABLED), "wall rack follows the story")
 		check(counts.windows_security == (1 if level == 5 else 0), "only level 5 installs Security")
 		check(counts.teamviewer == (1 if level == 6 else 0), "only level 6 installs TeamViewer")
 		check(current_scene.has_node("Mission06") == (level == 6), "phone mission isolated")
