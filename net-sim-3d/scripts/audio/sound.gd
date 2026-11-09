@@ -35,7 +35,7 @@ const BANK := {
 	"correct": {"files": ["confirmation_002.ogg"], "bus": "SoundEffect", "db": -3.0},
 	"wrong": {"files": ["error_004.ogg"], "bus": "SoundEffect", "db": -4.0},
 	"back": {"files": ["back_001.ogg"], "bus": "SoundEffect", "db": -8.0, "gap": 0.05},
-	"popup_open": {"files": ["open_002.ogg"], "bus": "SoundEffect", "db": -6.0},
+	"popup_open": {"files": ["@popup_soft.wav"], "bus": "SoundEffect", "db": -8.0},
 	"popup_close": {"files": ["close_002.ogg"], "bus": "SoundEffect", "db": -8.0},
 	"window_open": {"files": ["maximize_003.ogg"], "bus": "SoundEffect", "db": -8.0},
 	"window_close": {"files": ["minimize_003.ogg"], "bus": "SoundEffect", "db": -8.0},

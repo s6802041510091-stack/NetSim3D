@@ -251,6 +251,16 @@ writeWav("mouse_click", (() => {
 	return x;
 })(), false, 0.7);
 
+// Opening an install point: a soft, rounded "pop" — low notes, slow attack
+// and nothing above ~2.5 kHz, so it never sounds sharp.
+writeWav("popup_soft", (() => {
+	const out = buf(0.45);
+	const soft = (f, len) => envelope(tone(f, len, [[1, 1, 0.13], [2, 0.12, 0.05]]), 0.012, 0.05);
+	mixInto(out, soft(note("G4"), 0.32), 0, 0.8);
+	mixInto(out, soft(note("C5"), 0.38), 0.06, 0.7);
+	return biquad(out, "lp", 2500);
+})(), false, 0.55);
+
 // Result jingles.
 {
 	const out = buf(1.9);
