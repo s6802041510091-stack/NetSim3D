@@ -17,6 +17,7 @@ var auto_collapsed := false
 var _collapsed_before_auto := false
 var _objective_panel: PanelContainer
 var _objective_title: Label
+var _objective_hint: Label
 var _objective_label: Label
 var _toggle: Button
 var _toast_panel: PanelContainer
@@ -39,8 +40,15 @@ func _ready() -> void:
 	col.add_theme_constant_override("separation", 2)
 	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(col)
+	var title_row := HBoxContainer.new()
+	title_row.add_theme_constant_override("separation", 6)
+	title_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(title_row)
 	_objective_title = GameUI.label("", 14, Color(0.6, 0.78, 1.0), true)
-	col.add_child(_objective_title)
+	title_row.add_child(_objective_title)
+	_objective_hint = GameUI.label("", 13, Color(0.62, 0.65, 0.7))
+	_objective_hint.name = "HintLabel"
+	title_row.add_child(_objective_hint)
 	_objective_label = GameUI.label("", 18, Color.WHITE)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.custom_minimum_size = Vector2(PANEL_WIDTH - 60, 0)
@@ -54,10 +62,11 @@ func _ready() -> void:
 	_toggle.add_theme_stylebox_override("normal", GameUI.box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0), 6, 0, 0))
 	_toggle.add_theme_stylebox_override("hover", GameUI.box(Color(1, 1, 1, 0.2), Color(0, 0, 0, 0), 6, 0, 0))
 	_toggle.add_theme_stylebox_override("pressed", GameUI.box(Color(1, 1, 1, 0.28), Color(0, 0, 0, 0), 6, 0, 0))
-	# Chevron drawn (no font glyph needed): points left = fold, right = open.
+	# Chevron drawn (no font glyph needed). The panel sits on the right edge:
+	# open -> points right (fold away), folded -> points left (open out).
 	_toggle.draw.connect(func():
 		var c := _toggle.size * 0.5
-		var d := 5.0 if collapsed else -5.0
+		var d := -5.0 if collapsed else 5.0
 		_toggle.draw_polyline(PackedVector2Array([c + Vector2(-d * 0.6, -7), c + Vector2(d * 0.6, 0), c + Vector2(-d * 0.6, 7)]), Color(0.85, 0.9, 1.0), 2.5, true))
 	_toggle.pressed.connect(toggle)
 	row.add_child(_toggle)
@@ -67,9 +76,9 @@ func _ready() -> void:
 	_toast_panel.name = "ToastPanel"
 	_toast_panel.anchor_left = 0.5
 	_toast_panel.anchor_right = 0.5
-	# Narrow enough to stay clear of the objective panel on a 1280 px screen.
-	_toast_panel.offset_left = -240
-	_toast_panel.offset_right = 340
+	# Shifted left to stay clear of the objective panel (top-right) on a 1280 px screen.
+	_toast_panel.offset_left = -340
+	_toast_panel.offset_right = 240
 	_toast_panel.offset_top = 24
 	_toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_toast_panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.06, 0.32, 0.18, 0.94), Color(0.4, 0.85, 0.55), 8, 20, 12))
@@ -127,21 +136,17 @@ func _refresh() -> void:
 	if _objective_panel == null:
 		return
 	var title := String(_objective_title.get_meta("title", "ภารกิจตอนนี้"))
-	_objective_title.text = ("ภารกิจ  (Tab เปิด)" if collapsed else title + "  (Tab ซ่อน)")
+	_objective_title.text = "ภารกิจ" if collapsed else title
+	_objective_hint.text = "(กด Tab เพื่อเปิด)" if collapsed else "(กด Tab เพื่อซ่อน)"
 	_objective_label.visible = not collapsed
 	_objective_panel.custom_minimum_size = Vector2(0 if collapsed else PANEL_WIDTH, 0)
-	# Folded: a small tab in the top-right corner, clear of desktop icons.
-	# Open: the full panel in the top-left corner.
-	_objective_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT if collapsed else Control.PRESET_TOP_LEFT)
-	_objective_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN if collapsed else Control.GROW_DIRECTION_END
+	# Always in the top-right corner (clear of desktop icons), open or folded.
+	_objective_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	_objective_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_objective_panel.size = Vector2.ZERO # Shrink to fit when folding.
 	_objective_panel.offset_top = 20
-	if collapsed:
-		_objective_panel.offset_right = -20
-		_objective_panel.offset_left = -20 - _objective_panel.get_combined_minimum_size().x
-	else:
-		_objective_panel.offset_left = 20
-		_objective_panel.offset_right = 20 + _objective_panel.get_combined_minimum_size().x
+	_objective_panel.offset_right = -20
+	_objective_panel.offset_left = -20 - _objective_panel.get_combined_minimum_size().x
 	_objective_panel.visible = objective_text != ""
 	_toggle.queue_redraw()
 
