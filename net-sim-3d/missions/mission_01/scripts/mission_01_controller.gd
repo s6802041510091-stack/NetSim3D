@@ -45,6 +45,8 @@ var hud: ObjectiveHUD
 var dialogue: DialogueBox
 var summary: MissionSummary
 var talk: Talkable
+var marker: ObjectiveMarker
+var supervisor: Node3D
 var manager: ComputerManager
 var _timing := false
 
@@ -66,7 +68,10 @@ func _ready() -> void:
 	summary.replay_requested.connect(func(): replay_requested.emit())
 	summary.menu_requested.connect(func(): menu_requested.emit())
 	summary.next_requested.connect(func(): next_requested.emit())
-	var supervisor := world.get_node_or_null("ITSupportSupervisor")
+	marker = ObjectiveMarker.new()
+	marker.name = "ObjectiveMarker"
+	add_child(marker)
+	supervisor = world.get_node_or_null("ITSupportSupervisor") as Node3D
 	if supervisor:
 		talk = Talkable.new()
 		talk.name = "Talk"
@@ -90,15 +95,35 @@ func _enter(next: Stage) -> void:
 		Stage.BRIEFING:
 			hud.set_objective("คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
+			_point_at_supervisor()
 		Stage.DESIGN:
 			hud.set_objective("ไปที่คอมพิวเตอร์ของคุณ (%s) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ให้ครบ 3 จุด" % PLAYER_COMPUTER)
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_point_at_computer()
 		Stage.REPORT:
 			hud.set_objective("ออกจากคอมพิวเตอร์ แล้วกลับไปรายงานผลกับหัวหน้างาน Data Center")
 			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
+			_point_at_supervisor()
 		Stage.DONE:
 			hud.set_objective("")
 			_set_prompt("")
+			marker.clear()
+
+
+func _point_at_supervisor() -> void:
+	if supervisor:
+		marker.point_at(supervisor, 2.25)
+	else:
+		marker.clear()
+
+
+func _point_at_computer() -> void:
+	var station := manager.find_host(PLAYER_COMPUTER) if manager else null
+	if station == null or station.screen == null:
+		marker.clear()
+		return
+	var screen := station.screen
+	marker.point_at_position(screen.global_transform * screen.get_aabb().get_center(), 0.42)
 
 
 func _set_prompt(text: String) -> void:

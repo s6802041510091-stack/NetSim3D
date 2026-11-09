@@ -150,12 +150,13 @@ func _run() -> void:
 		15: "คะแนนรวม 30/50/20 ดาว และจุดที่ผิดพลาด", 16: "บันทึกข้อมูลได้", 17: "ออกจากคอมแล้วผู้เล่นควบคุมได้",
 		18: "Esc ปิด Popup → โปรแกรม → ออกจากคอม", 19: "ไม่มีส่วนที่ขัดกับ Web Export",
 		20: "คุยกับหัวหน้างาน รับภารกิจ และรายงานผล", 21: "หน้าสรุปผล + บันทึกความก้าวหน้า/ปลดล็อก", 22: "Wall Rack ว่างในห้องคอม",
+		23: "ลูกศรสีทองชี้เป้าหมายตามขั้นตอน",
 	}
-	for i in range(1, 23):
+	for i in range(1, 24):
 		var ok: bool = results.get(i, false)
 		print("%s [%02d] %s" % ["PASS" if ok else "FAIL", i, names[i]])
 	if failures == 0:
-		print("MISSION_01_VALID items=22")
+		print("MISSION_01_VALID items=23")
 		quit()
 	else:
 		print("MISSION_01_INVALID failures=", failures)
@@ -438,6 +439,8 @@ func _test_in_game() -> void:
 		map.queue_free()
 		return
 	_check(20, mission.hud.objective_text.contains("หัวหน้างาน"), "first objective: " + mission.hud.objective_text)
+	var supervisor_node: Node3D = map.get_node("ITSupportSupervisor")
+	_check(23, mission.marker.is_active() and mission.marker.target == supervisor_node, "gold arrow should point at the supervisor first")
 	_check(4, not pc.has_app("netplan_edu"), "NetPlan EDU must appear only after the briefing")
 	_check(4, not manager.find_host("PC-R1-L1").has_app("netplan_edu"), "student PCs should not have NetPlan EDU")
 	var rack: WallRack9U = map.get_node_or_null("ComputerRoomRack")
@@ -456,6 +459,8 @@ func _test_in_game() -> void:
 	await _finish_dialogue(mission.dialogue)
 	_check(20, mission.stage == Mission01Controller.Stage.DESIGN and pc.has_app("netplan_edu") and not player.controls_locked, "briefing did not start the mission")
 	_check(20, mission.hud.objective_text.contains("IT-PC-01"), "objective after briefing: " + mission.hud.objective_text)
+	var pc_screen: Vector3 = pc.screen.global_transform * pc.screen.get_aabb().get_center()
+	_check(23, mission.marker.is_active() and mission.marker.target == null and mission.marker.tip_position().distance_to(pc_screen + Vector3(0, 0.42, 0)) < 0.01, "gold arrow should move above IT-PC-01")
 
 	# Walk-up prompt for the computer.
 	var screen_center: Vector3 = pc.screen.global_transform * pc.screen.get_aabb().get_center()
@@ -524,6 +529,7 @@ func _test_in_game() -> void:
 	app.request_validation()                                   # pass with 25
 	_check(13, app.state.passed and app.state.final_score == 25 and app.is_completion_shown(), "in-game completion (correctness %d)" % app.state.final_score)
 	_check(20, mission.stage == Mission01Controller.Stage.REPORT and mission.hud.objective_text.contains("รายงาน"), "passing should ask to report: " + mission.hud.objective_text)
+	_check(23, mission.marker.target == supervisor_node, "gold arrow should return to the supervisor for the report")
 
 	# "ออกจากคอมพิวเตอร์" gives control back.
 	await _click(app.get_node("%ExitComputerButton"))
@@ -557,6 +563,7 @@ func _test_in_game() -> void:
 	await _frames(3)
 	var score := mission.score
 	_check(21, score != null and mission.summary.visible and mission.stage == Mission01Controller.Stage.DONE, "summary not shown after reporting")
+	_check(23, not mission.marker.is_active(), "gold arrow should disappear when the level is done")
 	if score:
 		_check(21, score.correctness == 25 and score.time == 20 and score.process > 0 and score.total() == score.correctness + score.process + score.time, "summary score %s" % score.to_dict())
 		_check(21, GameProgress.best_score(1) == score.total() and int(GameProgress.level_record(1).attempts) == 1, "progress not recorded")

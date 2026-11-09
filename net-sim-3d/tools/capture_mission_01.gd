@@ -65,6 +65,15 @@ func _run() -> void:
 	while mission.dialogue.is_open():
 		mission.dialogue.advance(true)
 	await _shot("m1_objective_after_briefing")
+	# Gold arrow over the player's computer, seen from across the room.
+	var pc: ComputerStation = (map.get_node("Computers") as ComputerManager).find_host("IT-PC-01")
+	var screen_center: Vector3 = pc.screen.global_transform * pc.screen.get_aabb().get_center()
+	player.global_position = supervisor.global_position + Vector3(1.0, 0, 1.2)
+	player.look_at(Vector3(screen_center.x, player.global_position.y, screen_center.z), Vector3.UP)
+	player.camera.rotation.x = -0.05
+	for i in 5:
+		await physics_frame
+	await _shot("m1_arrow_on_computer")
 
 	var camera := Camera3D.new()
 	camera.fov = 70.0
