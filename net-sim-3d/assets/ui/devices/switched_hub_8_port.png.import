@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c4ot1jglr3ug6"
-path="res://.godot/imported/bridge.svg-1b12ba646c9e97d64bee0d039b5c39f7.ctex"
+uid="uid://csb2tqdq76ygy"
+path="res://.godot/imported/switched_hub_8_port.png-1ac27faf24faa8aa0cb46793aa3841e5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/devices/bridge.svg"
-dest_files=["res://.godot/imported/bridge.svg-1b12ba646c9e97d64bee0d039b5c39f7.ctex"]
+source_file="res://assets/ui/devices/switched_hub_8_port.png"
+dest_files=["res://.godot/imported/switched_hub_8_port.png-1ac27faf24faa8aa0cb46793aa3841e5.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

@@ -12,8 +12,8 @@ signal equipment_selected(point_id: int, option: String)
 signal answer_confirmed(point_id: int, option: String, reason_index: int)
 signal cancelled
 
-const CARD_SIZE := Vector2(350, 86)
-const ICON_SIZE := Vector2(110, 66)
+const CARD_SIZE := Vector2(350, 90)
+const ICON_SIZE := Vector2(130, 78)
 
 var point_id: int = 0
 ## The device chosen in this pop-up ("" = none yet).

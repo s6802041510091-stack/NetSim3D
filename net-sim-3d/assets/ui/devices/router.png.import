@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3gqpyaqkysx"
-path="res://.godot/imported/repeater.svg-8850469ba8b3ab991c5709d45954c8cb.ctex"
+uid="uid://dqvvq5025f2wy"
+path="res://.godot/imported/router.png-53fb61779a273e62d0082d2f91638bbf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/devices/repeater.svg"
-dest_files=["res://.godot/imported/repeater.svg-8850469ba8b3ab991c5709d45954c8cb.ctex"]
+source_file="res://assets/ui/devices/router.png"
+dest_files=["res://.godot/imported/router.png-53fb61779a273e62d0082d2f91638bbf.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

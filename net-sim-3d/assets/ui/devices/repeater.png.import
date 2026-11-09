@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://gts3clmem8jg"
-path="res://.godot/imported/switched_hub_8_port.svg-b1197c14376f4b8c4ae78684a5db31ee.ctex"
+uid="uid://bv7ayp53aydjp"
+path="res://.godot/imported/repeater.png-cfabf26a4da9dc05a07ff879f0b7a576.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/devices/switched_hub_8_port.svg"
-dest_files=["res://.godot/imported/switched_hub_8_port.svg-b1197c14376f4b8c4ae78684a5db31ee.ctex"]
+source_file="res://assets/ui/devices/repeater.png"
+dest_files=["res://.godot/imported/repeater.png-cfabf26a4da9dc05a07ff879f0b7a576.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

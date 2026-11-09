@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ba2hbwo2dsp1s"
-path="res://.godot/imported/router.svg-78c5a0844c979f876e4f142a67a40999.ctex"
+uid="uid://b8dep18w28168"
+path="res://.godot/imported/switched_hub_24_port.png-f72d8b14201286cf84fc5e87f4a20e0b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/devices/router.svg"
-dest_files=["res://.godot/imported/router.svg-78c5a0844c979f876e4f142a67a40999.ctex"]
+source_file="res://assets/ui/devices/switched_hub_24_port.png"
+dest_files=["res://.godot/imported/switched_hub_24_port.png-f72d8b14201286cf84fc5e87f4a20e0b.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

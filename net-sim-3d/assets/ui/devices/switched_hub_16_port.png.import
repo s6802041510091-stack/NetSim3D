@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b2io122ns0eaj"
-path="res://.godot/imported/switched_hub_16_port.svg-068efe5b9291653b33b452b4e505160f.ctex"
+uid="uid://dcfy0sqhyqo5j"
+path="res://.godot/imported/switched_hub_16_port.png-9bb0dada4bae664c60498b5fb004a465.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/devices/switched_hub_16_port.svg"
-dest_files=["res://.godot/imported/switched_hub_16_port.svg-068efe5b9291653b33b452b4e505160f.ctex"]
+source_file="res://assets/ui/devices/switched_hub_16_port.png"
+dest_files=["res://.godot/imported/switched_hub_16_port.png-9bb0dada4bae664c60498b5fb004a465.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

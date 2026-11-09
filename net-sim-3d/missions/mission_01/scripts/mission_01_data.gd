@@ -70,9 +70,10 @@ func correct_reason(point_id: int, device: String) -> int:
 
 
 ## Picture of a device for the choice cards, e.g. "Switched Hub 24 Port" ->
-## res://assets/ui/devices/switched_hub_24_port.svg (null when missing).
+## res://assets/ui/devices/switched_hub_24_port.png, rendered from the 3D models
+## by 3Dmodel/scripts/render_device_thumbnails.py (null when missing).
 static func device_icon(device: String) -> Texture2D:
-	var path := ICON_DIR + device.to_lower().replace(" ", "_") + ".svg"
+	var path := ICON_DIR + device.to_lower().replace(" ", "_") + ".png"
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
