@@ -542,6 +542,7 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(not pc.plugged, "PC not plugged yet")
 	await mission.plug_pc(player)
 	var pcb := mission.pc_board
+	_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "the mouse shows at the teacher PC")
 	_check(not player._leg_parts.is_empty() and player._leg_parts.all(func(p): return p.layers == 2), "own legs hidden from the camera at the PC close-up")
 	_check(pcb.active and mission._pc_head != null and pcb.views.size() == 2 and not pc.plugged, "PC: the cable end lies behind the PC, 2 views")
 	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01 and not pcb.can_drag(), "PC: first the back of the PC at medium distance (look only)")

@@ -108,6 +108,9 @@ func begin(cam: Camera3D, view_list: Array, plug_nodes: Dictionary, socket_nodes
 	active = true
 	_busy = false
 	_bar.visible = true
+	# The mouse drags the heads: always show it (some spots open from walking,
+	# where it was captured).
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh_bar()
 
 
