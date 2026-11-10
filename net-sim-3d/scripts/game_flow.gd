@@ -284,8 +284,8 @@ func _enter_loaded_level() -> void:
 	var saved := _save_preferences()
 	get_tree().paused = true
 	_page("Level %d  /  พร้อมแล้ว" % current_level, TITLES[current_level - 1])
-	var hints := {1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
-	_label(hints[current_level], 16)
+	var hints := {1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 2: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วอ่านใบงาน", 5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
+	_label(String(hints.get(current_level, "")), 16)
 	_label("WASD เดิน • เมาส์มอง • F โต้ตอบ\nE กระเป๋า • F1 เปิดเมนูพักได้ทุกเวลา", 16)
 	if not saved:
 		_label("บันทึกด่านล่าสุดไม่ได้ — Continue อาจใช้ไม่ได้เมื่อปิดเกม", 14)
