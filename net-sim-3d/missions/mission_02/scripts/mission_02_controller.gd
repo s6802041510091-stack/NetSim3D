@@ -599,11 +599,14 @@ func plug_pc(player: Node) -> void:
 	_desk_busy = false
 
 
-## Where the end of cable 2 lies: on the desk just behind the PC, pointing at
-## the port (the cable drawn by the rack ends there).
+## Where the end of cable 2 waits: in front of the port, a little left of it
+## and lower, pointing at it, its cable running down to the desk (like the
+## heads at the rack), so a close look shows the port and the head together.
 func pc_head_home() -> Vector3:
 	var p := pc_port.global_position
-	return Vector3(p.x + 0.04, PC_DESK_Y + 0.006, p.z + 0.065)
+	var out := pc_port.global_basis.z.normalized()
+	var side := pc_port.global_basis.x.normalized()
+	return p + out * 0.045 - side * 0.045 + Vector3.DOWN * 0.03
 
 
 ## Q / E views at the PC: the port and the head together, then the whole desk.
@@ -611,8 +614,8 @@ func pc_views() -> Array:
 	var p := pc_port.global_position
 	var out := pc_port.global_basis.z.normalized()
 	var side := pc_port.global_basis.x.normalized()
-	var target := p.lerp(pc_head_home(), 0.6) + side * 0.03
-	var eye := target + out * 0.28 + Vector3.UP * 0.08
+	var target := p.lerp(pc_head_home(), 0.35)
+	var eye := target + out * 0.17 + side * 0.01 + Vector3.UP * 0.03
 	var wide_eye := p + out * 0.9 + Vector3.UP * 0.45
 	return [
 		{"name": "ช่อง LAN ด้านหลังคอมพิวเตอร์ครู", "xform": Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)},
@@ -630,7 +633,8 @@ func _rebuild_pc_tail() -> void:
 	var p := pc_port.global_position
 	# The rack's cable stops on the desk behind the PC (WallRack9U.drop_to_pc).
 	var end_on_desk := Vector3(p.x, PC_DESK_Y + 0.004, p.z + 0.11)
-	_pc_temp.add_child(CableBuilder.build([h * Vector3(0, 0, 0.033), h * Vector3(0, -0.01, 0.07), end_on_desk + Vector3(0.02, 0, 0.02), end_on_desk],
+	var hang := h * Vector3(0, -0.015, 0.075)
+	_pc_temp.add_child(CableBuilder.build([h * Vector3(0, 0, 0.033), hang, Vector3(hang.x, PC_DESK_Y + 0.004, hang.z), end_on_desk],
 		InstallPanel.CABLE_COLOR, "Tail", 0.003))
 
 

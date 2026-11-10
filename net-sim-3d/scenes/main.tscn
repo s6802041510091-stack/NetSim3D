@@ -97,7 +97,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.96, 3.205, 0)
 script = ExtResource("19_access_point")
 
 [node name="TeacherPcPort" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.26, 0.98, -7.741)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2505, 0.9546, -7.741)
 script = ExtResource("18_network_port")
 
 [node name="ComputerRoomRack" type="StaticBody3D" parent="."]
