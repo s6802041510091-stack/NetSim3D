@@ -510,6 +510,7 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(not pc.plugged, "PC not plugged yet")
 	await mission.plug_pc(player)
 	var pcb := mission.pc_board
+	_check(not player._leg_parts.is_empty() and player._leg_parts.all(func(p): return p.layers == 2), "own legs hidden from the camera at the PC close-up")
 	_check(pcb.active and mission._pc_head != null and pcb.views.size() == 2 and not pc.plugged, "PC: the cable end lies behind the PC, 2 views")
 	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01, "camera on the port and the cable end")
 	var at_port := cam.unproject_position(pc.global_position)
@@ -522,6 +523,7 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(pc.plugged and pc.link_on and rack.is_link_on("switch_02"), "PC plugged by hand, links up (spare cable)")
 	await create_timer(Mission02Controller.PC_LED_LOOK + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
 	_check(mission.install_step == "leds" and not player.controls_locked, "then check the LEDs at the rack")
+	_check(player._leg_parts.all(func(p): return p.layers == 3), "camera back at the eyes: own legs visible again")
 	await mission.open_rack(player)
 	_check(panel.mode == "leds" and panel.visible, "rack opens for the LED check")
 	panel.confirm_leds()

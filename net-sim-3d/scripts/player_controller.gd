@@ -33,6 +33,8 @@ var focused_interactable: Object = null
 ## True while the player is sitting at a computer.
 var controls_locked := false
 var _camera_home := Transform3D.IDENTITY
+## Trousers and shoes: the only body parts the player's camera sees.
+var _leg_parts: Array[VisualInstance3D] = []
 var _camera_tween: Tween
 var _interact_ray: RayCast3D
 var _prompt: Label
@@ -164,17 +166,29 @@ func set_controls_locked(locked: bool) -> void:
 
 
 ## Moves the first-person camera to a world pose (e.g. in front of a screen).
+## The player's own legs are hidden meanwhile: the camera can be in front of
+## or above the body (desk, rack, PC close-ups) and the legs would block it.
 func move_camera_to(target: Transform3D, duration: float) -> void:
 	_camera_home = camera.transform
 	camera.top_level = true # Keeps its world pose while detached from the head.
+	set_legs_shown(false)
 	await _tween_camera(target, duration)
 
 
-## Brings the camera back to the player's eyes.
+## Brings the camera back to the player's eyes (the legs show again).
 func return_camera(duration: float) -> void:
 	await _tween_camera(global_transform * _camera_home, duration)
 	camera.top_level = false
 	camera.transform = _camera_home
+	set_legs_shown(true)
+
+
+## Shows or hides the player's legs from the player's own camera (walking:
+## shown, so looking down shows them).
+func set_legs_shown(on: bool) -> void:
+	for part in _leg_parts:
+		if is_instance_valid(part):
+			part.layers = 3 if on else 2
 
 
 func _tween_camera(target: Transform3D, duration: float) -> void:
@@ -191,6 +205,7 @@ func _set_first_person_layers(node: Node) -> void:
 		var part: VisualInstance3D = node
 		if part.name.begins_with("Trousers") or part.name.begins_with("Shoes"):
 			part.layers = 3 # World layer and self-view layer.
+			_leg_parts.append(part)
 		else:
 			part.layers = 2 # Hidden from this camera (cull_mask = 1).
 	for child in node.get_children():
