@@ -83,5 +83,32 @@ func _run() -> void:
 	mission.work_order.open()
 	mission.work_order.choose(1, Mission02State.STRAIGHT)
 	await _shot("m2_work_order")
+	mission.work_order.visible = false
+	# The crimping desk: sit, then the cable end through the steps.
+	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
+	player.global_position = Vector3(-14.6, 0.05, -38.43)
+	mission._enter(Mission02Controller.Stage.CRIMP)
+	await mission.sit_at_desk(player)
+	player.camera.make_current()
+	var panel := mission.crimp_panel
+	await _shot("m2_desk_whole")
+	await panel.do_step() # cut
+	await panel.do_step() # strip
+	await _shot("m2_desk_stripped")
+	await panel.do_step() # untwist
+	await _shot("m2_desk_untwisted")
+	for id in ["white_orange", "orange", "white_green"]:
+		panel.place_wire(id)
+	await _shot("m2_desk_arranging")
+	for id in ["blue", "white_blue", "green", "white_brown", "brown"]:
+		panel.place_wire(id)
+	await _shot("m2_desk_arranged")
+	panel.confirm_arrangement()
+	await panel.do_step() # trim
+	await panel.do_step() # insert
+	await _shot("m2_desk_inserted")
+	await panel.do_step() # crimp
+	panel.bench.show_state(CrimpBench.Look.CRIMPED, WireColors.T568B)
+	await _shot("m2_desk_crimped")
 	print("CAPTURE_DONE ", out_dir)
 	quit()

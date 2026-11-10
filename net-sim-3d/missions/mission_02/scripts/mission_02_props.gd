@@ -23,8 +23,8 @@ const ITEMS := {
 }
 
 var items := {} # id -> PickupItem
-## Where the player sits to crimp (the camera zooms here later).
-var crimp_station: Node3D
+## Where the player sits to crimp (F at the desk; the camera zooms to its bench).
+var crimp_station: CrimpStation
 
 
 func _ready() -> void:
@@ -40,9 +40,9 @@ func _ready() -> void:
 		item.add_child(_visual_for(id))
 		add_child(item)
 		items[id] = item
-	crimp_station = Node3D.new()
+	crimp_station = CrimpStation.new()
 	crimp_station.name = "CrimpStation"
-	crimp_station.position = DESK_CENTER
+	crimp_station.position = Vector3(-13.74, DESK_TOP, -38.43)
 	add_child(crimp_station)
 
 

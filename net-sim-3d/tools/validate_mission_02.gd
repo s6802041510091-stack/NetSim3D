@@ -156,9 +156,63 @@ func _run() -> void:
 			owned.append(slot.id)
 	_check(owned.size() == 5 and "crimping_tool" in owned and "cable_tester" in owned and "rj45_heads" in owned, "all 5 in the tool case: %s" % [owned])
 	_check(mission.stage == Mission02Controller.Stage.CRIMP, "all items -> next stage")
+	await _test_crimping(mission, props, player)
 	map.queue_free()
 	await _frames(2)
 	_finish()
+
+
+## The crimping desk: 4 ends, cable 2 end 2 gets one pair swapped.
+func _test_crimping(mission: Mission02Controller, props: Mission02Props, player: CharacterBody3D) -> void:
+	var station := props.crimp_station
+	var panel := mission.crimp_panel
+	var bench := station.bench
+	_check(station.get_prompt_text() != "" and station.collision_layer == CrimpStation.COLLISION_LAYER, "desk prompt on in the crimp stage")
+	_check(mission.hud.objective_text.contains("0/4"), "objective counts ends: " + mission.hud.objective_text)
+	await mission.sit_at_desk(player)
+	_check(mission.at_desk and panel.visible and player.controls_locked, "sitting at the desk opens the step panel")
+	_check(player.camera.global_position.distance_to(bench.view_transform().origin) < 0.01, "camera moved to the cable end")
+	_check(panel.current_key() == "1A" and panel.current_step() == "cut" and bench.look == CrimpBench.Look.WHOLE, "starts with cable 1 end 1: cut")
+	var swapped := WireColors.T568B.duplicate()
+	swapped[2] = WireColors.T568B[5] # white-green <-> green, a classic split-pair mistake
+	swapped[5] = WireColors.T568B[2]
+	var plans := {"1A": WireColors.T568B, "1B": WireColors.T568B, "2A": WireColors.T568B, "2B": swapped}
+	var looks_seen := {}
+	var left_once := false
+	var guard := 0
+	while not panel.is_done() and guard < 60:
+		guard += 1
+		var key := panel.current_key()
+		var step := panel.current_step()
+		if step == "arrange":
+			_check(bench.look == CrimpBench.Look.UNTWISTED, "%s: loose wires before arranging" % key)
+			# Place two wires, take one back, then fill in the plan.
+			panel.place_wire(plans[key][1])
+			_check(panel.arrangement[0] == plans[key][1] and bench.look == CrimpBench.Look.ARRANGED, "%s: a wire goes to pin 1 and shows on the desk" % key)
+			panel.remove_pin(0)
+			for id: String in plans[key]:
+				panel.place_wire(id)
+			panel.confirm_arrangement()
+			_check(mission.state.ends.get(key, []) == plans[key], "%s: arrangement saved" % key)
+			panel.place_wire("brown")
+			continue
+		await panel.do_step()
+		looks_seen[bench.look] = true
+		if key == "1B" and panel.current_key() == "2A" and not left_once:
+			# Stand up after the first cable and come back.
+			left_once = true
+			await mission.leave_desk()
+			_check(not mission.at_desk and not player.controls_locked and not panel.visible, "standing up frees the player")
+			await mission.sit_at_desk(player)
+			_check(panel.current_key() == "2A" and panel.current_step() == "cut", "sitting again resumes at cable 2")
+	for look in [CrimpBench.Look.CUT, CrimpBench.Look.STRIPPED, CrimpBench.Look.TRIMMED, CrimpBench.Look.INSERTED]:
+		_check(looks_seen.has(look), "cable end showed look %d" % look)
+	await create_timer(Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
+	_check(panel.is_done() and mission.state.ends.size() == 4, "all 4 ends crimped")
+	_check(mission.state.cable_good(1) and not mission.state.cable_good(2), "cable 1 good, cable 2 has the swapped pair")
+	_check(is_equal_approx(mission.state.colour_points(), 22.5), "colour points 22.5 (%.2f)" % mission.state.colour_points())
+	_check(mission.stage == Mission02Controller.Stage.TEST and not mission.at_desk and not player.controls_locked, "crimping done -> test stage, player free")
+	_check(station.get_prompt_text() == "", "desk prompt off after crimping")
 
 
 func _finish() -> void:

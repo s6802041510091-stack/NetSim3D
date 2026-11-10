@@ -25,6 +25,9 @@ const BANK := {
 	"door_close": {"files": ["doorClose_1.ogg", "doorClose_2.ogg", "doorClose_4.ogg"], "bus": "Sound", "db": -6.0, "range": 20.0},
 	"door_blocked": {"files": ["metalLatch.ogg"], "bus": "Sound", "db": -6.0, "range": 12.0},
 	"chair": {"files": ["cloth1.ogg", "cloth2.ogg"], "bus": "Sound", "db": -8.0},
+	# Crimping desk (bus SoundEffect)
+	"snip": {"files": ["@key_tap.wav"], "bus": "SoundEffect", "db": -4.0, "pitch": 0.05},
+	"crimp": {"files": ["metalLatch.ogg"], "bus": "SoundEffect", "db": -2.0, "pitch": 0.04},
 	# NPC at work (bus Sound, quiet and close)
 	"key_tap": {"files": ["@key_tap.wav"], "bus": "Sound", "db": -14.0, "pitch": 0.12, "range": 7.0},
 	"mouse_click": {"files": ["@mouse_click.wav"], "bus": "Sound", "db": -16.0, "pitch": 0.08, "range": 6.0},

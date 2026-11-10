@@ -2,9 +2,10 @@ class_name Mission02WorkOrder
 extends CanvasLayer
 
 ## The work order the supervisor hands over: pick the cable type for the two
-## connection points. Each option shows the wire order at both ends (T568B-B
-## or T568A-B) but never says which devices it is for. One answer per point;
-## "ยืนยันใบงาน" saves both and closes (no changes afterwards).
+## connection points. Each option names the standard at both ends (T568B-B
+## or T568A-B) but never says which devices it is for, and never shows the
+## colour order (the player crimps T568B from memory later). One answer per
+## point; "ยืนยันใบงาน" saves both and closes (no changes afterwards).
 
 signal confirmed(answers: Dictionary)
 
@@ -146,7 +147,7 @@ func _option(point: int, type: String, group: ButtonGroup) -> Button:
 	b.toggle_mode = true
 	b.button_group = group
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(225, 128)
+	b.custom_minimum_size = Vector2(225, 104)
 	b.add_theme_stylebox_override("normal", GameUI.box(Color(1, 1, 1), Color(0.82, 0.85, 0.9), 8, 10, 8))
 	b.add_theme_stylebox_override("hover", GameUI.box(Color(0.94, 0.96, 1.0), GameUI.ACCENT.lightened(0.35), 8, 10, 8))
 	var on := GameUI.box(Color(0.89, 0.94, 1.0), GameUI.ACCENT, 8, 10, 8)
@@ -166,32 +167,8 @@ func _option(point: int, type: String, group: ButtonGroup) -> Button:
 	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	content.add_child(title)
 	for i in 2:
-		var end := HBoxContainer.new()
-		end.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		end.add_theme_constant_override("separation", 6)
-		content.add_child(end)
-		var tag := GameUI.label("ปลาย %d  %s" % [i + 1, info[1 + i]], 13, GameUI.INK_SOFT)
-		tag.custom_minimum_size = Vector2(92, 0)
+		var tag := GameUI.label("ปลาย %d:  %s" % [i + 1, info[1 + i]], 15, GameUI.INK_SOFT)
 		tag.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		end.add_child(tag)
-		var strip := WireStrip.new()
-		strip.order = WireColors.T568B if info[1 + i] == "T568B" else WireColors.T568A
-		strip.custom_minimum_size = Vector2(104, 26)
-		end.add_child(strip)
+		content.add_child(tag)
 	b.pressed.connect(func(): choose(point, type))
 	return b
-
-
-## Eight wires side by side, pin 1 on the left.
-class WireStrip:
-	extends Control
-
-	var order: Array = []
-
-	func _ready() -> void:
-		mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	func _draw() -> void:
-		var w := size.x / 8.0
-		for i in mini(order.size(), 8):
-			WireColors.draw_wire(self, Rect2(Vector2(i * w + 1, 0), Vector2(w - 2, size.y)), order[i])

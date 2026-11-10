@@ -35,7 +35,10 @@ const NEXT_REMINDER := [
 ]
 const RECEIVED := "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN"
 
-enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, DONE }
+enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, DONE }
+
+## Seconds for the camera to move to / from the crimping desk.
+const DESK_ZOOM_TIME := 0.6
 
 var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
@@ -48,8 +51,12 @@ var talk: Talkable
 var marker: ObjectiveMarker
 var supervisor: Node3D
 var props: Mission02Props
+var crimp_panel: CrimpPanel
+## True while the player sits at the crimping desk.
+var at_desk := false
 var _timing := false
 var _player: Node
+var _desk_busy := false
 
 
 func _ready() -> void:
@@ -73,11 +80,19 @@ func _ready() -> void:
 	work_order.name = "WorkOrder"
 	add_child(work_order)
 	work_order.confirmed.connect(_on_work_order_confirmed)
+	crimp_panel = CrimpPanel.new()
+	crimp_panel.name = "CrimpPanel"
+	add_child(crimp_panel)
+	crimp_panel.leave_requested.connect(leave_desk)
+	crimp_panel.end_finished.connect(func(_key: String): _refresh_crimp_objective())
+	crimp_panel.all_done.connect(_on_crimping_done)
 	props = world.get_node_or_null("Mission02Props") as Mission02Props
 	if props:
 		props.set_items_available(false)
 		for item: PickupItem in props.items.values():
 			item.picked_up.connect(_on_item_picked)
+		crimp_panel.setup(props.crimp_station.bench, state)
+		props.crimp_station.used.connect(sit_at_desk)
 	supervisor = world.get_node_or_null("ITSupportSupervisor") as Node3D
 	if supervisor:
 		talk = Talkable.new()
@@ -113,10 +128,17 @@ func _enter(next: Stage) -> void:
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			_refresh_gather()
 		Stage.CRIMP:
-			hud.set_objective("นั่งที่โต๊ะว่างในห้อง IT Support เพื่อเข้าหัวสาย LAN (ขั้นตอนนี้กำลังสร้าง)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			if props:
+				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
+			_refresh_crimp_objective()
+		Stage.TEST:
+			hud.set_objective("ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester (ขั้นตอนนี้กำลังสร้าง)")
+			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			if props:
+				props.crimp_station.set_prompt("")
+			marker.clear()
 		Stage.DONE:
 			hud.set_objective("")
 			_set_prompt("")
@@ -165,6 +187,55 @@ func _on_talked(player: Node) -> void:
 			await _say(player, PackedStringArray(GATHER_REMINDER))
 		_:
 			await _say(player, PackedStringArray(NEXT_REMINDER))
+
+
+func _refresh_crimp_objective() -> void:
+	if stage != Stage.CRIMP:
+		return
+	var done := crimp_panel.end_index
+	hud.set_objective("เข้าหัวสาย LAN ที่โต๊ะว่างในห้อง IT Support (เสร็จ %d/4 ปลาย)\nสายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย" % done)
+
+
+## Sits at the crimping desk: the camera moves to the cable end, the step panel opens.
+func sit_at_desk(player: Node) -> void:
+	if stage != Stage.CRIMP or at_desk or _desk_busy or props == null:
+		return
+	_desk_busy = true
+	_player = player
+	at_desk = true
+	if player.has_method("set_controls_locked"):
+		player.set_controls_locked(true)
+	hud.set_auto_collapsed(true)
+	marker.clear()
+	Sound.play("chair")
+	if player.has_method("move_camera_to"):
+		await player.move_camera_to(props.crimp_station.bench.view_transform(), DESK_ZOOM_TIME)
+	crimp_panel.open()
+	_desk_busy = false
+
+
+## Stands up from the desk; the work stays where it was.
+func leave_desk() -> void:
+	if not at_desk or _desk_busy:
+		return
+	_desk_busy = true
+	crimp_panel.close()
+	Sound.play("chair")
+	if _player and _player.has_method("return_camera"):
+		await _player.return_camera(DESK_ZOOM_TIME)
+	at_desk = false
+	hud.set_auto_collapsed(false)
+	if _player and _player.has_method("set_controls_locked"):
+		_player.set_controls_locked(false)
+	_desk_busy = false
+	if stage == Stage.CRIMP and props:
+		marker.point_at_position(props.crimp_station.global_position, 0.45)
+
+
+func _on_crimping_done() -> void:
+	hud.show_toast("เข้าหัวครบทั้ง 2 เส้นแล้ว — ต่อไปตรวจด้วย LAN Cable Tester")
+	await leave_desk()
+	_enter(Stage.TEST)
 
 
 func _on_work_order_confirmed(answers: Dictionary) -> void:
