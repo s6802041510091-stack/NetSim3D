@@ -103,9 +103,9 @@ func close_view(ids: Array, distance := 0.2) -> Transform3D:
 	for id in ids:
 		center += port_local(id)
 	center /= maxf(ids.size(), 1)
-	var eye := global_transform * (center + Vector3(0.05, 0.02, distance))
+	var eye := global_transform * (center + Vector3(0.025, 0.015, distance))
 	# Looking straight in past the ports' right side puts them left of centre.
-	var target := global_transform * (center + Vector3(0.05, 0.0, 0.0))
+	var target := global_transform * (center + Vector3(0.025, 0.0, 0.0))
 	var basis := Basis.looking_at(target - eye, Vector3.UP)
 	return Transform3D(basis, eye)
 

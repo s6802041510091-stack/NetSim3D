@@ -67,6 +67,8 @@ func _test_rules() -> void:
 
 
 func _run() -> void:
+	# Same shape as the game window, so close-up framing checks mean something.
+	root.size = Vector2i(1280, 720)
 	GameProgress.save_path = "user://test_validate_progress_m2.json"
 	GameProgress.clear()
 	_test_rules()
@@ -200,6 +202,14 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 		tag_text += (l as Label3D).text + " "
 	_check(tag_text.contains("สายจุดที่ 2") and tag_text.contains("Crossover"), "cable 2 tag shows the box it came from: " + tag_text)
 	_check(mission.at_desk and panel.visible and player.controls_locked, "sitting at the desk opens the step panel")
+	var side := panel.side_panel
+	_check(side.get_global_rect().size.x <= SidePanel.WIDTH + 1.0 and not side.collapsed, "step panel is %d px wide, open" % side.get_global_rect().size.x)
+	(side.find_child("FoldButton", true, false) as Button).pressed.emit()
+	await _frames(2)
+	_check(side.collapsed and not side.body.visible and side.get_global_rect().size.y < 120, "fold button: the panel folds into a small tab")
+	side.toggle()
+	await _frames(2)
+	_check(not side.collapsed and side.body.visible, "and opens again")
 	_check(player.camera.global_position.distance_to(bench.view_transform().origin) < 0.01, "camera moved to the cable end")
 	_check(panel.current_key() == "1A" and panel.current_step() == "cut" and bench.look == CrimpBench.Look.WHOLE, "starts with cable 1 end 1: cut")
 	var swapped := WireColors.T568B.duplicate()
@@ -369,7 +379,7 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	var c0: Button = box.find_child("Choice0", true, false)
 	var c1: Button = box.find_child("Choice1", true, false)
 	_check(box.visible and box.choosing and c0 != null and c1 != null and c0.text.begins_with("ผ่าน") and c1.text.begins_with("ไม่ผ่าน"), "after one scan: the question at the bottom, pass on the left, discard on the right")
-	_check(box._panel.get_global_rect().end.x <= 1280 - TesterPanel.PANEL_WIDTH, "the question stays clear of the step panel")
+	_check(box._panel.get_global_rect().end.x <= panel.side_panel.get_global_rect().position.x, "the question stays clear of the step panel")
 	box.advance()
 	_check(box.visible and box.choosing, "F / click does not skip the question")
 	c1.pressed.emit()
@@ -431,6 +441,7 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 	# MAIN close up: drag head A in.
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(_on_left_part(cam, board.plug_screen_point("A")) and _on_left_part(cam, board.socket_screen_point("MAIN")), "MAIN close up shows the socket and head A: %s %s" % [board.socket_screen_point("MAIN"), board.plug_screen_point("A")])
 	_drag(board, board.plug_screen_point("A"), board.socket_screen_point("MAIN"))
 	_check(board.connected.get("MAIN", "") == "A", "head A dragged into MAIN (seen close up)")
 	await create_timer(PlugBoard.SLIDE_TIME + 0.2).timeout
@@ -438,11 +449,18 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 	_check((station.test_heads()["A"] as Node3D).global_position.distance_to(socket.global_position) < 0.001, "the head slid all the way into the socket")
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(_on_left_part(cam, board.plug_screen_point("B")) and _on_left_part(cam, board.socket_screen_point("REMOTE")), "REMOTE close up shows the socket and head B")
 	_drag(board, board.plug_screen_point("B"), board.socket_screen_point("REMOTE"))
 	_check(board.connected.get("REMOTE", "") == "B", "head B dragged into REMOTE")
 	await create_timer(PlugBoard.SLIDE_TIME + 0.3).timeout
 	_check(board.active, "plugging stays on screen for a moment after the last head")
 	await create_timer(PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME).timeout
+
+
+## True when `at` is on screen and left of the (open) step panel.
+func _on_left_part(cam: Camera3D, at: Vector2) -> bool:
+	var screen := cam.get_viewport().get_visible_rect().size
+	return Rect2(Vector2.ZERO, Vector2(screen.x - SidePanel.WIDTH - SidePanel.MARGIN, screen.y)).has_point(at)
 
 
 func _key(target: Node, keycode: Key) -> void:
@@ -486,6 +504,7 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
 	_check(board._bar_label.text.contains("Router"), "E: the Router close up: " + board._bar_label.text)
+	_check(_on_left_part(cam, board.plug_screen_point("head")) and _on_left_part(cam, cam.unproject_position(rack.port_position("router_wan"))) and _on_left_part(cam, cam.unproject_position(rack.port_position("router_lan4"))), "Router close up shows the head and WAN..LAN 4")
 	# A switch port is not on the list for this head: it goes back.
 	var home := panel._head.global_position
 	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_05")))
@@ -498,6 +517,7 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(panel.current_step() == "switch1" and board.active and board.view_index == 1, "next head: switch port 1, the view stays")
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(_on_left_part(cam, board.plug_screen_point("head")) and _on_left_part(cam, cam.unproject_position(rack.port_position("switch_01"))), "switch close up shows the head and port 1")
 	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_01")))
 	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
 	_check(rack.is_plugged("switch_01") and rack.is_link_on("switch_01") and rack.is_link_on("router_lan1"), "switch port 1 plugged, links up (good cable)")

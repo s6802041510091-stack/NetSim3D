@@ -41,7 +41,7 @@ var rack: WallRack9U
 ## Dragging the heads into the rack's ports.
 var board: PlugBoard
 ## Where the dragged heads move: this far in front of the rack's back (m).
-const DRAG_Z := 0.2
+const DRAG_Z := 0.18
 const CABLE_COLOR := Color(0.16, 0.42, 0.85)
 ## Seconds before cable 2 is run down to the PC after it is plugged.
 const ROUTE_DELAY := 0.6
@@ -50,6 +50,8 @@ var _temp: Node3D
 var _head: Node3D
 
 var _title: Label
+## The step panel on the right (foldable).
+var side_panel: SidePanel
 var _steps_box: VBoxContainer
 var _action_box: VBoxContainer
 
@@ -57,22 +59,13 @@ var _action_box: VBoxContainer
 func _ready() -> void:
 	layer = 22
 	visible = false
-	var panel := PanelContainer.new()
-	panel.name = "InstallPanel"
-	panel.anchor_left = 1.0
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left = -470
-	panel.offset_right = -14
-	panel.offset_top = 14
-	panel.offset_bottom = -14
-	panel.add_theme_stylebox_override("panel", GameUI.box(Color(1, 1, 1, 0.97), Color(0.8, 0.83, 0.88), 12, 20, 16))
-	add_child(panel)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
-	panel.add_child(col)
-	_title = GameUI.label("ติดตั้งสาย LAN ที่ Wall Rack", 21, GameUI.INK, true)
-	col.add_child(_title)
+	# Narrow and foldable, so it covers less of the view (SidePanel).
+	side_panel = SidePanel.new()
+	side_panel.name = "InstallPanel"
+	add_child(side_panel)
+	var col := side_panel.body
+	_title = side_panel.title
+	_title.text = "ติดตั้งสาย LAN ที่ Wall Rack"
 	col.add_child(HSeparator.new())
 	_steps_box = VBoxContainer.new()
 	_steps_box.add_theme_constant_override("separation", 2)
@@ -124,8 +117,8 @@ func rack_views() -> Array:
 		switches.append("switch_%02d" % (i + 1))
 	return [
 		{"name": "ภาพรวมตู้ Rack", "xform": rack.view_transform()},
-		{"name": "Router (WAN / LAN 1–4)", "xform": rack.close_view(routers, 0.27)},
-		{"name": "Switched Hub พอร์ต 1–12", "xform": rack.close_view(switches, 0.22)},
+		{"name": "Router (WAN / LAN 1–4)", "xform": rack.close_view(routers, 0.17)},
+		{"name": "Switched Hub พอร์ต 1–12", "xform": rack.close_view(switches, 0.15)},
 	]
 
 
@@ -143,15 +136,14 @@ func allowed_ports() -> PackedStringArray:
 
 ## The head of this step waiting in front of the rack (rack space).
 func _home() -> Vector3:
-	var mid_y := (WallRack9U.SWITCH_Y + WallRack9U.ROUTER_Y) * 0.5 + 0.012
 	match current_step():
 		"router":
 			# Beside the router on the left, level with its ports (below it the shelf hides it).
-			return Vector3(rack.port_local("router_wan").x - 0.06, WallRack9U.ROUTER_Y, DRAG_Z)
+			return Vector3(rack.port_local("router_wan").x - 0.03, WallRack9U.ROUTER_Y, DRAG_Z)
 		"switch1":
-			return Vector3(rack.port_local("switch_01").x - 0.03, mid_y, DRAG_Z)
+			return Vector3(rack.port_local("switch_01").x - 0.015, WallRack9U.SWITCH_Y - 0.038, DRAG_Z)
 		_:
-			return Vector3(rack.port_local("switch_02").x + 0.045, mid_y, DRAG_Z)
+			return Vector3(rack.port_local("switch_02").x + 0.025, WallRack9U.SWITCH_Y - 0.038, DRAG_Z)
 
 
 func _start_step(keep_view: bool) -> void:

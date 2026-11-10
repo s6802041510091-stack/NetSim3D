@@ -26,14 +26,9 @@ const HEAD_SIZE := Vector3(0.019, 0.013, 0.034)
 const CABLE_RADIUS := 0.0045
 ## The test cable keeps this far to the side of the tester (m).
 const SIDE_CLEAR := 0.11
-## Where the two heads lie on the mat before plugging (station space), both
-## pointing at the tester: A beside the MAIN end (left of it seen from the
-## MAIN side), B beside the REMOTE end (left of it seen from the REMOTE
-## side), so each socket close-up shows a head to drag.
-const HEAD_HOMES := [
-	Transform3D(Basis(Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)), Vector3(-0.05, Mission02DeskLayout.MAT_THICKNESS + 0.0065, -0.13)),
-	Transform3D(Basis.IDENTITY, Vector3(0.14, Mission02DeskLayout.MAT_THICKNESS + 0.0065, 0.13)),
-]
+## A head waits this far in front of its socket and to the left of it (m).
+const HEAD_FRONT := 0.05
+const HEAD_SIDE := 0.045
 
 
 func _ready() -> void:
@@ -144,10 +139,27 @@ func plug_test_cable(on: bool, plugged := true, color := Color(0.62, 0.72, 0.84)
 			var socket: Node3D = sockets.values()[i]
 			head.global_transform = Transform3D(socket.global_basis.orthonormalized(), socket.global_position)
 		else:
-			head.transform = HEAD_HOMES[i]
+			head.transform = head_home(i)
 		_heads[id] = head
 		i += 1
 	_rebuild_cable()
+
+
+## Where head `i` (0 = A by MAIN, 1 = B by REMOTE) lies before plugging, in
+## station space: on the mat just in front of its socket and a little to the
+## left as seen from that socket's close-up, pointing at the socket, so the
+## close-up shows both.
+func head_home(i: int) -> Transform3D:
+	var socket: Node3D = tester_sockets().values()[i]
+	var inv := global_transform.affine_inverse()
+	var p := inv * socket.global_position
+	var out := global_basis.inverse() * socket.global_basis.z
+	out.y = 0.0
+	out = out.normalized()
+	var right := (-out).cross(Vector3.UP).normalized()
+	var at := p + out * HEAD_FRONT - right * HEAD_SIDE
+	at.y = Mission02DeskLayout.MAT_THICKNESS + HEAD_SIZE.y * 0.5
+	return Transform3D(Basis.looking_at(-out, Vector3.UP), at)
 
 
 ## The heads by id ("A", "B") while the test cable is out.
@@ -165,14 +177,17 @@ func tester_sockets() -> Dictionary:
 ## Q / E views at the tester: the whole device, then each socket close up.
 func tester_views() -> Array:
 	var list := [{"name": "ภาพรวมเครื่อง", "xform": tester_view_transform()}]
+	var i := 0
 	for id: String in tester_sockets():
 		var socket: Node3D = tester_sockets()[id]
 		var out := socket.global_basis.z.normalized()
-		var p := socket.global_position
-		var eye := p + out * 0.13 + Vector3.UP * 0.075
+		# Aimed between the socket and the head waiting for it, so both show.
+		var p := socket.global_position.lerp(global_transform * head_home(i).origin, 0.35)
+		i += 1
+		var eye := p + out * 0.1 + Vector3.UP * 0.06
 		var basis := Basis.looking_at(p - eye, Vector3.UP)
 		# Shifted right so the socket sits left of centre, clear of the step panel.
-		eye += basis.x * 0.05
+		eye += basis.x * 0.015
 		list.append({"name": "ช่อง %s (%s)" % [id, "ตัวแม่" if id == "MAIN" else "ตัวลูก"], "xform": Transform3D(basis, eye)})
 	return list
 

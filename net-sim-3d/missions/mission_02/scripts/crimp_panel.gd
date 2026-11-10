@@ -63,6 +63,8 @@ var _mini_note: Label
 
 var _rng := RandomNumberGenerator.new()
 var _title: Label
+## The step panel on the right (foldable).
+var side_panel: SidePanel
 var _subtitle: Label
 var _progress: Label
 var _steps_box: VBoxContainer
@@ -85,22 +87,13 @@ func _ready() -> void:
 	layer = 22
 	visible = false
 	_rng.randomize()
-	var panel := PanelContainer.new()
-	panel.name = "CrimpPanel"
-	panel.anchor_left = 1.0
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left = -470
-	panel.offset_right = -14
-	panel.offset_top = 14
-	panel.offset_bottom = -14
-	panel.add_theme_stylebox_override("panel", GameUI.box(Color(1, 1, 1, 0.97), Color(0.8, 0.83, 0.88), 12, 20, 16))
-	add_child(panel)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
-	panel.add_child(col)
-	_title = GameUI.label("เข้าหัวสาย LAN", 21, GameUI.INK, true)
-	col.add_child(_title)
+	# Narrow and foldable, so it covers less of the view (SidePanel).
+	side_panel = SidePanel.new()
+	side_panel.name = "CrimpPanel"
+	add_child(side_panel)
+	var col := side_panel.body
+	_title = side_panel.title
+	_title.text = "เข้าหัวสาย LAN"
 	_subtitle = GameUI.label("", 15, GameUI.INK_SOFT)
 	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_subtitle)
@@ -510,7 +503,7 @@ func _build_arrange() -> void:
 	for pin in 8:
 		var slot := Button.new()
 		slot.name = "Pin%d" % (pin + 1)
-		slot.custom_minimum_size = Vector2(46, 78)
+		slot.custom_minimum_size = Vector2(38, 72)
 		slot.focus_mode = Control.FOCUS_NONE
 		slot.set_meta("sound", "")
 		slot.add_theme_stylebox_override("normal", GameUI.box(Color(0.96, 0.97, 0.99), Color(0.78, 0.81, 0.87), 6, 2, 2))
@@ -530,12 +523,12 @@ func _build_arrange() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	_action_box.add_child(row)
-	var clear := GameUI.button("ล้างทั้งหมด", false, 130)
+	var clear := GameUI.button("ล้างทั้งหมด", false, 120)
 	clear.name = "ClearButton"
 	clear.set_meta("sound", "back")
 	clear.pressed.connect(clear_arrangement)
 	row.add_child(clear)
-	_confirm_arrange = GameUI.button("ยืนยันการเรียงสี", true, 220)
+	_confirm_arrange = GameUI.button("ยืนยันการเรียงสี", true, 200)
 	_confirm_arrange.name = "ConfirmArrangeButton"
 	_confirm_arrange.set_meta("sound", "")
 	_confirm_arrange.disabled = "" in arrangement

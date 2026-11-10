@@ -603,7 +603,7 @@ func plug_pc(player: Node) -> void:
 ## the port (the cable drawn by the rack ends there).
 func pc_head_home() -> Vector3:
 	var p := pc_port.global_position
-	return Vector3(p.x + 0.05, PC_DESK_Y + 0.006, p.z + 0.09)
+	return Vector3(p.x + 0.04, PC_DESK_Y + 0.006, p.z + 0.065)
 
 
 ## Q / E views at the PC: the port and the head together, then the whole desk.
@@ -612,7 +612,7 @@ func pc_views() -> Array:
 	var out := pc_port.global_basis.z.normalized()
 	var side := pc_port.global_basis.x.normalized()
 	var target := p.lerp(pc_head_home(), 0.6) + side * 0.03
-	var eye := target + out * 0.42 + Vector3.UP * 0.12
+	var eye := target + out * 0.28 + Vector3.UP * 0.08
 	var wide_eye := p + out * 0.9 + Vector3.UP * 0.45
 	return [
 		{"name": "ช่อง LAN ด้านหลังคอมพิวเตอร์ครู", "xform": Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)},

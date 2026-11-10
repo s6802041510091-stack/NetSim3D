@@ -19,7 +19,7 @@ extends Node
 ## head back. Heads move on `drag_plane` (default: level, at the height the
 ## head lay at; a wall rack or the back of a PC uses an upright plane).
 ## Keys work only while `active`; a small bar at the bottom shows the view
-## name and the Q / E keys.
+## name and the Q / E keys (top left of the screen).
 
 signal plugged(plug_id: String, socket_id: String)
 signal all_plugged
@@ -70,11 +70,9 @@ func _ready() -> void:
 	add_child(_bar)
 	var panel := PanelContainer.new()
 	panel.name = "ViewBar"
-	panel.anchor_top = 1.0
-	panel.anchor_bottom = 1.0
+	# Top left: heads and cables usually lie low in the picture.
 	panel.offset_left = 20
-	panel.offset_top = -92
-	panel.offset_bottom = -20
+	panel.offset_top = 20
 	panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.06, 0.08, 0.12, 0.82), Color(0.4, 0.6, 0.95, 0.6), 8, 16, 8))
 	_bar.add_child(panel)
 	var col := VBoxContainer.new()

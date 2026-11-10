@@ -22,7 +22,7 @@ signal all_done
 
 const STEPS := ["plug", "power", "test", "verdict"]
 ## Width the step panel takes on the right (the dialogue box keeps clear of it).
-const PANEL_WIDTH := 470.0
+const PANEL_WIDTH := SidePanel.WIDTH + SidePanel.MARGIN
 const STEP_TITLES := {"plug": "เสียบสาย", "power": "เปิดเครื่อง", "test": "กดปุ่ม TEST", "verdict": "ตัดสินผล"}
 const STEP_HELP := {
 	"plug": "ลากหัว RJ45 ด้านหนึ่งไปเสียบช่องตัวแม่ (MAIN) และอีกด้านเสียบช่องตัวลูก (REMOTE)\nกด Q / E เพื่อเปลี่ยนมุมมองไปดูช่องใกล้ ๆ",
@@ -48,6 +48,8 @@ var verdict_box: DialogueBox
 var _ask_id := 0
 
 var _title: Label
+## The step panel on the right (foldable).
+var side_panel: SidePanel
 var _subtitle: Label
 var _steps_box: VBoxContainer
 var _action_box: VBoxContainer
@@ -57,22 +59,13 @@ var _leave: Button
 func _ready() -> void:
 	layer = 22
 	visible = false
-	var panel := PanelContainer.new()
-	panel.name = "TesterPanel"
-	panel.anchor_left = 1.0
-	panel.anchor_right = 1.0
-	panel.anchor_bottom = 1.0
-	panel.offset_left = -470
-	panel.offset_right = -14
-	panel.offset_top = 14
-	panel.offset_bottom = -14
-	panel.add_theme_stylebox_override("panel", GameUI.box(Color(1, 1, 1, 0.97), Color(0.8, 0.83, 0.88), 12, 20, 16))
-	add_child(panel)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
-	panel.add_child(col)
-	_title = GameUI.label("ตรวจสายด้วย LAN Cable Tester", 21, GameUI.INK, true)
-	col.add_child(_title)
+	# Narrow and foldable, so it covers less of the view (SidePanel).
+	side_panel = SidePanel.new()
+	side_panel.name = "TesterPanel"
+	add_child(side_panel)
+	var col := side_panel.body
+	_title = side_panel.title
+	_title.text = "ตรวจสายด้วย LAN Cable Tester"
 	_subtitle = GameUI.label("", 15, GameUI.INK_SOFT)
 	_subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(_subtitle)
@@ -159,7 +152,7 @@ func _ask_after_scan() -> void:
 
 ## The verdict question in the dialogue box, left of the step panel.
 func ask_verdict() -> void:
-	verdict_box.ask(VERDICT_QUESTION % cable, PackedStringArray(VERDICT_ANSWERS), PackedStringArray(["ok", "bad"]), PANEL_WIDTH)
+	verdict_box.ask(VERDICT_QUESTION % cable, PackedStringArray(VERDICT_ANSWERS), PackedStringArray(["ok", "bad"]), side_panel.covered_width())
 
 
 ## The one decision per cable.
