@@ -162,12 +162,38 @@ func _run() -> void:
 	player.camera.make_current()
 	var tester_panel := mission.tester_panel
 	await _shot("m2_tester_start")
-	tester_panel.do_step()
-	tester_panel.do_step()
+	# Plugging by hand: each view, a head being dragged, both heads in.
+	var board := mission.props.crimp_station.plug_board
+	for i in [1, 2]:
+		board.go_to_view(i)
+		await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+		await _shot("m2_plug_view_%d" % i)
+	board.go_to_view(1)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = board.plug_screen_point("A")
+	board._unhandled_input(press)
+	var move := InputEventMouseMotion.new()
+	move.position = board.socket_screen_point("MAIN") + Vector2(-20, 25)
+	board._unhandled_input(move)
+	await _shot("m2_plug_dragging")
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.position = move.position
+	board._unhandled_input(release)
+	await create_timer(PlugBoard.SLIDE_TIME + 0.2).timeout
+	await _shot("m2_plug_main_in")
+	board.plug_into("B", "REMOTE")
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME + 0.2).timeout
+	tester_panel.do_step() # power
 	await _shot("m2_tester_plugged_on")
 	tester_panel.do_step() # test cable 1
 	tester_panel.judge(true)
-	tester_panel.do_step() # cable 2: plug, power, test
+	board.plug_into("A", "MAIN") # cable 2
+	board.plug_into("B", "REMOTE")
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME + 0.2).timeout
 	tester_panel.do_step()
 	tester_panel.do_step()
 	# Main LED 3 lights with remote LED 6 on cable 2.

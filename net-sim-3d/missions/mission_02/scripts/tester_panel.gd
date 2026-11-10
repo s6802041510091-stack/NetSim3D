@@ -3,7 +3,9 @@ extends CanvasLayer
 
 ## Testing the two crimped cables with the LAN cable tester (right side of the
 ## screen, the tester in close-up on the left). For each cable: plug both
-## ends into the main and remote units -> power on -> TEST (the LEDs scan
+## ends into the main and remote units by hand (drag each RJ45 head into a
+## socket; Q / E switch between the whole tester and each socket close up;
+## PlugBoard) -> power on -> TEST (the LEDs scan
 ## pins 1-8 and G for as long as the player watches) -> decide once:
 ## "ผ่าน" (use it) or "ใช้ไม่ได้" (discard). The LEDs follow the real wire
 ## order of both ends (Mission02State.tester_mapping).
@@ -19,7 +21,7 @@ signal all_done
 const STEPS := ["plug", "power", "test", "verdict"]
 const STEP_TITLES := {"plug": "เสียบสาย", "power": "เปิดเครื่อง", "test": "กดปุ่ม TEST", "verdict": "ตัดสินผล"}
 const STEP_HELP := {
-	"plug": "เสียบหัวสายด้านหนึ่งเข้าตัวแม่ (MAIN) และอีกด้านเข้าตัวลูก (REMOTE)",
+	"plug": "ลากหัว RJ45 ด้านหนึ่งไปเสียบช่องตัวแม่ (MAIN) และอีกด้านเสียบช่องตัวลูก (REMOTE)\nกด Q / E เพื่อเปลี่ยนมุมมองไปดูช่องใกล้ ๆ",
 	"power": "กดปุ่ม POWER เพื่อเปิดเครื่องทดสอบ",
 	"test": "กดปุ่ม TEST แล้วสังเกตไฟของตัวแม่และตัวลูก",
 	"verdict": "ดูไฟของตัวแม่ (MAIN) เทียบกับตัวลูก (REMOTE) ให้ครบทุกดวง แล้วตัดสินว่าสายเส้นนี้ใช้งานได้หรือไม่ (ตัดสินได้ครั้งเดียว)",
@@ -79,6 +81,7 @@ func _ready() -> void:
 func setup(desk: CrimpStation, mission_state: Mission02State) -> void:
 	station = desk
 	state = mission_state
+	station.plug_board.all_plugged.connect(_on_all_plugged)
 
 
 func open() -> void:
@@ -91,6 +94,8 @@ func open() -> void:
 
 func close() -> void:
 	visible = false
+	if station:
+		station.plug_board.end()
 
 
 func is_done() -> bool:
@@ -101,14 +106,11 @@ func current_step() -> String:
 	return "" if is_done() else STEPS[step_index]
 
 
-## Plug / power / test (the one-button steps).
+## Power / test (plugging is done by hand, see _start_plugging).
 func do_step() -> void:
 	var step := current_step()
 	var tester := station.tester
 	match step:
-		"plug":
-			station.plug_test_cable(true)
-			Sound.play("select")
 		"power":
 			tester.set_power(true)
 			Sound.play("toggle_on")
@@ -142,12 +144,36 @@ func judge(passes: bool) -> void:
 	_refresh()
 	if is_done():
 		all_done.emit()
+	else:
+		_start_plugging()
+
+
+## The plug step: the heads lie on the mat, the player drags them in.
+func _start_plugging() -> void:
+	if current_step() != "plug" or not visible:
+		return
+	station.plug_test_cable(true, false)
+	var camera := get_viewport().get_camera_3d()
+	station.plug_board.begin(camera, station.tester_views(), station.test_heads(), station.tester_sockets())
+
+
+## Both heads in (and a second to look at them): back to the whole tester.
+func _on_all_plugged() -> void:
+	if current_step() != "plug":
+		return
+	station.plug_board.go_to_view(0)
+	station.plug_board.end(true)
+	message = ""
+	step_index += 1
+	_refresh()
 
 
 func _sync_desk() -> void:
 	# Coming back mid-way: show the cable / power as they were left.
 	var tester := station.tester
 	station.plug_test_cable(step_index >= 1 and not is_done())
+	if step_index == 0 and not is_done():
+		_start_plugging()
 	tester.set_power(step_index >= 2 and not is_done())
 	if step_index >= 3 and not is_done():
 		tester.press_test(state.tester_mapping(cable))
@@ -184,7 +210,7 @@ func _refresh() -> void:
 		fail_button.set_meta("sound", "")
 		fail_button.pressed.connect(judge.bind(false))
 		_action_box.add_child(fail_button)
-	else:
+	elif step != "plug":
 		var go := GameUI.button(STEP_TITLES[step], true, 240)
 		go.name = "StepButton"
 		go.set_meta("sound", "")

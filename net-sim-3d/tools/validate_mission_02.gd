@@ -345,14 +345,20 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(panel.current_step() == "plug", "testing starts by plugging the cable in")
 	panel.judge(true)
 	_check(not mission.state.tester_verdicts.has(1), "no verdict before testing")
-	panel.do_step()
+	await _test_plugging(station, player)
+	_check(panel.current_step() == "power" and not station.plug_board.active, "both heads in: on to the power step")
+	_check(player.camera.global_transform.origin.distance_to(station.tester_views()[0]["xform"].origin) < 0.01, "the camera is back on the whole tester")
 	panel.do_step()
 	panel.do_step()
 	_check(tester.is_on and tester.is_testing and panel.current_step() == "verdict", "plugged, powered, testing")
 	panel.judge(false)
 	_check(mission.state.tester_verdicts.get(1) == false and mission.state.spare_cables.is_empty() and panel.message.contains("ใช้งานได้"), "good cable discarded: told it works, kept: " + panel.message)
 	_check(panel.cable == 2 and not tester.is_on, "next cable, tester off")
-	panel.do_step()
+	_check(station.plug_board.active and station.test_heads().size() == 2 and not station.plug_board.is_plugged("A"), "cable 2: its heads lie on the mat, plugging again")
+	station.plug_board.plug_into("A", "REMOTE")
+	station.plug_board.plug_into("B", "MAIN")
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.4).timeout
+	_check(panel.current_step() == "power", "either head fits either socket")
 	panel.do_step()
 	await mission.leave_desk()
 	_check(not tester.is_on and not mission.at_desk, "standing up stops the tester")
@@ -369,6 +375,70 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(not props.crimp_station.layout.cables_shown(), "the cables leave the desk for the install")
 	_check(station.get_prompt_text() == "" and not tester.visible, "desk cleared after testing")
 	await _test_install(mission, player)
+
+
+## Plugging cable 1 by hand: Q / E views, a drop on the bare mat (the head
+## goes back), then each head dragged into its socket from that socket's
+## close-up view.
+func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
+	var board := station.plug_board
+	var cam: Camera3D = player.camera
+	_check(board.active and board.views.size() == 3 and board._bar.visible and station.test_heads().size() == 2, "plug view: 3 views, the view bar, 2 heads on the mat")
+	_check(board._bar_label.text.contains("Q") and board._bar_label.text.contains("ภาพรวม"), "view bar: " + board._bar_label.text)
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(board.view_index == 1 and cam.global_position.distance_to(board.views[1]["xform"].origin) < 0.01 and board._bar_label.text.contains("MAIN"), "E: the MAIN socket close up")
+	_key(board, KEY_Q)
+	_key(board, KEY_Q)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(board.view_index == 2 and board._bar_label.text.contains("REMOTE"), "Q twice: round to the REMOTE socket")
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	# A head dropped on the bare mat goes back where it lay.
+	var home := (station.test_heads()["A"] as Node3D).global_position
+	var from := board.plug_screen_point("A")
+	_drag(board, from, from + Vector2(-150, 60))
+	await create_timer(0.35).timeout
+	_check(not board.is_plugged("A") and (station.test_heads()["A"] as Node3D).global_position.distance_to(home) < 0.002, "dropped off a socket: the head goes back")
+	# MAIN close up: drag head A in.
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_drag(board, board.plug_screen_point("A"), board.socket_screen_point("MAIN"))
+	_check(board.connected.get("MAIN", "") == "A", "head A dragged into MAIN (seen close up)")
+	await create_timer(PlugBoard.SLIDE_TIME + 0.2).timeout
+	var socket: Node3D = station.tester_sockets()["MAIN"]
+	_check((station.test_heads()["A"] as Node3D).global_position.distance_to(socket.global_position) < 0.001, "the head slid all the way into the socket")
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_drag(board, board.plug_screen_point("B"), board.socket_screen_point("REMOTE"))
+	_check(board.connected.get("REMOTE", "") == "B", "head B dragged into REMOTE")
+	await create_timer(PlugBoard.SLIDE_TIME + 0.3).timeout
+	_check(board.active, "plugging stays on screen for a moment after the last head")
+	await create_timer(PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME).timeout
+
+
+func _key(target: Node, keycode: Key) -> void:
+	var key := InputEventKey.new()
+	key.keycode = keycode
+	key.pressed = true
+	target._unhandled_input(key)
+
+
+func _drag(target: Node, from: Vector2, to: Vector2) -> void:
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.position = from
+	target._unhandled_input(press)
+	for t in [0.25, 0.5, 0.75, 1.0]:
+		var move := InputEventMouseMotion.new()
+		move.position = from.lerp(to, t)
+		target._unhandled_input(move)
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = to
+	target._unhandled_input(release)
 
 
 ## Installing: LAN 1, both switch ports, the teacher PC, then the LEDs.

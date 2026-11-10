@@ -16,6 +16,24 @@ var bench: CrimpBench
 var tester: CableTester
 var layout: Mission02DeskLayout
 var _test_cable: Node3D
+## Plugging the test cable by hand (drag, Q / E views).
+var plug_board: PlugBoard
+var _heads := {}
+var _cable_color := Color(0.62, 0.72, 0.84)
+
+## RJ45 plug drawn at the tester's 1.6x scale; the cable under test.
+const HEAD_SIZE := Vector3(0.019, 0.013, 0.034)
+const CABLE_RADIUS := 0.0045
+## The test cable keeps this far to the side of the tester (m).
+const SIDE_CLEAR := 0.11
+## Where the two heads lie on the mat before plugging (station space), both
+## pointing at the tester: A beside the MAIN end (left of it seen from the
+## MAIN side), B beside the REMOTE end (left of it seen from the REMOTE
+## side), so each socket close-up shows a head to drag.
+const HEAD_HOMES := [
+	Transform3D(Basis(Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)), Vector3(-0.05, Mission02DeskLayout.MAT_THICKNESS + 0.0065, -0.13)),
+	Transform3D(Basis.IDENTITY, Vector3(0.14, Mission02DeskLayout.MAT_THICKNESS + 0.0065, 0.13)),
+]
 
 
 func _ready() -> void:
@@ -36,6 +54,10 @@ func _ready() -> void:
 	bench.position = Vector3(0, CrimpBench.JACKET_RADIUS + Mission02DeskLayout.MAT_THICKNESS + 0.002, 0)
 	bench.visible = false
 	add_child(bench)
+	plug_board = PlugBoard.new()
+	plug_board.name = "PlugBoard"
+	add_child(plug_board)
+	plug_board.plug_moved.connect(func(_id: String): _rebuild_cable())
 
 
 ## Shows the prompt and makes the desk spot hit by the interact ray.
@@ -76,43 +98,118 @@ func hide_tester() -> void:
 	layout.set_side_tester_visible(true)
 
 
-## A short cable between the main and remote sockets while testing.
-func plug_test_cable(on: bool, color := Color(0.62, 0.72, 0.84)) -> void:
+## The cable under test: two RJ45 heads joined by the cable. Laid on the mat
+## beside the tester (`plugged` false) or already in the sockets (true, when
+## the player comes back to a cable that was plugged before). `on` false
+## takes it away.
+func plug_test_cable(on: bool, plugged := true, color := Color(0.62, 0.72, 0.84)) -> void:
 	if _test_cable:
 		_test_cable.queue_free()
 		_test_cable = null
+		_heads.clear()
 	if not on or tester == null:
 		return
-	var main := tester.get_plug_point("Main")
-	var remote := tester.get_plug_point("Remote")
-	if main == null or remote == null:
-		return
-	var a := to_local(main.global_position)
-	var b := to_local(remote.global_position)
-	var out_a := (global_basis.inverse() * main.global_basis.z).normalized()
-	var out_b := (global_basis.inverse() * remote.global_basis.z).normalized()
 	_test_cable = Node3D.new()
 	_test_cable.name = "TestCable"
 	add_child(_test_cable)
-	for end in [[a, out_a], [b, out_b]]:
-		var head := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = Vector3(0.019, 0.013, 0.034)
-		head.mesh = box
-		var clear := StandardMaterial3D.new()
-		clear.albedo_color = Color(0.88, 0.93, 0.98, 0.5)
-		clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		head.material_override = clear
-		var at: Vector3 = end[0] + end[1] * 0.01
-		head.transform = Transform3D(Basis.looking_at(-end[1], Vector3.UP), at)
+	_cable_color = color
+	var sockets := tester_sockets()
+	var clear := StandardMaterial3D.new()
+	clear.albedo_color = Color(0.88, 0.93, 0.98, 0.55)
+	clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	clear.roughness = 0.15
+	var gold := StandardMaterial3D.new()
+	gold.albedo_color = Color(0.9, 0.75, 0.3)
+	var i := 0
+	for id in ["A", "B"]:
+		var head := Node3D.new()
+		head.name = "Head" + id
 		_test_cable.add_child(head)
-	# The cable runs out of the main socket, round the right side of the
-	# tester and into the remote socket, flat on the desk.
-	var right := Vector3(0, 0, 0.1)
-	var a_out := a + out_a * 0.06
-	var b_out := b + out_b * 0.06
-	_test_cable.add_child(CableBuilder.build([a + out_a * 0.026, a_out, a_out + right,
-		b_out + right, b_out, b + out_b * 0.026], color, "Loop", 0.0045))
+		# The plug body sticks out of the socket along +Z (the node is the tip).
+		var body := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = HEAD_SIZE
+		body.mesh = box
+		body.material_override = clear
+		body.position = Vector3(0, 0, HEAD_SIZE.z * 0.5)
+		head.add_child(body)
+		var contacts := MeshInstance3D.new()
+		var strip := BoxMesh.new()
+		strip.size = Vector3(HEAD_SIZE.x * 0.8, 0.0015, 0.006)
+		contacts.mesh = strip
+		contacts.material_override = gold
+		contacts.position = Vector3(0, HEAD_SIZE.y * 0.5 - 0.001, 0.004)
+		head.add_child(contacts)
+		if plugged:
+			var socket: Node3D = sockets.values()[i]
+			head.global_transform = Transform3D(socket.global_basis.orthonormalized(), socket.global_position)
+		else:
+			head.transform = HEAD_HOMES[i]
+		_heads[id] = head
+		i += 1
+	_rebuild_cable()
+
+
+## The heads by id ("A", "B") while the test cable is out.
+func test_heads() -> Dictionary:
+	return _heads
+
+
+## The tester's sockets, for PlugBoard: id -> plug point (-Z goes in).
+func tester_sockets() -> Dictionary:
+	if tester == null:
+		return {}
+	return {"MAIN": tester.get_plug_point("Main"), "REMOTE": tester.get_plug_point("Remote")}
+
+
+## Q / E views at the tester: the whole device, then each socket close up.
+func tester_views() -> Array:
+	var list := [{"name": "ภาพรวมเครื่อง", "xform": tester_view_transform()}]
+	for id: String in tester_sockets():
+		var socket: Node3D = tester_sockets()[id]
+		var out := socket.global_basis.z.normalized()
+		var p := socket.global_position
+		var eye := p + out * 0.13 + Vector3.UP * 0.075
+		var basis := Basis.looking_at(p - eye, Vector3.UP)
+		# Shifted right so the socket sits left of centre, clear of the step panel.
+		eye += basis.x * 0.05
+		list.append({"name": "ช่อง %s (%s)" % [id, "ตัวแม่" if id == "MAIN" else "ตัวลูก"], "xform": Transform3D(basis, eye)})
+	return list
+
+
+## The cable from head A's tail, along the mat in front of the tester, to
+## head B's tail. Rebuilt whenever a head moves.
+func _rebuild_cable() -> void:
+	if _test_cable == null:
+		return
+	var old := _test_cable.get_node_or_null("Loop")
+	if old:
+		old.free()
+	if _heads.size() < 2:
+		return
+	var a: Node3D = _heads["A"]
+	var b: Node3D = _heads["B"]
+	var inv := global_transform.affine_inverse()
+	var pa := inv * a.global_position
+	var pb := inv * b.global_position
+	var za := (global_basis.inverse() * a.global_basis.z).normalized()
+	var zb := (global_basis.inverse() * b.global_basis.z).normalized()
+	var mat_y := Mission02DeskLayout.MAT_THICKNESS + CABLE_RADIUS
+	var a1 := pa + za * HEAD_SIZE.z
+	var b1 := pb + zb * HEAD_SIZE.z
+	var a2 := a1 + za * 0.05
+	var b2 := b1 + zb * 0.05
+	a2.y = maxf(mat_y, a2.y - 0.01)
+	b2.y = maxf(mat_y, b2.y - 0.01)
+	# Round the front of the tester (in front of the MAIN socket), never under it.
+	var main_socket: Node3D = tester_sockets().get("MAIN")
+	var front_x := (inv * main_socket.global_position).x - 0.07 if main_socket else -0.15
+	# Each end keeps to its own side of the tester (A left, B right).
+	var side_a := minf(a2.z, -SIDE_CLEAR)
+	var side_b := maxf(b2.z, SIDE_CLEAR)
+	var loop := CableBuilder.build([a1, a2, Vector3(a2.x, mat_y, side_a), Vector3(front_x, mat_y, side_a),
+		Vector3(front_x, mat_y, side_b), Vector3(b2.x, mat_y, side_b), b2, b1], _cable_color, "Loop", CABLE_RADIUS)
+	_test_cable.add_child(loop)
 
 
 ## Camera pose looking down at the tester's LEDs from the player's side.
