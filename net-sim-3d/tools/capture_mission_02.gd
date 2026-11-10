@@ -54,15 +54,17 @@ func _run() -> void:
 	camera.global_position = Vector3(5.2, 1.7, -6.2)
 	camera.look_at(Vector3(7.4, 0.6, -9.2))
 	await _shot("m2_cable_route")
-	# Tools on the spare desk in the IT Support room.
-	var props: Mission02Props = map.get_node("Mission02Props")
-	for id: String in props.items:
-		var item: PickupItem = props.items[id]
-		var shape := item.get_child(item.get_child_count() - 1) as CollisionShape3D
-		print("ITEM ", id, " box=", (shape.shape as BoxShape3D).size if shape else Vector3.ZERO)
-	camera.global_position = Vector3(-14.55, 1.45, -38.43)
-	camera.look_at(Vector3(-13.6, 0.76, -38.43))
-	await _shot("m2_desk_tools")
+	# The storage room: cable boxes on the drawer island, the crimping-kit drawer.
+	camera.fov = 70.0
+	camera.global_position = Vector3(-12.9, 1.6, -35.4)
+	camera.look_at(Vector3(-16.4, 0.9, -33.4))
+	await _shot("m2_storage_from_door")
+	camera.global_position = Vector3(-15.45, 1.45, -33.75)
+	camera.look_at(Vector3(-16.32, 1.02, -33.75))
+	await _shot("m2_storage_cable_boxes")
+	camera.global_position = Vector3(-14.4, 1.6, -32.5)
+	camera.look_at(Vector3(-14.6, 1.0, -31.1))
+	await _shot("m2_storage_drawer")
 	camera.global_position = Vector3(-15.8, 1.6, -36.6)
 	camera.look_at(Vector3(-13.6, 0.8, -38.43))
 	await _shot("m2_desk_room_view")
@@ -78,12 +80,14 @@ func _run() -> void:
 	camera.global_position = rack.global_position + Vector3(-1.2, -0.1, 2.2)
 	camera.look_at(rack.global_position)
 	await _shot("m2_rack_player_view")
-	# The work order (cable type for the two points), one option picked.
+	# The cable box window and the drawer window.
 	var mission: Mission02Controller = map.get_node("Mission02")
-	mission.work_order.open()
-	mission.work_order.choose(1, Mission02State.STRAIGHT)
-	await _shot("m2_work_order")
-	mission.work_order.visible = false
+	mission.box_panel.open(Mission02State.STRAIGHT, {1: Mission02State.STRAIGHT})
+	await _shot("m2_cable_box_window")
+	mission.box_panel.visible = false
+	mission.drawer.open({"cable_stripper": true})
+	await _shot("m2_drawer_window")
+	mission.drawer.visible = false
 	# The crimping desk: sit, then the cable end through the steps.
 	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
 	player.global_position = Vector3(-14.6, 0.05, -38.43)

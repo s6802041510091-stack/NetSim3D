@@ -3,8 +3,9 @@ extends Node
 
 ## Runs Level 2 in the school map (added by GameFlow.configure_level):
 ##   1. talk to the Data Center supervisor -> "ได้รับภารกิจ", the timer starts
-##   2. the work order: cable type for the 2 connection points (once)
-##   3. pick up the 5 items on the spare desk in the IT Support room
+##   2. storage room: a cable for each connection point from the labelled
+##      boxes (the cable-type decision, once) and the crimping kit from the
+##      drawer; the spare desk checks the tool case before the player sits
 ##   4. crimp 4 ends at the desk (CrimpPanel), test both cables (TesterPanel)
 ##   5. install at the wall rack and the teacher PC, check the port LEDs
 ##   6. report to the supervisor -> score (Mission02State) -> summary
@@ -25,13 +26,13 @@ const SUPERVISOR := "หัวหน้างาน Data Center"
 ## "**...**" marks the important words, shown in gold by DialogueBox.
 const BRIEFING := [
 	"หัวหน้างาน Data Center|แบบอุปกรณ์ของห้องคอมใหม่ผ่านแล้ว ทีมติดตั้ง**Router** กับ **Switched Hub 24 Port** ไว้ใน Wall Rack ให้แล้ว ขั้นต่อไปเราต้อง**เตรียมสาย LAN**สำหรับติดตั้ง",
-	"หัวหน้างาน Data Center|ใบงานนี้มีจุดเชื่อมต่อ **2 จุด** คือ **Router กับ Switched Hub** และ **Switched Hub กับคอมพิวเตอร์ครู** เลือกชนิดสายให้เหมาะกับแต่ละจุด แล้วเข้าหัวสายตามมาตรฐาน **T568B**",
-	"หัวหน้างาน Data Center|อุปกรณ์อยู่บน**โต๊ะว่างในห้องนี้** หยิบให้ครบ แล้วตรวจสายด้วย **LAN Cable Tester** ให้เรียบร้อยก่อนนำไปติดตั้งที่ห้องคอม",
+	"หัวหน้างาน Data Center|งานนี้มีจุดเชื่อมต่อ **2 จุด** คือ **Router กับ Switched Hub** และ **Switched Hub กับคอมพิวเตอร์ครู** ไปหยิบสายจาก**กล่องสายในห้องเก็บอุปกรณ์**ให้เหมาะกับแต่ละจุด แล้วเข้าหัวสายตามมาตรฐาน **T568B**",
+	"หัวหน้างาน Data Center|เครื่องมืออยู่ใน**ลิ้นชักชุดเข้าหัวสาย**ในห้องเก็บอุปกรณ์ หยิบให้ครบ แล้วมาเข้าหัวที่**โต๊ะว่างในห้องนี้** ตรวจสายด้วย **LAN Cable Tester** ก่อนนำไปติดตั้งที่ห้องคอม",
 	"หัวหน้างาน Data Center|สายกับหัว RJ45 มีจำกัด งานนี้**ทำได้ครั้งเดียว** ค่อย ๆ ทำให้ถูกตั้งแต่แรกนะ",
 	"คุณ|รับทราบครับ ผมจะเลือกสาย เข้าหัว ตรวจสอบ และนำสายไปเชื่อมต่อให้ถูกต้อง",
 ]
 const GATHER_REMINDER := [
-	"หัวหน้างาน Data Center|อุปกรณ์อยู่บน**โต๊ะว่างในห้องนี้** หยิบให้ครบ **5 อย่าง**ก่อนนะ",
+	"หัวหน้างาน Data Center|สายอยู่ใน**กล่องสายบนโต๊ะกลางห้องเก็บอุปกรณ์** เครื่องมืออยู่ใน**ลิ้นชักชุดเข้าหัวสาย** ได้ครบแล้วมาเข้าหัวที่**โต๊ะว่าง**นะ",
 ]
 const NEXT_REMINDER := [
 	"หัวหน้างาน Data Center|อุปกรณ์ครบแล้ว ทำงานตามใบงานต่อได้เลย",
@@ -42,7 +43,7 @@ const SUMMARY_TITLE := "ด่านที่ 2  ·  ประกอบและ
 const TIME_FULL_SEC := 720.0
 const TIME_ZERO_SEC := 1800.0
 
-enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, INSTALL, REPORT, DONE }
+enum Stage { BRIEFING, GATHER, CRIMP, TEST, INSTALL, REPORT, DONE }
 
 ## Seconds for the camera to move to / from the crimping desk.
 const DESK_ZOOM_TIME := 0.6
@@ -55,7 +56,12 @@ var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
 var state := Mission02State.new()
 var score: MissionScore
-var work_order: Mission02WorkOrder
+var box_panel: Mission02CableBoxPanel
+var drawer: Mission02ToolDrawer
+## Items taken from the drawer: id -> true (the other items included).
+var drawer_taken := {}
+## True once the player has opened the drawer (the arrow then moves on).
+var drawer_seen := false
 var hud: ObjectiveHUD
 var dialogue: DialogueBox
 var summary: MissionSummary
@@ -97,10 +103,16 @@ func _ready() -> void:
 	marker = ObjectiveMarker.new()
 	marker.name = "ObjectiveMarker"
 	add_child(marker)
-	work_order = Mission02WorkOrder.new()
-	work_order.name = "WorkOrder"
-	add_child(work_order)
-	work_order.confirmed.connect(_on_work_order_confirmed)
+	box_panel = Mission02CableBoxPanel.new()
+	box_panel.name = "CableBoxPanel"
+	add_child(box_panel)
+	box_panel.cable_taken.connect(_on_cable_taken)
+	box_panel.closed.connect(_release_player)
+	drawer = Mission02ToolDrawer.new()
+	drawer.name = "ToolDrawer"
+	add_child(drawer)
+	drawer.item_taken.connect(_on_drawer_item_taken)
+	drawer.closed.connect(_release_player)
 	crimp_panel = CrimpPanel.new()
 	crimp_panel.name = "CrimpPanel"
 	add_child(crimp_panel)
@@ -138,9 +150,9 @@ func _ready() -> void:
 	pc_spot.used.connect(plug_pc)
 	props = world.get_node_or_null("Mission02Props") as Mission02Props
 	if props:
-		props.set_items_available(false)
-		for item: PickupItem in props.items.values():
-			item.picked_up.connect(_on_item_picked)
+		for box: Mission02CableBox in props.cable_boxes.values():
+			box.used.connect(open_cable_box)
+		props.drawer_spot.used.connect(open_drawer)
 		crimp_panel.setup(props.crimp_station.bench, state)
 		tester_panel.setup(props.crimp_station, state)
 		props.crimp_station.used.connect(sit_at_desk)
@@ -170,17 +182,20 @@ func _enter(next: Stage) -> void:
 			hud.set_objective("คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
-		Stage.CABLE_TYPE:
-			hud.set_objective("อ่านใบงาน แล้วเลือกชนิดสายให้ครบทั้ง 2 จุดเชื่อมต่อ")
-			_set_prompt("")
-			marker.clear()
-			work_order.open()
 		Stage.GATHER:
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			if props:
+				for box: Mission02CableBox in props.cable_boxes.values():
+					box.set_prompt("กด F เพื่อดูกล่องสาย " + box.title())
+				props.drawer_spot.set_prompt("กด F เพื่อเปิดลิ้นชักชุดเข้าหัวสาย")
+				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
 			_refresh_gather()
 		Stage.CRIMP:
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			if props:
+				for box: Mission02CableBox in props.cable_boxes.values():
+					box.set_prompt("")
+				props.drawer_spot.set_prompt("")
 				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_crimp_objective()
@@ -207,19 +222,85 @@ func _enter(next: Stage) -> void:
 			marker.clear()
 
 
-## Objective "หยิบอุปกรณ์ (n/5)" with what is still on the desk, the arrow on the next item.
+## Objective for the storage room. It never lists the tools (choosing them is
+## part of the job); the arrow goes boxes -> drawer -> desk.
 func _refresh_gather() -> void:
-	if props == null:
+	if props == null or stage != Stage.GATHER:
 		return
-	var missing := props.missing_items()
-	var total := props.items.size()
-	hud.set_objective("หยิบอุปกรณ์บนโต๊ะว่างในห้อง IT Support (%d/%d)\nยังขาด: %s" % [total - missing.size(), total, ", ".join(missing)])
-	for id: String in Mission02Props.ITEMS:
-		var item: PickupItem = props.items[id]
-		if not item.taken:
-			marker.point_at_position(item.global_position, 0.3)
-			return
+	var cables := state.cable_types.size()
+	hud.set_objective("ไปที่ห้องเก็บอุปกรณ์ (มุมห้อง IT Support)\n%s หยิบสาย LAN จากกล่องสายให้ครบ 2 จุดเชื่อมต่อ (%d/2)\n%s หยิบเครื่องมือเข้าหัวสายจากลิ้นชัก \"ชุดเข้าหัวสาย\"\nแล้วนำไปเข้าหัวสายที่โต๊ะว่างในห้อง IT Support" % [
+		"✓" if cables == 2 else "•", cables, "✓" if drawer_seen else "•"])
+	if cables < 2:
+		var a: Vector3 = props.cable_boxes[Mission02State.STRAIGHT].global_position
+		var b: Vector3 = props.cable_boxes[Mission02State.CROSSOVER].global_position
+		marker.point_at_position((a + b) * 0.5, 0.55)
+	elif not drawer_seen:
+		marker.point_at_position(props.drawer_spot.global_position, 0.6)
+	else:
+		marker.point_at_position(props.crimp_station.global_position, 0.45)
+
+
+## Names of what the desk still needs: the two cables and the crimping kit.
+func missing_for_desk() -> PackedStringArray:
+	var out := PackedStringArray()
+	for point in Mission02State.POINTS:
+		if not state.cable_types.has(point):
+			out.append("สาย LAN จุดเชื่อมต่อที่ %d" % point)
+	for id: String in Mission02ToolDrawer.REQUIRED:
+		if not drawer_taken.has(id):
+			out.append(Mission02ToolDrawer.title_of(id))
+	return out
+
+
+## A cable box in the storage room: choose which point its cable is for.
+func open_cable_box(player: Node, type: String) -> void:
+	if stage != Stage.GATHER or at_desk or box_panel.is_open() or drawer.is_open():
+		return
+	_hold_player(player)
+	box_panel.open(type, state.cable_types)
+
+
+## The "ชุดเข้าหัวสาย" drawer: a window of what is inside.
+func open_drawer(player: Node) -> void:
+	if stage != Stage.GATHER or at_desk or box_panel.is_open() or drawer.is_open():
+		return
+	_hold_player(player)
+	drawer.open(drawer_taken)
+
+
+func _hold_player(player: Node) -> void:
+	_player = player
+	if player and player.has_method("set_controls_locked"):
+		player.set_controls_locked(true)
 	marker.clear()
+
+
+func _release_player() -> void:
+	if _player and _player.has_method("set_controls_locked"):
+		_player.set_controls_locked(false)
+	_refresh_gather()
+
+
+func _on_cable_taken(point: int, type: String) -> void:
+	if not state.set_cable_type(point, type):
+		return
+	_give(_player, "lan_cable_%d" % point, "สาย LAN จุดที่ %d (%s)" % [point, Mission02CableBox.TYPES[type][0]])
+	hud.show_toast("หยิบสาย %s สำหรับจุดเชื่อมต่อที่ %d แล้ว" % [Mission02CableBox.TYPES[type][0], point], 3.0)
+	if state.cable_types_done():
+		cable_types_chosen.emit()
+
+
+func _on_drawer_item_taken(id: String, title: String) -> void:
+	drawer_seen = true
+	drawer_taken[id] = true
+	_give(_player, id, title)
+
+
+## Puts an item in the player's tool case (PlayerPresentation), if there is one.
+func _give(player: Node, id: String, title: String) -> void:
+	var presentation: Node = player.get_node_or_null("Presentation") if player else null
+	if presentation and presentation.has_method("add_item"):
+		presentation.call("add_item", id, title)
 
 
 func _point_at_supervisor() -> void:
@@ -239,12 +320,11 @@ func _on_talked(player: Node) -> void:
 	match stage:
 		Stage.BRIEFING:
 			_player = player
-			# Stay seated in the conversation: the work order comes next.
-			await _say(player, PackedStringArray(BRIEFING), false)
+			await _say(player, PackedStringArray(BRIEFING))
 			_timing = true
 			hud.show_toast(RECEIVED)
 			briefed.emit()
-			_enter(Stage.CABLE_TYPE)
+			_enter(Stage.GATHER)
 		Stage.GATHER:
 			await _say(player, PackedStringArray(GATHER_REMINDER))
 		Stage.REPORT:
@@ -282,7 +362,8 @@ func finish(player: Node = null) -> MissionScore:
 	var record := GameProgress.record_attempt(LEVEL, score, {
 		"cable_types": state.cable_types.duplicate(), "ends": state.ends.duplicate(true),
 		"tester_verdicts": state.tester_verdicts.duplicate(), "router_port": state.router_port,
-		"spare_cables": Array(state.spare_cables), "job_works": state.job_works()})
+		"spare_cables": Array(state.spare_cables), "job_works": state.job_works(),
+		"drawer_items": drawer_taken.keys()})
 	_enter(Stage.DONE)
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)
@@ -326,7 +407,16 @@ func _refresh_test_objective() -> void:
 
 ## Sits at the desk: crimping (the cable end) or testing (the tester),
 ## depending on the stage. The camera moves there and the step panel opens.
+## Before the first crimp the desk checks what the player brought.
 func sit_at_desk(player: Node) -> void:
+	if stage == Stage.GATHER and not at_desk and not _desk_busy and props != null:
+		var missing := missing_for_desk()
+		if not missing.is_empty():
+			Sound.play("wrong")
+			hud.show_toast("ยังเข้าหัวสายไม่ได้ ยังขาด: " + ", ".join(missing), 5.0)
+			return
+		tools_gathered.emit()
+		_enter(Stage.CRIMP)
 	if not stage in [Stage.CRIMP, Stage.TEST] or at_desk or _desk_busy or props == null:
 		return
 	_desk_busy = true
@@ -500,31 +590,6 @@ func _on_testing_done() -> void:
 	if props:
 		props.crimp_station.hide_tester()
 	_enter(Stage.INSTALL)
-
-
-func _on_work_order_confirmed(answers: Dictionary) -> void:
-	if stage != Stage.CABLE_TYPE:
-		return
-	for point: int in answers:
-		state.set_cable_type(point, answers[point])
-	if _player and _player.has_method("set_controls_locked"):
-		_player.set_controls_locked(false)
-	hud.show_toast("บันทึกใบงานแล้ว — ไปหยิบอุปกรณ์บนโต๊ะว่าง")
-	if props:
-		props.set_items_available(true)
-	cable_types_chosen.emit()
-	_enter(Stage.GATHER)
-
-
-func _on_item_picked(_item_id: String) -> void:
-	if stage != Stage.GATHER:
-		return
-	if props.missing_items().is_empty():
-		hud.show_toast("หยิบอุปกรณ์ครบแล้ว")
-		_enter(Stage.CRIMP)
-		tools_gathered.emit()
-	else:
-		_refresh_gather()
 
 
 func _say(player: Node, lines: PackedStringArray, unlock_after: bool = true) -> void:

@@ -109,14 +109,17 @@ func _run() -> void:
 
 	var mission: Mission02Controller = map.get_node_or_null("Mission02")
 	var props: Mission02Props = map.get_node_or_null("Mission02Props")
-	_check(mission != null and props != null and props.items.size() == 5, "Level 2: controller and 5 items")
+	_check(mission != null and props != null and props.cable_boxes.size() == 2 and props.drawer_spot != null, "Level 2: controller, 2 cable boxes and the drawer")
 	if mission == null or props == null:
 		_finish()
 		return
 	_check(mission.stage == Mission02Controller.Stage.BRIEFING and mission.marker.target == mission.supervisor, "starts at the briefing, arrow on the supervisor")
 	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
-	var first: PickupItem = props.items["utp_cat6"]
-	_check(first.get_prompt_text() == "", "items cannot be picked before the briefing")
+	var straight_box: Mission02CableBox = props.cable_boxes[Mission02State.STRAIGHT]
+	var crossover_box: Mission02CableBox = props.cable_boxes[Mission02State.CROSSOVER]
+	_check(straight_box.get_prompt_text() == "" and props.drawer_spot.get_prompt_text() == "", "boxes and drawer wait for the briefing")
+	var decor := map.get_node("MapVisual").find_child(Mission02Props.ISLAND_DECOR, true, false) as Node3D
+	_check(decor != null and not decor.visible, "decorative tools on the storage island hidden in Level 2")
 
 	mission._on_talked(player)
 	await create_timer(mission.supervisor.turn_time + 0.5).timeout
@@ -124,40 +127,58 @@ func _run() -> void:
 	_check(mission.dialogue.lines.size() == mission.BRIEFING.size(), "briefing lines")
 	await _finish_dialogue(mission.dialogue)
 	await create_timer(0.3).timeout
-	# The work order: cable type for both points, once.
-	var order := mission.work_order
-	_check(mission.stage == Mission02Controller.Stage.CABLE_TYPE and order.is_open() and mission._timing, "after the briefing: work order open, timer running")
-	_check(player.controls_locked and first.get_prompt_text() == "", "player stays put and items wait while the work order is open")
-	var confirm: Button = order.find_child("ConfirmButton", true, false)
-	order.choose(1, Mission02State.STRAIGHT)
-	_check(confirm.disabled, "confirm waits for both points")
-	order.choose(2, Mission02State.CROSSOVER)
-	_check(not confirm.disabled, "confirm enabled with both answers")
-	confirm.pressed.emit()
-	await _frames(2)
-	_check(not order.is_open() and mission.state.cable_types == {1: Mission02State.STRAIGHT, 2: Mission02State.CROSSOVER}, "answers saved: %s" % [mission.state.cable_types])
+	_check(mission.stage == Mission02Controller.Stage.GATHER and mission._timing and not player.controls_locked, "after the briefing: gather in the storage room, timer running, player free")
+	_check(straight_box.get_prompt_text().contains("Straight-Through") and crossover_box.get_prompt_text().contains("Crossover"), "box prompts: " + straight_box.get_prompt_text())
+	_check(props.drawer_spot.get_prompt_text() != "" and props.crimp_station.get_prompt_text() != "", "drawer and desk prompts on")
+	_check(mission.hud.objective_text.contains("(0/2)") and not mission.hud.objective_text.contains("คีม"), "objective counts cables, never lists tools: " + mission.hud.objective_text)
+	_check(mission.marker._use_point and mission.marker._point.distance_to(straight_box.global_position) < 1.0, "arrow on the cable boxes")
+
+	# The desk refuses while something is missing and says what.
+	await mission.sit_at_desk(player)
+	_check(not mission.at_desk and mission.stage == Mission02Controller.Stage.GATHER, "desk refuses with nothing in hand")
+	_check(mission.missing_for_desk().size() == 6, "missing: 2 cables + 4 tools: %s" % [mission.missing_for_desk()])
+
+	# Cable boxes: one cable per point, from whichever box; final.
+	mission.open_cable_box(player, Mission02State.STRAIGHT)
+	_check(mission.box_panel.is_open() and player.controls_locked, "straight box opens its window, player held")
+	_check(mission.box_panel.take(1) and not mission.box_panel.take(1), "point 1 takes a cable once")
+	var take2: Button = mission.box_panel.find_child("Take2", true, false)
+	var take1: Button = mission.box_panel.find_child("Take1", true, false)
+	_check(take1.disabled and not take2.disabled and take1.text.contains("Straight-Through"), "point 1 marked taken: " + take1.text)
+	mission.box_panel.close()
+	await _frames(1)
+	_check(not player.controls_locked, "closing the box frees the player")
+	mission.open_cable_box(player, Mission02State.CROSSOVER)
+	take2.pressed.emit()
+	mission.box_panel.close()
+	await _frames(1)
+	_check(mission.state.cable_types == {1: Mission02State.STRAIGHT, 2: Mission02State.CROSSOVER}, "cable types from the boxes: %s" % [mission.state.cable_types])
 	_check(mission.state.cable_type_points() == 5.0, "cable type points = 5 (one right)")
 	_check(not mission.state.set_cable_type(2, Mission02State.STRAIGHT) and mission.state.cable_types[2] == Mission02State.CROSSOVER, "an answer cannot be changed")
-	_check(not player.controls_locked, "player free after the work order")
-	_check(mission.stage == Mission02Controller.Stage.GATHER, "work order -> gather the tools")
-	_check(mission.hud.objective_text.contains("0/5"), "objective counts items: " + mission.hud.objective_text)
-	_check(first.get_prompt_text().contains("สาย UTP Cat6"), "item prompt: " + first.get_prompt_text())
+	_check(mission.hud.objective_text.contains("(2/2)") and mission.marker._point.distance_to(props.drawer_spot.global_position) < 1.0, "both cables -> arrow on the drawer")
+
+	# The drawer: take the kit except the tester, plus a screwdriver.
+	mission.open_drawer(player)
+	_check(mission.drawer.is_open() and player.controls_locked, "drawer window opens")
+	for id in ["rj45_heads", "screwdriver", "cable_stripper", "crimping_tool"]:
+		_check(mission.drawer.take(id), "took " + id)
+	_check(not mission.drawer.take("screwdriver"), "an item is taken once")
+	mission.drawer.close()
+	await _frames(1)
+	_check(mission.marker._point.distance_to(props.crimp_station.global_position) < 1.0, "drawer seen -> arrow on the desk")
+	await mission.sit_at_desk(player)
+	_check(not mission.at_desk and mission.missing_for_desk() == PackedStringArray(["เครื่องทดสอบสาย LAN"]), "desk names the missing tester: %s" % [mission.missing_for_desk()])
+	mission.open_drawer(player)
+	(mission.drawer.find_child("Take_cable_tester", true, false) as Button).pressed.emit()
+	mission.drawer.close()
+	await _frames(1)
 
 	var presentation: Node = player.get_node("Presentation")
-	var picked := 0
-	for id: String in Mission02Props.ITEMS:
-		var item: PickupItem = props.items[id]
-		item.use(player)
-		picked += 1
-		_check(item.taken and not item.visible, "picked " + id)
-		if picked < 5:
-			_check(mission.hud.objective_text.contains("%d/5" % picked), "objective after %d items: %s" % [picked, mission.hud.objective_text])
 	var owned := []
 	for slot: Dictionary in presentation.items:
 		if not slot.is_empty():
 			owned.append(slot.id)
-	_check(owned.size() == 5 and "crimping_tool" in owned and "cable_tester" in owned and "rj45_heads" in owned, "all 5 in the tool case: %s" % [owned])
-	_check(mission.stage == Mission02Controller.Stage.CRIMP, "all items -> next stage")
+	_check(owned.size() == 7 and "lan_cable_1" in owned and "lan_cable_2" in owned and "cable_tester" in owned and "screwdriver" in owned, "tool case: %s" % [owned])
 	await _test_crimping(mission, props, player)
 	map.queue_free()
 	await _frames(2)
@@ -169,9 +190,9 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 	var station := props.crimp_station
 	var panel := mission.crimp_panel
 	var bench := station.bench
-	_check(station.get_prompt_text() != "" and station.collision_layer == CrimpStation.COLLISION_LAYER, "desk prompt on in the crimp stage")
-	_check(mission.hud.objective_text.contains("0/4"), "objective counts ends: " + mission.hud.objective_text)
+	_check(station.get_prompt_text() != "" and station.collision_layer == CrimpStation.COLLISION_LAYER, "desk prompt on")
 	await mission.sit_at_desk(player)
+	_check(mission.stage == Mission02Controller.Stage.CRIMP and mission.hud.objective_text.contains("0/4"), "everything in hand: the desk opens the crimp stage: " + mission.hud.objective_text)
 	_check(mission.at_desk and panel.visible and player.controls_locked, "sitting at the desk opens the step panel")
 	_check(player.camera.global_position.distance_to(bench.view_transform().origin) < 0.01, "camera moved to the cable end")
 	_check(panel.current_key() == "1A" and panel.current_step() == "cut" and bench.look == CrimpBench.Look.WHOLE, "starts with cable 1 end 1: cut")
@@ -325,6 +346,7 @@ func _test_report(mission: Mission02Controller, player: CharacterBody3D) -> void
 		_check(mistakes.contains(want), "mistakes list has: " + want)
 	var last: Dictionary = GameProgress.level_record(2).get("last", {})
 	_check(GameProgress.best_score(2) == 59 and last.get("job_works", true) == false and last.get("router_port", "") == "router_lan1", "progress recorded for Level 2: %s" % [GameProgress.level_record(2)])
+	_check("screwdriver" in Array(last.get("drawer_items", [])) and Array(last.get("drawer_items", [])).size() == 5, "drawer items kept for the report: %s" % [last.get("drawer_items")])
 	var details := ""
 	for l in mission.summary._details.find_children("*", "Label", true, false):
 		details += (l as Label).text + "\n"
