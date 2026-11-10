@@ -31,6 +31,7 @@ var _btn_test: Node3D
 var _green_on: StandardMaterial3D
 var _red_on: StandardMaterial3D
 var _run_id := 0
+var _hover_glow: StandardMaterial3D
 
 
 func _ready() -> void:
@@ -86,6 +87,33 @@ func stop_test() -> void:
 ## The node's -Z axis points into the socket (insertion direction).
 func get_plug_point(unit: String) -> Node3D:
 	return find_child(unit + "_PlugPoint", true, false)
+
+
+## The POWER ("power") or TEST ("test") button mesh, for clicking it in 3D.
+func button(which: String) -> MeshInstance3D:
+	return (_btn_power if which == "power" else _btn_test) as MeshInstance3D
+
+
+## The button goes down and up, nothing else happens.
+func tap(which: String) -> void:
+	_press(button(which))
+
+
+## Lights up the button under the mouse ("" = none).
+func set_button_hover(which: String) -> void:
+	if _hover_glow == null:
+		_hover_glow = StandardMaterial3D.new()
+		_hover_glow.albedo_color = Color(1, 1, 1, 0.35)
+		_hover_glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		_hover_glow.emission_enabled = true
+		_hover_glow.emission = Color(1, 1, 0.85)
+		_hover_glow.emission_energy_multiplier = 0.6
+		_hover_glow.grow = true
+		_hover_glow.grow_amount = 0.0004
+	for name in ["power", "test"]:
+		var mesh := button(name)
+		if mesh:
+			mesh.material_overlay = _hover_glow if name == which else null
 
 
 ## Direct LED control, if the game wants its own patterns. index 1-9 (9 = G).

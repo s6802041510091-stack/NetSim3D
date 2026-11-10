@@ -187,6 +187,12 @@ func _run() -> void:
 	await _shot("m2_plug_main_in")
 	board.plug_into("B", "REMOTE")
 	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME + 0.2).timeout
+	var tester_at := mission.props.crimp_station.tester
+	var hover := InputEventMouseMotion.new()
+	hover.position = player.camera.unproject_position(tester_at.button("power").global_position)
+	tester_panel._unhandled_input(hover)
+	await _shot("m2_tester_hover_power")
+	tester_panel._set_hover("")
 	tester_panel.do_step() # power
 	await _shot("m2_tester_plugged_on")
 	tester_panel.do_step() # test cable 1

@@ -286,7 +286,7 @@ func _drag_wire(panel: CrimpPanel, camera: Camera3D, id: String, pin: int) -> vo
 	_mouse(panel, to, false)
 
 
-func _mouse(panel: CrimpPanel, at: Vector2, down: bool) -> void:
+func _mouse(panel: Node, at: Vector2, down: bool) -> void:
 	var button := InputEventMouseButton.new()
 	button.button_index = MOUSE_BUTTON_LEFT
 	button.pressed = down
@@ -348,8 +348,20 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	await _test_plugging(station, player)
 	_check(panel.current_step() == "power" and not station.plug_board.active, "both heads in: on to the power step")
 	_check(player.camera.global_transform.origin.distance_to(station.tester_views()[0]["xform"].origin) < 0.01, "the camera is back on the whole tester")
-	panel.do_step()
-	panel.do_step()
+	_check(panel.find_child("StepButton", true, false) == null, "no POWER / TEST buttons in the panel")
+	var cam: Camera3D = player.camera
+	var power_at := cam.unproject_position(tester.button("power").global_position)
+	var test_at := cam.unproject_position(tester.button("test").global_position)
+	_check(panel.button_at(power_at) == "power" and panel.button_at(test_at) == "test" and panel.button_at(power_at + Vector2(0, 120)) == "", "the tester's own buttons can be pointed at")
+	var hover := InputEventMouseMotion.new()
+	hover.position = power_at
+	panel._unhandled_input(hover)
+	_check(tester.button("power").material_overlay != null and tester.button("test").material_overlay == null, "the button under the mouse lights up")
+	_mouse(panel, test_at, true)
+	_check(panel.current_step() == "power" and not tester.is_testing and panel.message.contains("ยังไม่ได้เปิด"), "TEST with the power off: nothing lights, the panel says why")
+	_mouse(panel, power_at, true)
+	_check(tester.is_on and panel.current_step() == "test", "clicking POWER on the tester turns it on")
+	_mouse(panel, test_at, true)
 	_check(tester.is_on and tester.is_testing and panel.current_step() == "verdict", "plugged, powered, testing")
 	panel.judge(false)
 	_check(mission.state.tester_verdicts.get(1) == false and mission.state.spare_cables.is_empty() and panel.message.contains("ใช้งานได้"), "good cable discarded: told it works, kept: " + panel.message)
@@ -359,12 +371,13 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	station.plug_board.plug_into("B", "MAIN")
 	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.4).timeout
 	_check(panel.current_step() == "power", "either head fits either socket")
-	panel.do_step()
+	_mouse(panel, power_at, true)
 	await mission.leave_desk()
 	_check(not tester.is_on and not mission.at_desk, "standing up stops the tester")
 	await mission.sit_at_desk(player)
 	_check(panel.cable == 2 and panel.current_step() == "test" and tester.is_on, "back at the desk: same cable, still powered")
-	panel.do_step()
+	_mouse(panel, test_at, true)
+	_check(tester.is_testing and panel.current_step() == "verdict", "clicking TEST on the tester starts the scan")
 	panel.judge(false)
 	_check(mission.state.spare_cables == [2] and panel.message.contains("สำรอง"), "bad cable discarded: spare cable: " + panel.message)
 	_check(not mission.state.set_verdict(2, true), "a verdict cannot be changed")

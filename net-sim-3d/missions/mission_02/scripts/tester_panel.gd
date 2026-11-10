@@ -5,7 +5,7 @@ extends CanvasLayer
 ## screen, the tester in close-up on the left). For each cable: plug both
 ## ends into the main and remote units by hand (drag each RJ45 head into a
 ## socket; Q / E switch between the whole tester and each socket close up;
-## PlugBoard) -> power on -> TEST (the LEDs scan
+## PlugBoard) -> click POWER on the tester itself -> click TEST on it (the LEDs scan
 ## pins 1-8 and G for as long as the player watches) -> decide once:
 ## "ผ่าน" (use it) or "ใช้ไม่ได้" (discard). The LEDs follow the real wire
 ## order of both ends (Mission02State.tester_mapping).
@@ -22,8 +22,8 @@ const STEPS := ["plug", "power", "test", "verdict"]
 const STEP_TITLES := {"plug": "เสียบสาย", "power": "เปิดเครื่อง", "test": "กดปุ่ม TEST", "verdict": "ตัดสินผล"}
 const STEP_HELP := {
 	"plug": "ลากหัว RJ45 ด้านหนึ่งไปเสียบช่องตัวแม่ (MAIN) และอีกด้านเสียบช่องตัวลูก (REMOTE)\nกด Q / E เพื่อเปลี่ยนมุมมองไปดูช่องใกล้ ๆ",
-	"power": "กดปุ่ม POWER เพื่อเปิดเครื่องทดสอบ",
-	"test": "กดปุ่ม TEST แล้วสังเกตไฟของตัวแม่และตัวลูก",
+	"power": "คลิกปุ่ม POWER (สีแดง) บนตัวเครื่องเพื่อเปิดเครื่องทดสอบ",
+	"test": "คลิกปุ่ม TEST (สีเหลือง) บนตัวเครื่อง แล้วสังเกตไฟของตัวแม่และตัวลูก",
 	"verdict": "ดูไฟของตัวแม่ (MAIN) เทียบกับตัวลูก (REMOTE) ให้ครบทุกดวง แล้วตัดสินว่าสายเส้นนี้ใช้งานได้หรือไม่ (ตัดสินได้ครั้งเดียว)",
 }
 
@@ -32,6 +32,10 @@ var state: Mission02State
 var cable := 1
 var step_index := 0
 var message := ""
+## Clicking the tester's own buttons: how close (px) the mouse must be to a
+## button's centre, and which one it is over now.
+const BUTTON_PX := 26.0
+var hovered_button := ""
 
 var _title: Label
 var _subtitle: Label
@@ -94,6 +98,8 @@ func open() -> void:
 
 func close() -> void:
 	visible = false
+	if station and station.tester:
+		_set_hover("")
 	if station:
 		station.plug_board.end()
 
@@ -112,7 +118,7 @@ func do_step() -> void:
 	var tester := station.tester
 	match step:
 		"power":
-			tester.set_power(true)
+			tester.press_power()
 			Sound.play("toggle_on")
 		"test":
 			tester.press_test(state.tester_mapping(cable))
@@ -210,12 +216,6 @@ func _refresh() -> void:
 		fail_button.set_meta("sound", "")
 		fail_button.pressed.connect(judge.bind(false))
 		_action_box.add_child(fail_button)
-	elif step != "plug":
-		var go := GameUI.button(STEP_TITLES[step], true, 240)
-		go.name = "StepButton"
-		go.set_meta("sound", "")
-		go.pressed.connect(do_step)
-		_action_box.add_child(go)
 
 
 func _message_label() -> Label:
@@ -226,6 +226,57 @@ func _message_label() -> Label:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+	if not visible:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		get_viewport().set_input_as_handled()
 		leave_requested.emit()
+		return
+	if current_step() in ["", "plug"] or station == null or station.tester == null:
+		return
+	if event is InputEventMouseMotion:
+		_set_hover(button_at((event as InputEventMouseMotion).position))
+	elif event is InputEventMouseButton and (event as InputEventMouseButton).pressed and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
+		var which := button_at((event as InputEventMouseButton).position)
+		if which != "":
+			get_viewport().set_input_as_handled()
+			press_button(which)
+
+
+## The tester button ("power" / "test") at screen point `at`, "" if none.
+func button_at(at: Vector2) -> String:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null or station.tester == null:
+		return ""
+	for which in ["power", "test"]:
+		var mesh := station.tester.button(which)
+		if mesh and not camera.is_position_behind(mesh.global_position) and camera.unproject_position(mesh.global_position).distance_to(at) <= BUTTON_PX:
+			return which
+	return ""
+
+
+## What clicking a button on the tester does. The right button for the step
+## moves on; TEST with the power off only clicks (no lights, like the real
+## device) and says why; POWER once it is on does nothing more.
+func press_button(which: String) -> void:
+	var step := current_step()
+	if (which == "power" and step == "power") or (which == "test" and step in ["test", "verdict"]):
+		if step == "verdict":
+			station.tester.press_test(state.tester_mapping(cable))
+			Sound.play("click")
+		else:
+			do_step()
+		return
+	station.tester.tap(which)
+	Sound.play("click")
+	if which == "test" and not station.tester.is_on:
+		message = "กด TEST แล้วไม่มีไฟขึ้น — เครื่องยังไม่ได้เปิด"
+		_refresh()
+
+
+func _set_hover(which: String) -> void:
+	if which == hovered_button:
+		return
+	hovered_button = which
+	station.tester.set_button_hover(which)
+	Input.set_default_cursor_shape(Input.CURSOR_POINTING_HAND if which != "" else Input.CURSOR_ARROW)
