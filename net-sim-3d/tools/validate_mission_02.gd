@@ -214,13 +214,20 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 		var key := panel.current_key()
 		var step := panel.current_step()
 		if step == "arrange":
-			_check(bench.look == CrimpBench.Look.UNTWISTED, "%s: loose wires before arranging" % key)
-			# Place two wires, take one back, then fill in the plan.
-			panel.place_wire(plans[key][1])
-			_check(panel.arrangement[0] == plans[key][1] and bench.look == CrimpBench.Look.ARRANGED, "%s: a wire goes to pin 1 and shows on the desk" % key)
-			panel.remove_pin(0)
+			await _frames(1)
+			_check(bench.look == CrimpBench.Look.ARRANGING and bench.wire_ids().size() == 8 and panel.find_child("Chip_orange", true, false) == null, "%s: 8 loose wires on the 3D model, no colour chips" % key)
+			_check(WireColors.correct_positions(panel._chip_order()) <= 3, "%s: the loose wires do not come nearly in order" % key)
+			# Click a wire on the model, click it again to take it back, then the plan.
+			var cam: Camera3D = player.camera
+			_click_wire(panel, cam, plans[key][1])
+			_check(panel.arrangement[0] == plans[key][1], "%s: clicking a 3D wire puts it on pin 1" % key)
+			_click_wire(panel, cam, plans[key][1])
+			_check(panel.arrangement[0] == "", "%s: clicking the placed wire takes it back" % key)
+			var misses := 0
 			for id: String in plans[key]:
-				panel.place_wire(id)
+				if not _click_wire(panel, cam, id):
+					misses += 1
+			_check(misses == 0 and panel.arrangement == plans[key], "%s: all 8 placed by clicking the model (%d mis-picks)" % [key, misses])
 			panel.confirm_arrangement()
 			_check(mission.state.ends.get(key, []) == plans[key], "%s: arrangement saved" % key)
 			panel.place_wire("brown")
@@ -243,6 +250,19 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 	_check(is_equal_approx(mission.state.colour_points(), 22.5), "colour points 22.5 (%.2f)" % mission.state.colour_points())
 	_check(mission.stage == Mission02Controller.Stage.TEST and not mission.at_desk and not player.controls_locked, "crimping done -> test stage, player free")
 	await _test_tester(mission, props, player)
+
+
+## A left click on wire `id` where it shows on screen; true if the click
+## picked that wire (and not a neighbour).
+func _click_wire(panel: CrimpPanel, camera: Camera3D, id: String) -> bool:
+	var at := panel.bench.wire_screen_point(camera, id)
+	var picked := panel.bench.pick_wire(camera, at)
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.position = at
+	panel._unhandled_input(click)
+	return picked == id
 
 
 ## One step at the desk, playing the minigames like a player: the first

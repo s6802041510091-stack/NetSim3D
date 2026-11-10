@@ -7,8 +7,12 @@ extends Node3D
 ## of the screen, so pin 1 sits on the left (-Z), as when looking at an RJ45
 ## head with the clip down and the cable towards you.
 ## show_state() rebuilds the end for each step; play_tool() slides a tool in.
+## While arranging (Look.ARRANGING) the player clicks the wires themselves:
+## the loose ones fan up and out of the jacket, the placed ones lie flat in
+## pin order with the pin numbers beside them; pick_wire() finds the wire
+## under the mouse.
 
-enum Look { WHOLE, CUT, STRIPPED, UNTWISTED, ARRANGED, TRIMMED, INSERTED, CRIMPED }
+enum Look { WHOLE, CUT, STRIPPED, UNTWISTED, ARRANGED, TRIMMED, INSERTED, CRIMPED, ARRANGING }
 
 const TOOL_CATALOG := preload("res://scripts/held_item_catalog.gd")
 const JACKET_RADIUS := 0.009
@@ -31,6 +35,16 @@ var _parts: Node3D
 var _materials := {}
 var _guide: MeshInstance3D
 var _crimper: Node3D
+## Wires drawn now: id -> [holder, start, end] (bench space), for picking.
+var _wires := {}
+var hovered := ""
+## Arranging: how far placed wires reach, how loose ones fan.
+const FLAT_LENGTH := 0.075
+const FAN_LENGTH := 0.07
+## Loose wires splay out to both sides (fixed slots, left to right), leaving
+## the lane straight ahead free for the placed ones.
+const FAN_SLOTS := [78.0, 64.0, 50.0, 36.0, -36.0, -50.0, -64.0, -78.0]
+const FAN_PITCH := 9.0 # a little raised so they cross above the placed ones
 ## Distance from the crimping tool's origin to the middle of its jaws (model units).
 const CRIMPER_JAW := 0.055
 
@@ -47,9 +61,12 @@ func view_transform() -> Transform3D:
 	return Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)
 
 
-func show_state(next: Look, wire_order: Array = []) -> void:
+## `fan` (ARRANGING only): the order the loose wires lie in, left to right.
+func show_state(next: Look, wire_order: Array = [], fan: Array = []) -> void:
 	look = next
 	order = wire_order.duplicate()
+	_wires.clear()
+	hovered = ""
 	if _parts:
 		_parts.queue_free()
 	_parts = Node3D.new()
@@ -68,7 +85,12 @@ func show_state(next: Look, wire_order: Array = []) -> void:
 			_untwisted()
 		Look.ARRANGED:
 			_jacket(-0.2, JACKET_END)
-			_flat(order, 0.075)
+			_flat(order, FLAT_LENGTH)
+		Look.ARRANGING:
+			_jacket(-0.2, JACKET_END)
+			_flat(order, FLAT_LENGTH)
+			_fan(fan)
+			_pin_marks()
 		Look.TRIMMED:
 			_jacket(-0.2, JACKET_END)
 			_flat(order, TRIMMED_LENGTH)
@@ -140,7 +162,82 @@ func set_crimp_tool(on: bool, t := 0.0) -> void:
 		_crimper.rotation_degrees = Vector3(0, 90, 6.0 * (1.0 - closed))
 
 
+## The wire under screen point `at` seen by `camera` ("" if none within
+## `reach` pixels). Works on the 3D model itself, not on a panel.
+func pick_wire(camera: Camera3D, at: Vector2, reach := 16.0) -> String:
+	var best := ""
+	var best_d := reach
+	for id: String in _wires:
+		var a: Vector3 = global_transform * (_wires[id][1] as Vector3)
+		var b: Vector3 = global_transform * (_wires[id][2] as Vector3)
+		if camera.is_position_behind(a) or camera.is_position_behind(b):
+			continue
+		var d := Geometry2D.get_closest_point_to_segment(at, camera.unproject_position(a), camera.unproject_position(b)).distance_to(at)
+		if d < best_d:
+			best_d = d
+			best = id
+	return best
+
+
+## Where wire `id` shows on screen (its middle), for tests and hints.
+func wire_screen_point(camera: Camera3D, id: String) -> Vector2:
+	if not _wires.has(id):
+		return Vector2(-1, -1)
+	var mid: Vector3 = ((_wires[id][1] as Vector3) + (_wires[id][2] as Vector3)) * 0.5
+	return camera.unproject_position(global_transform * mid)
+
+
+## Thickens the wire under the mouse so the player sees what a click takes.
+func set_hovered(id: String) -> void:
+	if id == hovered:
+		return
+	for key: String in [hovered, id]:
+		if _wires.has(key) and is_instance_valid(_wires[key][0]):
+			(_wires[key][0] as Node3D).scale = Vector3(1.0, 1.7, 1.7) if key == id else Vector3.ONE
+	hovered = id
+
+
+func wire_ids() -> PackedStringArray:
+	return PackedStringArray(_wires.keys())
+
+
 # ---------------------------------------------------------------- pieces
+
+## Loose wires in `fan` order splayed out of the jacket, each in its own
+## slot (the first on the far left), so they do not move as others are placed.
+func _fan(fan: Array) -> void:
+	var pitch := deg_to_rad(FAN_PITCH)
+	for i in fan.size():
+		if fan[i] in order:
+			continue
+		var yaw_deg: float = FAN_SLOTS[i % FAN_SLOTS.size()]
+		var yaw := deg_to_rad(yaw_deg)
+		var dir := Vector3(cos(pitch) * cos(yaw), sin(pitch), -cos(pitch) * sin(yaw))
+		var start := Vector3(JACKET_END, JACKET_RADIUS * 0.3, 0.0)
+		_wire(fan[i], start + dir * FAN_LENGTH * 0.5, FAN_LENGTH, yaw_deg, FAN_PITCH)
+
+
+## Pin numbers 1-8 beyond the flat wires, and a mark on the next free pin.
+func _pin_marks() -> void:
+	var next := order.find("") if order.size() == 8 else 0
+	for pin in 8:
+		var label := Label3D.new()
+		label.text = str(pin + 1)
+		label.font_size = 48
+		label.pixel_size = 0.00011
+		label.outline_size = 10
+		label.outline_modulate = Color(0.05, 0.1, 0.2)
+		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		label.modulate = Color(1.0, 0.9, 0.3) if pin == next else Color(0.9, 0.94, 1.0)
+		label.position = Vector3(JACKET_END + FLAT_LENGTH + 0.007, 0.003, (pin - 3.5) * PIN_PITCH)
+		_parts.add_child(label)
+	if next >= 0:
+		var clear := StandardMaterial3D.new()
+		clear.albedo_color = Color(1.0, 0.9, 0.3, 0.55)
+		clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		clear.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_box("NextPin", Vector3(FLAT_LENGTH, 0.0008, WIRE_WIDTH), Vector3(JACKET_END + FLAT_LENGTH * 0.5, -WIRE_HEIGHT * 0.5, (next - 3.5) * PIN_PITCH), clear)
+
 
 func _jacket(from_x: float, to_x: float) -> void:
 	var mesh := MeshInstance3D.new()
@@ -206,15 +303,17 @@ func _head(crimped: bool) -> void:
 		_box("Contact", Vector3(0.008, 0.003, 0.0026), Vector3(back + HEAD_SIZE.x - 0.008, y, (pin - 3.5) * PIN_PITCH), gold)
 
 
-func _wire(id: String, center: Vector3, length: float, yaw_degrees: float) -> void:
+func _wire(id: String, center: Vector3, length: float, yaw_degrees: float, pitch_degrees := 0.0) -> void:
 	if not WireColors.WIRES.has(id):
 		return
 	var color: Color = WireColors.WIRES[id][1]
 	var striped := bool(WireColors.WIRES[id][2])
 	var holder := Node3D.new()
 	holder.position = center
-	holder.rotation_degrees.y = yaw_degrees
+	holder.rotation_degrees = Vector3(0, yaw_degrees, pitch_degrees)
 	_parts.add_child(holder)
+	var half := holder.basis * Vector3(length * 0.5, 0, 0)
+	_wires[id] = [holder, center - half, center + half]
 	var body := _box_in(holder, Vector3(length, WIRE_HEIGHT, WIRE_WIDTH), Vector3.ZERO, _material("white" if striped else id, WireColors.WHITE if striped else color))
 	body.name = "Wire_" + id
 	if striped:

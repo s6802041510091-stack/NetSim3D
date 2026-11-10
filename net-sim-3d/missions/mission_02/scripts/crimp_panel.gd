@@ -34,7 +34,8 @@ const STEPS := {
 	"insert": ["เสียบหัว RJ45", "เสียบสายเข้าหัว RJ45 ให้ครบทั้ง 8 เส้น โดยไม่ให้ตำแหน่งสลับกัน", "", CrimpBench.Look.INSERTED, "click"],
 	"crimp": ["ย้ำหัว", "ใส่หัว RJ45 ในช่องของคีมย้ำสาย แล้วคลิกเมาส์ซ้ายรัวๆ (หรือกด Space) บีบคีมจนเกจเต็ม", "crimping_tool", CrimpBench.Look.CRIMPED, "crimp"],
 }
-const ARRANGE_HELP := "เรียงสายตามมาตรฐาน T568B จากขา 1 ถึงขา 8 (มองจากด้านบน ขา 1 อยู่ซ้ายสุด)\nคลิกสีเพื่อวางลงขาถัดไป คลิกที่ขาเพื่อเอาสายออก — ยืนยันแล้วแก้ไม่ได้"
+const ARRANGE_HELP := "คลิกเส้นลวดบนภาพ 3D ตามลำดับขา 1 → 8 ตามมาตรฐาน T568B (มองจากด้านบน ขา 1 อยู่ซ้ายสุด)
+คลิกเส้นที่วางแล้วเพื่อเอาออก — กดยืนยันแล้วแก้ไม่ได้"
 
 var bench: CrimpBench
 var state: Mission02State
@@ -69,7 +70,7 @@ var _steps_box: VBoxContainer
 var _action_box: VBoxContainer
 var _leave: Button
 var _pin_buttons: Array[Button] = []
-var _chip_buttons := {}
+var _hover_note: Label
 var _confirm_arrange: Button
 
 
@@ -229,6 +230,28 @@ func remove_pin(pin: int) -> void:
 	_refresh()
 
 
+## What a click on wire `id` in the 3D view does: a loose wire goes to the
+## next free pin, a placed one comes back out.
+func click_wire(id: String) -> void:
+	if current_step() != "arrange" or id == "":
+		return
+	if id in arrangement:
+		remove_pin(arrangement.find(id))
+	else:
+		place_wire(id)
+
+
+func _hover_at(at: Vector2) -> String:
+	var camera := get_viewport().get_camera_3d()
+	if bench == null or camera == null:
+		return ""
+	var id := bench.pick_wire(camera, at)
+	bench.set_hovered(id)
+	if _hover_note:
+		_hover_note.text = ("ชี้ที่: " + WireColors.thai_name(id) + ("  (คลิกเพื่อเอาออก)" if id in arrangement else "  (คลิกเพื่อวางขา %d)" % (arrangement.find("") + 1))) if id != "" else "ชี้เมาส์ที่เส้นลวดเพื่อดูชื่อสี"
+	return id
+
+
 func clear_arrangement() -> void:
 	if current_step() != "arrange":
 		return
@@ -280,9 +303,8 @@ func _show_bench() -> void:
 	var done_step := steps[step_index - 1]
 	var look: CrimpBench.Look = STEPS[done_step][3]
 	if current_step() == "arrange":
-		# Loose wires until the first one is placed, then the pins filled so far.
-		var any := arrangement.any(func(id: String): return id != "")
-		bench.show_state(CrimpBench.Look.ARRANGED if any else CrimpBench.Look.UNTWISTED, arrangement)
+		# Placed wires flat by pin, the rest fanned out to click.
+		bench.show_state(CrimpBench.Look.ARRANGING, arrangement, _chip_order())
 		return
 	bench.show_state(look, state.ends.get(key, arrangement))
 
@@ -293,7 +315,7 @@ func _refresh() -> void:
 	for child in _action_box.get_children():
 		child.queue_free()
 	_pin_buttons.clear()
-	_chip_buttons.clear()
+	_hover_note = null
 	_strip_bar = null
 	_crimp_bar = null
 	_mini_note = null
@@ -449,42 +471,8 @@ func _build_arrange() -> void:
 		slot.pressed.connect(remove_pin.bind(pin))
 		pins.add_child(slot)
 		_pin_buttons.append(slot)
-	_action_box.add_child(GameUI.label("สายที่ยังไม่ได้วาง", 14, GameUI.INK_SOFT, true))
-	var chips := GridContainer.new()
-	chips.columns = 2
-	chips.add_theme_constant_override("h_separation", 6)
-	chips.add_theme_constant_override("v_separation", 6)
-	_action_box.add_child(chips)
-	for id: String in _chip_order():
-		var chip := Button.new()
-		chip.name = "Chip_" + id
-		chip.custom_minimum_size = Vector2(200, 34)
-		chip.focus_mode = Control.FOCUS_NONE
-		chip.set_meta("sound", "")
-		chip.text = WireColors.thai_name(id)
-		chip.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		chip.add_theme_font_size_override("font_size", 15)
-		# Left margin keeps the text clear of the colour swatch.
-		for style_name in ["normal", "hover", "pressed", "disabled"]:
-			var bg := Color(1, 1, 1)
-			var edge := Color(0.8, 0.83, 0.88)
-			if style_name == "hover":
-				bg = Color(0.94, 0.96, 1.0)
-				edge = GameUI.ACCENT.lightened(0.3)
-			elif style_name == "disabled":
-				bg = Color(0.93, 0.94, 0.95)
-				edge = Color(0.88, 0.89, 0.91)
-			var style := GameUI.box(bg, edge, 6, 6, 4)
-			style.content_margin_left = 52
-			chip.add_theme_stylebox_override(style_name, style)
-		chip.add_theme_color_override("font_color", GameUI.INK)
-		chip.disabled = id in arrangement
-		chip.draw.connect(func():
-			if not chip.disabled:
-				WireColors.draw_wire(chip, Rect2(Vector2(10, 9), Vector2(30, chip.size.y - 18)), id))
-		chip.pressed.connect(place_wire.bind(id))
-		chips.add_child(chip)
-		_chip_buttons[id] = chip
+	_hover_note = GameUI.label("ชี้เมาส์ที่เส้นลวดเพื่อดูชื่อสี", 15, GameUI.INK_SOFT)
+	_action_box.add_child(_hover_note)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	_action_box.add_child(row)
@@ -501,7 +489,8 @@ func _build_arrange() -> void:
 	row.add_child(_confirm_arrange)
 
 
-## The 8 wires in a mixed order, fixed for this end so chips do not jump around.
+## The 8 wires in a mixed order (the loose fan), fixed for this end so the
+## wires do not jump around.
 var _chip_orders := {}
 func _chip_order() -> Array:
 	var key := current_key()
@@ -512,8 +501,10 @@ func _chip_order() -> Array:
 			var tmp: Variant = ids[i]
 			ids[i] = ids[j]
 			ids[j] = tmp
-		if ids == WireColors.T568B:
-			ids.reverse()
+		# Never hand over an order that is already right or nearly right.
+		var pair_order := ["white_orange", "orange", "white_green", "green", "white_blue", "blue", "white_brown", "brown"]
+		while WireColors.correct_positions(ids) > 3 or ids == pair_order:
+			ids.shuffle()
 		_chip_orders[key] = ids
 	return _chip_orders[key]
 
@@ -527,6 +518,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var space: bool = event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
 	var click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	if current_step() == "arrange":
+		if event is InputEventMouseMotion:
+			_hover_at((event as InputEventMouseMotion).position)
+		elif click:
+			var id := _hover_at((event as InputEventMouseButton).position)
+			if id != "":
+				get_viewport().set_input_as_handled()
+				click_wire(id)
+				_hover_at((event as InputEventMouseButton).position)
+		return
 	if current_step() == "strip" and space:
 		get_viewport().set_input_as_handled()
 		press_strip()

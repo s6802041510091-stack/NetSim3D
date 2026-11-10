@@ -125,6 +125,8 @@ func _run() -> void:
 	await _shot("m2_desk_untwisted")
 	for id in ["white_orange", "orange", "white_green"]:
 		panel.place_wire(id)
+	await process_frame
+	panel._hover_at(panel.bench.wire_screen_point(player.camera, "blue"))
 	await _shot("m2_desk_arranging")
 	for id in ["blue", "white_blue", "green", "white_brown", "brown"]:
 		panel.place_wire(id)
