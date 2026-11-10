@@ -50,6 +50,7 @@ var _port_index := {} # id -> instance index in the port / LED multimeshes
 var _links := {} # id -> true when its link LED is on
 var _leds: MultiMesh
 var _plugged := {} # id -> plug node
+var _internet := true
 
 
 func _ready() -> void:
@@ -128,6 +129,7 @@ func _build() -> void:
 	_port_index.clear()
 	_links.clear()
 	_plugged.clear()
+	_internet = true
 	_visual = Node3D.new()
 	_visual.name = "Visual"
 	add_child(_visual)
@@ -260,23 +262,85 @@ func _build_port_meshes() -> void:
 
 ## Level 3-6: Router LAN 1 -> switch port 1, switch port 2 -> down the wall to the teacher's PC.
 func _build_installed_cables() -> void:
-	for id in ["router_lan1", "switch_01", "switch_02"]:
-		plug(id)
-		set_link(id, true)
-	var lan: Vector3 = _ports["router_lan1"]
-	var p1: Vector3 = _ports["switch_01"]
-	var p2: Vector3 = _ports["switch_02"]
-	_cable([lan + Vector3(0, 0, 0.026), lan + Vector3(0, 0, 0.05), Vector3(lan.x, SWITCH_Y - 0.03, 0.19),
-		p1 + Vector3(0, 0.01, 0.05), p1 + Vector3(0, 0, 0.026)], CABLE_PATCH, "PatchRouterSwitch")
-	var down := [p2 + Vector3(0, 0, 0.026), p2 + Vector3(0, -0.01, 0.05), Vector3(0.262, SWITCH_Y - 0.04, 0.19),
-		Vector3(0.262, -0.2, 0.12), Vector3(0.262, -0.26, 0.0), Vector3(0.262, -1.0, -0.12)]
+	patch("router_lan1", "switch_01")
 	var pc: Node3D = null if teacher_port.is_empty() else get_node_or_null(teacher_port) as Node3D
-	if pc and pc.has_method("plug"):
-		pc.call("plug")
+	drop_to_pc("switch_02", pc, true)
+	for id in ["router_lan1", "switch_01", "switch_02"]:
+		set_link(id, true)
+	if pc and pc.has_method("set_link"):
 		pc.call("set_link", true)
-		for p in teacher_pc_route(pc):
-			down.append(to_local(p))
-	_cable(down, CABLE_PATCH, "CableToTeacherPC")
+
+
+## A patch cable from a Router port up to a switch port (both plugged).
+func patch(router_id: String, switch_id: String, color: Color = CABLE_PATCH) -> void:
+	if not _ports.has(router_id) or not _ports.has(switch_id):
+		return
+	plug(router_id, color)
+	plug(switch_id, color)
+	var r: Vector3 = _ports[router_id]
+	var s: Vector3 = _ports[switch_id]
+	_cable([r + Vector3(0, 0, 0.026), r + Vector3(0, 0, 0.05), Vector3(r.x, SWITCH_Y - 0.03, 0.19),
+		s + Vector3(0, 0.01, 0.05), s + Vector3(0, 0, 0.026)], color, "Patch_%s_%s" % [router_id, switch_id])
+
+
+## A cable from a switch port down the wall, along the floor and up behind the
+## teacher's PC; plugged into its network card when `plug_pc`, otherwise the
+## end lies on the desk behind the PC.
+func drop_to_pc(switch_id: String, pc: Node3D, plug_pc: bool, color: Color = CABLE_PATCH) -> void:
+	if not _ports.has(switch_id):
+		return
+	plug(switch_id, color)
+	var p: Vector3 = _ports[switch_id]
+	var points := [p + Vector3(0, 0, 0.026), p + Vector3(0, -0.01, 0.05), Vector3(0.262, SWITCH_Y - 0.04, 0.19),
+		Vector3(0.262, -0.2, 0.12), Vector3(0.262, -0.26, 0.0), Vector3(0.262, -1.0, -0.12)]
+	if pc:
+		var route := teacher_pc_route(pc)
+		if not plug_pc:
+			# Stop on the desk behind the PC, short of the socket.
+			route = route.slice(0, 4)
+			route.append(route[3] + Vector3(0, 0, -0.08))
+		elif pc.has_method("plug"):
+			pc.call("plug", color)
+		for point in route:
+			points.append(to_local(point))
+	var old := _visual.get_node_or_null("CableToTeacherPC")
+	if old:
+		old.free()
+	_cable(points, color, "CableToTeacherPC")
+
+
+## The player plugged into WAN: the Internet line is pulled out and hangs
+## loose in front of the rack (no Internet for the room any more).
+func disconnect_internet() -> void:
+	_internet = false
+	unplug("router_wan")
+	set_link("router_wan", false)
+	var line := _visual.get_node_or_null("InternetLine")
+	if line:
+		line.free()
+	_cable([Vector3(-0.262, 1.5, -0.05), Vector3(-0.262, 0.26, 0.0), Vector3(-0.262, 0.2, 0.12),
+		Vector3(-0.24, -0.1, 0.2), Vector3(-0.2, -0.3, 0.22)], CABLE_INTERNET, "InternetLine")
+
+
+## False once the Internet line was pulled out of WAN (disconnect_internet).
+func is_internet_connected() -> bool:
+	return _internet
+
+
+## The glass door is hidden while the player works inside the rack.
+func set_door_open(open: bool) -> void:
+	for part in ["DoorGlass", "DoorFrame", "Handle"]:
+		for node in _visual.get_children():
+			if node.name.begins_with(part):
+				(node as Node3D).visible = not open
+
+
+## Camera pose in front of the open rack, the devices on the left part of the
+## screen (a panel covers the right).
+func view_transform() -> Transform3D:
+	var eye := global_transform * Vector3(0.11, 0.03, 0.46)
+	var target := global_transform * Vector3(0.11, 0.03, 0.0)
+	return Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)
 
 
 ## World points from the bottom of the rack, down the wall, along the floor

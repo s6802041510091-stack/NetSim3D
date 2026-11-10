@@ -254,6 +254,49 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	await create_timer(Mission02Controller.TESTING_DONE_PAUSE + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
 	_check(mission.stage == Mission02Controller.Stage.INSTALL and not mission.at_desk and not player.controls_locked, "testing done -> install stage, player free")
 	_check(station.get_prompt_text() == "" and not tester.visible, "desk cleared after testing")
+	await _test_install(mission, player)
+
+
+## Installing: LAN 1, both switch ports, the teacher PC, then the LEDs.
+## Cable 1 is the player's good cable, cable 2 the spare (both work).
+func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> void:
+	var rack := mission.rack
+	var pc := mission.pc_port
+	var panel := mission.install_panel
+	_check(mission.install_step == "rack" and mission.rack_spot.get_prompt_text() != "" and mission.marker.is_active(), "install: go to the rack")
+	await mission.open_rack(player)
+	_check(mission.at_desk and panel.visible and panel.current_step() == "router", "the rack opens on the Router step")
+	_check(not rack.find_child("DoorGlass", true, false).visible, "rack door open")
+	panel.do_step()
+	_check(panel.current_step() == "router", "the Router port must be chosen, not skipped")
+	panel.choose_router_port("router_lan1")
+	_check(mission.state.router_port == "router_lan1" and rack.is_plugged("router_lan1") and rack.is_internet_connected(), "cable 1 in LAN 1, Internet still in WAN")
+	panel.do_step()
+	_check(rack.is_plugged("switch_01") and rack.is_link_on("switch_01") and rack.is_link_on("router_lan1"), "switch port 1 plugged, links up (good cable)")
+	panel.do_step()
+	_check(rack.is_plugged("switch_02") and not rack.is_link_on("switch_02"), "switch port 2 plugged, dark until the PC end is in")
+	panel.do_step()
+	await create_timer(0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
+	_check(mission.install_step == "pc" and not mission.at_desk and mission.pc_spot.get_prompt_text() != "", "rack done -> go to the teacher PC")
+	_check(not pc.plugged, "PC not plugged yet")
+	await mission.plug_pc(player)
+	_check(pc.plugged and pc.link_on and rack.is_link_on("switch_02"), "PC plugged, links up (spare cable)")
+	_check(mission.install_step == "leds" and not player.controls_locked, "then check the LEDs at the rack")
+	await mission.open_rack(player)
+	_check(panel.mode == "leds" and panel.visible, "rack opens for the LED check")
+	panel.confirm_leds()
+	await create_timer(Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
+	_check(mission.stage == Mission02Controller.Stage.REPORT and not mission.at_desk and rack.find_child("DoorGlass", true, false).visible, "LEDs checked -> report, door closed")
+	_check(not mission.state.job_works() and mission.state.port_points() == 6.0, "job does not work (cable 2 was the player's bad one), Router port right")
+	# Choosing WAN would pull out the Internet line.
+	var other := WallRack9U.new()
+	other.stage = WallRack9U.Stage.INSTALLED
+	root.add_child(other)
+	await process_frame
+	other.disconnect_internet()
+	other.plug("router_wan")
+	_check(not other.is_internet_connected() and other.is_plugged("router_wan"), "WAN chosen: Internet line out, the player's cable in WAN")
+	other.queue_free()
 
 
 func _finish() -> void:

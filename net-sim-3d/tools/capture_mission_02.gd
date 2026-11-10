@@ -134,5 +134,25 @@ func _run() -> void:
 	await _shot("m2_tester_cable2_pin3")
 	await create_timer(0.28 * 3).timeout
 	await _shot("m2_tester_cable2_pin6")
+	# Installing at the rack (cable 2 discarded -> spare).
+	await mission.leave_desk()
+	mission.state.tester_verdicts = {1: true, 2: false}
+	mission.state.spare_cables = [2]
+	player.global_position = Vector3(8.2, 0.05, -8.3)
+	mission._enter(Mission02Controller.Stage.INSTALL)
+	await mission.open_rack(player)
+	player.camera.make_current()
+	await _shot("m2_install_router_choice")
+	var install := mission.install_panel
+	install.choose_router_port("router_lan1")
+	install.do_step()
+	install.do_step()
+	install.do_step()
+	await _shot("m2_install_rack_done")
+	await create_timer(0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
+	player.global_position = Vector3(6.26, 0.05, -7.0)
+	mission.plug_pc(player)
+	await create_timer(Mission02Controller.DESK_ZOOM_TIME + 0.5).timeout
+	await _shot("m2_install_pc_port")
 	print("CAPTURE_DONE ", out_dir)
 	quit()

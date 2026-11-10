@@ -12,6 +12,7 @@ extends Node
 signal briefed
 signal cable_types_chosen
 signal tools_gathered
+signal installed
 signal replay_requested
 signal menu_requested
 signal next_requested
@@ -35,12 +36,14 @@ const NEXT_REMINDER := [
 ]
 const RECEIVED := "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN"
 
-enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, INSTALL, DONE }
+enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, INSTALL, REPORT, DONE }
 
 ## Seconds for the camera to move to / from the crimping desk.
 const DESK_ZOOM_TIME := 0.6
 ## Seconds to read the result of the last cable before standing up.
 const TESTING_DONE_PAUSE := 2.5
+## Seconds the camera stays on the teacher PC's port after plugging it.
+const PC_LED_LOOK := 1.6
 
 var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
@@ -55,6 +58,14 @@ var supervisor: Node3D
 var props: Mission02Props
 var crimp_panel: CrimpPanel
 var tester_panel: TesterPanel
+var install_panel: InstallPanel
+var rack: WallRack9U
+var pc_port: NetworkPort
+var rack_spot: InteractSpot
+var pc_spot: InteractSpot
+## Where the install stage is: "rack" (plug at the rack), "pc" (plug the
+## teacher PC), "leds" (look at the switch LEDs).
+var install_step := ""
 ## True while the player sits at the crimping desk.
 var at_desk := false
 var _timing := false
@@ -95,6 +106,29 @@ func _ready() -> void:
 	tester_panel.leave_requested.connect(leave_desk)
 	tester_panel.cable_judged.connect(_on_cable_judged)
 	tester_panel.all_done.connect(_on_testing_done)
+	install_panel = InstallPanel.new()
+	install_panel.name = "InstallPanel"
+	add_child(install_panel)
+	install_panel.leave_requested.connect(leave_desk)
+	install_panel.step_done.connect(_on_install_step)
+	install_panel.rack_done.connect(_on_rack_done)
+	install_panel.leds_checked.connect(_on_leds_checked)
+	rack = world.get_node_or_null("ComputerRoomRack") as WallRack9U
+	pc_port = world.get_node_or_null("TeacherPcPort") as NetworkPort
+	rack_spot = InteractSpot.new()
+	rack_spot.name = "RackSpot"
+	rack_spot.size = Vector3(0.7, 0.6, 0.4)
+	add_child(rack_spot)
+	if rack:
+		rack_spot.global_position = rack.global_position + rack.global_basis.z * 0.25
+	rack_spot.used.connect(open_rack)
+	pc_spot = InteractSpot.new()
+	pc_spot.name = "PcSpot"
+	pc_spot.size = Vector3(0.3, 0.4, 0.3)
+	add_child(pc_spot)
+	if pc_port:
+		pc_spot.global_position = pc_port.global_position + Vector3(0, -0.06, 0.08)
+	pc_spot.used.connect(plug_pc)
 	props = world.get_node_or_null("Mission02Props") as Mission02Props
 	if props:
 		props.set_items_available(false)
@@ -150,11 +184,16 @@ func _enter(next: Stage) -> void:
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_test_objective()
 		Stage.INSTALL:
-			hud.set_objective("นำสายทั้ง 2 เส้นไปติดตั้งที่ Wall Rack ในห้องคอมพิวเตอร์ (ขั้นตอนนี้กำลังสร้าง)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			if props:
 				props.crimp_station.set_prompt("")
-			marker.clear()
+			_set_install_step("rack")
+		Stage.REPORT:
+			hud.set_objective("กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support (ขั้นตอนนี้กำลังสร้าง)")
+			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
+			rack_spot.set_prompt("")
+			pc_spot.set_prompt("")
+			_point_at_supervisor()
 		Stage.DONE:
 			hud.set_objective("")
 			_set_prompt("")
@@ -251,6 +290,9 @@ func leave_desk() -> void:
 	_desk_busy = true
 	crimp_panel.close()
 	tester_panel.close()
+	install_panel.close()
+	if rack:
+		rack.set_door_open(false)
 	if props and props.crimp_station.tester:
 		# Off while away; sitting down again restores the step (TesterPanel._sync_desk).
 		props.crimp_station.tester.set_power(false)
@@ -264,6 +306,8 @@ func leave_desk() -> void:
 	_desk_busy = false
 	if stage in [Stage.CRIMP, Stage.TEST] and props:
 		marker.point_at_position(props.crimp_station.global_position, 0.45)
+	elif stage == Stage.INSTALL:
+		_set_install_step(install_step)
 
 
 func _on_crimping_done() -> void:
@@ -274,6 +318,110 @@ func _on_crimping_done() -> void:
 
 func _on_cable_judged(_cable: int, _passes: bool) -> void:
 	_refresh_test_objective()
+
+
+# ---------------------------------------------------------------- installing
+
+func _set_install_step(step: String) -> void:
+	install_step = step
+	rack_spot.set_prompt("")
+	pc_spot.set_prompt("")
+	match step:
+		"rack":
+			hud.set_objective("นำสายทั้ง 2 เส้นไปติดตั้งที่ Wall Rack ในห้องคอมพิวเตอร์ (หลังโต๊ะครู)")
+			rack_spot.set_prompt("กด F เพื่อเปิดตู้ Wall Rack และติดตั้งสาย")
+			if rack:
+				marker.point_at_position(rack.global_position, 0.45)
+		"pc":
+			hud.set_objective("เสียบสายเส้นที่ 2 เข้าการ์ดเครือข่ายด้านหลังคอมพิวเตอร์ครู")
+			pc_spot.set_prompt("กด F เพื่อเสียบสายเข้าการ์ดเครือข่าย")
+			if pc_port:
+				marker.point_at_position(pc_port.global_position, 0.35)
+		"leds":
+			hud.set_objective("กลับไปที่ Wall Rack แล้วตรวจไฟสถานะพอร์ตของ Switched Hub")
+			rack_spot.set_prompt("กด F เพื่อดูไฟสถานะพอร์ตที่ Wall Rack")
+			if rack:
+				marker.point_at_position(rack.global_position, 0.45)
+
+
+## Opens the rack: plugging the cables (rack step) or looking at the LEDs.
+func open_rack(player: Node) -> void:
+	if stage != Stage.INSTALL or not install_step in ["rack", "leds"] or at_desk or _desk_busy or rack == null:
+		return
+	_desk_busy = true
+	_player = player
+	at_desk = true
+	if player.has_method("set_controls_locked"):
+		player.set_controls_locked(true)
+	hud.set_auto_collapsed(true)
+	marker.clear()
+	rack.set_door_open(true)
+	Sound.play("door_open", rack)
+	if player.has_method("move_camera_to"):
+		await player.move_camera_to(rack.view_transform(), DESK_ZOOM_TIME)
+	install_panel.open(install_step)
+	_desk_busy = false
+
+
+func _on_install_step(step: String, value: String) -> void:
+	match step:
+		"router":
+			if state.router_port == "":
+				state.router_port = value
+			if value == "router_wan":
+				# The Internet line comes out of WAN to make room.
+				rack.disconnect_internet()
+			rack.plug(value)
+		"switch1":
+			rack.patch(state.router_port, "switch_01")
+			var works := state.installed_cable_works(1)
+			rack.set_link(state.router_port, works)
+			rack.set_link("switch_01", works)
+		"switch2":
+			rack.plug("switch_02")
+		"route":
+			rack.drop_to_pc("switch_02", pc_port, false)
+
+
+func _on_rack_done() -> void:
+	await get_tree().create_timer(0.8).timeout
+	await leave_desk()
+	_set_install_step("pc")
+
+
+## Plugs cable 2 into the teacher PC's network card and shows its LED.
+func plug_pc(player: Node) -> void:
+	if stage != Stage.INSTALL or install_step != "pc" or at_desk or _desk_busy or pc_port == null:
+		return
+	_desk_busy = true
+	_player = player
+	at_desk = true
+	pc_spot.set_prompt("")
+	marker.clear()
+	if player.has_method("set_controls_locked"):
+		player.set_controls_locked(true)
+	rack.drop_to_pc("switch_02", pc_port, true)
+	var works := state.installed_cable_works(2)
+	pc_port.set_link(works)
+	rack.set_link("switch_02", works)
+	Sound.play("crimp", pc_port)
+	# A close look at the port: is its link LED on?
+	var eye := pc_port.global_position + Vector3(0.05, 0.05, 0.26)
+	if player.has_method("move_camera_to"):
+		await player.move_camera_to(Transform3D(Basis.looking_at(pc_port.global_position - eye, Vector3.UP), eye), DESK_ZOOM_TIME)
+		await get_tree().create_timer(PC_LED_LOOK).timeout
+		await player.return_camera(DESK_ZOOM_TIME)
+	at_desk = false
+	if player.has_method("set_controls_locked"):
+		player.set_controls_locked(false)
+	_desk_busy = false
+	_set_install_step("leds")
+
+
+func _on_leds_checked() -> void:
+	await leave_desk()
+	installed.emit()
+	_enter(Stage.REPORT)
 
 
 ## Both cables judged: give the player time to read the last message, then go.
