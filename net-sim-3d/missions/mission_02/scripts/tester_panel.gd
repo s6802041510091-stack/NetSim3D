@@ -181,11 +181,16 @@ func judge(passes: bool) -> void:
 		_start_plugging()
 
 
+## The wires of this cable's two ends as crimped (shown inside the heads).
+func _wire_orders() -> Array:
+	return [state.ends.get("%dA" % cable, []), state.ends.get("%dB" % cable, [])]
+
+
 ## The plug step: the heads lie on the mat, the player drags them in.
 func _start_plugging() -> void:
 	if current_step() != "plug" or not visible:
 		return
-	station.plug_test_cable(true, false)
+	station.plug_test_cable(true, false, _wire_orders())
 	var camera := get_viewport().get_camera_3d()
 	station.plug_board.begin(camera, station.tester_views(), station.test_heads(), station.tester_sockets())
 
@@ -204,7 +209,7 @@ func _on_all_plugged() -> void:
 func _sync_desk() -> void:
 	# Coming back mid-way: show the cable / power as they were left.
 	var tester := station.tester
-	station.plug_test_cable(step_index >= 1 and not is_done())
+	station.plug_test_cable(step_index >= 1 and not is_done(), true, _wire_orders())
 	if step_index == 0 and not is_done():
 		_start_plugging()
 	tester.set_power(step_index >= 2 and not is_done())

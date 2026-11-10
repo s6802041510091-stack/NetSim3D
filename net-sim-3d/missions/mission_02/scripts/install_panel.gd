@@ -10,8 +10,9 @@ extends CanvasLayer
 ## Plugging is by hand (PlugBoard): for each step one RJ45 head waits in
 ## front of the rack with its cable coming up from below; the player drags
 ## it into a port. Only the ports the step allows take it (any Router port
-## for cable 1 - that is the decision; switch port 1, then 2). Q / E: the
-## whole rack, the Router close up, switch ports 1-12 close up. Running
+## for cable 1 - that is the decision; switch port 1, then 2). Q / E views:
+## 1 switch ports close up, 2 the whole rack (look only), 3 the Router close
+## up; a head can be dragged only in the close-up of its own device. Running
 ## cable 2 down to the teacher's PC follows by itself.
 ## The controller does the wiring when `step_done` fires.
 
@@ -40,8 +41,8 @@ var mode := "rack" # "rack" or "leds"
 var rack: WallRack9U
 ## Dragging the heads into the rack's ports.
 var board: PlugBoard
-## Where the dragged heads move: this far in front of the rack's back (m).
-const DRAG_Z := 0.18
+## The rack opens on the whole-rack view (index in rack_views()).
+const OVERVIEW_VIEW := 1
 const CABLE_COLOR := Color(0.16, 0.42, 0.85)
 ## Seconds before cable 2 is run down to the PC after it is plugged.
 const ROUTE_DELAY := 0.6
@@ -99,7 +100,7 @@ func open(new_mode: String) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh()
 	if mode == "rack":
-		_start_step(false)
+		_start_step(true)
 
 
 func close() -> void:
@@ -110,16 +111,29 @@ func close() -> void:
 
 
 ## Q / E views at the rack.
+## Q / E views at the rack: the head of the current step can be dragged only
+## in the close-up of the device it goes into.
 func rack_views() -> Array:
 	var routers := ["router_wan", "router_lan1", "router_lan2", "router_lan3", "router_lan4"]
 	var switches := []
 	for i in 12:
 		switches.append("switch_%02d" % (i + 1))
+	var step := current_step()
 	return [
-		{"name": "ภาพรวมตู้ Rack", "xform": rack.view_transform()},
-		{"name": "Router (WAN / LAN 1–4)", "xform": rack.close_view(routers, 0.17)},
-		{"name": "Switched Hub พอร์ต 1–12", "xform": rack.close_view(switches, 0.15)},
+		{"name": "Switched Hub พอร์ต 1–12", "xform": rack.close_view(switches, 0.15), "drag": step in ["switch1", "switch2"]},
+		{"name": "ภาพรวมตู้ Rack", "xform": rack.view_transform(), "drag": false},
+		{"name": "Router (WAN / LAN 1–4)", "xform": rack.close_view(routers, 0.17), "drag": step == "router"},
 	]
+
+
+## The close-up view where this step's head is dragged.
+func drag_view() -> int:
+	return 2 if current_step() == "router" else 0
+
+
+## The plane the head moves on: a little in front of its device's ports.
+func _drag_z() -> float:
+	return (WallRack9U.ROUTER_FRONT_Z if current_step() == "router" else WallRack9U.FRONT_Z) + 0.04
 
 
 ## Ports the current step's head may go into.
@@ -138,15 +152,17 @@ func allowed_ports() -> PackedStringArray:
 func _home() -> Vector3:
 	match current_step():
 		"router":
-			# Beside the router on the left, level with its ports (below it the shelf hides it).
-			return Vector3(rack.port_local("router_wan").x - 0.03, WallRack9U.ROUTER_Y, DRAG_Z)
+			# Right of LAN 4, level with the ports (the Internet line comes into WAN from the left).
+			return Vector3(rack.port_local("router_lan4").x + 0.018, rack.port_local("router_lan4").y, _drag_z())
 		"switch1":
-			return Vector3(rack.port_local("switch_01").x - 0.015, WallRack9U.SWITCH_Y - 0.038, DRAG_Z)
+			return Vector3(rack.port_local("switch_01").x - 0.015, WallRack9U.SWITCH_Y - 0.038, _drag_z())
 		_:
-			return Vector3(rack.port_local("switch_02").x + 0.025, WallRack9U.SWITCH_Y - 0.038, DRAG_Z)
+			return Vector3(rack.port_local("switch_02").x + 0.025, WallRack9U.SWITCH_Y - 0.038, _drag_z())
 
 
-func _start_step(keep_view: bool) -> void:
+## `at_overview`: the rack just opened (whole-rack view); otherwise the camera
+## glides to the close-up where the new head waits.
+func _start_step(at_overview: bool) -> void:
 	if rack == null or not visible or not current_step() in ["router", "switch1", "switch2"]:
 		return
 	_clear_head()
@@ -160,9 +176,9 @@ func _start_step(keep_view: bool) -> void:
 	var sockets := {}
 	for id in allowed_ports():
 		sockets[id] = rack.port_socket(id)
-	board.drag_plane = Plane(rack.global_basis.z.normalized(), rack.global_transform * Vector3(0, 0, DRAG_Z))
+	board.drag_plane = Plane(rack.global_basis.z.normalized(), rack.global_transform * Vector3(0, 0, _drag_z()))
 	board.hint = "ลากหัว RJ45 ไปเสียบที่พอร์ต" + ("ของ Router" if current_step() == "router" else " %d ของ Switched Hub" % (1 if current_step() == "switch1" else 2))
-	board.begin(get_viewport().get_camera_3d(), rack_views(), {"head": _head}, sockets, PackedStringArray(), keep_view)
+	board.begin(get_viewport().get_camera_3d(), rack_views(), {"head": _head}, sockets, PackedStringArray(), OVERVIEW_VIEW if at_overview else drag_view())
 	_rebuild_tail()
 
 
@@ -175,10 +191,11 @@ func _rebuild_tail() -> void:
 	if old:
 		old.free()
 	var h := _head.transform
-	var points := [h * Vector3(0, 0, 0.033), h * Vector3(0, -0.01, 0.07)]
+	var points := [h * Vector3(0, 0, 0.033), h * Vector3(0, -0.006, 0.05)]
 	match current_step():
 		"router":
-			points.append_array([Vector3(h.origin.x, -0.2, DRAG_Z + 0.03), Vector3(h.origin.x, -0.6, DRAG_Z + 0.03)])
+			var front := h.origin.z + 0.05
+			points.append_array([Vector3(h.origin.x, h.origin.y - 0.03, front), Vector3(h.origin.x, -0.6, front)])
 		"switch1":
 			var r := rack.port_local(router_port)
 			points.append_array([r + Vector3(0, -0.012, 0.06), r + Vector3(0, 0, 0.034)])
@@ -215,7 +232,7 @@ func _on_head_done() -> void:
 		if current_step() == "route":
 			_finish_step("")
 	else:
-		_start_step(true)
+		_start_step(false)
 
 
 func rack_finished() -> bool:

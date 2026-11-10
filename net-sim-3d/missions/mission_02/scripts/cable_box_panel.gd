@@ -13,7 +13,7 @@ const DEVICE_ICONS := "res://assets/ui/devices/"
 ## point -> [from title, from icon, to title, to icon]
 const POINTS := {
 	1: ["Router", "router", "Switched Hub 24 Port", "switched_hub_24_port"],
-	2: ["Switched Hub 24 Port", "switched_hub_24_port", "คอมพิวเตอร์ครู", ""],
+	2: ["Switched Hub 24 Port", "switched_hub_24_port", "คอมพิวเตอร์ครู", "computer"],
 }
 
 var box_type := ""
@@ -146,7 +146,15 @@ func _device(title: String, icon: String) -> Control:
 	var path := DEVICE_ICONS + icon + ".png"
 	if icon != "" and ResourceLoader.exists(path):
 		picture.texture = load(path)
-	box.add_child(picture)
+		box.add_child(picture)
+	else:
+		# No picture file for a desktop computer: draw one.
+		var drawn := Control.new()
+		drawn.name = "ComputerPicture"
+		drawn.custom_minimum_size = picture.custom_minimum_size
+		drawn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		drawn.draw.connect(draw_computer.bind(drawn))
+		box.add_child(drawn)
 	var name_label := GameUI.label(title, 14, GameUI.INK, true)
 	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -158,3 +166,29 @@ func _unhandled_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		close()
+
+
+## A desktop computer (monitor, keyboard, tower) in the grey-and-blue look of
+## the device pictures, fitted into `canvas`.
+static func draw_computer(canvas: Control) -> void:
+	var h := canvas.size.y
+	var unit := h / 56.0
+	var o := Vector2((canvas.size.x - 104.0 * unit) * 0.5, 0)
+	var r := func(x: float, y: float, w: float, hh: float) -> Rect2: return Rect2(o + Vector2(x, y) * unit, Vector2(w, hh) * unit)
+	var dark := Color(0.2, 0.22, 0.26)
+	var edge := Color(0.42, 0.45, 0.5)
+	# Monitor: bezel, screen with a soft highlight, stand and foot.
+	canvas.draw_rect(r.call(6, 4, 62, 38), dark)
+	canvas.draw_rect(r.call(9, 7, 56, 30), Color(0.2, 0.45, 0.78))
+	canvas.draw_rect(r.call(9, 7, 56, 12), Color(0.33, 0.58, 0.88))
+	canvas.draw_rect(r.call(6, 4, 62, 38), edge, false, 1.0)
+	canvas.draw_rect(r.call(33, 42, 8, 6), Color(0.32, 0.34, 0.38))
+	canvas.draw_rect(r.call(24, 48, 26, 3), Color(0.32, 0.34, 0.38))
+	# Keyboard.
+	canvas.draw_rect(r.call(12, 51, 50, 4), Color(0.55, 0.58, 0.63))
+	# Tower: case, front panel line, power button, drive slot.
+	canvas.draw_rect(r.call(76, 8, 24, 47), dark)
+	canvas.draw_rect(r.call(76, 8, 24, 47), edge, false, 1.0)
+	canvas.draw_rect(r.call(80, 14, 16, 3), Color(0.35, 0.38, 0.43))
+	canvas.draw_circle(o + Vector2(88, 24) * unit, 2.2 * unit, Color(0.3, 0.8, 1.0))
+	canvas.draw_rect(r.call(80, 44, 16, 1.5), Color(0.35, 0.38, 0.43))

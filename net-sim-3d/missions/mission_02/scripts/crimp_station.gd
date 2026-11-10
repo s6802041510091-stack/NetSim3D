@@ -97,7 +97,9 @@ func hide_tester() -> void:
 ## beside the tester (`plugged` false) or already in the sockets (true, when
 ## the player comes back to a cable that was plugged before). `on` false
 ## takes it away.
-func plug_test_cable(on: bool, plugged := true, color := Color(0.62, 0.72, 0.84)) -> void:
+## `wire_orders`: the 8 wires (pin 1 to 8) of end A and end B, shown inside
+## the clear heads in the order the player crimped them.
+func plug_test_cable(on: bool, plugged := true, wire_orders: Array = [], color := Color(0.62, 0.72, 0.84)) -> void:
 	if _test_cable:
 		_test_cable.queue_free()
 		_test_cable = null
@@ -135,6 +137,8 @@ func plug_test_cable(on: bool, plugged := true, color := Color(0.62, 0.72, 0.84)
 		contacts.material_override = gold
 		contacts.position = Vector3(0, HEAD_SIZE.y * 0.5 - 0.001, 0.004)
 		head.add_child(contacts)
+		if i < wire_orders.size():
+			_head_wires(head, wire_orders[i])
 		if plugged:
 			var socket: Node3D = sockets.values()[i]
 			head.global_transform = Transform3D(socket.global_basis.orthonormalized(), socket.global_position)
@@ -162,6 +166,38 @@ func head_home(i: int) -> Transform3D:
 	return Transform3D(Basis.looking_at(-out, Vector3.UP), at)
 
 
+## The 8 crimped wires inside a clear head, side by side under the contacts
+## (pin 1 on the left seen from the cable side with the contacts up).
+func _head_wires(head: Node3D, order: Array) -> void:
+	var pitch := HEAD_SIZE.x * 0.8 / 8.0
+	var length := HEAD_SIZE.z - 0.006
+	var y := HEAD_SIZE.y * 0.5 - 0.003
+	for pin in mini(order.size(), 8):
+		var id: String = order[pin]
+		if not WireColors.WIRES.has(id):
+			continue
+		var color: Color = WireColors.WIRES[id][1]
+		var striped := bool(WireColors.WIRES[id][2])
+		var x := (pin - 3.5) * pitch
+		_wire_box(head, Vector3(pitch * 0.82, 0.0016, length), Vector3(x, y, 0.006 + length * 0.5), WireColors.WHITE if striped else color)
+		if striped:
+			_wire_box(head, Vector3(pitch * 0.4, 0.0004, length), Vector3(x, y + 0.001, 0.006 + length * 0.5), color)
+
+
+func _wire_box(parent: Node3D, size: Vector3, at: Vector3, color: Color) -> void:
+	var mesh := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = size
+	mesh.mesh = box
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.5
+	mesh.material_override = material
+	mesh.position = at
+	mesh.name = "Wire"
+	parent.add_child(mesh)
+
+
 ## The heads by id ("A", "B") while the test cable is out.
 func test_heads() -> Dictionary:
 	return _heads
@@ -176,7 +212,7 @@ func tester_sockets() -> Dictionary:
 
 ## Q / E views at the tester: the whole device, then each socket close up.
 func tester_views() -> Array:
-	var list := [{"name": "ภาพรวมเครื่อง", "xform": tester_view_transform()}]
+	var list := [{"name": "ภาพรวมเครื่อง", "xform": tester_view_transform(), "drag": false}]
 	var i := 0
 	for id: String in tester_sockets():
 		var socket: Node3D = tester_sockets()[id]
@@ -188,7 +224,7 @@ func tester_views() -> Array:
 		var basis := Basis.looking_at(p - eye, Vector3.UP)
 		# Shifted right so the socket sits left of centre, clear of the step panel.
 		eye += basis.x * 0.015
-		list.append({"name": "ช่อง %s (%s)" % [id, "ตัวแม่" if id == "MAIN" else "ตัวลูก"], "xform": Transform3D(basis, eye)})
+		list.append({"name": "ช่อง %s (%s)" % [id, "ตัวแม่" if id == "MAIN" else "ตัวลูก"], "xform": Transform3D(basis, eye), "drag": true})
 	return list
 
 

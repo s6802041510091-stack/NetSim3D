@@ -7,6 +7,8 @@ extends Node
 ##     device, socket A close up, socket B close up; or device 1 / device 2,
 ##     top / bottom). Q goes to the previous one, E to the next; the camera
 ##     glides there, so the player always knows what each view shows.
+##     A view with "drag": false is for looking only (an overview): heads
+##     can be dragged only in the close-up views that allow it.
 ##   - Plugs: RJ45 heads (Node3D, -Z points the way the head goes in). The
 ##     player presses on a head, drags it, and lets go over a free socket;
 ##     the head lines up in front of the socket and slides in with a click.
@@ -44,6 +46,9 @@ var sockets := {} # id -> Node3D
 var required: PackedStringArray = []
 var connected := {} # socket id -> plug id
 var hint := "ลากหัว RJ45 ไปเสียบที่ช่อง"
+## Length of a head from its tip to the end of its boot (m): pressing
+## anywhere along it picks it up.
+var plug_length := 0.034
 ## Upright plane for dragging in front of a panel of ports; a zero normal
 ## means "level, at the head's height".
 var drag_plane := Plane(Vector3.ZERO, 0.0)
@@ -84,15 +89,15 @@ func _ready() -> void:
 	col.add_child(_hint_label)
 
 
-## Starts plugging. `view_list` as in `views`; the camera is assumed to be at
-## view 0 already. Plug homes are where the heads are now.
-## `keep_view`: the camera stays on the current view (a next step at the
-## same place, same view list).
-func begin(cam: Camera3D, view_list: Array, plug_nodes: Dictionary, socket_nodes: Dictionary, required_sockets: PackedStringArray = PackedStringArray(), keep_view := false) -> void:
+## Starts plugging. `view_list` as in `views`; the camera glides to view
+## `start_view` if it is not there already. Plug homes are where the heads
+## are now.
+func begin(cam: Camera3D, view_list: Array, plug_nodes: Dictionary, socket_nodes: Dictionary, required_sockets: PackedStringArray = PackedStringArray(), start_view := 0) -> void:
 	camera = cam
-	if not keep_view or view_list.size() != views.size():
-		view_index = 0
 	views = view_list
+	view_index = clampi(start_view, 0, maxi(views.size() - 1, 0))
+	if not views.is_empty() and camera and camera.global_position.distance_to((views[view_index]["xform"] as Transform3D).origin) > 0.002:
+		go_to_view(view_index, true)
 	plugs = plug_nodes
 	sockets = socket_nodes
 	required = required_sockets if not required_sockets.is_empty() else PackedStringArray(socket_nodes.keys())
@@ -120,8 +125,13 @@ func is_plugged(plug_id: String) -> bool:
 	return plug_id in connected.values()
 
 
+## True when the heads can be dragged in the current view.
+func can_drag() -> bool:
+	return views.is_empty() or bool(views[view_index].get("drag", true))
+
+
 ## Moves to view `index` (wraps round).
-func go_to_view(index: int) -> void:
+func go_to_view(index: int, silent := false) -> void:
 	if views.is_empty() or camera == null:
 		return
 	view_index = posmod(index, views.size())
@@ -129,7 +139,8 @@ func go_to_view(index: int) -> void:
 		_view_tween.kill()
 	_view_tween = create_tween()
 	_view_tween.tween_property(camera, "global_transform", views[view_index]["xform"], VIEW_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	Sound.play("select")
+	if not silent:
+		Sound.play("select")
 	_refresh_bar()
 	view_changed.emit(view_index)
 
@@ -207,6 +218,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var button := event as InputEventMouseButton
 	if button.pressed:
+		if not can_drag():
+			return
 		var id := _plug_at(button.position)
 		if id != "":
 			get_viewport().set_input_as_handled()
@@ -235,10 +248,12 @@ func _plug_at(at: Vector2) -> String:
 	for id: String in plugs:
 		if is_plugged(id):
 			continue
-		var p: Vector3 = (plugs[id] as Node3D).global_position
-		if camera.is_position_behind(p):
+		var head: Node3D = plugs[id]
+		var tip := head.global_position
+		var tail := head.global_transform * Vector3(0, 0, plug_length)
+		if camera.is_position_behind(tip) or camera.is_position_behind(tail):
 			continue
-		var d := camera.unproject_position(p).distance_to(at)
+		var d := Geometry2D.get_closest_point_to_segment(at, camera.unproject_position(tip), camera.unproject_position(tail)).distance_to(at)
 		if d < best_d:
 			best_d = d
 			best = id
@@ -300,7 +315,15 @@ func _refresh_bar() -> void:
 		_bar_label.text = ""
 	else:
 		_bar_label.text = "◀ Q    %s  (%d/%d)    E ▶" % [views[view_index]["name"], view_index + 1, views.size()]
-	_hint_label.text = hint
+	if can_drag():
+		_hint_label.text = hint
+	else:
+		var close := ""
+		for v in views:
+			if bool(v.get("drag", true)):
+				close = String(v["name"])
+				break
+		_hint_label.text = "มุมนี้ใช้ดูอย่างเดียว ลากหัวสายไม่ได้" + (" — กด Q / E ไปที่มุม \"%s\"" % close if close != "" else "")
 
 
 ## A real-size RJ45 plug with a coloured boot, its tip at the origin and the

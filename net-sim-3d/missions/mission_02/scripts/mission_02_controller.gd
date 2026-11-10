@@ -568,9 +568,9 @@ func _on_rack_done() -> void:
 	_set_install_step("pc")
 
 
-## At the teacher's PC: the end of cable 2 lies on the desk behind the PC;
-## the player drags it into the network card (PlugBoard; Q / E: the port
-## close up, the whole desk). Then the link LED shows for a moment.
+## At the teacher's PC: the end of cable 2 waits in front of the port; the
+## player drags it into the network card (PlugBoard; Q / E: the back of the
+## PC at medium distance, look only; the port close up, drag there). Then the link LED shows for a moment.
 func plug_pc(player: Node) -> void:
 	if stage != Stage.INSTALL or install_step != "pc" or at_desk or _desk_busy or pc_port == null:
 		return
@@ -616,10 +616,12 @@ func pc_views() -> Array:
 	var side := pc_port.global_basis.x.normalized()
 	var target := p.lerp(pc_head_home(), 0.35)
 	var eye := target + out * 0.17 + side * 0.01 + Vector3.UP * 0.03
-	var wide_eye := p + out * 0.9 + Vector3.UP * 0.45
+	# Medium distance: the back of the PC with the port and the cable end (look only).
+	var mid_target := p + Vector3.DOWN * 0.06
+	var mid_eye := mid_target + out * 0.5 + Vector3.UP * 0.16
 	return [
-		{"name": "ช่อง LAN ด้านหลังคอมพิวเตอร์ครู", "xform": Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)},
-		{"name": "ภาพรวมโต๊ะครู", "xform": Transform3D(Basis.looking_at(p - wide_eye, Vector3.UP), wide_eye)},
+		{"name": "ด้านหลังคอมพิวเตอร์ครู", "xform": Transform3D(Basis.looking_at(mid_target - mid_eye, Vector3.UP), mid_eye), "drag": false},
+		{"name": "ช่อง LAN ระยะใกล้", "xform": Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye), "drag": true},
 	]
 
 

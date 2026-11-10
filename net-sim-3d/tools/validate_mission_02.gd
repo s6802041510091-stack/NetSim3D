@@ -432,15 +432,23 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 	_check(board.view_index == 2 and board._bar_label.text.contains("REMOTE"), "Q twice: round to the REMOTE socket")
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
-	# A head dropped on the bare mat goes back where it lay.
+	# The overview is for looking only: a drag does nothing.
 	var home := (station.test_heads()["A"] as Node3D).global_position
-	var from := board.plug_screen_point("A")
-	_drag(board, from, from + Vector2(-150, 60))
+	_check(not board.can_drag() and board._hint_label.text.contains("ดูอย่างเดียว"), "overview: look only, the bar says so: " + board._hint_label.text)
+	_drag(board, board.plug_screen_point("A"), board.socket_screen_point("MAIN"))
 	await create_timer(0.35).timeout
-	_check(not board.is_plugged("A") and (station.test_heads()["A"] as Node3D).global_position.distance_to(home) < 0.002, "dropped off a socket: the head goes back")
-	# MAIN close up: drag head A in.
+	_check(not board.is_plugged("A") and (station.test_heads()["A"] as Node3D).global_position.distance_to(home) < 0.0005, "overview: the head cannot be dragged")
+	# MAIN close up: a drop on the bare mat goes back, then into MAIN.
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(board.can_drag(), "close up: heads can be dragged")
+	var a_tail: Vector2 = cam.unproject_position((station.test_heads()["A"] as Node3D).global_transform * Vector3(0, 0, 0.03))
+	_drag(board, a_tail, a_tail + Vector2(-150, 60))
+	await create_timer(0.35).timeout
+	_check(not board.is_plugged("A") and (station.test_heads()["A"] as Node3D).global_position.distance_to(home) < 0.002, "grabbed by its boot and dropped off a socket: the head goes back")
+	# Clear body + contacts, then 8 wires (and a stripe on each white one).
+	var parts := (station.test_heads()["A"] as Node3D).get_child_count()
+	_check(parts >= 2 + 8, "the crimped wires show inside the clear head (%d parts)" % parts)
 	_check(_on_left_part(cam, board.plug_screen_point("A")) and _on_left_part(cam, board.socket_screen_point("MAIN")), "MAIN close up shows the socket and head A: %s %s" % [board.socket_screen_point("MAIN"), board.plug_screen_point("A")])
 	_drag(board, board.plug_screen_point("A"), board.socket_screen_point("MAIN"))
 	_check(board.connected.get("MAIN", "") == "A", "head A dragged into MAIN (seen close up)")
@@ -500,6 +508,11 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	var board := panel.board
 	var cam: Camera3D = player.camera
 	_check(board.active and board.views.size() == 3 and panel.find_child("Port_router_lan1", true, false) == null and panel._head != null, "rack: a head to drag, 3 views, no port buttons")
+	_check(board.view_index == InstallPanel.OVERVIEW_VIEW and not board.can_drag() and board._bar_label.text.contains("ภาพรวม"), "the rack opens on the whole-rack view (look only): " + board._bar_label.text)
+	_key(board, KEY_Q)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(board.view_index == 0 and board._bar_label.text.contains("Switched Hub") and not board.can_drag(), "Q: switch close-up, but the Router head cannot be dragged there")
+	_key(board, KEY_E)
 	_check(Array(panel.allowed_ports()) == ["router_wan", "router_lan1", "router_lan2", "router_lan3", "router_lan4"], "cable 1 may go into any Router port (the decision)")
 	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
@@ -514,9 +527,8 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(board.connected.get("router_lan1", "") == "head", "head dragged into Router LAN 1 (seen close up)")
 	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
 	_check(mission.state.router_port == "router_lan1" and rack.is_plugged("router_lan1") and rack.is_internet_connected(), "cable 1 in LAN 1, Internet still in WAN")
-	_check(panel.current_step() == "switch1" and board.active and board.view_index == 1, "next head: switch port 1, the view stays")
-	_key(board, KEY_E)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(panel.current_step() == "switch1" and board.active and board.view_index == 0 and board.can_drag(), "next head: the camera moves to the switch close-up")
 	_check(_on_left_part(cam, board.plug_screen_point("head")) and _on_left_part(cam, cam.unproject_position(rack.port_position("switch_01"))), "switch close up shows the head and port 1")
 	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_01")))
 	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
@@ -532,7 +544,13 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	var pcb := mission.pc_board
 	_check(not player._leg_parts.is_empty() and player._leg_parts.all(func(p): return p.layers == 2), "own legs hidden from the camera at the PC close-up")
 	_check(pcb.active and mission._pc_head != null and pcb.views.size() == 2 and not pc.plugged, "PC: the cable end lies behind the PC, 2 views")
-	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01, "camera on the port and the cable end")
+	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01 and not pcb.can_drag(), "PC: first the back of the PC at medium distance (look only)")
+	_drag(pcb, pcb.plug_screen_point("head"), cam.unproject_position(pc.global_position))
+	await create_timer(0.3).timeout
+	_check(not pc.plugged and pcb.connected.is_empty(), "medium view: the cable end cannot be dragged")
+	_key(pcb, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(pcb.view_index == 1 and pcb.can_drag() and cam.global_position.distance_to(pc.global_position) < 0.25, "E: the LAN port close up, drag there")
 	var at_port := cam.unproject_position(pc.global_position)
 	var at_head := pcb.plug_screen_point("head")
 	var screen := cam.get_viewport().get_visible_rect().size

@@ -221,12 +221,10 @@ func _run() -> void:
 	await _shot("m2_install_router_choice")
 	var install := mission.install_panel
 	var hold := PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.3
-	for i in [1, 2]:
+	for i in [0, 2]:
 		install.board.go_to_view(i)
 		await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
 		await _shot("m2_rack_view_%d" % i)
-	install.board.go_to_view(1)
-	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
 	# Dragging cable 1 towards LAN 1: the port glows.
 	var drag_press := InputEventMouseButton.new()
 	drag_press.button_index = MOUSE_BUTTON_LEFT
@@ -242,7 +240,6 @@ func _run() -> void:
 	drag_release.position = drag_move.position
 	install.board._unhandled_input(drag_release)
 	await create_timer(hold).timeout
-	install.board.go_to_view(2)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
 	await _shot("m2_rack_switch_step")
 	install.plug_head("switch_01")
@@ -253,12 +250,10 @@ func _run() -> void:
 	await create_timer(InstallPanel.ROUTE_DELAY + 0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
 	player.global_position = Vector3(6.26, 0.05, -7.0)
 	await mission.plug_pc(player)
-	await _shot("m2_pc_plug_view")
+	await _shot("m2_pc_plug_medium")
 	mission.pc_board.go_to_view(1)
 	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
-	await _shot("m2_pc_plug_wide")
-	mission.pc_board.go_to_view(0)
-	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	await _shot("m2_pc_plug_view")
 	mission.pc_board.plug_into("head", "pc")
 	await create_timer(hold + 0.3).timeout
 	await _shot("m2_install_pc_port")
