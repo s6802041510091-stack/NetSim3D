@@ -40,7 +40,7 @@ func get_prompt_text() -> String:
 func use(player: Node) -> void:
 	if taken or not available:
 		return
-	var presentation: Node = player.get("presentation") if player else null
+	var presentation: Node = player.get_node_or_null("Presentation") if player else null
 	if presentation and presentation.has_method("add_item"):
 		if not presentation.call("add_item", item_id, title):
 			return

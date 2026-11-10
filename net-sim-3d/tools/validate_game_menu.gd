@@ -24,8 +24,8 @@ func run() -> void:
 	for child in flow._body.get_children():
 		if child is Button and child.disabled:
 			disabled += 1
-	check(disabled == 3, "levels 2, 3, 4 explicitly unavailable")
-	flow.start_level(2)
+	check(disabled == 2, "levels 3, 4 explicitly unavailable")
+	flow.start_level(3)
 	check(not flow.loading and flow.current_level == 0, "unfinished level cannot launch")
 	for bus in ["Music", "SoundEffect", "Sound"]:
 		flow.set_volume(bus, 0.0)
@@ -35,7 +35,7 @@ func run() -> void:
 		check(is_equal_approx(AudioServer.get_bus_volume_linear(AudioServer.get_bus_index(bus)), 0.37), bus + " gain")
 	flow.load_preferences()
 	check(flow.volumes.Sound == 37.0 and flow.volumes.Music == 37.0, "volume persists")
-	for level in [1, 5, 6]:
+	for level in [1, 2, 5, 6]:
 		flow.start_level(level)
 		var deadline := Time.get_ticks_msec() + 120000
 		while not paused and Time.get_ticks_msec() < deadline:
@@ -58,7 +58,9 @@ func run() -> void:
 		check(counts.netplan_edu == 0, "NetPlan waits for the level 1 briefing")
 		check(current_scene.has_node("Mission01") == (level == 1), "level 1 controller isolated")
 		var rack: WallRack9U = current_scene.get_node("ComputerRoomRack")
-		check(rack.stage == (WallRack9U.Stage.EMPTY if level == 1 else WallRack9U.Stage.CABLED), "wall rack follows the story")
+		var want_stage := WallRack9U.Stage.EMPTY if level == 1 else (WallRack9U.Stage.INSTALLED if level == 2 else WallRack9U.Stage.CABLED)
+		check(rack.stage == want_stage, "wall rack follows the story")
+		check(current_scene.has_node("Mission02") == (level == 2) and current_scene.has_node("Mission02Props") == (level == 2), "level 2 controller and props isolated")
 		check(counts.windows_security == (1 if level == 5 else 0), "only level 5 installs Security")
 		check(counts.teamviewer == (1 if level == 6 else 0), "only level 6 installs TeamViewer")
 		check(current_scene.has_node("Mission06") == (level == 6), "phone mission isolated")

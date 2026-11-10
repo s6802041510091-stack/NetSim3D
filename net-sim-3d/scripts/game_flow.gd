@@ -6,7 +6,7 @@ extends Node
 const MAP := "res://scenes/main.tscn"
 const MENU := "res://scenes/start_menu.tscn"
 var save_file := SavePaths.file("menu.cfg")
-const AVAILABLE := [1, 5, 6]
+const AVAILABLE := [1, 2, 5, 6]
 const TITLES := ["ออกแบบเครือข่าย", "ประกอบและเชื่อมต่อสาย LAN", "ตรวจรับระบบเครือข่าย", "ตรวจสอบและเปลี่ยนการ์ดเครือข่าย", "ความปลอดภัยของคอมพิวเตอร์", "ช่วยเหลือผ่าน Remote Desktop"]
 const AUDIO := {"Music": "เสียงเพลงประกอบ", "SoundEffect": "เสียงภารกิจ / โทรศัพท์ / คอมพิวเตอร์ / เสียงพูด", "Sound": "เสียงบรรยากาศ / เดิน / เปิด–ปิดประตู"}
 
@@ -202,6 +202,9 @@ func configure_level(world: Node, level: int) -> void:
 	var rack := world.get_node_or_null("ComputerRoomRack")
 	if rack:
 		rack.stage = WallRack9U.Stage.EMPTY if level == 1 else (WallRack9U.Stage.INSTALLED if level == 2 else WallRack9U.Stage.CABLED)
+	var access_point := world.get_node_or_null("ComputerRoomAccessPoint")
+	if access_point:
+		access_point.installed = level >= 2
 	if level == 1:
 		var mission: Node = load("res://missions/mission_01/scripts/mission_01_controller.gd").new()
 		mission.name = "Mission01"
@@ -210,6 +213,10 @@ func configure_level(world: Node, level: int) -> void:
 	if level == 2:
 		# Tools and cable on the spare desk in the IT Support room.
 		world.add_child(load("res://missions/mission_02/scripts/mission_02_props.gd").new())
+		var mission_02: Node = load("res://missions/mission_02/scripts/mission_02_controller.gd").new()
+		mission_02.name = "Mission02"
+		world.add_child(mission_02)
+		_connect_level_end(mission_02, level)
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)

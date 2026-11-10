@@ -66,6 +66,11 @@ func _run() -> void:
 	camera.global_position = Vector3(-15.8, 1.6, -36.6)
 	camera.look_at(Vector3(-13.6, 0.8, -38.43))
 	await _shot("m2_desk_room_view")
+	# Access point on the ceiling in the middle of the computer room.
+	camera.fov = 70.0
+	camera.global_position = Vector3(1.2, 1.65, 3.2)
+	camera.look_at(Vector3(2.96, 3.1, 0.0))
+	await _shot("m2_access_point")
 	# The rack as the player sees it, standing in the room.
 	rack.stage = WallRack9U.Stage.INSTALLED
 	await process_frame
