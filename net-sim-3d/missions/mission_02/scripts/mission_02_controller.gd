@@ -5,14 +5,16 @@ extends Node
 ##   1. talk to the Data Center supervisor -> "ได้รับภารกิจ", the timer starts
 ##   2. the work order: cable type for the 2 connection points (once)
 ##   3. pick up the 5 items on the spare desk in the IT Support room
-##   4. (next steps of the round) crimp, test, install, check the port LEDs,
-##      report -> summary
+##   4. crimp 4 ends at the desk (CrimpPanel), test both cables (TesterPanel)
+##   5. install at the wall rack and the teacher PC, check the port LEDs
+##   6. report to the supervisor -> score (Mission02State) -> summary
 ## Rules (ภารกิจ/ด่าน_02/README.md): every step once, no retries.
 
 signal briefed
 signal cable_types_chosen
 signal tools_gathered
 signal installed
+signal finished(score: MissionScore)
 signal replay_requested
 signal menu_requested
 signal next_requested
@@ -35,6 +37,10 @@ const NEXT_REMINDER := [
 	"หัวหน้างาน Data Center|อุปกรณ์ครบแล้ว ทำงานตามใบงานต่อได้เลย",
 ]
 const RECEIVED := "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN"
+const SUMMARY_TITLE := "ด่านที่ 2  ·  ประกอบและเชื่อมต่อสาย LAN — เข้าหัวและติดตั้งสาย"
+## Time score (placeholder until play-testing): full up to 12 min, 0 at 30 min.
+const TIME_FULL_SEC := 720.0
+const TIME_ZERO_SEC := 1800.0
 
 enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, INSTALL, REPORT, DONE }
 
@@ -48,6 +54,7 @@ const PC_LED_LOOK := 1.6
 var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
 var state := Mission02State.new()
+var score: MissionScore
 var work_order: Mission02WorkOrder
 var hud: ObjectiveHUD
 var dialogue: DialogueBox
@@ -189,7 +196,7 @@ func _enter(next: Stage) -> void:
 				props.crimp_station.set_prompt("")
 			_set_install_step("rack")
 		Stage.REPORT:
-			hud.set_objective("กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support (ขั้นตอนนี้กำลังสร้าง)")
+			hud.set_objective("กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support")
 			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
 			rack_spot.set_prompt("")
 			pc_spot.set_prompt("")
@@ -240,8 +247,68 @@ func _on_talked(player: Node) -> void:
 			_enter(Stage.CABLE_TYPE)
 		Stage.GATHER:
 			await _say(player, PackedStringArray(GATHER_REMINDER))
+		Stage.REPORT:
+			await _say(player, report_lines(), false)
+			hud.show_toast("ภารกิจที่ 2 เสร็จสิ้น")
+			finish(player)
+		Stage.DONE:
+			pass
 		_:
 			await _say(player, PackedStringArray(NEXT_REMINDER))
+
+
+## What the player reports and what the supervisor answers, from the real result.
+func report_lines() -> PackedStringArray:
+	var both_lit := rack != null and pc_port != null and rack.is_link_on("switch_01") and rack.is_link_on("switch_02") and pc_port.link_on
+	var lines := PackedStringArray()
+	lines.append("คุณ|ผมเข้าหัว ตรวจสอบ และติดตั้งสาย LAN ทั้ง 2 เส้นตามใบงานแล้วครับ " + ("ไฟสถานะพอร์ตติดทั้งสองจุดครับ" if both_lit else "แต่ไฟสถานะพอร์ตบางจุดไม่ติดครับ"))
+	if state.job_works():
+		lines.append("หัวหน้างาน Data Center|ดีมาก **การเลือกชนิดสาย การเรียงสี การย้ำหัว และการตรวจสอบสายก่อนติดตั้ง**เป็นขั้นตอนสำคัญ ถ้าสายมีปัญหาจะทำให้เสียเวลาในการตรวจสอบระบบภายหลัง")
+		return lines
+	if state.router_port == "router_wan":
+		lines.append("หัวหน้างาน Data Center|สายเส้นที่ 1 ไปเสียบที่**พอร์ต WAN** ซึ่งเป็นช่องของ**สายอินเทอร์เน็ต** ตอนนี้ห้องคอมเลยออกอินเทอร์เน็ตไม่ได้")
+	if not state.spare_cables.is_empty():
+		lines.append("หัวหน้างาน Data Center|ดีที่ตรวจเจอสายเสียก่อนติดตั้ง แต่สายที่เข้าหัวเอง**ยังใช้งานไม่ได้** ต้องใช้**สายสำรอง**แทน")
+	if not both_lit:
+		lines.append("หัวหน้างาน Data Center|ไฟสถานะไม่ติดแสดงว่า**สายยังมีปัญหา** ควรตรวจด้วย Tester ให้ดีก่อนนำไปติดตั้งทุกครั้ง")
+	lines.append("หัวหน้างาน Data Center|งานนี้ยังใช้งานไม่ได้จริง ลองดู**จุดที่ผิดพลาด**ในสรุปผล แล้วฝึกเรียงสี **T568B** ให้คล่องนะ")
+	return lines
+
+
+## Builds the score, records it and shows the summary. Also used by tests.
+func finish(player: Node = null) -> MissionScore:
+	_timing = false
+	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
+	var record := GameProgress.record_attempt(LEVEL, score, {
+		"cable_types": state.cable_types.duplicate(), "ends": state.ends.duplicate(true),
+		"tester_verdicts": state.tester_verdicts.duplicate(), "router_port": state.router_port,
+		"spare_cables": Array(state.spare_cables), "job_works": state.job_works()})
+	_enter(Stage.DONE)
+	if player and player.has_method("set_controls_locked"):
+		player.set_controls_locked(true)
+	var flow := get_tree().root.get_node_or_null("GameFlow")
+	var next_available: bool = flow != null and flow.call("next_level_available", LEVEL)
+	var colours_ok := 0
+	for key: String in ["1A", "1B", "2A", "2B"]:
+		colours_ok += 8 - state.wrong_pins(key).size()
+	var tester_ok := 0
+	for cable in [1, 2]:
+		if state.tester_verdicts.has(cable) and bool(state.tester_verdicts[cable]) == state.cable_good(cable):
+			tester_ok += 1
+	var types_ok := 0
+	for point in Mission02State.POINTS:
+		if state.cable_types.get(point, "") == Mission02State.STRAIGHT:
+			types_ok += 1
+	summary.show_result(SUMMARY_TITLE, score, record, next_available, [
+		["ผลงานใช้งานได้จริง", "ใช่" if state.job_works() else "ไม่ใช่ (สายเรียงสีผิด หรือเสียบพอร์ตผิด)"],
+		["เลือกชนิดสาย", "ถูก %d จาก 2 จุด" % types_ok],
+		["เรียงสี T568B", "ถูก %d จาก 32 ตำแหน่ง (4 ปลาย)" % colours_ok],
+		["อ่านผล LAN Cable Tester", "ถูก %d จาก 2 เส้น" % tester_ok],
+		["พอร์ตของ Router", state.router_port.replace("router_lan", "LAN ").replace("router_wan", "WAN")],
+		["ใช้สายสำรอง", "%d เส้น" % state.spare_cables.size()],
+	])
+	finished.emit(score)
+	return score
 
 
 func _refresh_crimp_objective() -> void:

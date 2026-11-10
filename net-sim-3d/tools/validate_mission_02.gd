@@ -67,6 +67,8 @@ func _test_rules() -> void:
 
 
 func _run() -> void:
+	GameProgress.save_path = "user://test_validate_progress_m2.json"
+	GameProgress.clear()
 	_test_rules()
 	var flow := root.get_node("GameFlow")
 	_check(2 in flow.AVAILABLE, "Level 2 is selectable")
@@ -297,8 +299,41 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	other.plug("router_wan")
 	_check(not other.is_internet_connected() and other.is_plugged("router_wan"), "WAN chosen: Internet line out, the player's cable in WAN")
 	other.queue_free()
+	await _test_report(mission, player)
+
+
+## Reporting: the summary with the agreed score.
+## A: 1 of 2 straight (5) + B 22.5 + D 1 of 2 (5) + E LAN (6) = 38.5 -> 39 (rounded);
+## correctness 0 (cable 2 was the player's bad one); time full in a test run.
+func _test_report(mission: Mission02Controller, player: CharacterBody3D) -> void:
+	_check(mission.talk.prompt.contains("รายงาน") and mission.marker.target == mission.supervisor, "report prompt and arrow on the supervisor")
+	var lines := mission.report_lines()
+	_check(lines[0].contains("บางจุดไม่ติด") == false and "\n".join(lines).contains("สายสำรอง"), "report mentions the spare cable: %s" % ["\n".join(lines)])
+	mission._on_talked(player)
+	await create_timer(mission.supervisor.turn_time + 0.5).timeout
+	await _finish_dialogue(mission.dialogue)
+	await _frames(3)
+	var score := mission.score
+	_check(score != null and mission.summary.visible and mission.stage == Mission02Controller.Stage.DONE, "summary shown after reporting")
+	if score == null:
+		return
+	_check(score.correctness == 0 and score.process == 39 and score.time == 20 and score.total() == 59, "score %s" % score.to_dict())
+	_check(score.passed() and score.stars() == 1, "59 passes with 1 star")
+	_check(score.decisions_correct == 6 and score.decisions_total == 9, "decisions %d/%d" % [score.decisions_correct, score.decisions_total])
+	var mistakes := "\n".join(score.mistakes)
+	for want in ["Crossover", "ปลายที่ 2: เรียงสีไม่ตรง T568B ที่ขา 3, 6", "อ่านผล Tester ผิด", "สายสำรอง", "ยังใช้งานไม่ได้จริง"]:
+		_check(mistakes.contains(want), "mistakes list has: " + want)
+	var last: Dictionary = GameProgress.level_record(2).get("last", {})
+	_check(GameProgress.best_score(2) == 59 and last.get("job_works", true) == false and last.get("router_port", "") == "router_lan1", "progress recorded for Level 2: %s" % [GameProgress.level_record(2)])
+	var details := ""
+	for l in mission.summary._details.find_children("*", "Label", true, false):
+		details += (l as Label).text + "\n"
+	for want in ["ผลงานใช้งานได้จริง", "ถูก 30 จาก 32 ตำแหน่ง", "อ่านผล LAN Cable Tester", "LAN 1", "ใช้สายสำรอง"]:
+		_check(details.contains(want), "details page has: " + want)
+	_check((mission.summary._main.find_child("LevelName", true, false) as Label).text.begins_with("ด่านที่ 2"), "level name on the summary")
 
 
 func _finish() -> void:
+	GameProgress.clear()
 	print("MISSION_02_VALID" if failures == 0 else "MISSION_02_INVALID failures=%d" % failures)
 	quit(1 if failures else 0)

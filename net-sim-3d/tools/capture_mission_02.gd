@@ -154,5 +154,18 @@ func _run() -> void:
 	mission.plug_pc(player)
 	await create_timer(Mission02Controller.DESK_ZOOM_TIME + 0.5).timeout
 	await _shot("m2_install_pc_port")
+	# The summary (test progress file, removed afterwards).
+	await create_timer(Mission02Controller.PC_LED_LOOK + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
+	GameProgress.save_path = "user://capture_progress_m2.json"
+	mission.state.set_cable_type(1, Mission02State.STRAIGHT)
+	mission.state.set_cable_type(2, Mission02State.CROSSOVER)
+	mission.state.router_port = "router_lan1"
+	mission.elapsed_sec = 860.0
+	mission.finish(player)
+	await create_timer(1.8).timeout
+	await _shot("m2_summary")
+	mission.summary.show_details()
+	await _shot("m2_summary_details")
+	GameProgress.clear()
 	print("CAPTURE_DONE ", out_dir)
 	quit()

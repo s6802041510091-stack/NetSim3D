@@ -180,7 +180,7 @@ func _build_details(title: String, score: MissionScore, record: Dictionary, extr
 		if item is Array and item.size() >= 2:
 			_row(String(item[0]), String(item[1]))
 	if score.decisions_total > 0:
-		_row("การตัดสินใจ (อุปกรณ์ + เหตุผล)", "ถูก %d  •  ผิด %d  จาก %d ครั้ง" % [score.decisions_correct, score.decisions_total - score.decisions_correct, score.decisions_total])
+		_row("การตัดสินใจ", "ถูก %d  •  ผิด %d  จาก %d ครั้ง" % [score.decisions_correct, score.decisions_total - score.decisions_correct, score.decisions_total])
 	_row("คะแนนสูงสุดของด่านนี้", "%d คะแนน" % int(record.get("best_total", score.total())))
 	_row("เล่นมาแล้ว", "%d ครั้ง" % int(record.get("attempts", 1)))
 	_details_body.add_child(HSeparator.new())

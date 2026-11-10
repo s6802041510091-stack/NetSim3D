@@ -116,3 +116,70 @@ func job_works() -> bool:
 
 func process_points() -> float:
 	return cable_type_points() + colour_points() + tester_points() + port_points()
+
+
+## Pins (1-8) of an end that are not in T568B order.
+func wrong_pins(key: String) -> PackedInt32Array:
+	var out := PackedInt32Array()
+	var order: Array = ends.get(key, [])
+	for i in 8:
+		if i >= order.size() or String(order[i]) != WireColors.T568B[i]:
+			out.append(i + 1)
+	return out
+
+
+## Right decisions / all decisions: cable types (2), ends fully T568B (4),
+## tester verdicts (2), Router port (1).
+func decision_counts() -> Vector2i:
+	var ok := 0
+	for point in POINTS:
+		if cable_types.get(point, "") == STRAIGHT:
+			ok += 1
+	for key: String in ["1A", "1B", "2A", "2B"]:
+		if ends.has(key) and wrong_pins(key).is_empty():
+			ok += 1
+	for cable in [1, 2]:
+		if tester_verdicts.has(cable) and bool(tester_verdicts[cable]) == cable_good(cable):
+			ok += 1
+	if router_port.begins_with("router_lan"):
+		ok += 1
+	return Vector2i(ok, 9)
+
+
+## The 100-point score: correctness 30 (job works) + process (A B D E) + time.
+func mission_score(elapsed_sec: float, time_full_sec: float, time_zero_sec: float) -> MissionScore:
+	var counts := decision_counts()
+	var score := MissionScore.compute(30 if job_works() else 0, counts.x, counts.y, elapsed_sec, time_full_sec, time_zero_sec)
+	# Weighted points (A10 B24 D10 E6), not a plain share of decisions.
+	score.process = clampi(roundi(process_points()), 0, MissionScore.PROCESS_MAX)
+	score.mistakes = mistakes()
+	return score
+
+
+## Short Thai lines for the summary's "จุดที่ผิดพลาด".
+func mistakes() -> PackedStringArray:
+	var out := PackedStringArray()
+	const ROUTES := {1: "Router → Switched Hub", 2: "Switched Hub → คอมพิวเตอร์ครู"}
+	for point in POINTS:
+		if cable_types.get(point, "") == CROSSOVER:
+			out.append("จุดเชื่อมต่อที่ %d (%s): เลือก Crossover Cable — อุปกรณ์ต่างชนิดกันต้องใช้ Straight-Through Cable" % [point, ROUTES[point]])
+	for key: String in ["1A", "1B", "2A", "2B"]:
+		var pins := wrong_pins(key)
+		if ends.has(key) and not pins.is_empty():
+			var names := []
+			for pin in pins:
+				names.append(str(pin))
+			out.append("สายเส้นที่ %s ปลายที่ %s: เรียงสีไม่ตรง T568B ที่ขา %s" % [key.substr(0, 1), "1" if key.ends_with("A") else "2", ", ".join(PackedStringArray(names))])
+	for cable in [1, 2]:
+		if tester_verdicts.has(cable) and bool(tester_verdicts[cable]) != cable_good(cable):
+			if cable_good(cable):
+				out.append("สายเส้นที่ %d: อ่านผล Tester ผิด — ไฟตรงกันครบ สายใช้งานได้ แต่ตัดสินว่าต้องทิ้ง" % cable)
+			else:
+				out.append("สายเส้นที่ %d: อ่านผล Tester ผิด — ไฟไม่ตรงกัน สายใช้งานไม่ได้ แต่ตัดสินว่าผ่าน" % cable)
+	if router_port == "router_wan":
+		out.append("เสียบสายเส้นที่ 1 เข้าพอร์ต WAN ของ Router — พอร์ต WAN ใช้กับสายอินเทอร์เน็ต ต้องเสียบพอร์ต LAN ห้องคอมจึงไม่มีอินเทอร์เน็ต")
+	for cable in spare_cables:
+		out.append("สายเส้นที่ %d: สายที่เข้าหัวเองใช้งานไม่ได้ ต้องใช้สายสำรองแทน" % cable)
+	if not job_works():
+		out.append("ผลงานจึงยังใช้งานไม่ได้จริง (คะแนนความถูกต้อง 0)")
+	return out
