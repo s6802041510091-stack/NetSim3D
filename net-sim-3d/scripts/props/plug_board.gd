@@ -13,8 +13,11 @@ extends Node
 ##   - Sockets: Node3D points whose -Z goes into the socket (like
 ##     CableTester's *_PlugPoint). A free socket glows while a head is dragged
 ##     near it.
-## When every socket in `required` is filled, the view stays a moment
-## (PLUGGED_HOLD) and then `all_plugged` fires.
+## When every head is in a socket, the view stays a moment (PLUGGED_HOLD)
+## and then `all_plugged` fires. Only the sockets passed to begin() take a
+## head (e.g. the ports a work order names); a drop anywhere else sends the
+## head back. Heads move on `drag_plane` (default: level, at the height the
+## head lay at; a wall rack or the back of a PC uses an upright plane).
 ## Keys work only while `active`; a small bar at the bottom shows the view
 ## name and the Q / E keys.
 
@@ -41,6 +44,11 @@ var sockets := {} # id -> Node3D
 var required: PackedStringArray = []
 var connected := {} # socket id -> plug id
 var hint := "ลากหัว RJ45 ไปเสียบที่ช่อง"
+## Upright plane for dragging in front of a panel of ports; a zero normal
+## means "level, at the head's height".
+var drag_plane := Plane(Vector3.ZERO, 0.0)
+## Size of the green glow on a socket (the tester's sockets are drawn 1.6x).
+var glow_size := Vector3(0.026, 0.02, 0.012)
 
 var _homes := {} # plug id -> Transform3D (global)
 var _drag := ""
@@ -80,10 +88,13 @@ func _ready() -> void:
 
 ## Starts plugging. `view_list` as in `views`; the camera is assumed to be at
 ## view 0 already. Plug homes are where the heads are now.
-func begin(cam: Camera3D, view_list: Array, plug_nodes: Dictionary, socket_nodes: Dictionary, required_sockets: PackedStringArray = PackedStringArray()) -> void:
+## `keep_view`: the camera stays on the current view (a next step at the
+## same place, same view list).
+func begin(cam: Camera3D, view_list: Array, plug_nodes: Dictionary, socket_nodes: Dictionary, required_sockets: PackedStringArray = PackedStringArray(), keep_view := false) -> void:
 	camera = cam
+	if not keep_view or view_list.size() != views.size():
+		view_index = 0
 	views = view_list
-	view_index = 0
 	plugs = plug_nodes
 	sockets = socket_nodes
 	required = required_sockets if not required_sockets.is_empty() else PackedStringArray(socket_nodes.keys())
@@ -156,8 +167,8 @@ func _finish_after(tween: Tween) -> void:
 
 
 func _all_done() -> bool:
-	for id in required:
-		if not connected.has(id):
+	for id: String in plugs:
+		if not is_plugged(id):
 			return false
 	return true
 
@@ -187,7 +198,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and _drag != "":
 		var at := (event as InputEventMouseMotion).position
 		var head: Node3D = plugs[_drag]
-		var hit: Variant = Plane(Vector3.UP, _drag_height).intersects_ray(camera.project_ray_origin(at), camera.project_ray_normal(at))
+		var plane := drag_plane if drag_plane.normal != Vector3.ZERO else Plane(Vector3.UP, _drag_height)
+		var hit: Variant = plane.intersects_ray(camera.project_ray_origin(at), camera.project_ray_normal(at))
 		if hit != null:
 			_move_head(_drag, Transform3D(head.global_basis, hit))
 		_near = _socket_near(at)
@@ -270,7 +282,7 @@ func _set_glow(socket_id: String) -> void:
 		_glow = MeshInstance3D.new()
 		_glow.name = "SocketGlow"
 		var box := BoxMesh.new()
-		box.size = Vector3(0.026, 0.02, 0.012)
+		box.size = glow_size
 		_glow.mesh = box
 		var material := StandardMaterial3D.new()
 		material.albedo_color = Color(0.3, 1.0, 0.45, 0.45)
@@ -280,7 +292,8 @@ func _set_glow(socket_id: String) -> void:
 		_glow.material_override = material
 		add_child(_glow)
 	var socket: Node3D = sockets[socket_id]
-	_glow.global_transform = Transform3D(socket.global_basis.orthonormalized(), socket.global_position + socket.global_basis.z.normalized() * 0.006)
+	(_glow.mesh as BoxMesh).size = glow_size
+	_glow.global_transform = Transform3D(socket.global_basis.orthonormalized(), socket.global_position + socket.global_basis.z.normalized() * glow_size.z * 0.5)
 	_glow.visible = true
 
 
@@ -290,3 +303,25 @@ func _refresh_bar() -> void:
 	else:
 		_bar_label.text = "◀ Q    %s  (%d/%d)    E ▶" % [views[view_index]["name"], view_index + 1, views.size()]
 	_hint_label.text = hint
+
+
+## A real-size RJ45 plug with a coloured boot, its tip at the origin and the
+## cable side along +Z (as the rack and the PC draw plugged cables).
+static func make_head(boot_color: Color) -> Node3D:
+	var head := Node3D.new()
+	var clear := StandardMaterial3D.new()
+	clear.albedo_color = Color(0.85, 0.9, 0.95, 0.55)
+	clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	clear.roughness = 0.2
+	var boot := StandardMaterial3D.new()
+	boot.albedo_color = boot_color
+	boot.roughness = 0.6
+	for part in [[Vector3(0.0112, 0.0082, 0.014), Vector3(0, 0, 0.007), clear], [Vector3(0.0128, 0.0108, 0.02), Vector3(0, 0, 0.024), boot]]:
+		var mesh := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = part[0]
+		mesh.mesh = box
+		mesh.position = part[1]
+		mesh.material_override = part[2]
+		head.add_child(mesh)
+	return head

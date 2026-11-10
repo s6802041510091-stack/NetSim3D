@@ -7,6 +7,12 @@ extends CanvasLayer
 ##   3. cable 2 into Switched Hub port 2
 ##   4. run cable 2 along the cable route to the teacher's PC
 ## and later, after plugging the PC, looking at the switch's port LEDs.
+## Plugging is by hand (PlugBoard): for each step one RJ45 head waits in
+## front of the rack with its cable coming up from below; the player drags
+## it into a port. Only the ports the step allows take it (any Router port
+## for cable 1 - that is the decision; switch port 1, then 2). Q / E: the
+## whole rack, the Router close up, switch ports 1-12 close up. Running
+## cable 2 down to the teacher's PC follows by itself.
 ## The controller does the wiring when `step_done` fires.
 
 signal step_done(step: String, value: String)
@@ -22,15 +28,26 @@ const TITLES := {
 	"route": "เดินสายเส้นที่ 2 ไปยังคอมพิวเตอร์ครู",
 }
 const HELP := {
-	"router": "สายเส้นที่ 1 (Router → Switched Hub) — เลือกพอร์ตของ Router ที่จะเสียบ (เลือกได้ครั้งเดียว)",
-	"switch1": "เสียบหัวอีกด้านของสายเส้นที่ 1 เข้าพอร์ต 1 ของ Switched Hub 24 Port ตามใบงาน",
-	"switch2": "เสียบหัวด้านหนึ่งของสายเส้นที่ 2 (Switched Hub → คอมพิวเตอร์ครู) เข้าพอร์ต 2",
-	"route": "เดินสายเส้นที่ 2 ลงตามผนังและใต้โต๊ะครู ตามเส้นทางเดินสายที่กำหนดไว้ ไปยังด้านหลังคอมพิวเตอร์ครู",
+	"router": "สายเส้นที่ 1 (Router → Switched Hub) — ลากหัวสายไปเสียบพอร์ตของ Router ที่ถูกต้อง (เสียบได้ครั้งเดียว)\nกด Q / E เพื่อเปลี่ยนมุมมอง",
+	"switch1": "ลากหัวอีกด้านของสายเส้นที่ 1 ไปเสียบพอร์ต 1 ของ Switched Hub 24 Port ตามใบงาน\nกด Q / E เพื่อเปลี่ยนมุมมอง",
+	"switch2": "ลากหัวด้านหนึ่งของสายเส้นที่ 2 (Switched Hub → คอมพิวเตอร์ครู) ไปเสียบพอร์ต 2\nกด Q / E เพื่อเปลี่ยนมุมมอง",
+	"route": "กำลังเดินสายเส้นที่ 2 ลงตามผนังและใต้โต๊ะครู ไปยังด้านหลังคอมพิวเตอร์ครู",
 }
 const ROUTER_PORTS := [["router_wan", "WAN"], ["router_lan1", "LAN 1"], ["router_lan2", "LAN 2"], ["router_lan3", "LAN 3"], ["router_lan4", "LAN 4"]]
 
 var step_index := 0
 var mode := "rack" # "rack" or "leds"
+var rack: WallRack9U
+## Dragging the heads into the rack's ports.
+var board: PlugBoard
+## Where the dragged heads move: this far in front of the rack's back (m).
+const DRAG_Z := 0.2
+const CABLE_COLOR := Color(0.16, 0.42, 0.85)
+## Seconds before cable 2 is run down to the PC after it is plugged.
+const ROUTE_DELAY := 0.6
+var router_port := ""
+var _temp: Node3D
+var _head: Node3D
 
 var _title: Label
 var _steps_box: VBoxContainer
@@ -72,15 +89,141 @@ func _ready() -> void:
 	col.add_child(leave)
 
 
+func setup(wall_rack: WallRack9U) -> void:
+	rack = wall_rack
+	board = PlugBoard.new()
+	board.name = "RackPlugBoard"
+	board.glow_size = Vector3(0.016, 0.013, 0.008)
+	add_child(board)
+	board.plugged.connect(_on_head_in)
+	board.plug_moved.connect(func(_id: String): _rebuild_tail())
+	board.all_plugged.connect(_on_head_done)
+
+
 func open(new_mode: String) -> void:
 	mode = new_mode
 	visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_refresh()
+	if mode == "rack":
+		_start_step(false)
 
 
 func close() -> void:
 	visible = false
+	if board:
+		board.end()
+	_clear_head()
+
+
+## Q / E views at the rack.
+func rack_views() -> Array:
+	var routers := ["router_wan", "router_lan1", "router_lan2", "router_lan3", "router_lan4"]
+	var switches := []
+	for i in 12:
+		switches.append("switch_%02d" % (i + 1))
+	return [
+		{"name": "ภาพรวมตู้ Rack", "xform": rack.view_transform()},
+		{"name": "Router (WAN / LAN 1–4)", "xform": rack.close_view(routers, 0.27)},
+		{"name": "Switched Hub พอร์ต 1–12", "xform": rack.close_view(switches, 0.22)},
+	]
+
+
+## Ports the current step's head may go into.
+func allowed_ports() -> PackedStringArray:
+	match current_step():
+		"router":
+			return PackedStringArray(["router_wan", "router_lan1", "router_lan2", "router_lan3", "router_lan4"])
+		"switch1":
+			return PackedStringArray(["switch_01"])
+		"switch2":
+			return PackedStringArray(["switch_02"])
+	return PackedStringArray()
+
+
+## The head of this step waiting in front of the rack (rack space).
+func _home() -> Vector3:
+	var mid_y := (WallRack9U.SWITCH_Y + WallRack9U.ROUTER_Y) * 0.5 + 0.012
+	match current_step():
+		"router":
+			# Beside the router on the left, level with its ports (below it the shelf hides it).
+			return Vector3(rack.port_local("router_wan").x - 0.06, WallRack9U.ROUTER_Y, DRAG_Z)
+		"switch1":
+			return Vector3(rack.port_local("switch_01").x - 0.03, mid_y, DRAG_Z)
+		_:
+			return Vector3(rack.port_local("switch_02").x + 0.045, mid_y, DRAG_Z)
+
+
+func _start_step(keep_view: bool) -> void:
+	if rack == null or not visible or not current_step() in ["router", "switch1", "switch2"]:
+		return
+	_clear_head()
+	_temp = Node3D.new()
+	_temp.name = "InstallTemp"
+	rack.add_child(_temp)
+	_head = PlugBoard.make_head(CABLE_COLOR)
+	_head.name = "Head"
+	_head.position = _home()
+	_temp.add_child(_head)
+	var sockets := {}
+	for id in allowed_ports():
+		sockets[id] = rack.port_socket(id)
+	board.drag_plane = Plane(rack.global_basis.z.normalized(), rack.global_transform * Vector3(0, 0, DRAG_Z))
+	board.hint = "ลากหัว RJ45 ไปเสียบที่พอร์ต" + ("ของ Router" if current_step() == "router" else " %d ของ Switched Hub" % (1 if current_step() == "switch1" else 2))
+	board.begin(get_viewport().get_camera_3d(), rack_views(), {"head": _head}, sockets, PackedStringArray(), keep_view)
+	_rebuild_tail()
+
+
+## The cable behind the waiting head: from below the rack (cable 1's first
+## end, cable 2), or from the Router port cable 1 went into.
+func _rebuild_tail() -> void:
+	if _temp == null or _head == null:
+		return
+	var old := _temp.get_node_or_null("Tail")
+	if old:
+		old.free()
+	var h := _head.transform
+	var points := [h * Vector3(0, 0, 0.033), h * Vector3(0, -0.01, 0.07)]
+	match current_step():
+		"router":
+			points.append_array([Vector3(h.origin.x, -0.2, DRAG_Z + 0.03), Vector3(h.origin.x, -0.6, DRAG_Z + 0.03)])
+		"switch1":
+			var r := rack.port_local(router_port)
+			points.append_array([r + Vector3(0, -0.012, 0.06), r + Vector3(0, 0, 0.034)])
+		_:
+			points.append_array([Vector3(0.262, WallRack9U.SWITCH_Y - 0.04, 0.19), Vector3(0.262, -0.2, 0.12), Vector3(0.262, -0.6, 0.12)])
+	_temp.add_child(CableBuilder.build(points, CABLE_COLOR, "Tail", 0.003))
+
+
+func _clear_head() -> void:
+	if _temp:
+		_temp.queue_free()
+	_temp = null
+	_head = null
+
+
+## The Internet line pops out the moment a head is pushed into WAN.
+func _on_head_in(_plug: String, socket: String) -> void:
+	if socket == "router_wan" and rack.is_internet_connected():
+		rack.disconnect_internet()
+
+
+## The head is in (and a second has passed): the rack draws the real plug.
+func _on_head_done() -> void:
+	var port: String = board.connected.keys()[0] if not board.connected.is_empty() else ""
+	board.end(true)
+	_clear_head()
+	if current_step() == "router":
+		router_port = port
+		_finish_step(port)
+	else:
+		_finish_step("")
+	if current_step() == "route":
+		await get_tree().create_timer(ROUTE_DELAY).timeout
+		if current_step() == "route":
+			_finish_step("")
+	else:
+		_start_step(true)
 
 
 func rack_finished() -> bool:
@@ -91,19 +234,9 @@ func current_step() -> String:
 	return "" if rack_finished() else RACK_STEPS[step_index]
 
 
-## Router port for cable 1 (the decision).
-func choose_router_port(port_id: String) -> void:
-	if current_step() != "router":
-		return
-	_finish_step(port_id)
-
-
-## The one-button rack steps.
-func do_step() -> void:
-	var step := current_step()
-	if step == "" or step == "router":
-		return
-	_finish_step("")
+## Pushes the waiting head into `port_id` (what a drop on it does; tests).
+func plug_head(port_id: String) -> bool:
+	return board != null and board.active and board.plug_into("head", port_id)
 
 
 func confirm_leds() -> void:
@@ -151,24 +284,6 @@ func _refresh() -> void:
 	var help := GameUI.label(HELP[step], 16, GameUI.INK)
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_action_box.add_child(help)
-	if step == "router":
-		var grid := GridContainer.new()
-		grid.columns = 3
-		grid.add_theme_constant_override("h_separation", 8)
-		grid.add_theme_constant_override("v_separation", 8)
-		_action_box.add_child(grid)
-		for entry in ROUTER_PORTS:
-			var b := GameUI.button(entry[1], false, 128)
-			b.name = "Port_" + entry[0]
-			b.set_meta("sound", "")
-			b.pressed.connect(choose_router_port.bind(entry[0]))
-			grid.add_child(b)
-	else:
-		var go := GameUI.button(TITLES[step], true, 380)
-		go.name = "StepButton"
-		go.set_meta("sound", "")
-		go.pressed.connect(do_step)
-		_action_box.add_child(go)
 
 
 func _unhandled_input(event: InputEvent) -> void:

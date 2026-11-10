@@ -76,6 +76,12 @@ var rack: WallRack9U
 var pc_port: NetworkPort
 var rack_spot: InteractSpot
 var pc_spot: InteractSpot
+## Plugging cable 2 into the teacher PC by hand.
+var pc_board: PlugBoard
+var _pc_temp: Node3D
+var _pc_head: Node3D
+## Height of the teacher's desk top behind the PC (m).
+const PC_DESK_Y := 0.766
 ## Where the install stage is: "rack" (plug at the rack), "pc" (plug the
 ## teacher PC), "leds" (look at the switch LEDs).
 var install_step := ""
@@ -134,6 +140,14 @@ func _ready() -> void:
 	install_panel.leds_checked.connect(_on_leds_checked)
 	rack = world.get_node_or_null("ComputerRoomRack") as WallRack9U
 	pc_port = world.get_node_or_null("TeacherPcPort") as NetworkPort
+	if rack:
+		install_panel.setup(rack)
+	pc_board = PlugBoard.new()
+	pc_board.name = "PcPlugBoard"
+	pc_board.glow_size = Vector3(0.016, 0.013, 0.008)
+	add_child(pc_board)
+	pc_board.plug_moved.connect(func(_id: String): _rebuild_pc_tail())
+	pc_board.all_plugged.connect(_on_pc_plugged)
 	rack_spot = InteractSpot.new()
 	rack_spot.name = "RackSpot"
 	rack_spot.size = Vector3(0.7, 0.6, 0.4)
@@ -554,7 +568,9 @@ func _on_rack_done() -> void:
 	_set_install_step("pc")
 
 
-## Plugs cable 2 into the teacher PC's network card and shows its LED.
+## At the teacher's PC: the end of cable 2 lies on the desk behind the PC;
+## the player drags it into the network card (PlugBoard; Q / E: the port
+## close up, the whole desk). Then the link LED shows for a moment.
 func plug_pc(player: Node) -> void:
 	if stage != Stage.INSTALL or install_step != "pc" or at_desk or _desk_busy or pc_port == null:
 		return
@@ -565,22 +581,100 @@ func plug_pc(player: Node) -> void:
 	marker.clear()
 	if player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)
+	_pc_temp = Node3D.new()
+	_pc_temp.name = "PcPlugTemp"
+	get_parent().add_child(_pc_temp)
+	_pc_head = PlugBoard.make_head(InstallPanel.CABLE_COLOR)
+	_pc_head.name = "Head"
+	_pc_temp.add_child(_pc_head)
+	_pc_head.global_transform = Transform3D(pc_port.global_basis.orthonormalized(), pc_head_home())
+	_rebuild_pc_tail()
+	var views := pc_views()
+	if player.has_method("move_camera_to"):
+		await player.move_camera_to(views[0]["xform"], DESK_ZOOM_TIME)
+	var out := pc_port.global_basis.z.normalized()
+	pc_board.drag_plane = Plane(out, pc_port.global_position + out * 0.035)
+	pc_board.hint = "ลากหัว RJ45 ไปเสียบช่อง LAN ของการ์ดเครือข่าย  ·  Esc เพื่อออก"
+	pc_board.begin(player.camera if "camera" in player else get_viewport().get_camera_3d(), views, {"head": _pc_head}, {"pc": pc_port})
+	_desk_busy = false
+
+
+## Where the end of cable 2 lies: on the desk just behind the PC, pointing at
+## the port (the cable drawn by the rack ends there).
+func pc_head_home() -> Vector3:
+	var p := pc_port.global_position
+	return Vector3(p.x + 0.05, PC_DESK_Y + 0.006, p.z + 0.09)
+
+
+## Q / E views at the PC: the port and the head together, then the whole desk.
+func pc_views() -> Array:
+	var p := pc_port.global_position
+	var out := pc_port.global_basis.z.normalized()
+	var side := pc_port.global_basis.x.normalized()
+	var target := p.lerp(pc_head_home(), 0.6) + side * 0.03
+	var eye := target + out * 0.42 + Vector3.UP * 0.12
+	var wide_eye := p + out * 0.9 + Vector3.UP * 0.45
+	return [
+		{"name": "ช่อง LAN ด้านหลังคอมพิวเตอร์ครู", "xform": Transform3D(Basis.looking_at(target - eye, Vector3.UP), eye)},
+		{"name": "ภาพรวมโต๊ะครู", "xform": Transform3D(Basis.looking_at(p - wide_eye, Vector3.UP), wide_eye)},
+	]
+
+
+func _rebuild_pc_tail() -> void:
+	if _pc_temp == null or _pc_head == null:
+		return
+	var old := _pc_temp.get_node_or_null("Tail")
+	if old:
+		old.free()
+	var h := _pc_head.global_transform
+	var p := pc_port.global_position
+	# The rack's cable stops on the desk behind the PC (WallRack9U.drop_to_pc).
+	var end_on_desk := Vector3(p.x, PC_DESK_Y + 0.004, p.z + 0.11)
+	_pc_temp.add_child(CableBuilder.build([h * Vector3(0, 0, 0.033), h * Vector3(0, -0.01, 0.07), end_on_desk + Vector3(0.02, 0, 0.02), end_on_desk],
+		InstallPanel.CABLE_COLOR, "Tail", 0.003))
+
+
+## The head is in the network card: the real cable is drawn, the LED shows
+## whether the link is up, then the camera goes back.
+func _on_pc_plugged() -> void:
+	pc_board.end(true)
+	_clear_pc_head()
 	rack.drop_to_pc("switch_02", pc_port, true)
 	var works := state.installed_cable_works(2)
 	pc_port.set_link(works)
 	rack.set_link("switch_02", works)
-	Sound.play("crimp", pc_port)
-	# A close look at the port: is its link LED on?
-	var eye := pc_port.global_position + Vector3(0.05, 0.05, 0.26)
-	if player.has_method("move_camera_to"):
-		await player.move_camera_to(Transform3D(Basis.looking_at(pc_port.global_position - eye, Vector3.UP), eye), DESK_ZOOM_TIME)
-		await get_tree().create_timer(PC_LED_LOOK).timeout
-		await player.return_camera(DESK_ZOOM_TIME)
-	at_desk = false
-	if player.has_method("set_controls_locked"):
-		player.set_controls_locked(false)
-	_desk_busy = false
+	await get_tree().create_timer(PC_LED_LOOK).timeout
+	await _stand_up_from_pc()
 	_set_install_step("leds")
+
+
+func _clear_pc_head() -> void:
+	if _pc_temp:
+		_pc_temp.queue_free()
+	_pc_temp = null
+	_pc_head = null
+
+
+func _stand_up_from_pc() -> void:
+	_desk_busy = true
+	if _player and _player.has_method("return_camera"):
+		await _player.return_camera(DESK_ZOOM_TIME)
+	at_desk = false
+	if _player and _player.has_method("set_controls_locked"):
+		_player.set_controls_locked(false)
+	_desk_busy = false
+
+
+## Esc at the PC before plugging: put the head back, stand up, try later.
+func _unhandled_input(event: InputEvent) -> void:
+	if pc_board == null or not pc_board.active or _desk_busy:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+		get_viewport().set_input_as_handled()
+		pc_board.end()
+		_clear_pc_head()
+		await _stand_up_from_pc()
+		_set_install_step("pc")
 
 
 func _on_leds_checked() -> void:

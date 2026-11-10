@@ -220,15 +220,47 @@ func _run() -> void:
 	player.camera.make_current()
 	await _shot("m2_install_router_choice")
 	var install := mission.install_panel
-	install.choose_router_port("router_lan1")
-	install.do_step()
-	install.do_step()
-	install.do_step()
+	var hold := PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.3
+	for i in [1, 2]:
+		install.board.go_to_view(i)
+		await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+		await _shot("m2_rack_view_%d" % i)
+	install.board.go_to_view(1)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	# Dragging cable 1 towards LAN 1: the port glows.
+	var drag_press := InputEventMouseButton.new()
+	drag_press.button_index = MOUSE_BUTTON_LEFT
+	drag_press.pressed = true
+	drag_press.position = install.board.plug_screen_point("head")
+	install.board._unhandled_input(drag_press)
+	var drag_move := InputEventMouseMotion.new()
+	drag_move.position = player.camera.unproject_position(mission.rack.port_position("router_lan1")) + Vector2(10, 25)
+	install.board._unhandled_input(drag_move)
+	await _shot("m2_rack_dragging")
+	var drag_release := InputEventMouseButton.new()
+	drag_release.button_index = MOUSE_BUTTON_LEFT
+	drag_release.position = drag_move.position
+	install.board._unhandled_input(drag_release)
+	await create_timer(hold).timeout
+	install.board.go_to_view(2)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	await _shot("m2_rack_switch_step")
+	install.plug_head("switch_01")
+	await create_timer(hold).timeout
+	install.plug_head("switch_02")
+	await create_timer(hold).timeout
 	await _shot("m2_install_rack_done")
-	await create_timer(0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
+	await create_timer(InstallPanel.ROUTE_DELAY + 0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
 	player.global_position = Vector3(6.26, 0.05, -7.0)
-	mission.plug_pc(player)
-	await create_timer(Mission02Controller.DESK_ZOOM_TIME + 0.5).timeout
+	await mission.plug_pc(player)
+	await _shot("m2_pc_plug_view")
+	mission.pc_board.go_to_view(1)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	await _shot("m2_pc_plug_wide")
+	mission.pc_board.go_to_view(0)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	mission.pc_board.plug_into("head", "pc")
+	await create_timer(hold + 0.3).timeout
 	await _shot("m2_install_pc_port")
 	# The summary (test progress file, removed afterwards).
 	await create_timer(Mission02Controller.PC_LED_LOOK + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout

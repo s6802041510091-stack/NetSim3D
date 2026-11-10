@@ -479,20 +479,48 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	await mission.open_rack(player)
 	_check(mission.at_desk and panel.visible and panel.current_step() == "router", "the rack opens on the Router step")
 	_check(not rack.find_child("DoorGlass", true, false).visible, "rack door open")
-	panel.do_step()
-	_check(panel.current_step() == "router", "the Router port must be chosen, not skipped")
-	panel.choose_router_port("router_lan1")
+	var board := panel.board
+	var cam: Camera3D = player.camera
+	_check(board.active and board.views.size() == 3 and panel.find_child("Port_router_lan1", true, false) == null and panel._head != null, "rack: a head to drag, 3 views, no port buttons")
+	_check(Array(panel.allowed_ports()) == ["router_wan", "router_lan1", "router_lan2", "router_lan3", "router_lan4"], "cable 1 may go into any Router port (the decision)")
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_check(board._bar_label.text.contains("Router"), "E: the Router close up: " + board._bar_label.text)
+	# A switch port is not on the list for this head: it goes back.
+	var home := panel._head.global_position
+	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_05")))
+	await create_timer(0.35).timeout
+	_check(panel.current_step() == "router" and panel._head.global_position.distance_to(home) < 0.002, "dropped on a port the step does not allow: the head goes back")
+	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("router_lan1")))
+	_check(board.connected.get("router_lan1", "") == "head", "head dragged into Router LAN 1 (seen close up)")
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
 	_check(mission.state.router_port == "router_lan1" and rack.is_plugged("router_lan1") and rack.is_internet_connected(), "cable 1 in LAN 1, Internet still in WAN")
-	panel.do_step()
+	_check(panel.current_step() == "switch1" and board.active and board.view_index == 1, "next head: switch port 1, the view stays")
+	_key(board, KEY_E)
+	await create_timer(PlugBoard.VIEW_TIME + 0.1).timeout
+	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_01")))
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
 	_check(rack.is_plugged("switch_01") and rack.is_link_on("switch_01") and rack.is_link_on("router_lan1"), "switch port 1 plugged, links up (good cable)")
-	panel.do_step()
+	_check(Array(panel.allowed_ports()) == ["switch_02"], "cable 2: switch port 2 only")
+	_drag(board, board.plug_screen_point("head"), cam.unproject_position(rack.port_position("switch_02")))
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
 	_check(rack.is_plugged("switch_02") and not rack.is_link_on("switch_02"), "switch port 2 plugged, dark until the PC end is in")
-	panel.do_step()
-	await create_timer(0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
+	await create_timer(InstallPanel.ROUTE_DELAY + 0.8 + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
 	_check(mission.install_step == "pc" and not mission.at_desk and mission.pc_spot.get_prompt_text() != "", "rack done -> go to the teacher PC")
 	_check(not pc.plugged, "PC not plugged yet")
 	await mission.plug_pc(player)
-	_check(pc.plugged and pc.link_on and rack.is_link_on("switch_02"), "PC plugged, links up (spare cable)")
+	var pcb := mission.pc_board
+	_check(pcb.active and mission._pc_head != null and pcb.views.size() == 2 and not pc.plugged, "PC: the cable end lies behind the PC, 2 views")
+	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01, "camera on the port and the cable end")
+	var at_port := cam.unproject_position(pc.global_position)
+	var at_head := pcb.plug_screen_point("head")
+	var screen := cam.get_viewport().get_visible_rect().size
+	var left_part := Rect2(Vector2.ZERO, Vector2(screen.x * (1.0 - 470.0 / 1280.0), screen.y))
+	_check(left_part.has_point(at_port) and left_part.has_point(at_head), "port and head both on screen, left of the panel: %s %s in %s" % [at_port, at_head, screen])
+	_drag(pcb, at_head, at_port)
+	await create_timer(PlugBoard.SLIDE_TIME + PlugBoard.PLUGGED_HOLD + 0.2).timeout
+	_check(pc.plugged and pc.link_on and rack.is_link_on("switch_02"), "PC plugged by hand, links up (spare cable)")
+	await create_timer(Mission02Controller.PC_LED_LOOK + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
 	_check(mission.install_step == "leds" and not player.controls_locked, "then check the LEDs at the rack")
 	await mission.open_rack(player)
 	_check(panel.mode == "leds" and panel.visible, "rack opens for the LED check")

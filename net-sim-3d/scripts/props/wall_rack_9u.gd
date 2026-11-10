@@ -80,6 +80,36 @@ func port_position(id: String) -> Vector3:
 	return global_transform * (_ports.get(id, Vector3.ZERO) as Vector3)
 
 
+## Port `id`'s opening in rack space.
+func port_local(id: String) -> Vector3:
+	return _ports.get(id, Vector3.ZERO)
+
+
+## A marker at port `id` whose -Z points into the socket (for PlugBoard).
+func port_socket(id: String) -> Node3D:
+	var marker := get_node_or_null("Socket_" + id) as Node3D
+	if marker == null and _ports.has(id):
+		marker = Node3D.new()
+		marker.name = "Socket_" + id
+		marker.position = _ports[id]
+		add_child(marker)
+	return marker
+
+
+## Camera pose in front of the ports `ids` (their middle on the left half of
+## the screen, clear of a side panel), `distance` m from the front.
+func close_view(ids: Array, distance := 0.2) -> Transform3D:
+	var center := Vector3.ZERO
+	for id in ids:
+		center += port_local(id)
+	center /= maxf(ids.size(), 1)
+	var eye := global_transform * (center + Vector3(0.05, 0.02, distance))
+	# Looking straight in past the ports' right side puts them left of centre.
+	var target := global_transform * (center + Vector3(0.05, 0.0, 0.0))
+	var basis := Basis.looking_at(target - eye, Vector3.UP)
+	return Transform3D(basis, eye)
+
+
 func is_link_on(id: String) -> bool:
 	return bool(_links.get(id, false))
 
