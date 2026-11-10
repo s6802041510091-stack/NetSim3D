@@ -34,8 +34,7 @@ const STEPS := {
 	"insert": ["เสียบหัว RJ45", "เสียบสายเข้าหัว RJ45 ให้ครบทั้ง 8 เส้น โดยไม่ให้ตำแหน่งสลับกัน", "", CrimpBench.Look.INSERTED, "click"],
 	"crimp": ["ย้ำหัว", "ใส่หัว RJ45 ในช่องของคีมย้ำสาย แล้วคลิกเมาส์ซ้ายรัวๆ (หรือกด Space) บีบคีมจนเกจเต็ม", "crimping_tool", CrimpBench.Look.CRIMPED, "crimp"],
 }
-const ARRANGE_HELP := "คลิกเส้นลวดบนภาพ 3D ตามลำดับขา 1 → 8 ตามมาตรฐาน T568B (มองจากด้านบน ขา 1 อยู่ซ้ายสุด)
-คลิกเส้นที่วางแล้วเพื่อเอาออก — กดยืนยันแล้วแก้ไม่ได้"
+const ARRANGE_HELP := "เรียงสายตาม T568B ลงหวีจัดสาย ช่อง 1 → 8 (ช่อง 1 อยู่ซ้ายสุด)\nคลิกเส้นลวดบนรางด้านซ้ายเพื่อใส่ช่องถัดไป หรือลากไปวางช่องที่ต้องการ (วางทับช่องที่มีสายจะสลับกัน) คลิกเส้นในหวีเพื่อเอากลับ — กดยืนยันแล้วแก้ไม่ได้"
 
 var bench: CrimpBench
 var state: Mission02State
@@ -71,6 +70,14 @@ var _action_box: VBoxContainer
 var _leave: Button
 var _pin_buttons: Array[Button] = []
 var _hover_note: Label
+## Arranging: the top-down view, and a wire being dragged (from a press on it).
+const ARRANGE_VIEW_TIME := 0.45
+const DRAG_START_PX := 6.0
+var _arrange_view := false
+var _view_tween: Tween
+var _drag_id := ""
+var _drag_from := Vector2.ZERO
+var _dragging := false
 var _confirm_arrange: Button
 
 
@@ -129,6 +136,11 @@ func open() -> void:
 
 func close() -> void:
 	visible = false
+	_end_drag()
+	# The controller moves the camera back when the player stands up.
+	if _view_tween and _view_tween.is_valid():
+		_view_tween.kill()
+	_arrange_view = false
 
 
 func is_done() -> bool:
@@ -230,6 +242,23 @@ func remove_pin(pin: int) -> void:
 	_refresh()
 
 
+## Puts wire `id` into comb slot `pin` (a drop). A wire already there swaps
+## places with it, or goes back to the rail if `id` came from the rail.
+func place_at(id: String, pin: int) -> void:
+	if current_step() != "arrange" or pin < 0 or pin >= 8 or id == "":
+		return
+	var from := arrangement.find(id)
+	if from == pin:
+		return
+	var occupant: String = arrangement[pin]
+	if from >= 0:
+		arrangement[from] = occupant
+	arrangement[pin] = id
+	Sound.play("select")
+	_show_bench()
+	_refresh()
+
+
 ## What a click on wire `id` in the 3D view does: a loose wire goes to the
 ## next free pin, a placed one comes back out.
 func click_wire(id: String) -> void:
@@ -305,8 +334,33 @@ func _show_bench() -> void:
 	if current_step() == "arrange":
 		# Placed wires flat by pin, the rest fanned out to click.
 		bench.show_state(CrimpBench.Look.ARRANGING, arrangement, _chip_order())
+		_set_arrange_view(true)
 		return
+	_set_arrange_view(false)
 	bench.show_state(look, state.ends.get(key, arrangement))
+
+
+## Moves the desk camera to the top-down arranging view and back.
+func _set_arrange_view(on: bool) -> void:
+	if on == _arrange_view or bench == null or not visible:
+		return
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return
+	_arrange_view = on
+	var size := get_viewport().get_visible_rect().size
+	var target := bench.arrange_view_transform(camera.fov, size.x / maxf(size.y, 1.0)) if on else bench.view_transform()
+	if _view_tween and _view_tween.is_valid():
+		_view_tween.kill()
+	_view_tween = create_tween()
+	_view_tween.tween_property(camera, "global_transform", target, ARRANGE_VIEW_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+
+func _end_drag() -> void:
+	_drag_id = ""
+	_dragging = false
+	if bench:
+		bench.set_drag("")
 
 
 func _refresh() -> void:
@@ -519,14 +573,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var space: bool = event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
 	var click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
 	if current_step() == "arrange":
-		if event is InputEventMouseMotion:
-			_hover_at((event as InputEventMouseMotion).position)
-		elif click:
-			var id := _hover_at((event as InputEventMouseButton).position)
-			if id != "":
-				get_viewport().set_input_as_handled()
-				click_wire(id)
-				_hover_at((event as InputEventMouseButton).position)
+		_arrange_input(event)
 		return
 	if current_step() == "strip" and space:
 		get_viewport().set_input_as_handled()
@@ -535,3 +582,46 @@ func _unhandled_input(event: InputEvent) -> void:
 		# A click anywhere on the 3D view squeezes too (panel buttons handle their own clicks).
 		get_viewport().set_input_as_handled()
 		squeeze()
+
+
+## Arranging with the mouse: press on a wire, then either release in place
+## (a click: next slot / back to the rail) or drag it onto a comb slot.
+func _arrange_input(event: InputEvent) -> void:
+	var camera := get_viewport().get_camera_3d()
+	if camera == null or bench == null:
+		return
+	if event is InputEventMouseMotion:
+		var at := (event as InputEventMouseMotion).position
+		if _drag_id != "":
+			if not _dragging and at.distance_to(_drag_from) >= DRAG_START_PX:
+				_dragging = true
+			if _dragging:
+				var p := bench.mouse_to_local(camera, at)
+				bench.set_drag(_drag_id, p, bench.slot_at(p))
+		else:
+			_hover_at(at)
+		return
+	if not event is InputEventMouseButton or (event as InputEventMouseButton).button_index != MOUSE_BUTTON_LEFT:
+		return
+	var button := event as InputEventMouseButton
+	if button.pressed:
+		var id := _hover_at(button.position)
+		if id != "":
+			get_viewport().set_input_as_handled()
+			_drag_id = id
+			_drag_from = button.position
+			_dragging = false
+		return
+	if _drag_id == "":
+		return
+	get_viewport().set_input_as_handled()
+	var id := _drag_id
+	var dragged := _dragging
+	_end_drag()
+	if not dragged:
+		click_wire(id)
+	else:
+		var slot := bench.slot_at(bench.mouse_to_local(camera, button.position))
+		if slot >= 0:
+			place_at(id, slot)
+	_hover_at(button.position)

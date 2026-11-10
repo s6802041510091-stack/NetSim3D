@@ -7,10 +7,10 @@ extends Node3D
 ## of the screen, so pin 1 sits on the left (-Z), as when looking at an RJ45
 ## head with the clip down and the cable towards you.
 ## show_state() rebuilds the end for each step; play_tool() slides a tool in.
-## While arranging (Look.ARRANGING) the player clicks the wires themselves:
-## the loose ones fan up and out of the jacket, the placed ones lie flat in
-## pin order with the pin numbers beside them; pick_wire() finds the wire
-## under the mouse.
+## While arranging (Look.ARRANGING) the camera looks straight down: loose
+## wires lie in their own lanes on a rail to the left, placed ones in the 8
+## numbered slots of a wire comb straight ahead. pick_wire() finds the wire
+## under the mouse, slot_at() the comb slot under a dragged wire.
 
 enum Look { WHOLE, CUT, STRIPPED, UNTWISTED, ARRANGED, TRIMMED, INSERTED, CRIMPED, ARRANGING }
 
@@ -38,13 +38,17 @@ var _crimper: Node3D
 ## Wires drawn now: id -> [holder, start, end] (bench space), for picking.
 var _wires := {}
 var hovered := ""
-## Arranging: how far placed wires reach, how loose ones fan.
+## Arranging: how far placed wires reach, the comb's slot spacing (wider
+## than the head's pins so each wire reads), the rail's lanes, the view.
 const FLAT_LENGTH := 0.075
-const FAN_LENGTH := 0.07
-## Loose wires splay out to both sides (fixed slots, left to right), leaving
-## the lane straight ahead free for the placed ones.
-const FAN_SLOTS := [78.0, 64.0, 50.0, 36.0, -36.0, -50.0, -64.0, -78.0]
-const FAN_PITCH := 9.0 # a little raised so they cross above the placed ones
+const COMB_PITCH := 0.0075
+const FAN_LANES := 8
+const RAIL_Z0 := -0.042
+const RAIL_PITCH := 0.0095
+const RAIL_END := JACKET_END + FLAT_LENGTH + 0.005
+const ARRANGE_HALF_X := 0.075
+const ARRANGE_CENTER_X := -0.02
+var _drag: Node3D
 ## Distance from the crimping tool's origin to the middle of its jaws (model units).
 const CRIMPER_JAW := 0.055
 
@@ -88,9 +92,9 @@ func show_state(next: Look, wire_order: Array = [], fan: Array = []) -> void:
 			_flat(order, FLAT_LENGTH)
 		Look.ARRANGING:
 			_jacket(-0.2, JACKET_END)
-			_flat(order, FLAT_LENGTH)
-			_fan(fan)
-			_pin_marks()
+			_comb()
+			_comb_wires()
+			_rail(fan)
 		Look.TRIMMED:
 			_jacket(-0.2, JACKET_END)
 			_flat(order, TRIMMED_LENGTH)
@@ -203,40 +207,129 @@ func wire_ids() -> PackedStringArray:
 
 # ---------------------------------------------------------------- pieces
 
-## Loose wires in `fan` order splayed out of the jacket, each in its own
-## slot (the first on the far left), so they do not move as others are placed.
-func _fan(fan: Array) -> void:
-	var pitch := deg_to_rad(FAN_PITCH)
+## The parking rail on the left: each loose wire bends out of the jacket and
+## lies straight in its own lane (lane = its place in `fan`, so the others
+## never move). Wires bound for far lanes bend first, so no two wires cross
+## where they can be clicked. A grey tray with ridges sits under the lanes.
+func _rail(fan: Array) -> void:
+	var far_z := RAIL_Z0 - (FAN_LANES - 1) * RAIL_PITCH
+	var tray_x0 := _bend_x(FAN_LANES - 1) - 0.004
+	_box("RailTray", Vector3(RAIL_END + 0.004 - tray_x0, 0.0012, RAIL_Z0 - far_z + RAIL_PITCH),
+		Vector3((tray_x0 + RAIL_END + 0.004) * 0.5, -WIRE_HEIGHT * 0.5 - 0.0008, (RAIL_Z0 + far_z) * 0.5), _material("rail_tray", Color(0.8, 0.82, 0.85)))
+	for lane in FAN_LANES + 1:
+		var z := RAIL_Z0 + RAIL_PITCH * 0.5 - lane * RAIL_PITCH
+		_box("RailRidge", Vector3(RAIL_END - tray_x0, 0.002, 0.0008), Vector3((tray_x0 + RAIL_END) * 0.5, -WIRE_HEIGHT * 0.5, z), _material("rail_ridge", Color(0.68, 0.7, 0.74)))
 	for i in fan.size():
-		if fan[i] in order:
+		var id: String = fan[i]
+		if id in order:
 			continue
-		var yaw_deg: float = FAN_SLOTS[i % FAN_SLOTS.size()]
-		var yaw := deg_to_rad(yaw_deg)
-		var dir := Vector3(cos(pitch) * cos(yaw), sin(pitch), -cos(pitch) * sin(yaw))
-		var start := Vector3(JACKET_END, JACKET_RADIUS * 0.3, 0.0)
-		_wire(fan[i], start + dir * FAN_LENGTH * 0.5, FAN_LENGTH, yaw_deg, FAN_PITCH)
+		var lane_z := RAIL_Z0 - i * RAIL_PITCH
+		var bend := Vector3(_bend_x(i), 0.0, lane_z)
+		var root := Vector3(JACKET_END, 0.0, -0.005)
+		var d := bend - root
+		_wire(id, (root + bend) * 0.5, d.length() + WIRE_WIDTH * 0.6, rad_to_deg(atan2(-d.z, d.x)))
+		# The straight part last, so it is the one picked.
+		_wire(id, Vector3((bend.x + RAIL_END) * 0.5, 0.0, lane_z), RAIL_END - bend.x, 0.0)
 
 
-## Pin numbers 1-8 beyond the flat wires, and a mark on the next free pin.
-func _pin_marks() -> void:
+func _bend_x(lane: int) -> float:
+	return JACKET_END + 0.03 - lane * 0.003
+
+
+## The wire comb straight ahead: 8 numbered slots between thin teeth, the
+## next free slot marked yellow.
+func _comb() -> void:
 	var next := order.find("") if order.size() == 8 else 0
+	var comb_x := JACKET_END + FLAT_LENGTH * 0.62
+	_box("CombBase", Vector3(0.016, 0.0015, 8 * COMB_PITCH + 0.003), Vector3(comb_x, -WIRE_HEIGHT * 0.5 - 0.001, 0.0), _material("comb_base", Color(0.3, 0.33, 0.38)))
+	for k in 9:
+		_box("CombTooth", Vector3(0.014, 0.006, 0.0011), Vector3(comb_x, 0.0005, (k - 4) * COMB_PITCH), _material("comb", Color(0.93, 0.94, 0.96)))
 	for pin in 8:
 		var label := Label3D.new()
 		label.text = str(pin + 1)
 		label.font_size = 48
-		label.pixel_size = 0.00011
+		label.pixel_size = 0.00013
 		label.outline_size = 10
 		label.outline_modulate = Color(0.05, 0.1, 0.2)
 		label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-		label.modulate = Color(1.0, 0.9, 0.3) if pin == next else Color(0.9, 0.94, 1.0)
-		label.position = Vector3(JACKET_END + FLAT_LENGTH + 0.007, 0.003, (pin - 3.5) * PIN_PITCH)
+		label.modulate = Color(1.0, 0.9, 0.3) if pin == next else Color(0.92, 0.95, 1.0)
+		label.position = Vector3(JACKET_END + FLAT_LENGTH + 0.009, 0.003, (pin - 3.5) * COMB_PITCH)
 		_parts.add_child(label)
 	if next >= 0:
 		var clear := StandardMaterial3D.new()
 		clear.albedo_color = Color(1.0, 0.9, 0.3, 0.55)
 		clear.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 		clear.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		_box("NextPin", Vector3(FLAT_LENGTH, 0.0008, WIRE_WIDTH), Vector3(JACKET_END + FLAT_LENGTH * 0.5, -WIRE_HEIGHT * 0.5, (next - 3.5) * PIN_PITCH), clear)
+		_box("NextPin", Vector3(FLAT_LENGTH - 0.008, 0.0008, COMB_PITCH * 0.8), Vector3(JACKET_END + 0.008 + (FLAT_LENGTH - 0.008) * 0.5, -WIRE_HEIGHT * 0.5, (next - 3.5) * COMB_PITCH), clear)
+
+
+## Placed wires in the comb: a short bend out of the jacket, then straight
+## along their slot.
+func _comb_wires() -> void:
+	for pin in 8:
+		var id: String = order[pin] if pin < order.size() else ""
+		if id == "":
+			continue
+		var z := (pin - 3.5) * COMB_PITCH
+		var root := Vector3(JACKET_END, 0.0, z * 0.3)
+		var bend := Vector3(JACKET_END + 0.008, 0.0, z)
+		var d := bend - root
+		_wire(id, (root + bend) * 0.5, d.length() + WIRE_WIDTH * 0.6, rad_to_deg(atan2(-d.z, d.x)))
+		_wire(id, Vector3((bend.x + JACKET_END + FLAT_LENGTH) * 0.5, 0.0, z), JACKET_END + FLAT_LENGTH - bend.x, 0.0)
+
+
+## Camera straight down on the rail and the comb (screen up = away from the
+## player), framed for the part of the screen left of the step panel.
+func arrange_view_transform(fov_degrees: float, aspect: float) -> Transform3D:
+	var half := ARRANGE_HALF_X
+	var height := half / tan(deg_to_rad(fov_degrees) * 0.5)
+	# Left screen edge just past the far rail lane; the panel covers the right part.
+	var center_z := -0.116 + half * aspect
+	var eye := global_transform * Vector3(ARRANGE_CENTER_X, height, center_z)
+	return Transform3D(Basis.looking_at(-global_basis.y.normalized(), global_basis.x.normalized()), eye)
+
+
+## The point on the bench plane under screen point `at` (bench space).
+func mouse_to_local(camera: Camera3D, at: Vector2) -> Vector3:
+	var plane := Plane(global_basis.y.normalized(), global_position)
+	var hit: Variant = plane.intersects_ray(camera.project_ray_origin(at), camera.project_ray_normal(at))
+	return to_local(hit) if hit != null else Vector3(INF, 0, INF)
+
+
+## Comb slot (0-7) at bench point `p`, -1 outside the comb.
+func slot_at(p: Vector3) -> int:
+	if p.x < JACKET_END - 0.006 or p.x > JACKET_END + FLAT_LENGTH + 0.016:
+		return -1
+	var pin := int(floor(p.z / COMB_PITCH + 4.0))
+	return pin if pin >= 0 and pin < 8 else -1
+
+
+func slot_screen_point(camera: Camera3D, pin: int) -> Vector2:
+	return camera.unproject_position(global_transform * Vector3(JACKET_END + FLAT_LENGTH * 0.75, 0.0, (pin - 3.5) * COMB_PITCH))
+
+
+## While dragging: a copy of wire `id` under the mouse and the slot it would
+## drop into lit up. `id` "" clears both.
+func set_drag(id: String, p := Vector3.ZERO, slot := -1) -> void:
+	if _drag:
+		_drag.queue_free()
+		_drag = null
+	if id == "" or not WireColors.WIRES.has(id):
+		return
+	_drag = Node3D.new()
+	_drag.name = "Drag"
+	add_child(_drag)
+	var color: Color = WireColors.WIRES[id][1]
+	var striped := bool(WireColors.WIRES[id][2])
+	_box_in(_drag, Vector3(0.045, WIRE_HEIGHT, WIRE_WIDTH), Vector3(p.x, 0.006, p.z), _material("white" if striped else id, WireColors.WHITE if striped else color))
+	if striped:
+		_box_in(_drag, Vector3(0.045, 0.0006, WIRE_WIDTH * 0.45), Vector3(p.x, 0.006 + WIRE_HEIGHT * 0.5 + 0.0002, p.z), _material(id, color))
+	if slot >= 0:
+		var lit := StandardMaterial3D.new()
+		lit.albedo_color = Color(0.3, 0.9, 0.45, 0.6)
+		lit.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		lit.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_box_in(_drag, Vector3(FLAT_LENGTH - 0.008, 0.001, COMB_PITCH * 0.9), Vector3(JACKET_END + 0.008 + (FLAT_LENGTH - 0.008) * 0.5, -WIRE_HEIGHT * 0.5 + 0.0002, (slot - 3.5) * COMB_PITCH), lit)
 
 
 func _jacket(from_x: float, to_x: float) -> void:

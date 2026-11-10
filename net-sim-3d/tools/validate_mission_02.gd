@@ -214,8 +214,9 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 		var key := panel.current_key()
 		var step := panel.current_step()
 		if step == "arrange":
-			await _frames(1)
-			_check(bench.look == CrimpBench.Look.ARRANGING and bench.wire_ids().size() == 8 and panel.find_child("Chip_orange", true, false) == null, "%s: 8 loose wires on the 3D model, no colour chips" % key)
+			await create_timer(CrimpPanel.ARRANGE_VIEW_TIME + 0.15).timeout
+			_check(bench.look == CrimpBench.Look.ARRANGING and bench.wire_ids().size() == 8 and panel.find_child("Chip_orange", true, false) == null, "%s: 8 loose wires on the rail, no colour chips" % key)
+			_check(player.camera.global_basis.z.dot(Vector3.UP) > 0.99, "%s: the camera looks straight down while arranging" % key)
 			_check(WireColors.correct_positions(panel._chip_order()) <= 3, "%s: the loose wires do not come nearly in order" % key)
 			# Click a wire on the model, click it again to take it back, then the plan.
 			var cam: Camera3D = player.camera
@@ -228,6 +229,17 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 				if not _click_wire(panel, cam, id):
 					misses += 1
 			_check(misses == 0 and panel.arrangement == plans[key], "%s: all 8 placed by clicking the model (%d mis-picks)" % [key, misses])
+			if key == "1A":
+				# Drag the pin-1 wire onto slot 2: they swap; drag it back.
+				var w1: String = plans[key][0]
+				var w2: String = plans[key][1]
+				_drag_wire(panel, cam, w1, 1)
+				_check(panel.arrangement[0] == w2 and panel.arrangement[1] == w1, "1A: dropping on a full slot swaps the two wires")
+				_drag_wire(panel, cam, w1, 0)
+				_check(panel.arrangement == plans[key], "1A: dragging it back restores the order")
+				panel.remove_pin(7)
+				_drag_wire(panel, cam, plans[key][7], 7)
+				_check(panel.arrangement == plans[key] and bench._drag == null, "1A: a wire dragged from the rail lands in the chosen slot")
 			panel.confirm_arrangement()
 			_check(mission.state.ends.get(key, []) == plans[key], "%s: arrangement saved" % key)
 			panel.place_wire("brown")
@@ -257,12 +269,29 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 func _click_wire(panel: CrimpPanel, camera: Camera3D, id: String) -> bool:
 	var at := panel.bench.wire_screen_point(camera, id)
 	var picked := panel.bench.pick_wire(camera, at)
-	var click := InputEventMouseButton.new()
-	click.button_index = MOUSE_BUTTON_LEFT
-	click.pressed = true
-	click.position = at
-	panel._unhandled_input(click)
+	_mouse(panel, at, true)
+	_mouse(panel, at, false)
 	return picked == id
+
+
+## Press on wire `id`, move to comb slot `pin`, release there.
+func _drag_wire(panel: CrimpPanel, camera: Camera3D, id: String, pin: int) -> void:
+	var from := panel.bench.wire_screen_point(camera, id)
+	var to := panel.bench.slot_screen_point(camera, pin)
+	_mouse(panel, from, true)
+	for t in [0.3, 0.7, 1.0]:
+		var move := InputEventMouseMotion.new()
+		move.position = from.lerp(to, t)
+		panel._unhandled_input(move)
+	_mouse(panel, to, false)
+
+
+func _mouse(panel: CrimpPanel, at: Vector2, down: bool) -> void:
+	var button := InputEventMouseButton.new()
+	button.button_index = MOUSE_BUTTON_LEFT
+	button.pressed = down
+	button.position = at
+	panel._unhandled_input(button)
 
 
 ## One step at the desk, playing the minigames like a player: the first

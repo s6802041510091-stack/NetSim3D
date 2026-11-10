@@ -122,12 +122,18 @@ func _run() -> void:
 		await process_frame
 	await _shot("m2_desk_stripped")
 	await panel.do_step() # untwist
+	await create_timer(CrimpPanel.ARRANGE_VIEW_TIME + 0.2).timeout
 	await _shot("m2_desk_untwisted")
 	for id in ["white_orange", "orange", "white_green"]:
 		panel.place_wire(id)
 	await process_frame
 	panel._hover_at(panel.bench.wire_screen_point(player.camera, "blue"))
 	await _shot("m2_desk_arranging")
+	# A wire being dragged onto slot 5.
+	var slot_point: Vector3 = panel.bench.global_transform.affine_inverse() * (panel.bench.global_transform * Vector3(CrimpBench.JACKET_END + CrimpBench.FLAT_LENGTH * 0.7, 0, 0.5 * CrimpBench.COMB_PITCH))
+	panel.bench.set_drag("white_blue", slot_point, 4)
+	await _shot("m2_desk_dragging")
+	panel.bench.set_drag("")
 	for id in ["blue", "white_blue", "green", "white_brown", "brown"]:
 		panel.place_wire(id)
 	await _shot("m2_desk_arranged")
