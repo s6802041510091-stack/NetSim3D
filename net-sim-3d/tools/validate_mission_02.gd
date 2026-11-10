@@ -191,8 +191,14 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 	var panel := mission.crimp_panel
 	var bench := station.bench
 	_check(station.get_prompt_text() != "" and station.collision_layer == CrimpStation.COLLISION_LAYER, "desk prompt on")
+	_check(station.layout.mat != null and not station.layout.cables_shown() and not bench.visible, "desk: only the work mat before the crimp stage")
 	await mission.sit_at_desk(player)
 	_check(mission.stage == Mission02Controller.Stage.CRIMP and mission.hud.objective_text.contains("0/4"), "everything in hand: the desk opens the crimp stage: " + mission.hud.objective_text)
+	_check(station.layout.cables_shown() and station.layout.tool_ids().size() == 4 and bench.visible, "cables and kit laid out, the cable end shown while seated")
+	var tag_text := ""
+	for l in station.layout.find_child("Cable2", true, false).find_children("*", "Label3D", true, false):
+		tag_text += (l as Label3D).text + " "
+	_check(tag_text.contains("สายจุดที่ 2") and tag_text.contains("Crossover"), "cable 2 tag shows the box it came from: " + tag_text)
 	_check(mission.at_desk and panel.visible and player.controls_locked, "sitting at the desk opens the step panel")
 	_check(player.camera.global_position.distance_to(bench.view_transform().origin) < 0.01, "camera moved to the cable end")
 	_check(panel.current_key() == "1A" and panel.current_step() == "cut" and bench.look == CrimpBench.Look.WHOLE, "starts with cable 1 end 1: cut")
@@ -225,6 +231,7 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 			# Stand up after the first cable and come back.
 			left_once = true
 			await mission.leave_desk()
+			_check(not bench.visible and station.layout.cables_shown(), "standing up hides the close-up end, the cables stay on the desk")
 			_check(not mission.at_desk and not player.controls_locked and not panel.visible, "standing up frees the player")
 			await mission.sit_at_desk(player)
 			_check(panel.current_key() == "2A" and panel.current_step() == "cut", "sitting again resumes at cable 2")
@@ -276,6 +283,7 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(mission.state.installed_cable_works(1) and mission.state.installed_cable_works(2) and not mission.state.cable_good(2), "both installed cables work (cable 2 is the spare)")
 	await create_timer(Mission02Controller.TESTING_DONE_PAUSE + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
 	_check(mission.stage == Mission02Controller.Stage.INSTALL and not mission.at_desk and not player.controls_locked, "testing done -> install stage, player free")
+	_check(not props.crimp_station.layout.cables_shown(), "the cables leave the desk for the install")
 	_check(station.get_prompt_text() == "" and not tester.visible, "desk cleared after testing")
 	await _test_install(mission, player)
 

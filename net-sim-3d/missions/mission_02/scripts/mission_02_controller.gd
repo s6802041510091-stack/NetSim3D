@@ -196,6 +196,8 @@ func _enter(next: Stage) -> void:
 				for box: Mission02CableBox in props.cable_boxes.values():
 					box.set_prompt("")
 				props.drawer_spot.set_prompt("")
+				# The player puts the cables and the kit out on the desk.
+				props.crimp_station.layout.lay_out(state.cable_types)
 				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_crimp_objective()
@@ -209,6 +211,8 @@ func _enter(next: Stage) -> void:
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			if props:
 				props.crimp_station.set_prompt("")
+				# The two cables go to the computer room.
+				props.crimp_station.layout.set_cables_visible(false)
 			_set_install_step("rack")
 		Stage.REPORT:
 			hud.set_objective("กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support")
@@ -430,6 +434,8 @@ func sit_at_desk(player: Node) -> void:
 	var station := props.crimp_station
 	if stage == Stage.TEST:
 		station.show_tester()
+	else:
+		station.bench.visible = true
 	var view := station.tester_view_transform() if stage == Stage.TEST else station.bench.view_transform()
 	if player.has_method("move_camera_to"):
 		await player.move_camera_to(view, DESK_ZOOM_TIME)
@@ -450,6 +456,8 @@ func leave_desk() -> void:
 	install_panel.close()
 	if rack:
 		rack.set_door_open(false)
+	if props:
+		props.crimp_station.bench.visible = false
 	if props and props.crimp_station.tester:
 		# Off while away; sitting down again restores the step (TesterPanel._sync_desk).
 		props.crimp_station.tester.set_power(false)

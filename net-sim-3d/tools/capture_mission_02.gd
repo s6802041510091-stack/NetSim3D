@@ -65,7 +65,7 @@ func _run() -> void:
 	camera.global_position = Vector3(-14.4, 1.6, -32.5)
 	camera.look_at(Vector3(-14.6, 1.0, -31.1))
 	await _shot("m2_storage_drawer")
-	camera.global_position = Vector3(-15.8, 1.6, -36.6)
+	camera.global_position = Vector3(-15.6, 1.65, -40.4)
 	camera.look_at(Vector3(-13.6, 0.8, -38.43))
 	await _shot("m2_desk_room_view")
 	# Access point on the ceiling in the middle of the computer room.
@@ -91,7 +91,17 @@ func _run() -> void:
 	# The crimping desk: sit, then the cable end through the steps.
 	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
 	player.global_position = Vector3(-14.6, 0.05, -38.43)
+	mission.state.set_cable_type(1, Mission02State.STRAIGHT)
+	mission.state.set_cable_type(2, Mission02State.CROSSOVER)
 	mission._enter(Mission02Controller.Stage.CRIMP)
+	camera.make_current()
+	camera.fov = 70.0
+	camera.global_position = Vector3(-14.45, 1.55, -38.1)
+	camera.look_at(Vector3(-13.55, 0.76, -38.5))
+	await _shot("m2_desk_laid_out")
+	camera.global_position = Vector3(-15.6, 1.65, -40.4)
+	camera.look_at(Vector3(-13.6, 0.8, -38.43))
+	await _shot("m2_desk_room_view_laid_out")
 	await mission.sit_at_desk(player)
 	player.camera.make_current()
 	var panel := mission.crimp_panel

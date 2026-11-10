@@ -2,8 +2,9 @@ class_name CrimpStation
 extends StaticBody3D
 
 ## The work spot on the spare desk: look at it and press F to sit and crimp.
-## Holds the CrimpBench (the cable end). A mission sets `prompt` when the
-## player may use it and listens to `used`.
+## Holds the CrimpBench (the 3x cable end, shown only while seated) and the
+## DeskLayout (work mat, the two cables, the kit). A mission sets `prompt`
+## when the player may use it and listens to `used`.
 
 signal used(player: Node)
 
@@ -13,11 +14,12 @@ var prompt := ""
 var bench: CrimpBench
 ## The LAN cable tester, put on the desk for the test step (null before).
 var tester: CableTester
+var layout: Mission02DeskLayout
 var _test_cable: Node3D
 
 
 func _ready() -> void:
-	# Off until the crimping stage: its box covers the tools on the desk.
+	# Off until the mission sets a prompt.
 	collision_layer = 0
 	collision_mask = 0
 	set_meta(&"interactable", self)
@@ -27,9 +29,12 @@ func _ready() -> void:
 	shape.shape = box
 	shape.position = Vector3(0, 0.07, 0)
 	add_child(shape)
+	layout = Mission02DeskLayout.new()
+	add_child(layout)
 	bench = CrimpBench.new()
 	bench.name = "CrimpBench"
-	bench.position = Vector3(0, CrimpBench.JACKET_RADIUS + 0.002, 0)
+	bench.position = Vector3(0, CrimpBench.JACKET_RADIUS + Mission02DeskLayout.MAT_THICKNESS + 0.002, 0)
+	bench.visible = false
 	add_child(bench)
 
 
@@ -56,8 +61,9 @@ func show_tester() -> CableTester:
 			# Turn so the main socket opens towards -X (the player).
 			var out := tester.global_basis.inverse() * plug.global_basis.z
 			tester.rotation.y = atan2(-1.0, 0.0) - atan2(out.x, out.z)
-		tester.position = Vector3(0.02, 0.0, 0.0)
+		tester.position = Vector3(0.02, Mission02DeskLayout.MAT_THICKNESS, 0.0)
 	bench.visible = false
+	layout.set_side_tester_visible(false)
 	tester.visible = true
 	return tester
 
@@ -67,7 +73,7 @@ func hide_tester() -> void:
 		tester.visible = false
 		tester.set_power(false)
 	plug_test_cable(false)
-	bench.visible = true
+	layout.set_side_tester_visible(true)
 
 
 ## A short cable between the main and remote sockets while testing.
