@@ -212,7 +212,48 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 	_check(mission.state.cable_good(1) and not mission.state.cable_good(2), "cable 1 good, cable 2 has the swapped pair")
 	_check(is_equal_approx(mission.state.colour_points(), 22.5), "colour points 22.5 (%.2f)" % mission.state.colour_points())
 	_check(mission.stage == Mission02Controller.Stage.TEST and not mission.at_desk and not player.controls_locked, "crimping done -> test stage, player free")
-	_check(station.get_prompt_text() == "", "desk prompt off after crimping")
+	await _test_tester(mission, props, player)
+
+
+## The tester: cable 1 is good but the player discards it; cable 2 has the
+## swapped green pair and the player discards it (right) -> a spare cable.
+func _test_tester(mission: Mission02Controller, props: Mission02Props, player: CharacterBody3D) -> void:
+	var station := props.crimp_station
+	var panel := mission.tester_panel
+	_check(station.get_prompt_text().contains("Tester"), "desk prompt for testing: " + station.get_prompt_text())
+	_check(mission.hud.objective_text.contains("0/2"), "objective counts tested cables: " + mission.hud.objective_text)
+	await mission.sit_at_desk(player)
+	var tester := station.tester
+	_check(tester != null and tester.visible and not station.bench.visible and panel.visible, "the tester is on the desk, the cable end put away")
+	_check(player.camera.global_position.distance_to(station.tester_view_transform().origin) < 0.01, "camera on the tester")
+	_check(tester.get_plug_point("Main") != null and tester.get_plug_point("Remote") != null and tester._main_leds.size() == 9 and not tester._main_leds.has(null), "tester model has its LEDs and sockets")
+	_check(mission.state.tester_mapping(1) == CableTester.STRAIGHT, "cable 1 shows straight 1-1 ... 8-8")
+	_check(mission.state.tester_mapping(2) == [1, 2, 6, 4, 5, 3, 7, 8, 9], "cable 2 shows 3<->6 crossed: %s" % [mission.state.tester_mapping(2)])
+	_check(panel.current_step() == "plug", "testing starts by plugging the cable in")
+	panel.judge(true)
+	_check(not mission.state.tester_verdicts.has(1), "no verdict before testing")
+	panel.do_step()
+	panel.do_step()
+	panel.do_step()
+	_check(tester.is_on and tester.is_testing and panel.current_step() == "verdict", "plugged, powered, testing")
+	panel.judge(false)
+	_check(mission.state.tester_verdicts.get(1) == false and mission.state.spare_cables.is_empty() and panel.message.contains("ใช้งานได้"), "good cable discarded: told it works, kept: " + panel.message)
+	_check(panel.cable == 2 and not tester.is_on, "next cable, tester off")
+	panel.do_step()
+	panel.do_step()
+	await mission.leave_desk()
+	_check(not tester.is_on and not mission.at_desk, "standing up stops the tester")
+	await mission.sit_at_desk(player)
+	_check(panel.cable == 2 and panel.current_step() == "test" and tester.is_on, "back at the desk: same cable, still powered")
+	panel.do_step()
+	panel.judge(false)
+	_check(mission.state.spare_cables == [2] and panel.message.contains("สำรอง"), "bad cable discarded: spare cable: " + panel.message)
+	_check(not mission.state.set_verdict(2, true), "a verdict cannot be changed")
+	_check(is_equal_approx(mission.state.tester_points(), 5.0), "tester points 5 (one right)")
+	_check(mission.state.installed_cable_works(1) and mission.state.installed_cable_works(2) and not mission.state.cable_good(2), "both installed cables work (cable 2 is the spare)")
+	await create_timer(Mission02Controller.TESTING_DONE_PAUSE + Mission02Controller.DESK_ZOOM_TIME + 0.4).timeout
+	_check(mission.stage == Mission02Controller.Stage.INSTALL and not mission.at_desk and not player.controls_locked, "testing done -> install stage, player free")
+	_check(station.get_prompt_text() == "" and not tester.visible, "desk cleared after testing")
 
 
 func _finish() -> void:

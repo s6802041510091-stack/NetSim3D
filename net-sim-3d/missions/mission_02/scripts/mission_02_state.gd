@@ -24,6 +24,38 @@ var ends := {}
 var tester_verdicts := {}
 ## The Router port the player used for cable 1 ("" = not yet).
 var router_port := ""
+## Cables the player discarded after a failed test: the supervisor gave a
+## ready-made spare so the work can go on (the player's job still failed).
+var spare_cables: Array[int] = []
+
+
+## What the LAN cable tester shows for `cable`: for main LED 1-8 (and G), the
+## remote LED that lights with it — the pin where the same wire sits at the
+## other end (0 = no wire there).
+func tester_mapping(cable: int) -> Array:
+	var a: Array = ends.get("%dA" % cable, [])
+	var b: Array = ends.get("%dB" % cable, [])
+	var mapping := []
+	for pin in 8:
+		var wire: String = a[pin] if pin < a.size() else ""
+		mapping.append(b.find(wire) + 1 if wire != "" else 0)
+	mapping.append(9) # the shield / ground
+	return mapping
+
+
+## Records the verdict once. Returns false if this cable was already judged.
+func set_verdict(cable: int, passes: bool) -> bool:
+	if tester_verdicts.has(cable):
+		return false
+	tester_verdicts[cable] = passes
+	if not passes and not cable_good(cable):
+		spare_cables.append(cable)
+	return true
+
+
+## The cable that ends up installed works: the player's good cable, or a spare.
+func installed_cable_works(cable: int) -> bool:
+	return cable_good(cable) or cable in spare_cables
 
 
 func set_cable_type(point: int, type: String) -> bool:

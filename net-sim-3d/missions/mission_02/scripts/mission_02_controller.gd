@@ -35,10 +35,12 @@ const NEXT_REMINDER := [
 ]
 const RECEIVED := "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN"
 
-enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, DONE }
+enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, TEST, INSTALL, DONE }
 
 ## Seconds for the camera to move to / from the crimping desk.
 const DESK_ZOOM_TIME := 0.6
+## Seconds to read the result of the last cable before standing up.
+const TESTING_DONE_PAUSE := 2.5
 
 var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
@@ -52,6 +54,7 @@ var marker: ObjectiveMarker
 var supervisor: Node3D
 var props: Mission02Props
 var crimp_panel: CrimpPanel
+var tester_panel: TesterPanel
 ## True while the player sits at the crimping desk.
 var at_desk := false
 var _timing := false
@@ -86,12 +89,19 @@ func _ready() -> void:
 	crimp_panel.leave_requested.connect(leave_desk)
 	crimp_panel.end_finished.connect(func(_key: String): _refresh_crimp_objective())
 	crimp_panel.all_done.connect(_on_crimping_done)
+	tester_panel = TesterPanel.new()
+	tester_panel.name = "TesterPanel"
+	add_child(tester_panel)
+	tester_panel.leave_requested.connect(leave_desk)
+	tester_panel.cable_judged.connect(_on_cable_judged)
+	tester_panel.all_done.connect(_on_testing_done)
 	props = world.get_node_or_null("Mission02Props") as Mission02Props
 	if props:
 		props.set_items_available(false)
 		for item: PickupItem in props.items.values():
 			item.picked_up.connect(_on_item_picked)
 		crimp_panel.setup(props.crimp_station.bench, state)
+		tester_panel.setup(props.crimp_station, state)
 		props.crimp_station.used.connect(sit_at_desk)
 	supervisor = world.get_node_or_null("ITSupportSupervisor") as Node3D
 	if supervisor:
@@ -134,7 +144,13 @@ func _enter(next: Stage) -> void:
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_crimp_objective()
 		Stage.TEST:
-			hud.set_objective("ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester (ขั้นตอนนี้กำลังสร้าง)")
+			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			if props:
+				props.crimp_station.set_prompt("กด F เพื่อตรวจสายด้วย LAN Cable Tester")
+				marker.point_at_position(props.crimp_station.global_position, 0.45)
+			_refresh_test_objective()
+		Stage.INSTALL:
+			hud.set_objective("นำสายทั้ง 2 เส้นไปติดตั้งที่ Wall Rack ในห้องคอมพิวเตอร์ (ขั้นตอนนี้กำลังสร้าง)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			if props:
 				props.crimp_station.set_prompt("")
@@ -196,9 +212,16 @@ func _refresh_crimp_objective() -> void:
 	hud.set_objective("เข้าหัวสาย LAN ที่โต๊ะว่างในห้อง IT Support (เสร็จ %d/4 ปลาย)\nสายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย" % done)
 
 
-## Sits at the crimping desk: the camera moves to the cable end, the step panel opens.
+func _refresh_test_objective() -> void:
+	if stage != Stage.TEST:
+		return
+	hud.set_objective("ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester ที่โต๊ะว่าง (ตรวจแล้ว %d/2)" % mini(tester_panel.cable - 1, 2))
+
+
+## Sits at the desk: crimping (the cable end) or testing (the tester),
+## depending on the stage. The camera moves there and the step panel opens.
 func sit_at_desk(player: Node) -> void:
-	if stage != Stage.CRIMP or at_desk or _desk_busy or props == null:
+	if not stage in [Stage.CRIMP, Stage.TEST] or at_desk or _desk_busy or props == null:
 		return
 	_desk_busy = true
 	_player = player
@@ -208,9 +231,16 @@ func sit_at_desk(player: Node) -> void:
 	hud.set_auto_collapsed(true)
 	marker.clear()
 	Sound.play("chair")
+	var station := props.crimp_station
+	if stage == Stage.TEST:
+		station.show_tester()
+	var view := station.tester_view_transform() if stage == Stage.TEST else station.bench.view_transform()
 	if player.has_method("move_camera_to"):
-		await player.move_camera_to(props.crimp_station.bench.view_transform(), DESK_ZOOM_TIME)
-	crimp_panel.open()
+		await player.move_camera_to(view, DESK_ZOOM_TIME)
+	if stage == Stage.TEST:
+		tester_panel.open()
+	else:
+		crimp_panel.open()
 	_desk_busy = false
 
 
@@ -220,6 +250,10 @@ func leave_desk() -> void:
 		return
 	_desk_busy = true
 	crimp_panel.close()
+	tester_panel.close()
+	if props and props.crimp_station.tester:
+		# Off while away; sitting down again restores the step (TesterPanel._sync_desk).
+		props.crimp_station.tester.set_power(false)
 	Sound.play("chair")
 	if _player and _player.has_method("return_camera"):
 		await _player.return_camera(DESK_ZOOM_TIME)
@@ -228,7 +262,7 @@ func leave_desk() -> void:
 	if _player and _player.has_method("set_controls_locked"):
 		_player.set_controls_locked(false)
 	_desk_busy = false
-	if stage == Stage.CRIMP and props:
+	if stage in [Stage.CRIMP, Stage.TEST] and props:
 		marker.point_at_position(props.crimp_station.global_position, 0.45)
 
 
@@ -236,6 +270,21 @@ func _on_crimping_done() -> void:
 	hud.show_toast("เข้าหัวครบทั้ง 2 เส้นแล้ว — ต่อไปตรวจด้วย LAN Cable Tester")
 	await leave_desk()
 	_enter(Stage.TEST)
+
+
+func _on_cable_judged(_cable: int, _passes: bool) -> void:
+	_refresh_test_objective()
+
+
+## Both cables judged: give the player time to read the last message, then go.
+func _on_testing_done() -> void:
+	if tester_panel.message != "":
+		hud.show_toast(tester_panel.message, 5.0)
+	await get_tree().create_timer(TESTING_DONE_PAUSE).timeout
+	await leave_desk()
+	if props:
+		props.crimp_station.hide_tester()
+	_enter(Stage.INSTALL)
 
 
 func _on_work_order_confirmed(answers: Dictionary) -> void:

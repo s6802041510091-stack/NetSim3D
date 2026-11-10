@@ -110,5 +110,29 @@ func _run() -> void:
 	await panel.do_step() # crimp
 	panel.bench.show_state(CrimpBench.Look.CRIMPED, WireColors.T568B)
 	await _shot("m2_desk_crimped")
+	# The tester: cable 1 good, cable 2 with the green pair swapped.
+	await mission.leave_desk()
+	var swapped := WireColors.T568B.duplicate()
+	swapped[2] = WireColors.T568B[5]
+	swapped[5] = WireColors.T568B[2]
+	mission.state.ends = {"1A": WireColors.T568B, "1B": WireColors.T568B, "2A": WireColors.T568B, "2B": swapped}
+	mission._enter(Mission02Controller.Stage.TEST)
+	await mission.sit_at_desk(player)
+	player.camera.make_current()
+	var tester_panel := mission.tester_panel
+	await _shot("m2_tester_start")
+	tester_panel.do_step()
+	tester_panel.do_step()
+	await _shot("m2_tester_plugged_on")
+	tester_panel.do_step() # test cable 1
+	tester_panel.judge(true)
+	tester_panel.do_step() # cable 2: plug, power, test
+	tester_panel.do_step()
+	tester_panel.do_step()
+	# Main LED 3 lights with remote LED 6 on cable 2.
+	await create_timer(0.28 * 2 + 0.1).timeout
+	await _shot("m2_tester_cable2_pin3")
+	await create_timer(0.28 * 3).timeout
+	await _shot("m2_tester_cable2_pin6")
 	print("CAPTURE_DONE ", out_dir)
 	quit()
