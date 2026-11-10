@@ -207,6 +207,9 @@ func configure_level(world: Node, level: int) -> void:
 		mission.name = "Mission01"
 		world.add_child(mission)
 		_connect_level_end(mission, level)
+	if level == 2:
+		# Tools and cable on the spare desk in the IT Support room.
+		world.add_child(load("res://missions/mission_02/scripts/mission_02_props.gd").new())
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)

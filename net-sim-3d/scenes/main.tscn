@@ -14,6 +14,7 @@
 [ext_resource type="Script" path="res://scripts/school_visual_fixes.gd" id="12_visual_fixes"]
 [ext_resource type="Script" path="res://scripts/props/wall_rack_9u.gd" id="13_wall_rack"]
 [ext_resource type="Script" path="res://scripts/audio/ambience_zone.gd" id="14_ambience"]
+[ext_resource type="Script" path="res://scripts/props/network_port.gd" id="18_network_port"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_outdoor.wav" id="15_outdoor"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_aircon.wav" id="16_aircon"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_pc_fans.wav" id="17_fans"]
@@ -90,9 +91,14 @@ script = ExtResource("6")
 part_prefix = "Server_"
 display_name = "ห้อง Server"
 
+[node name="TeacherPcPort" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.26, 0.98, -7.741)
+script = ExtResource("18_network_port")
+
 [node name="ComputerRoomRack" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.2, 1.75, -9.525)
 script = ExtResource("13_wall_rack")
+teacher_port = NodePath("../TeacherPcPort")
 
 [node name="DeskPhone" parent="." unique_id=1245524682 instance=ExtResource("8")]
 transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, -13.75, 0.758, -43.25)
