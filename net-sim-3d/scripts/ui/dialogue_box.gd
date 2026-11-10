@@ -4,8 +4,11 @@ extends CanvasLayer
 ## Subtitles for talking with an NPC: one line at a time at the bottom of the
 ## screen. Each line is "ผู้พูด|ข้อความ". Click, F, Space or Enter goes to the
 ## next line; `finished` fires after the last one.
+## ask() shows one line with answer buttons side by side instead (a decision
+## in the player's own words); `chosen` fires with the button's index.
 
 signal finished
+signal chosen(choice: int)
 
 ## Ignore the same key press that opened the dialogue.
 const INPUT_GRACE_MS := 250
@@ -24,6 +27,9 @@ var _text: RichTextLabel
 var _hint: Label
 var _header: Label
 var _reveal := -1.0 # characters shown so far while typing, -1 = whole line shown
+## True while ask() waits for an answer (clicks and F do not skip it).
+var choosing := false
+var _choices: HBoxContainer
 
 
 func _ready() -> void:
@@ -65,6 +71,11 @@ func _ready() -> void:
 	_text.add_theme_font_override("bold_font", GameUI.FONT_BOLD)
 	_text.add_theme_color_override("default_color", Color.WHITE)
 	col.add_child(_text)
+	_choices = HBoxContainer.new()
+	_choices.name = "Choices"
+	_choices.add_theme_constant_override("separation", 14)
+	_choices.visible = false
+	col.add_child(_choices)
 	_hint = GameUI.label("", 13, Color(0.7, 0.74, 0.8))
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	col.add_child(_hint)
@@ -72,6 +83,8 @@ func _ready() -> void:
 
 ## `header` is an optional small line above the speaker (hidden when empty).
 func show_lines(dialogue_lines: PackedStringArray, header: String = "") -> void:
+	_end_choice()
+	_place(0.0)
 	lines = dialogue_lines
 	_header.text = header
 	_header.visible = header != ""
@@ -85,6 +98,10 @@ func show_lines(dialogue_lines: PackedStringArray, header: String = "") -> void:
 ## Next line. While a line is still typing, the first press shows all of it.
 func advance(force: bool = false) -> void:
 	if not visible:
+		return
+	if choosing:
+		if is_typing():
+			_finish_typing()
 		return
 	if not force and Time.get_ticks_msec() - _opened_at < INPUT_GRACE_MS:
 		return
@@ -104,6 +121,79 @@ func advance(force: bool = false) -> void:
 	_hint.text = "คลิก หรือกด F / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
 	_reveal = 0.0
 	_text.visible_characters = 0
+
+
+## One line ("ผู้พูด|ข้อความ") with a button per answer, side by side (the
+## first on the left). `tones`: per button "ok" (green), "bad" (red) or ""
+## (plain). `right_margin`: keep clear of a panel on the right (px).
+func ask(line: String, answers: PackedStringArray, tones: PackedStringArray = PackedStringArray(), right_margin := 0.0, header := "") -> void:
+	lines = PackedStringArray([line])
+	index = 0
+	choosing = true
+	_header.text = header
+	_header.visible = header != ""
+	var parts := line.split("|", true, 1)
+	_speaker.text = parts[0] if parts.size() > 1 else ""
+	_text.text = highlight(keep_together(parts[1] if parts.size() > 1 else parts[0]))
+	_reveal = 0.0
+	_text.visible_characters = 0
+	_hint.visible = false
+	for child in _choices.get_children():
+		child.queue_free()
+	for i in answers.size():
+		var tone := tones[i] if i < tones.size() else ""
+		var color := GameUI.OK if tone == "ok" else (GameUI.BAD if tone == "bad" else Color(0.3, 0.34, 0.42))
+		var b := GameUI.button(answers[i], true, 200)
+		b.name = "Choice%d" % i
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.set_meta("sound", "") # the caller plays its own sound
+		b.add_theme_stylebox_override("normal", GameUI.box(color, color.darkened(0.2), 8, 16, 8))
+		b.add_theme_stylebox_override("hover", GameUI.box(color.lightened(0.12), color.darkened(0.25), 8, 16, 8))
+		b.add_theme_stylebox_override("pressed", GameUI.box(color.darkened(0.1), color.darkened(0.3), 8, 16, 8))
+		b.pressed.connect(choose.bind(i))
+		_choices.add_child(b)
+	_choices.visible = true
+	_place(right_margin)
+	visible = true
+	_opened_at = Time.get_ticks_msec()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Sound.play("popup_open")
+
+
+## Answers ask() with button `choice` (also what clicking it does).
+func choose(choice: int) -> void:
+	if not choosing or not visible:
+		return
+	_end_choice()
+	visible = false
+	chosen.emit(choice)
+
+
+## Puts an unanswered question away (e.g. the player stood up).
+func cancel_choice() -> void:
+	if choosing:
+		_end_choice()
+		visible = false
+
+
+func _end_choice() -> void:
+	choosing = false
+	_choices.visible = false
+	_hint.visible = true
+
+
+## Centred at the bottom, or (right_margin > 0) across the space left of a panel.
+func _place(right_margin: float) -> void:
+	if right_margin > 0.0:
+		_panel.anchor_left = 0.0
+		_panel.anchor_right = 1.0
+		_panel.offset_left = 20
+		_panel.offset_right = -(right_margin + 20)
+	else:
+		_panel.anchor_left = 0.5
+		_panel.anchor_right = 0.5
+		_panel.offset_left = -500
+		_panel.offset_right = 500
 
 
 ## True while the current line is still appearing letter by letter.
@@ -160,6 +250,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	var go := event.is_action_pressed("interact") and not event.is_echo()
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 		go = true
+	if choosing and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3]:
+		get_viewport().set_input_as_handled()
+		var pick: int = [KEY_1, KEY_2, KEY_3].find((event as InputEventKey).keycode)
+		if pick < _choices.get_child_count() and not is_typing():
+			choose(pick)
+		return
 	if go:
 		get_viewport().set_input_as_handled()
 		advance()

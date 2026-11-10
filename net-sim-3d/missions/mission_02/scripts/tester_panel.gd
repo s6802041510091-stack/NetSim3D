@@ -5,7 +5,9 @@ extends CanvasLayer
 ## screen, the tester in close-up on the left). For each cable: plug both
 ## ends into the main and remote units by hand (drag each RJ45 head into a
 ## socket; Q / E switch between the whole tester and each socket close up;
-## PlugBoard) -> click POWER on the tester itself -> click TEST on it (the LEDs scan
+## PlugBoard) -> click POWER on the tester itself -> click TEST on it -> after
+## one full scan of the LEDs, a question in the dialogue box at the bottom
+## with two answers side by side (pass / discard) (the LEDs scan
 ## pins 1-8 and G for as long as the player watches) -> decide once:
 ## "ผ่าน" (use it) or "ใช้ไม่ได้" (discard). The LEDs follow the real wire
 ## order of both ends (Mission02State.tester_mapping).
@@ -19,12 +21,14 @@ signal cable_judged(cable: int, passes: bool)
 signal all_done
 
 const STEPS := ["plug", "power", "test", "verdict"]
+## Width the step panel takes on the right (the dialogue box keeps clear of it).
+const PANEL_WIDTH := 470.0
 const STEP_TITLES := {"plug": "เสียบสาย", "power": "เปิดเครื่อง", "test": "กดปุ่ม TEST", "verdict": "ตัดสินผล"}
 const STEP_HELP := {
 	"plug": "ลากหัว RJ45 ด้านหนึ่งไปเสียบช่องตัวแม่ (MAIN) และอีกด้านเสียบช่องตัวลูก (REMOTE)\nกด Q / E เพื่อเปลี่ยนมุมมองไปดูช่องใกล้ ๆ",
 	"power": "คลิกปุ่ม POWER (สีแดง) บนตัวเครื่องเพื่อเปิดเครื่องทดสอบ",
 	"test": "คลิกปุ่ม TEST (สีเหลือง) บนตัวเครื่อง แล้วสังเกตไฟของตัวแม่และตัวลูก",
-	"verdict": "ดูไฟของตัวแม่ (MAIN) เทียบกับตัวลูก (REMOTE) ให้ครบทุกดวง แล้วตัดสินว่าสายเส้นนี้ใช้งานได้หรือไม่ (ตัดสินได้ครั้งเดียว)",
+	"verdict": "ดูไฟของตัวแม่ (MAIN) เทียบกับตัวลูก (REMOTE) ให้ครบทุกดวง แล้วตอบในกล่องด้านล่างว่าสายเส้นนี้ผ่านหรือไม่ (ตัดสินได้ครั้งเดียว กด TEST ซ้ำเพื่อดูไฟอีกรอบได้)",
 }
 
 var station: CrimpStation
@@ -36,6 +40,12 @@ var message := ""
 ## button's centre, and which one it is over now.
 const BUTTON_PX := 26.0
 var hovered_button := ""
+## The verdict question: asked after one full scan of the 9 LEDs.
+const WATCH_BEFORE_ASK := 9 * 0.28 + 0.4
+const VERDICT_QUESTION := "คุณ|ไฟของตัวแม่ (MAIN) กับตัวลูก (REMOTE) ขึ้นแบบนี้ สายเส้นที่ %d ควรตัดสินว่าอย่างไร?"
+const VERDICT_ANSWERS := ["ผ่าน — ใช้งานได้ นำไปติดตั้ง", "ไม่ผ่าน — ใช้ไม่ได้ ต้องทิ้ง"]
+var verdict_box: DialogueBox
+var _ask_id := 0
 
 var _title: Label
 var _subtitle: Label
@@ -80,6 +90,10 @@ func _ready() -> void:
 	_leave.set_meta("sound", "back")
 	_leave.pressed.connect(func(): leave_requested.emit())
 	col.add_child(_leave)
+	verdict_box = DialogueBox.new()
+	verdict_box.name = "VerdictBox"
+	add_child(verdict_box)
+	verdict_box.chosen.connect(func(choice: int): judge(choice == 0))
 
 
 func setup(desk: CrimpStation, mission_state: Mission02State) -> void:
@@ -98,6 +112,8 @@ func open() -> void:
 
 func close() -> void:
 	visible = false
+	_ask_id += 1
+	verdict_box.cancel_choice()
 	if station and station.tester:
 		_set_hover("")
 	if station:
@@ -128,6 +144,22 @@ func do_step() -> void:
 	message = ""
 	step_index += 1
 	_refresh()
+	if current_step() == "verdict":
+		_ask_after_scan()
+
+
+## Lets the player watch one full scan, then asks for the verdict.
+func _ask_after_scan() -> void:
+	_ask_id += 1
+	var id := _ask_id
+	await get_tree().create_timer(WATCH_BEFORE_ASK).timeout
+	if id == _ask_id and visible and current_step() == "verdict" and not verdict_box.choosing:
+		ask_verdict()
+
+
+## The verdict question in the dialogue box, left of the step panel.
+func ask_verdict() -> void:
+	verdict_box.ask(VERDICT_QUESTION % cable, PackedStringArray(VERDICT_ANSWERS), PackedStringArray(["ok", "bad"]), PANEL_WIDTH)
 
 
 ## The one decision per cable.
@@ -135,6 +167,8 @@ func judge(passes: bool) -> void:
 	if current_step() != "verdict" or not state.set_verdict(cable, passes):
 		return
 	var good := state.cable_good(cable)
+	_ask_id += 1
+	verdict_box.cancel_choice()
 	if not passes and not good:
 		message = "สายเส้นที่ %d ถูกทิ้งไป — หัวหน้างานส่งสายสำเร็จรูปสำรองมาให้แทน เพื่อนำไปติดตั้งให้เสร็จ" % cable
 	elif not passes and good:
@@ -183,6 +217,7 @@ func _sync_desk() -> void:
 	tester.set_power(step_index >= 2 and not is_done())
 	if step_index >= 3 and not is_done():
 		tester.press_test(state.tester_mapping(cable))
+		_ask_after_scan()
 
 
 func _refresh() -> void:
@@ -205,17 +240,6 @@ func _refresh() -> void:
 	var help := GameUI.label(STEP_HELP[step], 16, GameUI.INK)
 	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_action_box.add_child(help)
-	if step == "verdict":
-		var pass_button := GameUI.button("ผ่าน — ใช้งานได้", true, 300)
-		pass_button.name = "PassButton"
-		pass_button.set_meta("sound", "")
-		pass_button.pressed.connect(judge.bind(true))
-		_action_box.add_child(pass_button)
-		var fail_button := GameUI.button("ไม่ผ่าน — ใช้ไม่ได้ ต้องทิ้ง", false, 300)
-		fail_button.name = "DiscardButton"
-		fail_button.set_meta("sound", "")
-		fail_button.pressed.connect(judge.bind(false))
-		_action_box.add_child(fail_button)
 
 
 func _message_label() -> Label:

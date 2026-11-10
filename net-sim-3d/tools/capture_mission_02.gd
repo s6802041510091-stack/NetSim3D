@@ -196,6 +196,9 @@ func _run() -> void:
 	tester_panel.do_step() # power
 	await _shot("m2_tester_plugged_on")
 	tester_panel.do_step() # test cable 1
+	await create_timer(TesterPanel.WATCH_BEFORE_ASK + 0.3).timeout
+	tester_panel.verdict_box.advance()
+	await _shot("m2_tester_verdict")
 	tester_panel.judge(true)
 	board.plug_into("A", "MAIN") # cable 2
 	board.plug_into("B", "REMOTE")

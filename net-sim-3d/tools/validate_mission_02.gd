@@ -363,7 +363,16 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(tester.is_on and panel.current_step() == "test", "clicking POWER on the tester turns it on")
 	_mouse(panel, test_at, true)
 	_check(tester.is_on and tester.is_testing and panel.current_step() == "verdict", "plugged, powered, testing")
-	panel.judge(false)
+	var box := panel.verdict_box
+	_check(not box.visible and panel.find_child("PassButton", true, false) == null, "no verdict buttons in the panel, no question before the LEDs are watched")
+	await create_timer(TesterPanel.WATCH_BEFORE_ASK + 0.2).timeout
+	var c0: Button = box.find_child("Choice0", true, false)
+	var c1: Button = box.find_child("Choice1", true, false)
+	_check(box.visible and box.choosing and c0 != null and c1 != null and c0.text.begins_with("ผ่าน") and c1.text.begins_with("ไม่ผ่าน"), "after one scan: the question at the bottom, pass on the left, discard on the right")
+	_check(box._panel.get_global_rect().end.x <= 1280 - TesterPanel.PANEL_WIDTH, "the question stays clear of the step panel")
+	box.advance()
+	_check(box.visible and box.choosing, "F / click does not skip the question")
+	c1.pressed.emit()
 	_check(mission.state.tester_verdicts.get(1) == false and mission.state.spare_cables.is_empty() and panel.message.contains("ใช้งานได้"), "good cable discarded: told it works, kept: " + panel.message)
 	_check(panel.cable == 2 and not tester.is_on, "next cable, tester off")
 	_check(station.plug_board.active and station.test_heads().size() == 2 and not station.plug_board.is_plugged("A"), "cable 2: its heads lie on the mat, plugging again")
@@ -378,7 +387,13 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(panel.cable == 2 and panel.current_step() == "test" and tester.is_on, "back at the desk: same cable, still powered")
 	_mouse(panel, test_at, true)
 	_check(tester.is_testing and panel.current_step() == "verdict", "clicking TEST on the tester starts the scan")
-	panel.judge(false)
+	await create_timer(TesterPanel.WATCH_BEFORE_ASK + 0.2).timeout
+	box.advance() # show the whole line
+	var two := InputEventKey.new()
+	two.keycode = KEY_2
+	two.pressed = true
+	box._unhandled_input(two)
+	_check(not box.visible, "key 2 answers the second choice")
 	_check(mission.state.spare_cables == [2] and panel.message.contains("สำรอง"), "bad cable discarded: spare cable: " + panel.message)
 	_check(not mission.state.set_verdict(2, true), "a verdict cannot be changed")
 	_check(is_equal_approx(mission.state.tester_points(), 5.0), "tester points 5 (one right)")
