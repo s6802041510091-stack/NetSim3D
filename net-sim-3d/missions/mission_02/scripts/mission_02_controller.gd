@@ -3,12 +3,14 @@ extends Node
 
 ## Runs Level 2 in the school map (added by GameFlow.configure_level):
 ##   1. talk to the Data Center supervisor -> "ได้รับภารกิจ", the timer starts
-##   2. pick up the 5 items on the spare desk in the IT Support room
-##   3. (next steps of the round) choose cable types, crimp, test, install,
-##      check the port LEDs, report -> summary
+##   2. the work order: cable type for the 2 connection points (once)
+##   3. pick up the 5 items on the spare desk in the IT Support room
+##   4. (next steps of the round) crimp, test, install, check the port LEDs,
+##      report -> summary
 ## Rules (ภารกิจ/ด่าน_02/README.md): every step once, no retries.
 
 signal briefed
+signal cable_types_chosen
 signal tools_gathered
 signal replay_requested
 signal menu_requested
@@ -33,10 +35,12 @@ const NEXT_REMINDER := [
 ]
 const RECEIVED := "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN"
 
-enum Stage { BRIEFING, GATHER, CRIMP, DONE }
+enum Stage { BRIEFING, CABLE_TYPE, GATHER, CRIMP, DONE }
 
 var stage := Stage.BRIEFING
 var elapsed_sec := 0.0
+var state := Mission02State.new()
+var work_order: Mission02WorkOrder
 var hud: ObjectiveHUD
 var dialogue: DialogueBox
 var summary: MissionSummary
@@ -45,6 +49,7 @@ var marker: ObjectiveMarker
 var supervisor: Node3D
 var props: Mission02Props
 var _timing := false
+var _player: Node
 
 
 func _ready() -> void:
@@ -64,6 +69,10 @@ func _ready() -> void:
 	marker = ObjectiveMarker.new()
 	marker.name = "ObjectiveMarker"
 	add_child(marker)
+	work_order = Mission02WorkOrder.new()
+	work_order.name = "WorkOrder"
+	add_child(work_order)
+	work_order.confirmed.connect(_on_work_order_confirmed)
 	props = world.get_node_or_null("Mission02Props") as Mission02Props
 	if props:
 		props.set_items_available(false)
@@ -95,6 +104,11 @@ func _enter(next: Stage) -> void:
 			hud.set_objective("คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
+		Stage.CABLE_TYPE:
+			hud.set_objective("อ่านใบงาน แล้วเลือกชนิดสายให้ครบทั้ง 2 จุดเชื่อมต่อ")
+			_set_prompt("")
+			marker.clear()
+			work_order.open()
 		Stage.GATHER:
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			_refresh_gather()
@@ -140,17 +154,31 @@ func _set_prompt(text: String) -> void:
 func _on_talked(player: Node) -> void:
 	match stage:
 		Stage.BRIEFING:
-			await _say(player, PackedStringArray(BRIEFING))
+			_player = player
+			# Stay seated in the conversation: the work order comes next.
+			await _say(player, PackedStringArray(BRIEFING), false)
 			_timing = true
 			hud.show_toast(RECEIVED)
-			if props:
-				props.set_items_available(true)
-			_enter(Stage.GATHER)
 			briefed.emit()
+			_enter(Stage.CABLE_TYPE)
 		Stage.GATHER:
 			await _say(player, PackedStringArray(GATHER_REMINDER))
 		_:
 			await _say(player, PackedStringArray(NEXT_REMINDER))
+
+
+func _on_work_order_confirmed(answers: Dictionary) -> void:
+	if stage != Stage.CABLE_TYPE:
+		return
+	for point: int in answers:
+		state.set_cable_type(point, answers[point])
+	if _player and _player.has_method("set_controls_locked"):
+		_player.set_controls_locked(false)
+	hud.show_toast("บันทึกใบงานแล้ว — ไปหยิบอุปกรณ์บนโต๊ะว่าง")
+	if props:
+		props.set_items_available(true)
+	cable_types_chosen.emit()
+	_enter(Stage.GATHER)
 
 
 func _on_item_picked(_item_id: String) -> void:

@@ -40,7 +40,34 @@ func _finish_dialogue(dialogue: DialogueBox) -> void:
 	await _frames(2)
 
 
+## Scoring rules of Mission02State (README: A10 B24 D10 E6, job works = 30).
+func _test_rules() -> void:
+	var s := Mission02State.new()
+	var b := WireColors.T568B.duplicate()
+	var swapped := b.duplicate()
+	swapped[0] = b[1]
+	swapped[1] = b[0]
+	_check(WireColors.correct_positions(b) == 8 and WireColors.correct_positions(swapped) == 6 and WireColors.correct_positions(WireColors.T568A) == 4, "T568B positions")
+	s.set_cable_type(1, Mission02State.STRAIGHT)
+	s.set_cable_type(2, Mission02State.STRAIGHT)
+	for key in ["1A", "1B", "2A", "2B"]:
+		s.ends[key] = b
+	s.tester_verdicts = {1: true, 2: true}
+	s.router_port = "router_lan1"
+	_check(s.job_works() and is_equal_approx(s.process_points(), 50.0), "perfect job: works, process 50")
+	s.ends["2B"] = swapped
+	_check(not s.cable_good(2) and s.cable_good(1) and not s.job_works(), "one swapped pair breaks cable 2 and the job")
+	_check(is_equal_approx(s.colour_points(), 22.5), "colours 22.5 with one pair swapped (%.2f)" % s.colour_points())
+	_check(is_equal_approx(s.tester_points(), 5.0), "saying 'pass' to the bad cable loses 5")
+	s.tester_verdicts[2] = false
+	_check(is_equal_approx(s.tester_points(), 10.0) and is_equal_approx(s.process_points(), 48.5), "discarding the bad cable keeps D: process 48.5")
+	s.ends["2B"] = b
+	s.router_port = "router_wan"
+	_check(not s.job_works() and is_equal_approx(s.port_points(), 0.0), "WAN port: job does not work, E = 0")
+
+
 func _run() -> void:
+	_test_rules()
 	var flow := root.get_node("GameFlow")
 	_check(2 in flow.AVAILABLE, "Level 2 is selectable")
 
@@ -95,7 +122,22 @@ func _run() -> void:
 	_check(mission.dialogue.lines.size() == mission.BRIEFING.size(), "briefing lines")
 	await _finish_dialogue(mission.dialogue)
 	await create_timer(0.3).timeout
-	_check(mission.stage == Mission02Controller.Stage.GATHER and mission._timing, "after the briefing: gather, timer running")
+	# The work order: cable type for both points, once.
+	var order := mission.work_order
+	_check(mission.stage == Mission02Controller.Stage.CABLE_TYPE and order.is_open() and mission._timing, "after the briefing: work order open, timer running")
+	_check(player.controls_locked and first.get_prompt_text() == "", "player stays put and items wait while the work order is open")
+	var confirm: Button = order.find_child("ConfirmButton", true, false)
+	order.choose(1, Mission02State.STRAIGHT)
+	_check(confirm.disabled, "confirm waits for both points")
+	order.choose(2, Mission02State.CROSSOVER)
+	_check(not confirm.disabled, "confirm enabled with both answers")
+	confirm.pressed.emit()
+	await _frames(2)
+	_check(not order.is_open() and mission.state.cable_types == {1: Mission02State.STRAIGHT, 2: Mission02State.CROSSOVER}, "answers saved: %s" % [mission.state.cable_types])
+	_check(mission.state.cable_type_points() == 5.0, "cable type points = 5 (one right)")
+	_check(not mission.state.set_cable_type(2, Mission02State.STRAIGHT) and mission.state.cable_types[2] == Mission02State.CROSSOVER, "an answer cannot be changed")
+	_check(not player.controls_locked, "player free after the work order")
+	_check(mission.stage == Mission02Controller.Stage.GATHER, "work order -> gather the tools")
 	_check(mission.hud.objective_text.contains("0/5"), "objective counts items: " + mission.hud.objective_text)
 	_check(first.get_prompt_text().contains("สาย UTP Cat6"), "item prompt: " + first.get_prompt_text())
 

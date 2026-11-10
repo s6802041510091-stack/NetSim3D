@@ -78,5 +78,10 @@ func _run() -> void:
 	camera.global_position = rack.global_position + Vector3(-1.2, -0.1, 2.2)
 	camera.look_at(rack.global_position)
 	await _shot("m2_rack_player_view")
+	# The work order (cable type for the two points), one option picked.
+	var mission: Mission02Controller = map.get_node("Mission02")
+	mission.work_order.open()
+	mission.work_order.choose(1, Mission02State.STRAIGHT)
+	await _shot("m2_work_order")
 	print("CAPTURE_DONE ", out_dir)
 	quit()
