@@ -107,7 +107,19 @@ func _run() -> void:
 	var panel := mission.crimp_panel
 	await _shot("m2_desk_whole")
 	await panel.do_step() # cut
-	await panel.do_step() # strip
+	# Strip minigame: the mark inside the green zone, then a miss, then the hit.
+	panel.strip_pos = 2.4
+	panel.set_process(false)
+	panel.bench.set_strip_guide(true, 2.4, true)
+	panel._strip_bar.queue_redraw()
+	await _shot("m2_strip_minigame")
+	panel.set_process(true)
+	panel.strip_at(4.2)
+	await _shot("m2_strip_missed")
+	await create_timer(CrimpPanel.STRIP_MISS_PAUSE + 0.05).timeout
+	panel.strip_at(2.5)
+	while panel.busy:
+		await process_frame
 	await _shot("m2_desk_stripped")
 	await panel.do_step() # untwist
 	await _shot("m2_desk_untwisted")
@@ -121,7 +133,14 @@ func _run() -> void:
 	await panel.do_step() # trim
 	await panel.do_step() # insert
 	await _shot("m2_desk_inserted")
-	await panel.do_step() # crimp
+	# Crimp minigame: half squeezed, then squeezed shut.
+	for i in 6:
+		panel.squeeze()
+	await _shot("m2_crimp_minigame")
+	while panel.current_step() == "crimp" and not panel.busy:
+		panel.squeeze()
+	while panel.busy:
+		await process_frame
 	panel.bench.show_state(CrimpBench.Look.CRIMPED, WireColors.T568B)
 	await _shot("m2_desk_crimped")
 	# The tester: cable 1 good, cable 2 with the green pair swapped.

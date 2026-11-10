@@ -22,10 +22,17 @@ const HEAD_SIZE := Vector3(0.063, 0.024, 0.036) # 21 x 8 x 12 mm, x3
 ## Natural pair order coming out of the jacket (before arranging).
 const PAIRS := [["white_orange", "orange"], ["white_green", "green"], ["white_blue", "blue"], ["white_brown", "brown"]]
 
+## 1 cm of real cable in this 3x model.
+const CM := 0.03
+
 var look := Look.WHOLE
 var order: Array = [] # wire ids by pin (may hold "" for empty pins)
 var _parts: Node3D
 var _materials := {}
+var _guide: MeshInstance3D
+var _crimper: Node3D
+## Distance from the crimping tool's origin to the middle of its jaws (model units).
+const CRIMPER_JAW := 0.055
 
 
 func _ready() -> void:
@@ -87,6 +94,50 @@ func play_tool(id: String, duration := 0.7) -> void:
 	tween.tween_property(tool, "position", at + Vector3(0, 0.12, 0.12), duration * 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	await tween.finished
 	tool.queue_free()
+
+
+## Strip minigame: a ring round the jacket where the stripper's blade sits,
+## `cm` from the cut end (green inside the right range, red outside).
+func set_strip_guide(on: bool, cm := 0.0, good := false) -> void:
+	if _guide == null:
+		_guide = MeshInstance3D.new()
+		_guide.name = "StripGuide"
+		var torus := TorusMesh.new()
+		torus.inner_radius = JACKET_RADIUS * 1.02
+		torus.outer_radius = JACKET_RADIUS * 1.45
+		torus.rings = 24
+		torus.ring_segments = 8
+		_guide.mesh = torus
+		_guide.rotation_degrees.z = 90.0
+		var material := StandardMaterial3D.new()
+		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		_guide.material_override = material
+		add_child(_guide)
+	_guide.visible = on
+	if on:
+		_guide.position = Vector3(-cm * CM, 0, 0)
+		(_guide.material_override as StandardMaterial3D).albedo_color = Color(0.2, 0.85, 0.35) if good else Color(0.95, 0.3, 0.25)
+
+
+## Crimp minigame: the crimping tool over the RJ45 head, closing as `t` goes
+## from 0 (open, above) to 1 (squeezed shut).
+func set_crimp_tool(on: bool, t := 0.0) -> void:
+	if on and _crimper == null:
+		_crimper = (TOOL_CATALOG.TOOLS["crimping_tool"]["scene"] as PackedScene).instantiate()
+		_crimper.name = "Crimper"
+		_crimper.scale = Vector3.ONE * 1.4
+		add_child(_crimper)
+	if _crimper == null:
+		return
+	_crimper.visible = on
+	if on:
+		# The tool model lies in its XY plane, jaws towards +X (tip ~0.08 m),
+		# handles towards -X. Turned 90 degrees it stands across the cable with
+		# the jaws on the head and the handles running off to the right (+Z).
+		var closed := clampf(t, 0.0, 1.0)
+		var head := Vector3(JACKET_END - 0.012 + HEAD_SIZE.x * 0.5, 0.0, 0.0)
+		_crimper.position = head + Vector3(0.0, 0.03 * (1.0 - closed), CRIMPER_JAW * _crimper.scale.x)
+		_crimper.rotation_degrees = Vector3(0, 90, 6.0 * (1.0 - closed))
 
 
 # ---------------------------------------------------------------- pieces

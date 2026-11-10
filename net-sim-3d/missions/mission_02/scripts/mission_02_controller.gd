@@ -367,7 +367,7 @@ func finish(player: Node = null) -> MissionScore:
 		"cable_types": state.cable_types.duplicate(), "ends": state.ends.duplicate(true),
 		"tester_verdicts": state.tester_verdicts.duplicate(), "router_port": state.router_port,
 		"spare_cables": Array(state.spare_cables), "job_works": state.job_works(),
-		"drawer_items": drawer_taken.keys()})
+		"drawer_items": drawer_taken.keys(), "strip_misses": crimp_panel.strip_misses})
 	_enter(Stage.DONE)
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)

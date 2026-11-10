@@ -225,7 +225,7 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 			_check(mission.state.ends.get(key, []) == plans[key], "%s: arrangement saved" % key)
 			panel.place_wire("brown")
 			continue
-		await panel.do_step()
+		await _crimp_step(panel)
 		looks_seen[bench.look] = true
 		if key == "1B" and panel.current_key() == "2A" and not left_once:
 			# Stand up after the first cable and come back.
@@ -243,6 +243,40 @@ func _test_crimping(mission: Mission02Controller, props: Mission02Props, player:
 	_check(is_equal_approx(mission.state.colour_points(), 22.5), "colour points 22.5 (%.2f)" % mission.state.colour_points())
 	_check(mission.stage == Mission02Controller.Stage.TEST and not mission.at_desk and not player.controls_locked, "crimping done -> test stage, player free")
 	await _test_tester(mission, props, player)
+
+
+## One step at the desk, playing the minigames like a player: the first
+## strip misses once (too short), every crimp is squeezed until the gauge is full.
+var _strip_missed := false
+func _crimp_step(panel: CrimpPanel) -> void:
+	var step := panel.current_step()
+	if step == "strip":
+		var bench := panel.bench
+		await _frames(2)
+		_check(bench._guide != null and bench._guide.visible, "strip: the blade ring shows on the cable")
+		if not _strip_missed:
+			_strip_missed = true
+			_check(not panel.strip_at(1.0) and panel.strip_misses == 1 and panel.current_step() == "strip", "strip at 1 cm: too short, a miss, the step stays")
+			_check(not panel.strip_at(2.5), "no second try during the miss pause")
+			await create_timer(CrimpPanel.STRIP_MISS_PAUSE + 0.05).timeout
+		_check(panel.strip_at(2.5), "strip at 2.5 cm: in the green zone")
+	elif step == "crimp":
+		panel.squeeze()
+		panel.squeeze()
+		_check(panel.crimp_force > 15.0 and panel.current_step() == "crimp", "crimp: two squeezes fill the gauge part way")
+		await create_timer(0.3).timeout
+		_check(panel.crimp_force < 22.0, "the gauge eases off when squeezing stops (%.1f)" % panel.crimp_force)
+		var guard := 0
+		while panel.current_step() == "crimp" and not panel.busy and guard < 30:
+			panel.squeeze()
+			guard += 1
+		_check(panel.busy or panel.current_step() != "crimp", "crimp: a full gauge crimps the head (%d squeezes)" % (guard + 2))
+	else:
+		await panel.do_step()
+	var wait := 0
+	while panel.busy and wait < 200:
+		await process_frame
+		wait += 1
 
 
 ## The tester: cable 1 is good but the player discards it; cable 2 has the
@@ -354,7 +388,7 @@ func _test_report(mission: Mission02Controller, player: CharacterBody3D) -> void
 		_check(mistakes.contains(want), "mistakes list has: " + want)
 	var last: Dictionary = GameProgress.level_record(2).get("last", {})
 	_check(GameProgress.best_score(2) == 59 and last.get("job_works", true) == false and last.get("router_port", "") == "router_lan1", "progress recorded for Level 2: %s" % [GameProgress.level_record(2)])
-	_check("screwdriver" in Array(last.get("drawer_items", [])) and Array(last.get("drawer_items", [])).size() == 5, "drawer items kept for the report: %s" % [last.get("drawer_items")])
+	_check("screwdriver" in Array(last.get("drawer_items", [])) and Array(last.get("drawer_items", [])).size() == 5 and int(last.get("strip_misses", -1)) == 1, "drawer items and strip misses kept for the report: %s, %s" % [last.get("drawer_items"), last.get("strip_misses")])
 	var details := ""
 	for l in mission.summary._details.find_children("*", "Label", true, false):
 		details += (l as Label).text + "\n"

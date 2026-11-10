@@ -4,8 +4,11 @@ extends CanvasLayer
 ## The step panel at the crimping desk (right side of the screen) and the
 ## order of work for the 4 cable ends: cable 1 end 1, cable 1 end 2, cable 2
 ## end 1, cable 2 end 2. Each end: (cut) -> strip -> untwist -> arrange the
-## colours -> trim -> insert into the RJ45 head -> crimp. Every step is one
-## button except arranging, where the player clicks the 8 wires into pins 1-8.
+## colours -> trim -> insert into the RJ45 head -> crimp. Cut, untwist, trim
+## and insert are one button. Strip is a timing game (press while the blade
+## mark is in the green 2-3 cm zone; a miss means stripping again) and crimp
+## is a mashing game (click fast until the gauge is full). Misses only cost
+## time, never points. Arranging: the player places the 8 wires in pins 1-8.
 ## The arrangement is confirmed once (Mission02State.ends) — no changes later.
 ## The player may stand up (Esc) and come back; work resumes where it stopped.
 
@@ -24,12 +27,12 @@ const CABLES := {
 ## step -> [title, what to do, tool shown, look after the step, sound]
 const STEPS := {
 	"cut": ["ตัดสาย", "ตัดสาย UTP Cat6 ยาว %s ด้วยใบมีดของคีมย้ำสาย", "crimping_tool", CrimpBench.Look.CUT, "snip"],
-	"strip": ["ปอกฉนวน", "ปอกฉนวนด้านนอกออกประมาณ 2.5 ซม. ด้วยคีมปอกสาย", "cable_stripper", CrimpBench.Look.STRIPPED, "snip"],
+	"strip": ["ปอกฉนวน", "กด \"ปอกตอนนี้\" (หรือ Space) ตอนที่ขีดใบมีดอยู่ในช่องสีเขียว เพื่อปอกฉนวนด้านนอกออกประมาณ 2.5 ซม.", "cable_stripper", CrimpBench.Look.STRIPPED, "snip"],
 	"untwist": ["คลายเกลียว", "คลายเกลียวสายแต่ละคู่ แล้วจัดเส้นลวดทั้ง 8 เส้นให้ตรง", "", CrimpBench.Look.UNTWISTED, "click"],
 	"arrange": ["เรียงสี T568B", "", "", CrimpBench.Look.ARRANGED, ""],
 	"trim": ["ตัดปลายให้เสมอ", "ตัดปลายสายทั้ง 8 เส้นให้เสมอกัน เหลือยาวประมาณ 1.3 ซม.", "crimping_tool", CrimpBench.Look.TRIMMED, "snip"],
 	"insert": ["เสียบหัว RJ45", "เสียบสายเข้าหัว RJ45 ให้ครบทั้ง 8 เส้น โดยไม่ให้ตำแหน่งสลับกัน", "", CrimpBench.Look.INSERTED, "click"],
-	"crimp": ["ย้ำหัว", "ใส่หัว RJ45 ในช่องของคีมย้ำสาย แล้วบีบให้สุด", "crimping_tool", CrimpBench.Look.CRIMPED, "crimp"],
+	"crimp": ["ย้ำหัว", "ใส่หัว RJ45 ในช่องของคีมย้ำสาย แล้วคลิกเมาส์ซ้ายรัวๆ (หรือกด Space) บีบคีมจนเกจเต็ม", "crimping_tool", CrimpBench.Look.CRIMPED, "crimp"],
 }
 const ARRANGE_HELP := "เรียงสายตามมาตรฐาน T568B จากขา 1 ถึงขา 8 (มองจากด้านบน ขา 1 อยู่ซ้ายสุด)\nคลิกสีเพื่อวางลงขาถัดไป คลิกที่ขาเพื่อเอาสายออก — ยืนยันแล้วแก้ไม่ได้"
 
@@ -39,6 +42,24 @@ var end_index := 0
 var step_index := 0
 var busy := false
 var arrangement: Array = ["", "", "", "", "", "", "", ""]
+
+## Strip minigame: where the blade mark is (cm from the cut end), the zone
+## that counts as right, how fast the mark moves, and misses so far.
+const STRIP_RANGE := Vector2(0.5, 4.5)
+const STRIP_GOOD := Vector2(2.0, 3.0)
+const STRIP_SPEED := 3.2 # cm per second
+const STRIP_MISS_PAUSE := 0.9
+var strip_pos := STRIP_RANGE.x
+var strip_misses := 0
+var _strip_dir := 1.0
+var _strip_paused_until := 0.0
+var _strip_bar: Control
+## Crimp minigame: 0..100, each squeeze adds, it eases off when the player stops.
+const CRIMP_PER_SQUEEZE := 11.0
+const CRIMP_EASE := 22.0 # per second
+var crimp_force := 0.0
+var _crimp_bar: ProgressBar
+var _mini_note: Label
 
 var _rng := RandomNumberGenerator.new()
 var _title: Label
@@ -124,18 +145,59 @@ func current_step() -> String:
 	return steps[step_index] if step_index < steps.size() else ""
 
 
-## Does the current one-button step (cut, strip, untwist, trim, insert, crimp).
+## Does the current one-button step (cut, untwist, trim, insert).
 func do_step() -> void:
 	var step := current_step()
-	if busy or step == "" or step == "arrange":
+	if busy or step in ["", "arrange", "strip", "crimp"]:
 		return
+	await _run_step(step)
+
+
+## Strip: tries at the mark's current place.
+func press_strip() -> bool:
+	return strip_at(strip_pos)
+
+
+## Strip at `cm` from the end: inside the green zone the step is done; too
+## short or too long is a miss (a short pause, then the mark moves again).
+func strip_at(cm: float) -> bool:
+	if busy or current_step() != "strip" or Time.get_ticks_msec() / 1000.0 < _strip_paused_until:
+		return false
+	if cm >= STRIP_GOOD.x and cm <= STRIP_GOOD.y:
+		_run_step("strip")
+		return true
+	strip_misses += 1
+	Sound.play("wrong")
+	_strip_paused_until = Time.get_ticks_msec() / 1000.0 + STRIP_MISS_PAUSE
+	if _mini_note:
+		_mini_note.text = ("ปอกยาวเกินไป (%.1f ซม.) สายลวดยาวเกิน ต้องตัดปลายทิ้งแล้วปอกใหม่" if cm > STRIP_GOOD.y else "ปอกสั้นเกินไป (%.1f ซม.) สายลวดสั้นเกินจะเรียงไม่ได้ ปอกใหม่อีกครั้ง") % cm
+		_mini_note.add_theme_color_override("font_color", GameUI.BAD)
+	return false
+
+
+## Crimp: one squeeze of the tool; the head is crimped when the gauge is full.
+func squeeze() -> void:
+	if busy or current_step() != "crimp":
+		return
+	crimp_force = minf(100.0, crimp_force + CRIMP_PER_SQUEEZE)
+	Sound.play("click", null, 0.0, 0.7 + crimp_force / 200.0)
+	if crimp_force >= 100.0:
+		_run_step("crimp")
+
+
+func _run_step(step: String) -> void:
 	busy = true
+	if bench:
+		bench.set_strip_guide(false)
+		bench.set_crimp_tool(false)
 	_refresh()
 	var info: Array = STEPS[step]
 	if String(info[4]) != "":
 		Sound.play(info[4])
-	if String(info[2]) != "" and bench:
+	if String(info[2]) != "" and bench and step != "crimp":
 		await bench.play_tool(info[2], 0.55)
+	if step == "crimp":
+		crimp_force = 0.0
 	if step == "crimp" and bench:
 		# Let the player see the finished head before the next end.
 		bench.show_state(CrimpBench.Look.CRIMPED, state.ends.get(current_key(), arrangement))
@@ -232,6 +294,9 @@ func _refresh() -> void:
 		child.queue_free()
 	_pin_buttons.clear()
 	_chip_buttons.clear()
+	_strip_bar = null
+	_crimp_bar = null
+	_mini_note = null
 	if is_done():
 		_subtitle.text = "เข้าหัวครบทั้ง 2 เส้นแล้ว"
 		_progress.text = ""
@@ -264,13 +329,99 @@ func _refresh() -> void:
 		var help := GameUI.label(text, 16, GameUI.INK)
 		help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_action_box.add_child(help)
-		var go := GameUI.button(STEPS[step][0], true, 240)
-		go.name = "StepButton"
-		go.set_meta("sound", "")
-		go.disabled = busy
-		go.pressed.connect(do_step)
-		_action_box.add_child(go)
+		if step == "strip":
+			_build_strip()
+		elif step == "crimp":
+			_build_crimp()
+		else:
+			var go := GameUI.button(STEPS[step][0], true, 240)
+			go.name = "StepButton"
+			go.set_meta("sound", "")
+			go.disabled = busy
+			go.pressed.connect(do_step)
+			_action_box.add_child(go)
 	_leave.disabled = busy
+
+
+## The strip bar: a 0-5 cm scale with the green 2-3 cm zone and the blade mark.
+func _build_strip() -> void:
+	var bar := Control.new()
+	bar.name = "StripBar"
+	bar.custom_minimum_size = Vector2(0, 64)
+	bar.draw.connect(_draw_strip_bar.bind(bar))
+	_action_box.add_child(bar)
+	_strip_bar = bar
+	_mini_note = GameUI.label("ขีดดำคือตำแหน่งใบมีด (นับจากปลายสาย)", 14, GameUI.INK_SOFT)
+	_mini_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_action_box.add_child(_mini_note)
+	var go := GameUI.button("ปอกตอนนี้", true, 240)
+	go.name = "StripButton"
+	go.set_meta("sound", "")
+	go.disabled = busy
+	go.pressed.connect(press_strip)
+	_action_box.add_child(go)
+
+
+func _draw_strip_bar(bar: Control) -> void:
+	var top := 6.0
+	var h := 30.0
+	var left := 8.0
+	var width := bar.size.x - 16.0
+	bar.draw_rect(Rect2(left, top, width, h), Color(0.62, 0.72, 0.84))
+	var g0 := left + width * STRIP_GOOD.x / 5.0
+	var g1 := left + width * STRIP_GOOD.y / 5.0
+	bar.draw_rect(Rect2(g0, top, g1 - g0, h), Color(0.25, 0.75, 0.4, 0.85))
+	var font := bar.get_theme_default_font()
+	for cm in 6:
+		var x := left + width * cm / 5.0
+		bar.draw_line(Vector2(x, top + h), Vector2(x, top + h + 6), GameUI.INK_SOFT, 1.0)
+		bar.draw_string(font, Vector2(x - 22, top + h + 22), "%d ซม." % cm, HORIZONTAL_ALIGNMENT_CENTER, 44, 12, GameUI.INK_SOFT)
+	var mx := left + width * strip_pos / 5.0
+	var paused := Time.get_ticks_msec() / 1000.0 < _strip_paused_until
+	bar.draw_rect(Rect2(mx - 2.5, top - 5, 5, h + 10), GameUI.BAD if paused else GameUI.INK)
+
+
+## The crimp gauge and a big squeeze button (clicks on the 3D view count too).
+func _build_crimp() -> void:
+	_crimp_bar = ProgressBar.new()
+	_crimp_bar.name = "CrimpGauge"
+	_crimp_bar.custom_minimum_size = Vector2(0, 30)
+	_crimp_bar.max_value = 100.0
+	_crimp_bar.value = crimp_force
+	_crimp_bar.show_percentage = false
+	_crimp_bar.add_theme_stylebox_override("background", GameUI.box(Color(0.9, 0.92, 0.95), Color(0.78, 0.81, 0.87), 6, 0, 0))
+	_crimp_bar.add_theme_stylebox_override("fill", GameUI.box(GameUI.ACCENT, Color(0, 0, 0, 0), 6, 0, 0))
+	_action_box.add_child(_crimp_bar)
+	_mini_note = GameUI.label("ถ้าหยุดบีบ แรงบีบจะค่อย ๆ คลายลง", 14, GameUI.INK_SOFT)
+	_action_box.add_child(_mini_note)
+	var go := GameUI.button("บีบคีม", true, 240)
+	go.name = "SqueezeButton"
+	go.set_meta("sound", "")
+	go.disabled = busy
+	go.pressed.connect(squeeze)
+	_action_box.add_child(go)
+
+
+func _process(delta: float) -> void:
+	var step := current_step() if visible else ""
+	if step == "strip" and not busy:
+		if Time.get_ticks_msec() / 1000.0 >= _strip_paused_until:
+			strip_pos += _strip_dir * STRIP_SPEED * delta
+			if strip_pos >= STRIP_RANGE.y:
+				strip_pos = STRIP_RANGE.y
+				_strip_dir = -1.0
+			elif strip_pos <= STRIP_RANGE.x:
+				strip_pos = STRIP_RANGE.x
+				_strip_dir = 1.0
+		if _strip_bar:
+			_strip_bar.queue_redraw()
+	if step == "crimp" and not busy:
+		crimp_force = maxf(0.0, crimp_force - CRIMP_EASE * delta)
+		if _crimp_bar:
+			_crimp_bar.value = crimp_force
+	if bench:
+		bench.set_strip_guide(step == "strip" and not busy, strip_pos, strip_pos >= STRIP_GOOD.x and strip_pos <= STRIP_GOOD.y)
+		bench.set_crimp_tool(step == "crimp" and not busy, crimp_force / 100.0)
 
 
 func _build_arrange() -> void:
@@ -368,6 +519,18 @@ func _chip_order() -> Array:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if visible and not busy and event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
+	if not visible or busy:
+		return
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_ESCAPE:
 		get_viewport().set_input_as_handled()
 		leave_requested.emit()
+		return
+	var space: bool = event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_SPACE
+	var click: bool = event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT
+	if current_step() == "strip" and space:
+		get_viewport().set_input_as_handled()
+		press_strip()
+	elif current_step() == "crimp" and (space or click):
+		# A click anywhere on the 3D view squeezes too (panel buttons handle their own clicks).
+		get_viewport().set_input_as_handled()
+		squeeze()
