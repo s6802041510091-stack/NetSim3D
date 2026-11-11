@@ -108,7 +108,8 @@ def refit_cleaner_arms(body,rig,shirt):
 def main():
     path=ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm.blend'
     backup=ROOT/'ใช้ร่วมกัน/blend/cleaner_female_apron_160cm_before_arm_alignment.blend'
-    if not backup.exists():shutil.copy2(path,backup)
+    if not backup.exists():
+        raise SystemExit('This arm correction is already applied. Its old input snapshot was removed during cleanup; use the current cleaner model.')
     bpy.ops.wm.open_mainfile(filepath=str(backup));bpy.context.preferences.filepaths.save_version=0
     asset=bpy.data.collections['CLEANER | female | 160 cm'];rig=bpy.data.objects['Cleaner_Female_Rig']
     body=bpy.data.objects['Body | female head arms lower legs'];shirt=bpy.data.objects['Workwear | short sleeve blouse']

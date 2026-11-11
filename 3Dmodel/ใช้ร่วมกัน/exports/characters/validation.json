@@ -1,0 +1,102 @@
+[
+  {
+    "name": "it_support_male_180cm",
+    "source": "blend\\it_support_male_180cm.blend",
+    "glb": "exports\\characters\\it_support_male_180cm.glb",
+    "glb_bytes": 10297396,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 20,
+    "required_bones": true
+  },
+  {
+    "name": "it_support_supervisor_male_170cm",
+    "source": "blend\\it_support_supervisor_male_170cm.blend",
+    "glb": "exports\\characters\\it_support_supervisor_male_170cm.glb",
+    "glb_bytes": 7547712,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 19,
+    "required_bones": true
+  },
+  {
+    "name": "teacher_male_khaki_180cm",
+    "source": "blend\\teacher_male_khaki_180cm.blend",
+    "glb": "exports\\characters\\teacher_male_khaki_180cm.glb",
+    "glb_bytes": 10932052,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 13,
+    "required_bones": true
+  },
+  {
+    "name": "teacher_female_khaki_160cm",
+    "source": "blend\\teacher_female_khaki_160cm.blend",
+    "glb": "exports\\characters\\teacher_female_khaki_160cm.glb",
+    "glb_bytes": 13015288,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 12,
+    "required_bones": true
+  },
+  {
+    "name": "cleaner_female_apron_160cm",
+    "source": "blend\\cleaner_female_apron_160cm.blend",
+    "glb": "exports\\characters\\cleaner_female_apron_160cm.glb",
+    "glb_bytes": 11708032,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 30,
+    "required_bones": true
+  },
+  {
+    "name": "student_male_mullet",
+    "source": "blend\\students\\student_male_mullet.blend",
+    "glb": "exports\\characters\\student_male_mullet.glb",
+    "glb_bytes": 10229620,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 11,
+    "required_bones": true
+  },
+  {
+    "name": "student_male_two_block",
+    "source": "blend\\students\\student_male_two_block.blend",
+    "glb": "exports\\characters\\student_male_two_block.glb",
+    "glb_bytes": 10059888,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 11,
+    "required_bones": true
+  },
+  {
+    "name": "student_female_bob_cut",
+    "source": "blend\\students\\student_female_bob_cut.blend",
+    "glb": "exports\\characters\\student_female_bob_cut.glb",
+    "glb_bytes": 19259040,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 14,
+    "required_bones": true
+  },
+  {
+    "name": "student_female_wendy_cut",
+    "source": "blend\\students\\student_female_wendy_cut.blend",
+    "glb": "exports\\characters\\student_female_wendy_cut.glb",
+    "glb_bytes": 12010164,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 10,
+    "required_bones": true
+  },
+  {
+    "name": "student_female_layer_cut",
+    "source": "blend\\students\\student_female_layer_cut.blend",
+    "glb": "exports\\characters\\student_female_layer_cut.glb",
+    "glb_bytes": 12088444,
+    "source_bones": 163,
+    "glb_bones": 163,
+    "skinned_meshes": 11,
+    "required_bones": true
+  }
+]

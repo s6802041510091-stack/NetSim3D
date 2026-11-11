@@ -1,0 +1,14 @@
+{
+  "corridor_bench": {
+    "triangles": 1516,
+    "mesh_objects": 1
+  },
+  "corridor_shoe_rack_30": {
+    "triangles": 17432,
+    "mesh_objects": 1
+  },
+  "corridor_plant": {
+    "triangles": 1852,
+    "mesh_objects": 1
+  }
+}

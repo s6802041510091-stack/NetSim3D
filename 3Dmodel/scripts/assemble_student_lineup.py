@@ -4,7 +4,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ROOT=Path('D:/NetSim3D/3Dmodel');folder=ROOT/'ใช้ร่วมกัน/blend/students'
-specs=[('male_mullet','SHORT CROP',1.65),('male_two_block','SIDE PART',1.65),('female_bob_cut','SHORT PIXIE',1.60),('female_wendy_cut','PONYTAIL',1.60),('female_layer_cut','TIED BUN',1.60)]
+specs=[('male_mullet','SHORT CROP',1.65),('male_two_block','SIDE PART',1.65),('female_bob_cut','CENTRE-PARTED BOB',1.60),('female_wendy_cut','PONYTAIL',1.60),('female_layer_cut','TIED BUN',1.60)]
 reports=[]
 for stem,label,height in specs:
     bpy.ops.wm.open_mainfile(filepath=str(folder/('student_'+stem+'.blend')))
