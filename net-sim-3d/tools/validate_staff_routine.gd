@@ -59,13 +59,37 @@ func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	StaffRoomLife.auto_routine = false
 
-	# Who is free where (male: missions 3, 5; female: missions 4, 6).
-	for case in [[3, ["female"]], [4, ["male"]]]:
-		var m := await _load(case[0])
-		var life3: StaffRoomLife = m.get_node("StaffRoomLife")
-		_check(life3.idle.keys() == case[1], "Level %d: free teachers %s" % [case[0], life3.idle.keys()])
+	# Every level: who is free (male: missions 3, 5; female: missions 4, 6),
+	# where each teacher is, who can be greeted.
+	var free_by_level := {1: ["male", "female"], 2: ["male", "female"], 3: ["female"], 4: ["male"], 5: ["female"], 6: ["male"]}
+	for lv: int in free_by_level:
+		var m := await _load(lv)
+		var lv_life: StaffRoomLife = m.get_node("StaffRoomLife")
+		var free: Array = free_by_level[lv]
+		_check(lv_life.idle.keys() == free, "Level %d: free teachers %s" % [lv, lv_life.idle.keys()])
+		var m_male: Node3D = m.get_node("TeacherMale")
+		if lv in [3, 5]:
+			_check(not m_male is NpcCharacter and m_male.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level %d: male teacher in the computer room for his mission" % lv)
+		else:
+			_check(m_male is NpcCharacter and (m_male as NpcCharacter).seated and m_male.global_position.distance_to(StaffRoomLife.seat_of("male")) < 0.01, "Level %d: male teacher at his desk" % lv)
+		var m_female := m.get_node("TeacherFemale") as NpcCharacter
+		_check(m_female != null and m_female.seated and m_female.global_position.distance_to(StaffRoomLife.seat_of("female")) < 0.01, "Level %d: female teacher at her desk" % lv)
+		_check((m_female.get_node_or_null("Talk") != null) == ("female" in free), "Level %d: female teacher greetable only when free" % lv)
+		if lv == 4:
+			# Alone in the teachers' room: his break is a coffee.
+			var lv_male := m_male as NpcCharacter
+			lv_life.run_coffee("male")
+			var spot: Vector3 = StaffRoomLife.ROUTES["male_to_coffee"][-1]
+			_check(await _wait_until(func(): return lv_male.global_position.distance_to(spot) < 0.06 and not lv_male.walking, 30.0), "Level 4: male teacher walks to the pantry")
+			camera = Camera3D.new()
+			camera.fov = 65.0
+			m.add_child(camera)
+			camera.make_current()
+			await _shot("level4_male_coffee", Vector3(4.3, 1.6, -26.9), Vector3(3.1, 1.0, -29.6))
+			_check(await _wait_until(func(): return lv_life.activity.get("male") == "desk", 45.0), "Level 4: back at his desk after the coffee")
 		m.queue_free()
-		await process_frame
+		for i in 2:
+			await process_frame
 
 	var map := await _load(1)
 	var life: StaffRoomLife = map.get_node("StaffRoomLife")
