@@ -68,7 +68,9 @@ func _run() -> void:
 		var jamb_b: AABB = visual.get_node(jambs[1]).global_transform * visual.get_node(jambs[1]).get_aabb()
 		var low: AABB = jamb_a if jamb_a.position.z < jamb_b.position.z else jamb_b
 		var high: AABB = jamb_b if jamb_a.position.z < jamb_b.position.z else jamb_a
-		var expected_gap := 0.004 if door_name == "ClassroomDoor" else 0.0
+		# Classroom: 4 mm in the model, 2 mm after school_visual_fixes.gd moves the
+		# jambs into the opening (they were coplanar with the wall edge).
+		var expected_gap := 0.002 if door_name == "ClassroomDoor" else 0.0
 		var low_gap := leaf_bounds.position.z - low.end.z
 		var high_gap := high.position.z - leaf_bounds.end.z
 		var depth := leaf_bounds.get_center().x - (jamb_a.get_center().x + jamb_b.get_center().x) / 2.0

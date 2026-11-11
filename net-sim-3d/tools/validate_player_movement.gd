@@ -13,16 +13,16 @@ func _run() -> void:
 	world.add_child(player)
 	await process_frame
 
-	var visible_legs := 0
-	var hidden_upper_body := 0
+	# The player's own body (legs included) is hidden from the first-person camera.
+	var shown := 0
+	var hidden := 0
 	for part in player.get_node("Visual").find_children("*", "MeshInstance3D", true, false):
-		if String(part.name).begins_with("Trousers") or String(part.name).begins_with("Shoes"):
-			if part.layers == 3:
-				visible_legs += 1
-		elif part.layers == 2:
-			hidden_upper_body += 1
-	if visible_legs < 2 or hidden_upper_body < 1:
-		push_error("First-person body layers are wrong: legs=%d hidden=%d" % [visible_legs, hidden_upper_body])
+		if part.layers == 2:
+			hidden += 1
+		else:
+			shown += 1
+	if shown > 0 or hidden < 2:
+		push_error("First-person body layers are wrong: shown=%d hidden=%d" % [shown, hidden])
 		quit(1)
 		return
 
@@ -97,7 +97,7 @@ func _run() -> void:
 		quit(1)
 		return
 
-	print("PLAYER_MOVEMENT_VALID legs=", visible_legs, " upper_hidden=", hidden_upper_body, " run_speed=", measured_run_speed, " step_height=", stepped_height, " map_stair_height=", map_stair_height, " climbed_to=", climbed_position, " descended_to=", map_player.global_position)
+	print("PLAYER_MOVEMENT_VALID body_hidden=", hidden, " run_speed=", measured_run_speed, " step_height=", stepped_height, " map_stair_height=", map_stair_height, " climbed_to=", climbed_position, " descended_to=", map_player.global_position)
 	quit()
 
 

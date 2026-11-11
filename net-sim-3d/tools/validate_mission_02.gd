@@ -81,6 +81,7 @@ func _run() -> void:
 	_check(rack.stage == WallRack9U.Stage.EMPTY and rack.port_ids().is_empty(), "Level 1: empty rack")
 	_check(not (map.get_node("ComputerRoomAccessPoint") as CeilingAccessPoint).visible, "Level 1: no access point yet")
 	_check(map.get_node_or_null("Mission02Props") == null and map.get_node_or_null("Mission02") == null, "Level 1: no Mission 2 props")
+	_check_teacher_seated(map, "Level 1")
 	map.queue_free()
 	await _frames(2)
 
@@ -90,6 +91,8 @@ func _run() -> void:
 	_check(rack.stage == WallRack9U.Stage.CABLED and rack.is_link_on("router_lan1") and rack.is_link_on("switch_01") and rack.is_link_on("switch_02"), "Level 3: rack cabled, links up")
 	_check(pc_port.plugged and pc_port.link_on, "Level 3: teacher PC cabled")
 	_check(map.get_node_or_null("Mission02Props") == null, "Level 3: no Mission 2 props")
+	var teacher3: Node3D = map.get_node("TeacherMale")
+	_check(not teacher3 is NpcCharacter and teacher3.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level 3: the male teacher stays in the computer room")
 	map.queue_free()
 	await _frames(2)
 
@@ -103,6 +106,7 @@ func _run() -> void:
 		_check(not rack.is_plugged(id) and not rack.is_link_on(id), "Level 2: %s free and dark" % id)
 	_check(not pc_port.plugged and not pc_port.link_on, "Level 2: teacher PC not cabled")
 	_check((map.get_node("ComputerRoomAccessPoint") as CeilingAccessPoint).visible, "Level 2: access point on the ceiling")
+	_check_teacher_seated(map, "Level 2")
 	_check(rack.plug("switch_05") and rack.is_plugged("switch_05") and not rack.plug("switch_05"), "rack plug() once per port")
 	rack.unplug("switch_05")
 	rack.set_link("switch_05", true)
@@ -465,6 +469,14 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 	await create_timer(PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME).timeout
 
 
+## Levels 1-2: the male teacher sits working at STAFF-PC-02 in the teachers' room.
+func _check_teacher_seated(map: Node3D, level_name: String) -> void:
+	var teacher := map.get_node("TeacherMale") as NpcCharacter
+	var station: ComputerStation = (map.get_node("Computers") as ComputerManager).find_host(TeacherSeat.DESK_HOST)
+	_check(teacher != null and teacher.seated and teacher.work_at_desk and teacher.global_position.distance_to(TeacherSeat.SEAT) < 0.01, "%s: the male teacher sits at his desk in the teachers' room" % level_name)
+	_check(station != null and station.collision_layer == 0, "%s: his computer is in use (the player cannot sit at it)" % level_name)
+
+
 ## True when `at` is on screen and left of the (open) step panel.
 func _on_left_part(cam: Camera3D, at: Vector2) -> bool:
 	var screen := cam.get_viewport().get_visible_rect().size
@@ -543,7 +555,6 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	await mission.plug_pc(player)
 	var pcb := mission.pc_board
 	_check(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE, "the mouse shows at the teacher PC")
-	_check(not player._leg_parts.is_empty() and player._leg_parts.all(func(p): return p.layers == 2), "own legs hidden from the camera at the PC close-up")
 	_check(pcb.active and mission._pc_head != null and pcb.views.size() == 2 and not pc.plugged, "PC: the cable end lies behind the PC, 2 views")
 	_check(cam.global_position.distance_to(pcb.views[0]["xform"].origin) < 0.01 and not pcb.can_drag(), "PC: first the back of the PC at medium distance (look only)")
 	_drag(pcb, pcb.plug_screen_point("head"), cam.unproject_position(pc.global_position))
@@ -562,7 +573,8 @@ func _test_install(mission: Mission02Controller, player: CharacterBody3D) -> voi
 	_check(pc.plugged and pc.link_on and rack.is_link_on("switch_02"), "PC plugged by hand, links up (spare cable)")
 	await create_timer(Mission02Controller.PC_LED_LOOK + Mission02Controller.DESK_ZOOM_TIME + 0.3).timeout
 	_check(mission.install_step == "leds" and not player.controls_locked, "then check the LEDs at the rack")
-	_check(player._leg_parts.all(func(p): return p.layers == 3), "camera back at the eyes: own legs visible again")
+	var body_parts := player.get_node("Visual").find_children("*", "MeshInstance3D", true, false)
+	_check(not body_parts.is_empty() and body_parts.all(func(p): return p.layers == 2), "own body (legs too) never shown to the player camera")
 	await mission.open_rack(player)
 	_check(panel.mode == "leds" and panel.visible, "rack opens for the LED check")
 	panel.confirm_leds()

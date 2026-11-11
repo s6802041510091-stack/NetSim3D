@@ -205,6 +205,10 @@ func configure_level(world: Node, level: int) -> void:
 	var access_point := world.get_node_or_null("ComputerRoomAccessPoint")
 	if access_point:
 		access_point.installed = level >= 2
+	# Levels 1-2: the male teacher works at his desk in the teachers' room
+	# (from Level 3 on he is in the computer room).
+	if level <= 2:
+		TeacherSeat.seat_at_staff_desk(world)
 	if level == 1:
 		var mission: Node = load("res://missions/mission_01/scripts/mission_01_controller.gd").new()
 		mission.name = "Mission01"
