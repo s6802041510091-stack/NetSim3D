@@ -95,6 +95,7 @@ func _ready() -> void:
 	set_process(false)
 	if skeleton == null:
 		return
+	_rest_pose = _current_pose()
 	if seated:
 		sit()
 	_store_base_pose()
@@ -215,6 +216,9 @@ func _store_base_pose() -> void:
 # --- Working at the desk -----------------------------------------------------
 
 func _process(delta: float) -> void:
+	if not seated:
+		_step_walk(delta)
+		return
 	if not work_at_desk:
 		return
 	_since_update += delta
@@ -431,3 +435,225 @@ func _hand_sound(side: String, id: String) -> void:
 	var wrist := skeleton.find_bone("wrist." + side)
 	if wrist >= 0:
 		Sound.play(id, skeleton.global_transform * _bone_pos(wrist))
+
+
+# --- Standing up, walking, sitting down -------------------------------------
+# Only for NPCs that move (the teachers). A seated NPC that never stands (the
+# Data Center supervisor) never runs any of this.
+
+## Stand-up / sit-down time, how far the body moves back from the desk while
+## rising, walking speed (m/s), stride (m per step) and turning speed (rad/s).
+const STAND_TIME := 0.9
+const STAND_BACK := 0.38
+const WALK_SPEED := 1.05
+const STRIDE := 0.62
+const TURN_SPEED := 4.5
+## Standing: the wrists hang by the thighs (placed with the same arm solver
+## as the typing hands): a little out to the side and forward of the
+## shoulder, the arm almost straight, palms facing the legs.
+const HANG_DIRECTION := Vector3(0.12, -1.0, 0.06) # +X = out to the side
+const HANG_REACH := 0.97 # share of the arm's length
+## Walk cycle swing (radians): thighs, knees on the forward swing, arms, feet.
+const THIGH_SWING := 0.4
+const KNEE_BEND := 0.6
+const ARM_SWING := 0.28
+const FOOT_LIFT := 0.25
+## Someone (the player) this close in front makes the walker wait (m).
+const BLOCK_DISTANCE := 0.95
+const WALK_BONES := ["upperleg01.L", "upperleg01.R", "lowerleg01.L", "lowerleg01.R",
+	"foot.L", "foot.R", "upperarm01.L", "upperarm01.R", "lowerarm01.L", "lowerarm01.R"]
+
+signal arrived
+
+## True while following a path.
+var walking := false
+## Who can stand in the way (waits while they are close in front).
+@export var blocker_path: NodePath = ^"../ITSupportPlayer"
+## True while the walker waits for someone in the way.
+var blocked := false
+var _path: Array[Vector3] = []
+var _rest_pose := {} # bone -> rotation as imported (A-pose), captured before sitting
+var _stand_pose := {} # bone -> rotation standing with the arms down
+var _seated_pose := {} # bone -> rotation when it last stood up from its desk
+var _seat_xform := Transform3D.IDENTITY
+var _phase := 0.0
+var _walk_blend := 0.0
+var _posture_tween: Tween
+
+
+## Gets up from the chair: the body rises and moves back from the desk, the
+## arms come down. Remembers the seat to come back to with sit_down().
+func stand_up() -> void:
+	if not seated or skeleton == null:
+		return
+	_seated_pose = _current_pose()
+	_seat_xform = global_transform
+	seated = false
+	var visual := get_node_or_null("Visual") as Node3D
+	var from_visual := visual.position if visual else Vector3.ZERO
+	var start := global_position
+	var back := -global_basis.z.normalized() * STAND_BACK
+	await _blend_pose(_seated_pose, _standing_pose(), func(t: float):
+		if visual:
+			visual.position = from_visual.lerp(Vector3.ZERO, t)
+		global_position = start + back * t)
+	_reset_turn_base()
+	set_process(true)
+
+
+## Back onto the seat it stood up from (walk to near it first): turns to the
+## desk, lowers into the chair and goes back to work.
+func sit_down() -> void:
+	if seated or skeleton == null or _seated_pose.is_empty():
+		return
+	walking = false
+	var visual := get_node_or_null("Visual") as Node3D
+	var start := global_transform
+	await _blend_pose(_current_pose(), _seated_pose, func(t: float):
+		global_transform = start.interpolate_with(_seat_xform, t)
+		if visual:
+			visual.position = Vector3.ZERO.lerp(Vector3(0.0, -seat_drop, seat_forward), t))
+	seated = true
+	_walk_blend = 0.0
+	_reset_turn_base()
+	_update_hands()
+
+
+## Walks through `points` (world positions on the floor) and returns on arrival.
+func walk_path(points: Array) -> void:
+	if seated or points.is_empty():
+		return
+	_path.clear()
+	for p in points:
+		_path.append(p)
+	walking = true
+	await arrived
+
+
+## Turns on the spot to face `yaw` (radians, model forward +Z).
+func face_yaw(yaw: float) -> void:
+	while absf(angle_difference(rotation.y, yaw)) > 0.02:
+		rotation.y = rotate_toward(rotation.y, yaw, TURN_SPEED * get_process_delta_time())
+		await get_tree().process_frame
+	rotation.y = yaw
+
+
+func _step_walk(delta: float) -> void:
+	var moving := false
+	if walking and not _path.is_empty():
+		var target: Vector3 = _path[0]
+		var to := target - global_position
+		to.y = 0.0
+		if to.length() < 0.05:
+			global_position = Vector3(target.x, global_position.y, target.z)
+			_path.pop_front()
+			if _path.is_empty():
+				walking = false
+				blocked = false
+				arrived.emit()
+		else:
+			var desired := atan2(to.x, to.z)
+			rotation.y = rotate_toward(rotation.y, desired, TURN_SPEED * delta)
+			blocked = _someone_in_the_way()
+			if absf(angle_difference(rotation.y, desired)) < 0.6 and not blocked:
+				var step := minf(WALK_SPEED * delta * maxf(_walk_blend, 0.3), to.length())
+				global_position += to.normalized() * step
+				moving = true
+	_walk_blend = move_toward(_walk_blend, 1.0 if moving else 0.0, delta * 4.0)
+	if moving:
+		_phase += delta * WALK_SPEED / STRIDE * PI
+	var camera := get_viewport().get_camera_3d()
+	if camera and camera.global_position.distance_to(global_position) > WORK_RANGE:
+		return
+	_pose_walk()
+
+
+## Legs and arms swing with the walk; still when standing.
+func _pose_walk() -> void:
+	var stand := _standing_pose()
+	for bone_name: String in WALK_BONES:
+		var bone := skeleton.find_bone(bone_name)
+		if bone >= 0 and stand.has(bone):
+			skeleton.set_bone_pose_rotation(bone, stand[bone])
+	if _walk_blend <= 0.001:
+		return
+	for side in ["L", "R"]:
+		var p := _phase + (0.0 if side == "L" else PI)
+		var swing := sin(p) * _walk_blend # > 0: this leg in front
+		var lifting := maxf(0.0, cos(p)) * _walk_blend # the leg swinging forward
+		_rotate_global("upperleg01." + side, Vector3.RIGHT, -THIGH_SWING * swing)
+		_rotate_global("lowerleg01." + side, Vector3.RIGHT, KNEE_BEND * lifting)
+		_rotate_global("foot." + side, Vector3.RIGHT, -FOOT_LIFT * lifting * 0.5)
+		# The arm swings with the other leg.
+		_rotate_global("upperarm01." + side, Vector3.RIGHT, ARM_SWING * swing)
+	var visual := get_node_or_null("Visual") as Node3D
+	if visual:
+		visual.position.y = -absf(sin(_phase)) * 0.015 * _walk_blend
+
+
+## True while the blocker (the player) stands close, in front of the walker.
+func _someone_in_the_way() -> bool:
+	var other := get_node_or_null(blocker_path) as Node3D
+	if other == null:
+		return false
+	var to := other.global_position - global_position
+	to.y = 0.0
+	if to.length() > BLOCK_DISTANCE:
+		return false
+	var ahead := Vector3(sin(rotation.y), 0.0, cos(rotation.y))
+	return ahead.dot(to.normalized()) > 0.35
+
+
+## Every bone's current rotation.
+func _current_pose() -> Dictionary:
+	var pose := {}
+	for bone in skeleton.get_bone_count():
+		pose[bone] = skeleton.get_bone_pose_rotation(bone)
+	return pose
+
+
+func _apply_pose(pose: Dictionary) -> void:
+	for bone in pose:
+		skeleton.set_bone_pose_rotation(bone, pose[bone])
+
+
+## Standing, arms by the sides: worked out once from the imported pose.
+func _standing_pose() -> Dictionary:
+	if _stand_pose.is_empty() and not _rest_pose.is_empty():
+		var now := _current_pose()
+		_apply_pose(_rest_pose)
+		for side in ["L", "R"]:
+			var out := 1.0 if side == "L" else -1.0 # +X is the character's left
+			var upper := skeleton.find_bone("upperarm01." + side)
+			var lower := skeleton.find_bone("lowerarm01." + side)
+			var wrist := skeleton.find_bone("wrist." + side)
+			if [upper, lower, wrist].has(-1):
+				continue
+			var shoulder := _bone_pos(upper)
+			var length := shoulder.distance_to(_bone_pos(lower)) + _bone_pos(lower).distance_to(_bone_pos(wrist))
+			var hang := Vector3(HANG_DIRECTION.x * out, HANG_DIRECTION.y, HANG_DIRECTION.z).normalized()
+			# Elbow toward the back, hand pointing down, thumb forward.
+			_place_hand(side, shoulder + hang * length * HANG_REACH, Vector3(0.2 * out, 0.0, -1.0), Vector3(0.05 * out, -1.0, 0.02), Vector3(0.0, 0.0, 1.0))
+		_stand_pose = _current_pose()
+		_apply_pose(now)
+	return _stand_pose
+
+
+## Blends every bone from `from` to `to` over STAND_TIME; `extra(t)` moves the body.
+func _blend_pose(from: Dictionary, to: Dictionary, extra: Callable) -> void:
+	if _posture_tween:
+		_posture_tween.kill()
+	_posture_tween = create_tween()
+	_posture_tween.tween_method(func(t: float):
+		for bone in to:
+			skeleton.set_bone_pose_rotation(bone, (from.get(bone, to[bone]) as Quaternion).slerp(to[bone], t))
+		extra.call(t), 0.0, 1.0, STAND_TIME).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	await _posture_tween.finished
+
+
+## Head / body turning works from the current posture.
+func _reset_turn_base() -> void:
+	turn_amount = 0.0
+	turn_pitch = 0.0
+	_base_pose.clear()
+	_store_base_pose()
