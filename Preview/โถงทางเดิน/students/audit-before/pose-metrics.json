@@ -1,0 +1,202 @@
+[
+  {
+    "back_penetrating_vertices": 0,
+    "id": "mullet",
+    "root": "(-8.04, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.0000818600237835199,
+    "tag": "mullet | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "mullet",
+    "root": "(-8.161094, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0301603060215712,
+    "tag": "mullet | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "mullet",
+    "root": "(-8.4275, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0667719021439552,
+    "tag": "mullet | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "mullet",
+    "root": "(-8.693907, 0.02, -18.8)",
+    "seat_penetrating_vertices": 72,
+    "sole_min_y": -0.031683936715126,
+    "tag": "mullet | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "mullet",
+    "root": "(-8.815001, 0.02, -18.8)",
+    "seat_penetrating_vertices": 64,
+    "sole_min_y": -0.00538594275712967,
+    "tag": "mullet | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "two_block",
+    "root": "(-4.26, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.000944040715694427,
+    "tag": "two_block | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "two_block",
+    "root": "(-4.138906, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0299936849623919,
+    "tag": "two_block | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "two_block",
+    "root": "(-3.8725, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0656008869409561,
+    "tag": "two_block | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "two_block",
+    "root": "(-3.606094, 0.02, -5.3)",
+    "seat_penetrating_vertices": 56,
+    "sole_min_y": -0.0288885403424501,
+    "tag": "two_block | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "two_block",
+    "root": "(-3.485, 0.02, -5.3)",
+    "seat_penetrating_vertices": 56,
+    "sole_min_y": -0.00176268722862005,
+    "tag": "two_block | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "bob",
+    "root": "(-8.04, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00334641616791487,
+    "tag": "bob | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "bob",
+    "root": "(-8.161094, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0290670730173588,
+    "tag": "bob | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "bob",
+    "root": "(-8.4275, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0591851882636547,
+    "tag": "bob | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "bob",
+    "root": "(-8.693907, 0.02, -0.4)",
+    "seat_penetrating_vertices": 18,
+    "sole_min_y": -0.0136281801387668,
+    "tag": "bob | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "bob",
+    "root": "(-8.815001, 0.02, -0.4)",
+    "seat_penetrating_vertices": 55,
+    "sole_min_y": 0.0180022139102221,
+    "tag": "bob | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "wendy",
+    "root": "(-4.26, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0027410164475441,
+    "tag": "wendy | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "wendy",
+    "root": "(-4.138906, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0288775488734245,
+    "tag": "wendy | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "wendy",
+    "root": "(-3.8725, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0577553659677505,
+    "tag": "wendy | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "wendy",
+    "root": "(-3.606094, 0.02, -22.2)",
+    "seat_penetrating_vertices": 21,
+    "sole_min_y": -0.0101586049422622,
+    "tag": "wendy | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "wendy",
+    "root": "(-3.485, 0.02, -22.2)",
+    "seat_penetrating_vertices": 53,
+    "sole_min_y": 0.0225144699215889,
+    "tag": "wendy | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "layer",
+    "root": "(-4.26, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0027550607919693,
+    "tag": "layer | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "layer",
+    "root": "(-4.138906, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0288775488734245,
+    "tag": "layer | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "layer",
+    "root": "(-3.8725, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": -0.0577553659677505,
+    "tag": "layer | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "layer",
+    "root": "(-3.606094, 0.02, -40.4)",
+    "seat_penetrating_vertices": 21,
+    "sole_min_y": -0.0101586049422622,
+    "tag": "layer | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "id": "layer",
+    "root": "(-3.485, 0.02, -40.4)",
+    "seat_penetrating_vertices": 53,
+    "sole_min_y": 0.0225144699215889,
+    "tag": "layer | sit 100%"
+  }
+]

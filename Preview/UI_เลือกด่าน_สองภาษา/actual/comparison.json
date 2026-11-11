@@ -1,0 +1,14 @@
+{
+	"levels-en": {
+		"mean_rgb_difference_percent": 0.61,
+		"sampled_pixels": 82944
+	},
+	"levels-th": {
+		"mean_rgb_difference_percent": 0.59,
+		"sampled_pixels": 82944
+	},
+	"settings-th": {
+		"mean_rgb_difference_percent": 1.65,
+		"sampled_pixels": 82944
+	}
+}

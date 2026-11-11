@@ -1,0 +1,652 @@
+[
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "mullet",
+    "root": "(-8.32, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.0030002505518496,
+    "tag": "mullet | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "mullet",
+    "root": "(-8.393437, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.0030006158631295,
+    "tag": "mullet | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.65533322095871
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "mullet",
+    "root": "(-8.555, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300025544129312,
+    "tag": "mullet | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.509141504764557
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.647496104240417
+      }
+    },
+    "id": "mullet",
+    "root": "(-8.716562, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299981841817498,
+    "tag": "mullet | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.461999714374542
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.597747921943665
+      }
+    },
+    "id": "mullet",
+    "root": "(-8.79, 0.02, -18.8)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299956253729761,
+    "tag": "mullet | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "two_block",
+    "root": "(-3.98, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300025683827698,
+    "tag": "two_block | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "two_block",
+    "root": "(-3.906563, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.0030004964210093,
+    "tag": "two_block | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.658338904380798
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "two_block",
+    "root": "(-3.745, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300015229731798,
+    "tag": "two_block | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.510470449924469
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.648605167865753
+      }
+    },
+    "id": "two_block",
+    "root": "(-3.583437, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299998559057713,
+    "tag": "two_block | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | head neck arms hands": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black knee-length school shorts": {
+        "hits": 0,
+        "min_above_seat": 0.461999654769897
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.597612738609314
+      }
+    },
+    "id": "two_block",
+    "root": "(-3.51, 0.02, -5.3)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299967592582107,
+    "tag": "two_block | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "bob",
+    "root": "(-8.32, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300025450997055,
+    "tag": "bob | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "bob",
+    "root": "(-8.393437, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300040934234858,
+    "tag": "bob | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.644215703010559
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "bob",
+    "root": "(-8.555, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300033343955874,
+    "tag": "bob | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.492850363254547
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.653858780860901
+      }
+    },
+    "id": "bob",
+    "root": "(-8.716562, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300002959556878,
+    "tag": "bob | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.461999416351318
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.603348731994629
+      }
+    },
+    "id": "bob",
+    "root": "(-8.79, 0.02, -0.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299988361075521,
+    "tag": "bob | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "wendy",
+    "root": "(-3.98, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300025660544634,
+    "tag": "wendy | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "wendy",
+    "root": "(-3.906563, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300061423331499,
+    "tag": "wendy | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.647864282131195
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "wendy",
+    "root": "(-3.745, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.0030004067812115,
+    "tag": "wendy | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.493750154972076
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.65589302778244
+      }
+    },
+    "id": "wendy",
+    "root": "(-3.583437, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300010992214084,
+    "tag": "wendy | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.461999833583832
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.603359818458557
+      }
+    },
+    "id": "wendy",
+    "root": "(-3.51, 0.02, -22.2)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299977441318333,
+    "tag": "wendy | sit 100%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "layer",
+    "root": "(-3.98, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300025660544634,
+    "tag": "layer | sit 0%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "layer",
+    "root": "(-3.906563, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300049828365445,
+    "tag": "layer | sit 25%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.64786434173584
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": null
+      }
+    },
+    "id": "layer",
+    "root": "(-3.745, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300038768909872,
+    "tag": "layer | sit 50%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.493750393390656
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.655891954898834
+      }
+    },
+    "id": "layer",
+    "root": "(-3.583437, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00300007127225399,
+    "tag": "layer | sit 75%"
+  },
+  {
+    "back_penetrating_vertices": 0,
+    "by_mesh": {
+      "Body | female head arms lower legs": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Shoes | black Oxford with socks": {
+        "hits": 0,
+        "min_above_seat": null
+      },
+      "Uniform | black pleated knee-length skirt": {
+        "hits": 0,
+        "min_above_seat": 0.461999714374542
+      },
+      "Uniform_Shirt | short sleeve": {
+        "hits": 0,
+        "min_above_seat": 0.603359818458557
+      }
+    },
+    "id": "layer",
+    "root": "(-3.51, 0.02, -40.4)",
+    "seat_penetrating_vertices": 0,
+    "sole_min_y": 0.00299994321539998,
+    "tag": "layer | sit 100%"
+  }
+]

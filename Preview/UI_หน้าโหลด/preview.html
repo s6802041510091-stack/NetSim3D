@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetSim3D — ตัวอย่างหน้าโหลด</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @font-face { font-family: SarabunLocal; src: url('../../net-sim-3d/assets/fonts/Sarabun-Regular.ttf'); }
+    :root { color-scheme: light; --navy:#193747; --blue:#27627a; --line:#aac5cb; --paper:#fbfaf6; --gold:#e5aa51; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:#dbeaf0; color:var(--navy); font-family:SarabunLocal, Sarabun, sans-serif; }
+    .screen { position:relative; isolation:isolate; overflow:hidden; width:min(100vw, calc(100vh * 16 / 9)); aspect-ratio:16/9; min-height:550px; background:linear-gradient(#b6d8e4 0%,#e6eef0 58%,#d0ddda 100%); box-shadow:0 24px 60px #284d5a25; }
+    .sun { position:absolute; width:240px; height:240px; border-radius:50%; background:#fff7dc66; top:34px; right:14%; filter:blur(4px); }
+    .hill { position:absolute; height:215px; width:140%; left:-20%; bottom:0; background:#9cb9b686; clip-path:polygon(0 100%,0 78%,17% 44%,31% 76%,47% 29%,67% 76%,78% 43%,100% 83%,100% 100%); }
+    .school { position:absolute; right:5%; bottom:0; height:190px; width:41%; border:1px solid #7398a433; background:repeating-linear-gradient(90deg,#b3c9c7aa 0 50px,#e4eeebaa 50px 66px); clip-path:polygon(0 17%,100% 17%,100% 100%,0 100%); opacity:.56; }
+    .school:before { content:''; position:absolute; top:0; left:0; width:100%; height:17px; background:#668491; }
+    .top { position:absolute; top:32px; left:48px; right:48px; display:flex; justify-content:space-between; align-items:center; font-family:Anuphan,SarabunLocal,sans-serif; }
+    .brand { font-size:22px; font-weight:700; letter-spacing:-.02em; }
+    .brand em { font-style:normal; color:#b86152; }
+    .stage { font-size:14px; font-weight:600; letter-spacing:.04em; }
+    .panel { position:absolute; left:50%; top:51%; transform:translate(-50%,-50%); width:min(86%,1030px); padding:34px 48px 30px; background:#fbfaf6f2; border:1px solid #fdfdf9; border-radius:14px; box-shadow:0 12px 40px #31566627; }
+    .eyebrow { font-size:12px; font-weight:700; color:#bd735d; letter-spacing:.17em; text-transform:uppercase; }
+    h1 { margin:7px 0 2px; font:600 clamp(27px,3vw,38px)/1.2 Anuphan,SarabunLocal,sans-serif; letter-spacing:-.03em; }
+    .caption { margin:0; color:#617883; font-size:16px; }
+    .route { position:relative; height:220px; display:flex; align-items:center; justify-content:space-between; padding:0 62px; margin-top:12px; }
+    .route:before { content:''; position:absolute; z-index:0; left:26%; right:26%; top:49%; border-top:4px dashed #7b9aa5; opacity:.68; }
+    .endpoint { position:absolute; top:calc(49% - 5px); width:12px; height:12px; border:3px solid #37657b; border-radius:50%; background:var(--paper); z-index:1; }
+    .endpoint.left { left:26%; } .endpoint.right { right:26%; }
+    .computer { position:relative; width:155px; height:152px; z-index:2; flex:none; }
+    .monitor { width:126px; height:92px; margin:auto; padding:9px; background:#d8e3e3; border:3px solid #566e7b; border-radius:8px; box-shadow:6px 7px 0 #486a7924; transform:skewY(-2deg); }
+    .display { height:100%; border-radius:3px; background:linear-gradient(145deg,#274b60,#142d3b); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px; }
+    .display .line { width:51px; height:4px; border-radius:8px; background:#b8d4d1aa; }
+    .display .line.short { width:32px; }
+    .stand { width:13px; height:16px; margin:auto; background:#6a8590; }
+    .stand:after { content:''; display:block; position:relative; top:13px; left:-29px; width:72px; height:8px; border-radius:3px; background:#68838e; }
+    .keyboard { width:126px; height:26px; margin:12px auto 0; border:2px solid #59727c; border-radius:4px; background:repeating-linear-gradient(90deg,#d8e2df 0 8px,#96b0b2 8px 10px); transform:skewX(-23deg); }
+    .machine-label { position:absolute; bottom:-17px; width:100%; text-align:center; font-size:13px; color:#617883; }
+    .mail { position:absolute; z-index:3; top:59px; left:27%; width:94px; height:69px; filter:drop-shadow(2px 6px 3px #8d653240); transition:left .8s cubic-bezier(.3,.1,.2,1); }
+    .mail svg { width:100%; height:100%; display:block; }
+    .mail .badge { position:absolute; top:-11px; right:-11px; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:#cb5d4b; color:#fff; font:700 15px Anuphan,sans-serif; }
+    .ready .mail { left:65%; }
+    .progress-row { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-top:8px; }
+    .progress-label { color:#526b76; font-size:15px; }
+    .percentage { font:600 42px/1 Anuphan,SarabunLocal,sans-serif; letter-spacing:-.04em; }
+    .track { height:9px; border-radius:20px; overflow:hidden; background:#dce6e4; margin:14px 0 11px; }
+    .fill { height:100%; width:0; border-radius:20px; background:#3d8091; transition:width .08s linear; }
+    .bottom { display:flex; align-items:center; justify-content:space-between; min-height:42px; }
+    .hint { color:#667f88; font-size:14px; }
+    .start { visibility:hidden; opacity:0; border:0; border-radius:5px; background:#1c5267; color:white; padding:11px 28px; font:600 16px Anuphan,SarabunLocal,sans-serif; transition:opacity .3s ease; }
+    .ready .start { visibility:visible; opacity:1; cursor:pointer; }
+    .start:hover { background:#124255; }
+    .footer { position:absolute; left:48px; right:48px; bottom:25px; display:flex; justify-content:space-between; color:#476773; font-size:12px; }
+    @media (max-width:850px) { .screen { min-height:620px; aspect-ratio:auto; width:100%; height:100vh; } .panel { top:52%; width:92%; padding:28px 22px; } .top { left:22px; right:22px; } .route { padding:0 8px; height:190px; } .route:before { left:21%; right:21%; } .endpoint.left { left:21%; } .endpoint.right { right:21%; } .computer { transform:scale(.7); transform-origin:center; margin:0 -18px; } .mail { left:25%; width:68px; top:53px; } .ready .mail { left:65%; } .footer { left:22px; right:22px; } }
+  </style>
+</head>
+<body>
+  <main class="screen" id="screen">
+    <div class="sun"></div><div class="hill"></div><div class="school"></div>
+    <header class="top"><div class="brand">Net<em>Sim</em>3D</div><div class="stage">ด่าน 01 · ออกแบบเครือข่าย</div></header>
+    <section class="panel" aria-label="ตัวอย่างหน้าโหลด">
+      <div class="eyebrow">NETWORK DELIVERY</div>
+      <h1 id="heading">กำลังเตรียมห้องเรียน</h1>
+      <p class="caption">ส่งข้อมูลจากเครื่องต้นทางไปยังเครื่องปลายทาง</p>
+      <div class="route">
+        <div class="endpoint left"></div><div class="endpoint right"></div>
+        <div class="computer"><div class="monitor"><div class="display"><span class="line"></span><span class="line short"></span></div></div><div class="stand"></div><div class="keyboard"></div><span class="machine-label">เครื่องต้นทาง</span></div>
+        <div class="mail" aria-hidden="true"><svg viewBox="0 0 94 69"><rect x="2" y="3" width="90" height="63" rx="8" fill="#f6c367" stroke="#bd8440" stroke-width="2"/><path d="M5 11 L47 41 L89 11" fill="none" stroke="#fff0ca" stroke-width="5" stroke-linecap="round"/><path d="M6 60 L35 36 M88 60 L59 36" fill="none" stroke="#df9b47" stroke-width="3"/></svg><span class="badge">1</span></div>
+        <div class="computer"><div class="monitor"><div class="display"><span class="line"></span><span class="line short"></span></div></div><div class="stand"></div><div class="keyboard"></div><span class="machine-label">เครื่องปลายทาง</span></div>
+      </div>
+      <div class="progress-row"><span class="progress-label" id="status">กำลังส่งข้อมูล…</span><span class="percentage" id="percent">0%</span></div>
+      <div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="track"><div class="fill" id="fill"></div></div>
+      <div class="bottom"><span class="hint" id="hint">รอสักครู่ ข้อมูลกำลังเดินทาง</span><button class="start" type="button" id="start">Start →</button></div>
+    </section>
+    <footer class="footer"><span>NETSIM3D · SCHOOL NETWORK SIMULATION</span><span>ตัวอย่างภาพและการเคลื่อนไหวสำหรับตรวจแบบ</span></footer>
+  </main>
+  <script>
+    const state = new URLSearchParams(location.search).get('state');
+    const screen = document.getElementById('screen');
+    const percent = document.getElementById('percent');
+    const fill = document.getElementById('fill');
+    const track = document.getElementById('track');
+    function setProgress(value) {
+      percent.textContent = value + '%'; fill.style.width = value + '%'; track.setAttribute('aria-valuenow', value);
+      if (value === 100) {
+        screen.classList.add('ready');
+        document.getElementById('heading').textContent = 'พร้อมเริ่มภารกิจ';
+        document.getElementById('status').textContent = 'ส่งข้อมูลสำเร็จ';
+        document.getElementById('hint').textContent = 'อีเมลถึงเครื่องปลายทางแล้ว';
+      }
+    }
+    if (state === 'loading') setProgress(68);
+    else if (state === 'ready') setProgress(100);
+    else {
+      const duration = 6500, started = performance.now();
+      function tick(now) { const value = Math.min(100, Math.floor((now-started)/duration*100)); setProgress(value); if (value < 100) requestAnimationFrame(tick); }
+      requestAnimationFrame(tick);
+    }
+    document.getElementById('start').addEventListener('click', () => { document.getElementById('hint').textContent = 'ตัวอย่างหน้าจอ — ยังไม่ได้เชื่อมกับเกม'; });
+  </script>
+</body>
+</html>
