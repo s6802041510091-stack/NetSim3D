@@ -156,6 +156,12 @@ func turn_to(target: Node3D) -> void:
 	var eyes: Variant = target.get("camera")
 	if eyes is Node3D:
 		point = (eyes as Node3D).global_position
+	elif target is NpcCharacter and (target as NpcCharacter).skeleton:
+		# Another NPC (a teacher chatting): look at the head.
+		var other := target as NpcCharacter
+		var other_head := other.skeleton.find_bone("head")
+		if other_head >= 0:
+			point = other.skeleton.global_transform * other._bone_pos(other_head)
 	var from := global_position
 	var head := skeleton.find_bone("head")
 	if head >= 0:
