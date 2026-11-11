@@ -19,6 +19,7 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_outdoor.wav" id="15_outdoor"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_aircon.wav" id="16_aircon"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_pc_fans.wav" id="17_fans"]
+[ext_resource type="Script" path="res://scripts/props/restrooms.gd" id="20_restrooms"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -95,6 +96,9 @@ display_name = "ห้อง Server"
 [node name="ComputerRoomAccessPoint" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.96, 3.205, 0)
 script = ExtResource("19_access_point")
+
+[node name="Restrooms" type="Node3D" parent="."]
+script = ExtResource("20_restrooms")
 
 [node name="TeacherPcPort" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2505, 0.9546, -7.741)
