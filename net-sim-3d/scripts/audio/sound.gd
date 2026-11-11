@@ -35,6 +35,7 @@ const BANK := {
 	"click": {"files": ["click_002.ogg", "click_003.ogg"], "bus": "SoundEffect", "db": -8.0, "pitch": 0.04, "gap": 0.05},
 	"select": {"files": ["select_001.ogg"], "bus": "SoundEffect", "db": -6.0, "pitch": 0.03, "gap": 0.05},
 	"confirm": {"files": ["confirmation_001.ogg"], "bus": "SoundEffect", "db": -4.0},
+	"load_complete": {"files": ["confirmation_001.ogg"], "bus": "SoundEffect", "db": -3.0},
 	"correct": {"files": ["confirmation_002.ogg"], "bus": "SoundEffect", "db": -3.0},
 	"wrong": {"files": ["error_004.ogg"], "bus": "SoundEffect", "db": -4.0},
 	"back": {"files": ["back_001.ogg"], "bus": "SoundEffect", "db": -8.0, "gap": 0.05},
@@ -73,6 +74,8 @@ var _last_play := {}
 var _music_a: AudioStreamPlayer
 var _music_b: AudioStreamPlayer
 var _music_id := ""
+var _active_music: AudioStreamPlayer
+var _music_fade: Tween
 ## The last few ids played, newest last (for tests).
 var history: PackedStringArray = PackedStringArray()
 
@@ -98,6 +101,8 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
+	if _music_fade and _music_fade.is_valid():
+		_music_fade.kill()
 	for p in _players + [_music_a, _music_b]:
 		p.stop()
 		p.stream = null
@@ -188,16 +193,23 @@ func _music_player() -> AudioStreamPlayer:
 
 
 func _switch_music(id: String) -> void:
-	if id == _music_id:
+	if id == _music_id and _active_music != null and _active_music.playing:
 		return
+	if _music_fade and _music_fade.is_valid():
+		_music_fade.kill()
 	_music_id = id
-	var old := _music_a if _music_a.playing else _music_b
+	var old := _active_music
 	var new := _music_b if old == _music_a else _music_a
-	if old.playing:
-		create_tween().tween_property(old, "volume_db", -80.0, MUSIC_FADE).finished.connect(old.stop)
+	# Cancel a previous transition before reusing either voice, so an older
+	# fade-out callback cannot stop music that was just restarted.
+	new.stop()
 	var entry: Dictionary = MUSIC.get(id, {})
 	var path: String = MUSIC_DIR + String(entry.get("file", ""))
 	if entry.is_empty() or not ResourceLoader.exists(path):
+		if old != null and old.playing:
+			_music_fade = create_tween()
+			_music_fade.tween_property(old, "volume_db", -80.0, MUSIC_FADE)
+			_music_fade.tween_callback(old.stop)
 		return
 	var stream: AudioStream = load(path)
 	if stream is AudioStreamOggVorbis:
@@ -205,7 +217,12 @@ func _switch_music(id: String) -> void:
 	new.stream = stream
 	new.volume_db = -60.0
 	new.play()
-	create_tween().tween_property(new, "volume_db", float(entry["db"]), MUSIC_FADE)
+	_active_music = new
+	_music_fade = create_tween().set_parallel(true)
+	_music_fade.tween_property(new, "volume_db", float(entry["db"]), MUSIC_FADE)
+	if old != null and old.playing:
+		_music_fade.tween_property(old, "volume_db", -80.0, MUSIC_FADE)
+		_music_fade.chain().tween_callback(old.stop)
 
 
 # --- automatic UI sounds -----------------------------------------------------------

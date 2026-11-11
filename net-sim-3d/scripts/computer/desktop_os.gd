@@ -3,11 +3,11 @@ extends CanvasLayer
 
 ## The simulated computer screen: a 2-second set-up (boot) screen, then a
 ## desktop with icons, windows, a taskbar and a Command Prompt that knows
-## ipconfig, ping and hostname. Built in code so it needs no extra assets.
+## ipconfig, ping and hostname. Artwork is separate from the live desktop controls.
 
 signal shutdown_requested
 signal desktop_ready
-## Emitted when a program window opens, e.g. ("network_designer", NetworkDesigner).
+## Emitted when a program window opens, e.g. ("netplan_edu", NetPlanEdu).
 ## The mission system connects here to follow the player's progress.
 signal app_opened(app_id: String, app: Node)
 
@@ -19,7 +19,7 @@ const WINDOWS_SECURITY_SCENE := "res://missions/mission_05/scenes/windows_securi
 ## Mission 6 program: TeamViewer (simulated). Shown only on computers that have "teamviewer".
 const TEAMVIEWER_SCENE := "res://missions/mission_06/scenes/teamviewer.tscn"
 const OS_NAME := "NetSim OS"
-const COLOR_TASKBAR := Color(0.07, 0.09, 0.13, 0.95)
+const COLOR_TASKBAR := Color("d3e7fff2")
 const COLOR_WINDOW := Color(0.96, 0.97, 0.98)
 const COLOR_TITLE := Color(0.13, 0.33, 0.62)
 const COLOR_TEXT := Color(0.1, 0.12, 0.16)
@@ -41,7 +41,11 @@ var _windows := {}
 var _cmd_output: RichTextLabel
 var _cmd_input: LineEdit
 var _icons: VBoxContainer
-var _designer_icon: Control
+var _app_menu_buttons := {}
+var _taskbar_buttons := {}
+var _search: LineEdit
+var _menu_entries: Array[Button] = []
+var _taskbar: PanelContainer
 var _netplan_icon: Control
 var _netplan: Control
 var _winsec_icon: Control
@@ -103,10 +107,15 @@ func _show_desktop() -> void:
 	_desktop.visible = true
 	_update_clock()
 	_tray_network.text = "LAN ✓" if station.network_connected else "LAN ✗"
-	_designer_icon.visible = station.has_app("network_designer")
 	_netplan_icon.visible = station.has_app("netplan_edu")
 	_winsec_icon.visible = station.has_app("windows_security")
 	_teamviewer_icon.visible = station.has_app("teamviewer")
+	for app_id: String in _app_menu_buttons:
+		_app_menu_buttons[app_id].visible = station.has_app(app_id)
+	for app_id: String in _taskbar_buttons:
+		_taskbar_buttons[app_id].visible = app_id in ["this_pc", "cmd"] or station.has_app(app_id)
+	_search.clear()
+	_filter_menu("")
 	# The security warning the teacher saw (Mission 5) pops up until the computer is fixed.
 	_security_toast.visible = station.has_app("windows_security") and station.screen_alert
 	desktop_ready.emit()
@@ -115,11 +124,14 @@ func _show_desktop() -> void:
 func _process(_delta: float) -> void:
 	if visible and _desktop.visible:
 		_update_clock()
+		_update_taskbar()
+		_tray_network.text = "LAN ✓" if station.network_connected else "LAN ✗"
 
 
 func _update_clock() -> void:
 	var t := Time.get_time_dict_from_system()
-	_clock.text = "%02d:%02d" % [t.hour, t.minute]
+	var date := Time.get_date_dict_from_system()
+	_clock.text = "%02d:%02d\n%02d/%02d/%04d" % [t.hour, t.minute, date.day, date.month, date.year]
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -191,14 +203,7 @@ func _build_desktop() -> void:
 	_root.add_child(_desktop)
 
 	var wallpaper := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0.05, 0.22, 0.42))
-	gradient.set_color(1, Color(0.02, 0.55, 0.62))
-	var texture := GradientTexture2D.new()
-	texture.gradient = gradient
-	texture.fill_from = Vector2(0, 0)
-	texture.fill_to = Vector2(1, 1)
-	wallpaper.texture = texture
+	wallpaper.texture = DesktopArt.WALLPAPER
 	wallpaper.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	wallpaper.stretch_mode = TextureRect.STRETCH_SCALE
 	wallpaper.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -206,25 +211,23 @@ func _build_desktop() -> void:
 	_desktop.add_child(wallpaper)
 
 	var icons := VBoxContainer.new()
-	icons.position = Vector2(24, 24)
+	icons.position = Vector2(4, 16)
 	icons.add_theme_constant_override("separation", 14)
 	_desktop.add_child(icons)
 	_icons = icons
-	icons.add_child(_desktop_icon("PC", Color(0.35, 0.6, 0.95), "This PC", _open_this_pc))
-	icons.add_child(_desktop_icon("NET", Color(0.2, 0.75, 0.5), "Network", _open_network))
-	icons.add_child(_desktop_icon(">_", Color(0.15, 0.15, 0.18), "Command Prompt", _open_cmd))
-	_designer_icon = _desktop_icon("ND", Color(0.95, 0.55, 0.15), "Network Designer", open_network_designer)
-	icons.add_child(_designer_icon)
-	_netplan_icon = _desktop_icon("NP", Color(0.2, 0.6, 0.95), "NetPlan EDU", open_netplan_edu)
+	icons.add_child(_desktop_icon("this_pc", "This PC", _open_this_pc))
+	icons.add_child(_desktop_icon("network", "Network", _open_network))
+	icons.add_child(_desktop_icon("cmd", "Command Prompt", _open_cmd))
+	_netplan_icon = _desktop_icon("netplan_edu", "NetPlan EDU", open_netplan_edu)
 	_netplan_icon.name = "NetPlanEduIcon"
 	icons.add_child(_netplan_icon)
-	_winsec_icon = _desktop_icon("WS", Color(0.0, 0.37, 0.72), "Windows Security", open_windows_security)
+	_winsec_icon = _desktop_icon("windows_security", "Windows Security", open_windows_security)
 	_winsec_icon.name = "WindowsSecurityIcon"
 	icons.add_child(_winsec_icon)
-	_teamviewer_icon = _desktop_icon("TV", Color(0.05, 0.39, 0.82), "TeamViewer", open_teamviewer)
+	_teamviewer_icon = _desktop_icon("teamviewer", "TeamViewer", open_teamviewer)
 	_teamviewer_icon.name = "TeamViewerIcon"
 	icons.add_child(_teamviewer_icon)
-	icons.add_child(_desktop_icon("BIN", Color(0.55, 0.6, 0.65), "Recycle Bin", _open_recycle_bin))
+	icons.add_child(_desktop_icon("bin", "Recycle Bin", _open_recycle_bin))
 
 	_window_layer = Control.new()
 	_window_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -237,83 +240,201 @@ func _build_desktop() -> void:
 
 func _build_taskbar() -> void:
 	var bar := PanelContainer.new()
+	bar.name = "Taskbar"
+	_taskbar = bar
 	bar.anchor_left = 0.0
 	bar.anchor_right = 1.0
 	bar.anchor_top = 1.0
 	bar.anchor_bottom = 1.0
 	bar.offset_top = -48.0
-	bar.add_theme_stylebox_override("panel", _flat(COLOR_TASKBAR))
+	var glass := _flat(COLOR_TASKBAR)
+	glass.border_color = Color("eef7ff")
+	glass.border_width_top = 1
+	bar.add_theme_stylebox_override("panel", glass)
 	_desktop.add_child(bar)
-
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	bar.add_child(row)
-
-	var start := Button.new()
-	start.text = "  เริ่ม  "
-	start.custom_minimum_size = Vector2(90, 40)
-	start.pressed.connect(func(): _start_menu.visible = not _start_menu.visible)
-	row.add_child(start)
-
-	var hint := _label("Esc = ลุกจากเครื่อง", 15, Color(0.75, 0.8, 0.88))
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var surface := Control.new()
+	surface.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bar.add_child(surface)
+	var hint := _label("Esc = ลุกจากเครื่อง", 12, COLOR_TEXT)
+	hint.position = Vector2(12, 0)
+	hint.size = Vector2(200, 38)
 	hint.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	row.add_child(hint)
-
-	_tray_network = _label("LAN ✓", 16, Color(0.7, 0.95, 0.75))
+	surface.add_child(hint)
+	var centered := CenterContainer.new()
+	centered.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	centered.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	surface.add_child(centered)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 7)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	centered.add_child(row)
+	var start := _task_button("start", "เริ่ม", func(): _start_menu.visible = not _start_menu.visible)
+	start.name = "TaskbarStart"
+	row.add_child(start)
+	var search := _task_button("search", "ค้นหาโปรแกรม", _open_search)
+	search.name = "TaskbarSearch"
+	search.text = "ค้นหา"
+	search.custom_minimum_size.x = 126
+	search.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	search.add_theme_stylebox_override("normal", _flat(Color("eff7ffcf"), 18))
+	row.add_child(search)
+	for item in [["this_pc", "folder", "This PC", _open_this_pc], ["cmd", "cmd", "Command Prompt", _open_cmd], ["netplan_edu", "netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "windows_security", "Windows Security", open_windows_security], ["teamviewer", "teamviewer", "TeamViewer", open_teamviewer]]:
+		var id: String = item[0]
+		var button := _task_button(item[1], item[2], _taskbar_action.bind(id, item[3]))
+		button.name = "Taskbar_" + id
+		_taskbar_buttons[id] = button
+		var line := ColorRect.new()
+		line.name = "Running"
+		line.color = Color("127ac5")
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
+		line.offset_left = -7
+		line.offset_right = 7
+		line.offset_top = -3
+		line.offset_bottom = 0
+		line.hide()
+		button.add_child(line)
+		row.add_child(button)
+	var tray := HBoxContainer.new()
+	tray.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	tray.offset_left = -196
+	tray.offset_right = -6
+	tray.add_theme_constant_override("separation", 9)
+	surface.add_child(tray)
+	_tray_network = _label("LAN ✓", 12, COLOR_TEXT)
 	_tray_network.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	row.add_child(_tray_network)
-	_clock = _label("00:00", 18, Color.WHITE)
+	tray.add_child(_tray_network)
+	tray.add_child(_icon_view("volume", 20))
+	tray.add_child(VSeparator.new())
+	_clock = _label("00:00", 12, COLOR_TEXT)
 	_clock.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_clock.custom_minimum_size = Vector2(70, 0)
-	row.add_child(_clock)
+	_clock.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_clock.custom_minimum_size.x = 72
+	tray.add_child(_clock)
 
 	_start_menu = PanelContainer.new()
+	_start_menu.name = "StartMenu"
+	_start_menu.anchor_left = 0.5
+	_start_menu.anchor_right = 0.5
 	_start_menu.anchor_top = 1.0
 	_start_menu.anchor_bottom = 1.0
-	_start_menu.offset_left = 4.0
-	_start_menu.offset_top = -48.0 - 210.0
-	_start_menu.offset_right = 264.0
-	_start_menu.offset_bottom = -52.0
-	_start_menu.add_theme_stylebox_override("panel", _flat(Color(0.12, 0.14, 0.2, 0.97), 8))
+	_start_menu.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_start_menu.offset_left = -180.0
+	_start_menu.offset_top = -400.0
+	_start_menu.offset_right = 180.0
+	_start_menu.offset_bottom = -58.0
+	var menu_style := _flat(Color("edf5fffa"), 14)
+	menu_style.content_margin_left = 18
+	menu_style.content_margin_right = 18
+	menu_style.content_margin_top = 16
+	menu_style.content_margin_bottom = 16
+	menu_style.shadow_color = Color("04102a55")
+	menu_style.shadow_size = 10
+	_start_menu.add_theme_stylebox_override("panel", menu_style)
 	_start_menu.visible = false
 	_desktop.add_child(_start_menu)
 	var menu := VBoxContainer.new()
 	_start_menu.add_child(menu)
-	menu.add_child(_label("  " + OS_NAME, 20, Color(0.55, 0.8, 1.0)))
-	for item in [["This PC", _open_this_pc], ["Network", _open_network], ["Command Prompt", _open_cmd], ["Network Designer", open_network_designer], ["NetPlan EDU", open_netplan_edu], ["Windows Security", open_windows_security], ["TeamViewer", open_teamviewer]]:
-		menu.add_child(_menu_button(item[0], item[1]))
+	menu.add_theme_constant_override("separation", 6)
+	menu.add_child(_label(OS_NAME, 20, COLOR_TEXT))
+	_search = LineEdit.new()
+	_search.name = "ProgramSearch"
+	_search.placeholder_text = "ค้นหาโปรแกรม"
+	_search.custom_minimum_size.y = 36
+	_search.add_theme_stylebox_override("normal", _flat(Color.WHITE, 8))
+	_search.add_theme_color_override("font_color", COLOR_TEXT)
+	_search.add_theme_color_override("font_placeholder_color", Color("53667e"))
+	_search.text_changed.connect(_filter_menu)
+	menu.add_child(_search)
+	for item in [["This PC", _open_this_pc], ["Network", _open_network], ["Command Prompt", _open_cmd]]:
+		var entry := _menu_button(item[0], item[1])
+		_menu_entries.append(entry)
+		menu.add_child(entry)
+	for item in [["netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "Windows Security", open_windows_security], ["teamviewer", "TeamViewer", open_teamviewer]]:
+		var app_button := _menu_button(item[1], item[2])
+		_app_menu_buttons[item[0]] = app_button
+		app_button.set_meta("app_id", item[0])
+		_menu_entries.append(app_button)
+		menu.add_child(app_button)
 	menu.add_child(HSeparator.new())
 	menu.add_child(_menu_button("ปิดเครื่อง (Shut down)", request_shutdown))
 
 
-func _desktop_icon(glyph: String, color: Color, title: String, action: Callable) -> Control:
+func _desktop_icon(id: String, title: String, action: Callable) -> Control:
 	var button := Button.new()
 	button.flat = true
-	button.custom_minimum_size = Vector2(96, 86)
+	button.custom_minimum_size = Vector2(106, 82)
 	button.tooltip_text = title
+	button.name = id + "Icon"
+	button.add_theme_stylebox_override("hover", _flat(Color("ffffff22"), 6))
+	button.add_theme_stylebox_override("pressed", _flat(Color("ffffff38"), 6))
 	button.pressed.connect(action)
 	var box := VBoxContainer.new()
 	box.set_anchors_preset(Control.PRESET_FULL_RECT)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	button.add_child(box)
-	var tile := PanelContainer.new()
-	tile.custom_minimum_size = Vector2(46, 40)
+	var tile := _icon_view(id, 46)
 	tile.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tile.add_theme_stylebox_override("panel", _flat(color, 6))
-	var g := _label(glyph, 15, Color.WHITE)
-	g.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	g.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	tile.add_child(g)
 	box.add_child(tile)
-	var caption := _label(title, 14, Color.WHITE)
+	var caption := _label(title, 13, Color.WHITE)
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	caption.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	caption.add_theme_constant_override("outline_size", 3)
 	box.add_child(caption)
 	return button
+
+func _icon_view(id: String, pixels: int) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture = DesktopArt.icon(id)
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon.custom_minimum_size = Vector2(pixels, pixels)
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return icon
+
+func _task_button(id: String, title: String, action: Callable) -> Button:
+	var button := Button.new()
+	button.custom_minimum_size = Vector2(36, 38)
+	button.icon = DesktopArt.icon(id)
+	button.expand_icon = true
+	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	button.add_theme_constant_override("icon_max_width", 26)
+	button.add_theme_color_override("font_color", COLOR_TEXT)
+	button.add_theme_color_override("font_hover_color", COLOR_TEXT)
+	button.add_theme_stylebox_override("normal", _flat(Color.TRANSPARENT, 6))
+	button.add_theme_stylebox_override("hover", _flat(Color("ffffff70"), 6))
+	button.add_theme_stylebox_override("pressed", _flat(Color("a8d7ff70"), 6))
+	button.tooltip_text = title
+	button.pressed.connect(action)
+	return button
+
+func _open_search() -> void:
+	_start_menu.show()
+	_search.grab_focus()
+
+func _filter_menu(query: String) -> void:
+	for entry in _menu_entries:
+		var id := str(entry.get_meta("app_id", ""))
+		var installed := id == "" or (station != null and station.has_app(id))
+		entry.visible = installed and GameLocale.text(entry.text).to_lower().contains(query.strip_edges().to_lower())
+	call_deferred("_fit_start_menu")
+
+func _fit_start_menu() -> void:
+	_start_menu.offset_top = -58.0 - maxf(200.0, _start_menu.get_combined_minimum_size().y)
+
+func _taskbar_action(id: String, action: Callable) -> void:
+	_start_menu.hide()
+	if _windows.has(id):
+		var window: Control = _windows[id]
+		if window.visible and window.get_index() == window.get_parent().get_child_count() - 1:
+			window.hide()
+			return
+	action.call()
+
+func _update_taskbar() -> void:
+	for id: String in _taskbar_buttons:
+		_taskbar_buttons[id].get_node("Running").visible = _windows.has(id)
 
 
 func _menu_button(text: String, action: Callable) -> Button:
@@ -322,7 +443,10 @@ func _menu_button(text: String, action: Callable) -> Button:
 	b.flat = true
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.custom_minimum_size = Vector2(250, 36)
-	b.add_theme_color_override("font_color", Color.WHITE)
+	b.add_theme_color_override("font_color", COLOR_TEXT)
+	b.add_theme_color_override("font_hover_color", COLOR_TEXT)
+	b.add_theme_color_override("font_pressed_color", COLOR_TEXT)
+	b.add_theme_stylebox_override("hover", _flat(Color("ffffffaa"), 6))
 	b.pressed.connect(func():
 		_start_menu.visible = false
 		action.call())
@@ -354,6 +478,7 @@ func _flat(color: Color, radius: int = 0) -> StyleBoxFlat:
 func _open_window(id: String, title: String, size: Vector2, build_content: Callable, maximized: bool = false) -> PanelContainer:
 	if _windows.has(id):
 		var existing: PanelContainer = _windows[id]
+		existing.show()
 		existing.move_to_front()
 		return existing
 
@@ -475,21 +600,6 @@ func _open_network() -> void:
 			["DNS Server", station.dns_server if ok else "-"],
 			["MAC Address", station.mac_address],
 		]))
-
-
-## Opens the Network Designer program (Mission 1). Returns the program node.
-func open_network_designer() -> NetworkDesigner:
-	if not station.has_app("network_designer"):
-		return null
-	if _windows.has("network_designer"):
-		_windows["network_designer"].move_to_front()
-		return _windows["network_designer"].find_child("NetworkDesigner", true, false)
-	var app := NetworkDesigner.new()
-	app.name = "NetworkDesigner"
-	app.close_requested.connect(func(): _close_window("network_designer"))
-	_open_window("network_designer", "Network Designer", Vector2.ZERO, func(body): body.add_child(app), true)
-	app_opened.emit("network_designer", app)
-	return app
 
 
 func _build_security_toast() -> void:

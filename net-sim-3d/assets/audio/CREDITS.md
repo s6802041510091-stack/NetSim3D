@@ -12,4 +12,5 @@ credits are given anyway.
 | `music/calm_track-loop.ogg` | Level music | "Calm Track" by pmiller, https://opengameart.org/content/calm-track | CC0 / public domain |
 
 Which sound plays for what: `scripts/audio/sound.gd` (`BANK` and `MUSIC`).
+Menu track is now included; its current original download is https://opengameart.org/sites/default/files/LofiLoop_2.ogg (source page https://opengameart.org/node/94031). The loading-complete notification uses Kenney's `confirmation_001.ogg`, already covered by the Kenney CC0 license above. The optional level music reference does not mean that file is bundled.
 Room ambience layers: node `Ambience` in `scenes/main.tscn`.

@@ -20,6 +20,8 @@
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_aircon.wav" id="16_aircon"]
 [ext_resource type="AudioStream" path="res://assets/audio/generated/amb_pc_fans.wav" id="17_fans"]
 [ext_resource type="Script" path="res://scripts/props/restrooms.gd" id="20_restrooms"]
+[ext_resource type="PackedScene" path="res://scenes/props/corridor_furnishings.tscn" id="21_corridor"]
+[ext_resource type="PackedScene" path="res://scenes/npc/corridor_students.tscn" id="22_students"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -42,6 +44,10 @@ script = ExtResource("12_visual_fixes")
 [node name="MapCollision" type="StaticBody3D" parent="." unique_id=1418392378]
 collision_mask = 0
 script = ExtResource("2")
+
+[node name="CorridorFurnishings" parent="." instance=ExtResource("21_corridor")]
+
+[node name="CorridorStudents" parent="." instance=ExtResource("22_students")]
 
 [node name="Doors" type="Node3D" parent="." unique_id=1627901788]
 

@@ -11,9 +11,9 @@ var out_dir := ""
 
 const WALKS := {
 	"women": [Vector3(-8.5, 0.0, -15.01), Vector3(-10.5, 0.0, -15.01), Vector3(-10.5, 0.0, -13.3), Vector3(-11.9, 0.0, -13.3),
-		Vector3(-14.0, 0.0, -13.2), Vector3(-13.0, 0.0, -15.9), Vector3(-15.6, 0.0, -14.5), Vector3(-18.0, 0.0, -12.3)],
+		Vector3(-14.0, 0.0, -13.2), Vector3(-13.0, 0.0, -15.9), Vector3(-17.8, 0.0, -15.9), Vector3(-18.0, 0.0, -12.65)],
 	"men": [Vector3(-8.5, 0.0, -22.8), Vector3(-10.5, 0.0, -22.8), Vector3(-10.5, 0.0, -21.2), Vector3(-11.9, 0.0, -21.2),
-		Vector3(-15.0, 0.0, -19.2), Vector3(-14.2, 0.0, -18.3), Vector3(-18.6, 0.0, -21.0), Vector3(-17.0, 0.0, -22.8), Vector3(-13.2, 0.0, -22.9)],
+		Vector3(-16.0, 0.0, -21.0), Vector3(-20.2, 0.0, -21.5), Vector3(-19.5, 0.0, -22.8), Vector3(-17.8, 0.0, -22.9), Vector3(-13.0, 0.0, -22.9), Vector3(-16.0, 0.0, -20.1)],
 }
 
 
@@ -58,6 +58,12 @@ func _run() -> void:
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.28
 	capsule.height = 1.6
+	# Privacy walls must reach the room's south wall at every player height.
+	# The entrance remains open on the north end (covered by WALKS below).
+	for south in [Restrooms.F_SOUTH,Restrooms.M_SOUTH]:
+		for height in [.3,1.5,2.8]:
+			var ray:=PhysicsRayQueryParameters3D.create(Vector3(-10.7,height,south+.1),Vector3(-11.5,height,south+.1),1)
+			_check(not space.intersect_ray(ray).is_empty(),"privacy wall joined at z=%.2f height=%.1f"%[south,height])
 	for room: String in WALKS:
 		var points: Array = WALKS[room]
 		for i in points.size() - 1:

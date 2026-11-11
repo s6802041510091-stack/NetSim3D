@@ -132,7 +132,7 @@ func show_toast(text: String, seconds: float = 4.0) -> void:
 	_toast_label.text = text
 	_toast_panel.visible = true
 	get_tree().create_timer(seconds, true).timeout.connect(func():
-		if _toast_label.text == text:
+		if _toast_label.text == text or _toast_label.text == GameLocale.text(text):
 			_toast_panel.visible = false)
 
 

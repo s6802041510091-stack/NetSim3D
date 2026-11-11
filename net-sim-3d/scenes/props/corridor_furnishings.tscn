@@ -1,0 +1,93 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/props/corridor_bench.tscn" id="1_bench"]
+[ext_resource type="PackedScene" path="res://scenes/props/corridor_shoe_rack_30.tscn" id="2_rack"]
+[ext_resource type="PackedScene" path="res://scenes/props/corridor_plant.tscn" id="3_plant"]
+
+[node name="CorridorFurnishings" type="Node3D"]
+metadata/design_reference = "Preview/โถงทางเดิน/corridor-concept-v2.png"
+
+[node name="ComputerClassShoeRack30" parent="." instance=ExtResource("2_rack")]
+position = Vector3(-3.42, 0, 0)
+rotation = Vector3(0, -1.5707963, 0)
+metadata/classroom = "Computer classroom"
+
+[node name="ScienceClassShoeRack30" parent="." instance=ExtResource("2_rack")]
+position = Vector3(-8.88, 0, -4.8)
+rotation = Vector3(0, 1.5707963, 0)
+metadata/classroom = "Science classroom"
+
+[node name="BenchLeft01" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-8.84, 0, -0.4)
+rotation = Vector3(0, 1.5707963, 0)
+
+[node name="BenchLeft02" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-8.84, 0, -11.3)
+rotation = Vector3(0, 1.5707963, 0)
+
+[node name="BenchLeft03" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-8.84, 0, -18.8)
+rotation = Vector3(0, 1.5707963, 0)
+
+[node name="BenchLeft04" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-8.84, 0, -32.8)
+rotation = Vector3(0, 1.5707963, 0)
+
+[node name="BenchRight01" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-3.46, 0, -5.3)
+rotation = Vector3(0, -1.5707963, 0)
+
+[node name="BenchRight02" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-3.46, 0, -14.2)
+rotation = Vector3(0, -1.5707963, 0)
+
+[node name="BenchRight03" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-3.46, 0, -22.2)
+rotation = Vector3(0, -1.5707963, 0)
+
+[node name="BenchRight04" parent="." instance=ExtResource("1_bench")]
+position = Vector3(-3.46, 0, -40.4)
+rotation = Vector3(0, -1.5707963, 0)
+
+[node name="PlantLeft01" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-8.82, 0, -1.8)
+
+[node name="PlantLeft02" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-8.82, 0, -9.9)
+rotation = Vector3(0, 0.7, 0)
+
+[node name="PlantLeft03" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-8.82, 0, -17.3)
+rotation = Vector3(0, 1.5, 0)
+
+[node name="PlantLeft04" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-8.82, 0, -31.4)
+rotation = Vector3(0, 2.4, 0)
+
+[node name="PlantLeft05" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-8.82, 0, -41.3)
+rotation = Vector3(0, 0.4, 0)
+
+[node name="PlantRight01" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, 2.8)
+rotation = Vector3(0, 0.8, 0)
+
+[node name="PlantRight02" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, -3.8)
+rotation = Vector3(0, 2.0, 0)
+
+[node name="PlantRight03" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, -12.8)
+rotation = Vector3(0, 1.2, 0)
+
+[node name="PlantRight04" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, -20.7)
+rotation = Vector3(0, 2.6, 0)
+
+[node name="PlantRight05" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, -29)
+rotation = Vector3(0, 1.8, 0)
+
+[node name="PlantRight06" parent="." instance=ExtResource("3_plant")]
+position = Vector3(-3.48, 0, -38.9)
+rotation = Vector3(0, 0.5, 0)

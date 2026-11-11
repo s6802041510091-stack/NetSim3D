@@ -28,7 +28,7 @@
   จุดหมุน, ตัวชนบาน และตำแหน่งหลังเปิด–ปิดแบบมีแอนิเมชันซ้ำ 3 รอบ
 - `tools/validate_import.gd`, `validate_computers.gd`, `validate_player_movement.gd`
 - `tools/validate_mission_01.gd`, `validate_mission_05.gd`,
-  `validate_mission_06.gd`, `validate_network_designer.gd`
+  `validate_mission_06.gd` (Network Designer รุ่นเก่าถูกถอดออกแล้ว ใช้ NetPlan EDU สำหรับด่าน 1)
 - เปิดแพ็กเกจ `index.pck` ที่ส่งออกด้วย Godot แล้วรันตัวตรวจ Phase 5 ผ่าน
 - ภาพทดสอบจากมุมหน้าต่างห้องเรียนและห้องวิทยาศาสตร์แสดงเมืองและภูเขาครบ
 

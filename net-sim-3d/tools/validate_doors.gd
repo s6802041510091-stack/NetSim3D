@@ -148,7 +148,9 @@ func _run() -> void:
 	for i in range(4):
 		await physics_frame
 	_check(player.focused_door == it_door, "player is not focused on the IT Support door")
-	_check(player._prompt.visible and player._prompt.text.contains("เปิด"), "open prompt not shown: " + player._prompt.text)
+	# The saved menu language can be Thai or English.
+	var open_prompt: bool = player._prompt.text.contains("เปิด") or player._prompt.text.contains("Open door")
+	_check(player._prompt.visible and open_prompt, "open prompt not shown: " + player._prompt.text)
 
 	Input.action_press("move_forward")
 	for i in range(40):

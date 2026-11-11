@@ -21,7 +21,7 @@ var mac_address := "00-1A-2B-00-00-01"
 ## Missions can unplug a computer's LAN cable by setting this to false.
 var network_connected := true
 ## Programs installed on this computer (desktop icons). Set by ComputerManager.
-var installed_apps := PackedStringArray(["network_designer"])
+var installed_apps := PackedStringArray()
 
 ## True while this computer shows a security warning (Mission 5 target):
 ## its screen glows red in the room and the desktop pops up a warning.

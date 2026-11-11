@@ -9,9 +9,6 @@ extends Node3D
 @export var map_visual_path: NodePath = ^"../MapVisual"
 ## Mesh names that end like this are monitor screens.
 @export var screen_name_suffix: String = "Monitor_Display_Surface"
-## Computers (hostnames) that have Network Designer installed.
-## Leave empty to install it on every computer, e.g. ["IT-PC-01"] for Mission 1.
-@export var network_designer_hosts: PackedStringArray = []
 ## Computers (hostnames) that have NetPlan EDU (Mission 1) installed.
 ## IT-PC-01 is the player's own desk computer in the IT Support room.
 @export var netplan_edu_hosts: PackedStringArray = ["IT-PC-01"]
@@ -73,8 +70,6 @@ func _ready() -> void:
 		add_child(station)
 		station.setup(self, screens[i])
 		_assign_identity(station, String(screens[i].name), i)
-		if not network_designer_hosts.is_empty() and not station.hostname in network_designer_hosts:
-			station.installed_apps.erase("network_designer")
 		if station.hostname in netplan_edu_hosts:
 			station.installed_apps.append("netplan_edu")
 		if station.hostname in teamviewer_hosts:

@@ -1,0 +1,3577 @@
+[
+  {
+    "id": 0,
+    "th": "การเชื่อมต่อเครือข่ายภายนอก",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 1,
+    "th": "ระหว่างเครือข่ายภายนอกกับเครือข่ายภายใน",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 2,
+    "th": "เลือกอุปกรณ์สำหรับเชื่อมต่อเครือข่ายภายนอกกับเครือข่ายภายใน",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 3,
+    "th": "พิจารณาว่าอุปกรณ์ใดทำหน้าที่เชื่อมต่อเครือข่ายต่างวงเข้าด้วยกัน",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 4,
+    "th": "อุปกรณ์ศูนย์กลางภายใน Wall Rack",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 5,
+    "th": "ภายใน Wall Rack 9U หลังโต๊ะครู",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 6,
+    "th": "เลือกอุปกรณ์ศูนย์กลางสำหรับคอมพิวเตอร์ครูและคอมพิวเตอร์นักเรียนรวม 21 เครื่อง",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 7,
+    "th": "คอมพิวเตอร์ 21 เครื่องใช้งานพร้อมกัน อย่าลืมนับพอร์ตที่ต้องต่อไปยังอุปกรณ์จุดอื่นด้วย",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 8,
+    "th": "จุดให้บริการเครือข่ายไร้สาย",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 9,
+    "th": "จุดติดตั้งบนเพดานกลางห้องคอมพิวเตอร์",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 10,
+    "th": "เลือกอุปกรณ์สำหรับให้บริการเครือข่ายไร้สายภายในห้องคอมพิวเตอร์",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 11,
+    "th": "จุดนี้รับสาย LAN จากอุปกรณ์ศูนย์กลาง แล้วให้บริการอุปกรณ์พกพาภายในห้องเดียวกัน",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 12,
+    "th": "ฝ่าย IT ได้รับมอบหมายให้วางแผนเครือข่ายของห้องปฏิบัติการคอมพิวเตอร์\n\nผังห้อง โต๊ะ Wall Rack 9U จุดติดตั้ง และเส้นทางสาย LAN ถูกกำหนดไว้เรียบร้อยแล้ว งานของคุณคือเลือกอุปกรณ์เครือข่ายที่เหมาะสมให้ครบทั้ง 3 จุดบนผังห้อง\n\nจุดที่ 1  การเชื่อมต่อเครือข่ายภายนอก\nจุดที่ 2  อุปกรณ์ศูนย์กลางภายใน Wall Rack\nจุดที่ 3  จุดให้บริการเครือข่ายไร้สาย\n\nแต่ละจุดมีอุปกรณ์ให้เลือก 4 ชนิด คลิกรูปอุปกรณ์ที่ต้องการ แล้วตอบว่าเลือกอุปกรณ์นั้นเพราะอะไร\n\nคะแนนเต็ม 100 = ความถูกต้องของผลงาน 30 + กระบวนการทำงาน (อุปกรณ์และเหตุผล) 50 + ประสิทธิภาพด้านเวลา 20\nเมื่อกด \"ตรวจสอบแบบ\" จุดจะผ่านเมื่อเลือกอุปกรณ์ถูกและเหตุผลถูก จุดที่ยังผิดจะถูกหักคะแนนความถูกต้อง ระบบนับเหตุผลครั้งแรกที่ยืนยันของแต่ละอุปกรณ์",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 13,
+    "th": "ห้องคอมพิวเตอร์มีคอมพิวเตอร์ครู 1 เครื่อง และคอมพิวเตอร์นักเรียน 20 เครื่อง (โต๊ะนักเรียน 10 ตัว ตัวละ 2 เครื่อง) รวม 21 เครื่อง",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 14,
+    "th": "คอมพิวเตอร์ทุกเครื่องเชื่อมต่อด้วยสาย LAN เข้ากับอุปกรณ์ศูนย์กลาง และต้องเชื่อมต่อออกสู่เครือข่ายภายนอกได้",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 15,
+    "th": "อุปกรณ์ศูนย์กลางของห้องติดตั้งใน Wall Rack 9U ซึ่งอยู่หลังโต๊ะครู และต้องเหลือพอร์ตสำหรับต่อไปยังอุปกรณ์จุดอื่น",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 16,
+    "th": "ภายในห้องต้องมีจุดให้บริการเครือข่ายไร้สายสำหรับอุปกรณ์พกพา",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 17,
+    "th": "ผังห้อง ตำแหน่งโต๊ะ Wall Rack จุดติดตั้ง และเส้นทางสาย LAN ถูกกำหนดไว้แล้ว ลาก ย้าย ลบ หรือแก้ไขไม่ได้",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 18,
+    "th": "แต่ละจุดต้องเลือกอุปกรณ์ 1 ชนิดพร้อมเหตุผล แล้วกด \"ตรวจสอบแบบ\" เพื่อตรวจทั้ง 3 จุดพร้อมกัน",
+    "source": "missions/mission_01/data/mission_01_data.tres"
+  },
+  {
+    "id": 19,
+    "th": "Mission 1 reasoning (v2, 2026-11-09): clicking a device means choosing it, then 'why choose it?' with 4 options of similar length. point -> device -> 4 options. The right device has exactly 1 option with 'correct': true; every other option (and every option of a wrong device) carries a 'misconception' label used in the summary. Review copy: ภารกิจ/ด่าน_01/คำถามเหตุผล_ร่าง.md",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 20,
+    "th": "เชื่อมเครือข่ายภายในห้องเข้ากับเครือข่ายภายนอก และหาเส้นทางส่งข้อมูลระหว่างสองเครือข่าย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 21,
+    "th": "กระจายสัญญาณไร้สายให้คอมพิวเตอร์ทุกเครื่องในห้องเชื่อมต่ออินเทอร์เน็ตได้พร้อมกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 22,
+    "th": "Router คืออุปกรณ์กระจาย Wi-Fi",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 23,
+    "th": "มีพอร์ตมากพอให้ต่อคอมพิวเตอร์ทั้ง 21 เครื่องเข้ากับอุปกรณ์ตัวนี้ได้โดยตรง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 24,
+    "th": "Router ทำหน้าที่อุปกรณ์ศูนย์กลางของห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 25,
+    "th": "ขยายสัญญาณที่อ่อนลงจากสายยาวให้แรงขึ้นก่อนส่งต่อไปยังคอมพิวเตอร์ในห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 26,
+    "th": "สับสน Router กับ Repeater",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 27,
+    "th": "มีเสาสัญญาณในตัว จึงรับอินเทอร์เน็ตจากผู้ให้บริการภายนอกได้โดยตรงไม่ต้องใช้สาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 28,
+    "th": "มีเสาสัญญาณแปลว่าเชื่อมเครือข่ายภายนอกได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 29,
+    "th": "ทำงานเหมือน Router ทุกประการ เพียงแต่ส่งข้อมูลระหว่างเครือข่ายผ่านคลื่นวิทยุแทนสาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 30,
+    "th": "Access Point คือ Router แบบไร้สาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 31,
+    "th": "ส่งข้อมูลไร้สายได้เร็วกว่าสาย LAN จึงเหมาะเป็นทางเชื่อมหลักออกสู่เครือข่ายภายนอก",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 32,
+    "th": "เครือข่ายไร้สายเร็วกว่าเครือข่ายแบบใช้สายเสมอ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 33,
+    "th": "ทุกเครือข่ายในโรงเรียนต้องผ่านจุดกระจาย Wi-Fi ก่อน จึงจะออกสู่อินเทอร์เน็ตได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 34,
+    "th": "Wi-Fi เป็นทางออกอินเทอร์เน็ตทางเดียว",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 35,
+    "th": "มีจำนวนพอร์ตมากที่สุด จึงรองรับการเชื่อมต่อได้ทุกเครือข่ายทั้งภายในและภายนอก",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 36,
+    "th": "พอร์ตมากแปลว่าเชื่อมได้ทุกเครือข่าย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 37,
+    "th": "ส่งข้อมูลถึงเครื่องปลายทางในห้องได้ถูกต้อง จึงส่งต่อไปถึงเครือข่ายภายนอกได้เช่นกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 38,
+    "th": "Switched Hub ทำหน้าที่ Router ได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 39,
+    "th": "อุปกรณ์ที่ติดตั้งอยู่ใน Wall Rack ทุกตัวทำหน้าที่เชื่อมต่อกับเครือข่ายภายนอกได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 40,
+    "th": "ตำแหน่งติดตั้งเป็นตัวกำหนดหน้าที่",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 41,
+    "th": "ส่งข้อมูลเฉพาะเครื่องปลายทาง จึงปลอดภัยพอที่จะใช้เป็นทางเข้าออกของเครือข่าย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 42,
+    "th": "ความปลอดภัยเป็นตัวกำหนดหน้าที่เชื่อมเครือข่ายภายนอก",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 43,
+    "th": "ขยายสัญญาณให้ส่งได้ไกลขึ้น จึงส่งข้อมูลไปถึงเครือข่ายภายนอกที่อยู่ไกลได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 44,
+    "th": "ส่งได้ไกลแปลว่าเชื่อมเครือข่ายภายนอกได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 45,
+    "th": "เป็นอุปกรณ์ที่ใช้เชื่อมเครือข่ายทุกแบบเข้าด้วยกัน โดยไม่ต้องกำหนดเส้นทางข้อมูล",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 46,
+    "th": "Repeater ทำหน้าที่ Router",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 47,
+    "th": "ทำงานเหมือน Router ทุกอย่างแต่มีราคาถูกกว่า จึงคุ้มค่ากว่าสำหรับห้องเรียน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 48,
+    "th": "Repeater กับ Router ต่างกันแค่ราคา",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 49,
+    "th": "ทวนสัญญาณซ้ำ ทำให้ข้อมูลจากอินเทอร์เน็ตไม่สูญหายระหว่างทางเข้าห้องคอม",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 50,
+    "th": "Repeater ทำหน้าที่ป้องกันข้อมูลสูญหาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 51,
+    "th": "ส่งข้อมูลไปเฉพาะพอร์ตปลายทาง และมีพอร์ตพอสำหรับ 21 เครื่องรวมกับ Router และ Access Point",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 52,
+    "th": "ส่งข้อมูลออกไปทุกพอร์ตพร้อมกัน ทำให้คอมพิวเตอร์ทุกเครื่องได้รับข้อมูลเร็วขึ้น",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 53,
+    "th": "สับสนการทำงานของ Switched Hub กับ Shared Hub",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 54,
+    "th": "เชื่อมต่อออกอินเทอร์เน็ตได้ด้วยตัวเอง จึงไม่จำเป็นต้องมี Router อยู่ในห้องนี้อีก",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 55,
+    "th": "มีพอร์ตเท่ากับจำนวนคอมพิวเตอร์ในห้องพอดี จึงไม่เหลือพอร์ตว่างให้สิ้นเปลือง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 56,
+    "th": "ลืมนับพอร์ตที่ต่อไป Router และ Access Point",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 57,
+    "th": "มีพอร์ตเท่ากับ Switched Hub 24 Port จึงใช้แทนกันได้โดยไม่มีผลต่อการทำงาน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 58,
+    "th": "เลือกอุปกรณ์จากจำนวนพอร์ตอย่างเดียว",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 59,
+    "th": "ส่งข้อมูลไปทุกเครื่องพร้อมกัน ทำให้คอมพิวเตอร์ทุกเครื่องได้รับข้อมูลครบเสมอ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 60,
+    "th": "การส่งข้อมูลไปทุกพอร์ตเป็นข้อดี",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 61,
+    "th": "Shared Hub กับ Switched Hub เป็นอุปกรณ์ชนิดเดียวกัน เพียงแต่ใช้ชื่อเรียกต่างกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 62,
+    "th": "Shared Hub กับ Switched Hub ทำงานเหมือนกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 63,
+    "th": "ราคาถูกกว่าและเร็วพอ แม้คอมพิวเตอร์ทั้ง 21 เครื่องจะใช้งานพร้อมกันทั้งห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 64,
+    "th": "Shared Hub รองรับการใช้งานพร้อมกันจำนวนมากได้ดี",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 65,
+    "th": "เสียบคอมพิวเตอร์ 2 เครื่องในพอร์ตเดียวกันได้ จึงรองรับได้ครบทั้ง 21 เครื่อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 66,
+    "th": "1 พอร์ตต่อคอมพิวเตอร์ได้หลายเครื่อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 67,
+    "th": "จำนวนพอร์ตน้อยกว่าทำให้แต่ละพอร์ตได้ความเร็วมากขึ้น เครือข่ายจึงเร็วกว่าเดิม",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 68,
+    "th": "พอร์ตน้อยแปลว่าเร็วกว่า",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 69,
+    "th": "คอมพิวเตอร์ที่เหลือเชื่อมต่อผ่าน Wi-Fi แทนได้ จำนวนพอร์ตจึงไม่ใช่เรื่องสำคัญ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 70,
+    "th": "ไม่ทำตามข้อกำหนดที่ให้คอมพิวเตอร์ทุกเครื่องใช้สาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 71,
+    "th": "ส่งข้อมูลเฉพาะพอร์ตปลายทางเหมือนรุ่น 24 พอร์ต จึงใช้แทนกันได้ในทุกกรณี",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 72,
+    "th": "ไม่นับจำนวนพอร์ตที่ต้องใช้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 73,
+    "th": "ซื้อเพียงตัวเดียวก็ต่อคอมพิวเตอร์ได้ไม่จำกัดจำนวน เพราะส่งข้อมูลเฉพาะปลายทาง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 74,
+    "th": "ไม่เข้าใจข้อจำกัดของจำนวนพอร์ต",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 75,
+    "th": "หนึ่งพอร์ตต่อคอมพิวเตอร์ได้หลายเครื่อง จึงรองรับคอมพิวเตอร์ทั้งห้องได้สบาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 76,
+    "th": "ขนาดเล็กและใช้ไฟน้อย จึงเหมาะกับห้องเรียนมากกว่ารุ่นที่มีพอร์ตจำนวนมาก",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 77,
+    "th": "เลือกอุปกรณ์จากเกณฑ์ที่ไม่เกี่ยวกับความต้องการ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 78,
+    "th": "พอร์ตน้อยทำให้ดูแลง่าย ถ้าเครื่องไหนเสียก็หาสาเหตุได้เร็วกว่ารุ่นอื่น",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 79,
+    "th": "เลือกอุปกรณ์จากความสะดวกในการดูแลแทนความต้องการของห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 80,
+    "th": "รับสาย LAN จากอุปกรณ์ศูนย์กลาง แล้วกระจายสัญญาณให้อุปกรณ์พกพาเข้าเครือข่ายของห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 81,
+    "th": "เชื่อมต่อเครือข่ายภายในเข้ากับเครือข่ายภายนอกได้เองโดยไม่ต้องผ่าน Router",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 82,
+    "th": "Access Point ทำหน้าที่ Router",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 83,
+    "th": "เพิ่มจำนวนพอร์ตสาย LAN ให้คอมพิวเตอร์ในห้องที่ต่อกับอุปกรณ์ศูนย์กลางไม่ทัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 84,
+    "th": "Access Point ทำหน้าที่ Switched Hub",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 85,
+    "th": "ขยายสัญญาณ Wi-Fi จากห้องอื่นให้แรงขึ้น โดยไม่ต้องต่อสาย LAN เข้ากับเครือข่าย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 86,
+    "th": "Access Point คือตัวขยายสัญญาณ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 87,
+    "th": "สัญญาณ Wi-Fi ทุกชนิดต้องมาจาก Router จึงต้องติดตั้ง Router เพิ่มอีกตัวในจุดนี้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 88,
+    "th": "สัญญาณ Wi-Fi มาจาก Router เท่านั้น",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 89,
+    "th": "Router กับ Access Point ทำงานเหมือนกันทุกอย่าง จะเลือกตัวไหนก็ได้ผลเหมือนกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 90,
+    "th": "ติดตั้ง Router หลายตัวในห้องเดียวกันจะช่วยให้อินเทอร์เน็ตทั้งห้องเร็วขึ้น",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 91,
+    "th": "จำนวน Router เพิ่มความเร็วอินเทอร์เน็ต",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 92,
+    "th": "Router แยกอุปกรณ์พกพาไว้คนละเครือข่ายกับคอมพิวเตอร์ ซึ่งเป็นสิ่งที่ห้องต้องการ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 93,
+    "th": "อ่านข้อกำหนดผิดว่าต้องแยกเครือข่ายของอุปกรณ์พกพา",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 94,
+    "th": "อุปกรณ์เครือข่ายทุกชนิดปล่อยสัญญาณไร้สายได้ เพียงต่อสาย LAN เข้ากับเครือข่าย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 95,
+    "th": "อุปกรณ์เครือข่ายทุกตัวมี Wi-Fi",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 96,
+    "th": "ต่อเพิ่มจากอุปกรณ์ศูนย์กลางแล้ว อุปกรณ์พกพาจะเชื่อมต่อเข้าเครือข่ายได้เอง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 97,
+    "th": "ต่อสาย LAN แล้วจะได้ Wi-Fi เอง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 98,
+    "th": "ขนาดเล็กและน้ำหนักเบา จึงเหมาะติดตั้งบนเพดานเพื่อกระจายสัญญาณให้ทั่วห้อง",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 99,
+    "th": "ขนาดอุปกรณ์เป็นตัวกำหนดหน้าที่",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 100,
+    "th": "มีพอร์ตว่างพอให้อุปกรณ์พกพาทุกเครื่องในห้องเสียบสายเข้าใช้งานเครือข่ายได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 101,
+    "th": "อุปกรณ์พกพาต้องใช้สาย LAN",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 102,
+    "th": "Bridge แปลว่าสะพาน จึงเป็นทางเชื่อมให้อุปกรณ์พกพาทุกเครื่องเข้าเครือข่ายได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 103,
+    "th": "เดาหน้าที่จากความหมายของชื่ออุปกรณ์",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 104,
+    "th": "Bridge กับ Access Point เป็นอุปกรณ์ชนิดเดียวกัน เพียงแต่ผู้ผลิตตั้งชื่อต่างกัน",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 105,
+    "th": "สับสน Bridge กับ Access Point",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 106,
+    "th": "Bridge ขยายสัญญาณ Wi-Fi จากอุปกรณ์ศูนย์กลางให้ครอบคลุมทั่วทั้งห้องได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 107,
+    "th": "Bridge ทำหน้าที่ขยายสัญญาณ",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 108,
+    "th": "Bridge เชื่อมเครือข่ายสองส่วนเข้าด้วยกัน จึงรวมอุปกรณ์พกพากับคอมพิวเตอร์ได้",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 109,
+    "th": "การเชื่อมเครือข่ายสองส่วนเท่ากับการให้บริการไร้สาย",
+    "source": "missions/mission_01/data/mission_01_reasons.json"
+  },
+  {
+    "id": 110,
+    "th": "จุดที่ 1\nยังไม่เลือก",
+    "source": "missions/mission_01/scenes/equipment_point.tscn"
+  },
+  {
+    "id": 111,
+    "th": "จุดที่ 1",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 112,
+    "th": "ตำแหน่งติดตั้ง:",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 113,
+    "th": "คำถาม",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 114,
+    "th": "เลือกได้ 1 ตัวเลือก",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 115,
+    "th": "ยกเลิก",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 116,
+    "th": "ยืนยันการเลือก",
+    "source": "missions/mission_01/scenes/equipment_popup.tscn"
+  },
+  {
+    "id": 117,
+    "th": "ออกจากคอมพิวเตอร์แล้ว",
+    "source": "missions/mission_01/scenes/mission_01_test.tscn"
+  },
+  {
+    "id": 118,
+    "th": "ฉากทดสอบภารกิจที่ 1 (ในเกมจริง ผู้เล่นจะกลับมาเดินและหันกล้องได้ตามปกติ)",
+    "source": "missions/mission_01/scenes/mission_01_test.tscn"
+  },
+  {
+    "id": 119,
+    "th": "ข้อมูลบันทึก",
+    "source": "missions/mission_01/scenes/mission_01_test.tscn"
+  },
+  {
+    "id": 120,
+    "th": "กด F เพื่อใช้งานคอมพิวเตอร์ (open_computer)",
+    "source": "missions/mission_01/scenes/mission_01_test.tscn"
+  },
+  {
+    "id": 121,
+    "th": "ล้างข้อมูลบันทึกภารกิจที่ 1 (สำหรับทดสอบใหม่)",
+    "source": "missions/mission_01/scenes/mission_01_test.tscn"
+  },
+  {
+    "id": 122,
+    "th": "— ภารกิจที่ 1 — เลือกอุปกรณ์เครือข่ายห้องคอม",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 123,
+    "th": "ย่อหน้าต่าง (กลับไปที่ Desktop โดยไม่ปิดงาน)",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 124,
+    "th": "หน้าต่างขยายเต็มจออยู่แล้ว",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 125,
+    "th": "ปิดโปรแกรม (งานที่เลือกไว้ถูกบันทึกแล้ว)",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 126,
+    "th": "ไฟล์",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 127,
+    "th": "แก้ไข",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 128,
+    "th": "มุมมอง",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 129,
+    "th": "ตรวจสอบ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 130,
+    "th": "ช่วยเหลือ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 131,
+    "th": "Project ของภารกิจนี้เปิดอยู่แล้ว",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 132,
+    "th": "เปิด Project",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 133,
+    "th": "บันทึกงาน (ระบบบันทึกให้อัตโนมัติทุกครั้งที่เลือกอุปกรณ์)",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 134,
+    "th": "บันทึก",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 135,
+    "th": "ใช้ไม่ได้ในภารกิจนี้ — เปลี่ยนอุปกรณ์ได้โดยคลิกที่จุดอีกครั้ง",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 136,
+    "th": "ย้อนกลับ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 137,
+    "th": "ใช้ไม่ได้ในภารกิจนี้",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 138,
+    "th": "ทำซ้ำ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 139,
+    "th": "ตรวจอุปกรณ์ทั้ง 3 จุดพร้อมกัน",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 140,
+    "th": "ตรวจสอบแบบ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 141,
+    "th": "ผังห้องและสาย LAN ถูกล็อกไว้",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 142,
+    "th": "ภารกิจที่ 1 — เลือกอุปกรณ์เครือข่ายห้องคอม",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 143,
+    "th": "ภารกิจที่ 1",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 144,
+    "th": "ผังห้องคอม",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 145,
+    "th": "ข้อกำหนด",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 146,
+    "th": "แสดงเส้นทางสาย LAN ให้เด่นขึ้น (ดูได้อย่างเดียว แก้ไขไม่ได้)",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 147,
+    "th": "เส้นทางสาย LAN",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 148,
+    "th": "เส้นทางสาย LAN ถูกกำหนดไว้แล้ว ดูได้อย่างเดียว",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 149,
+    "th": "รายละเอียด",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 150,
+    "th": "กลับไปที่ผังห้องคอม",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 151,
+    "th": "ความคืบหน้า",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 152,
+    "th": "0/3 จุด",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 153,
+    "th": "อุปกรณ์ที่เลือก",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 154,
+    "th": "ผลการตรวจสอบ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 155,
+    "th": "คะแนน: ยังไม่ได้ตรวจสอบ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 156,
+    "th": "ตรวจสอบแล้ว: 0 ครั้ง",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 157,
+    "th": "คำแนะนำ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 158,
+    "th": "พร้อมทำภารกิจ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 159,
+    "th": "Esc = ปิดหน้าต่าง",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 160,
+    "th": "ภารกิจสำเร็จ",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 161,
+    "th": "เลือกอุปกรณ์เครือข่ายห้องคอมครบและถูกต้องทั้ง 3 จุด",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 162,
+    "th": "คะแนนรวม 100 / 100",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 163,
+    "th": "จำนวนครั้งที่ตรวจสอบ: 1 ครั้ง",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 164,
+    "th": "จำนวนจุดที่เคยผิด: 0 จุด",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 165,
+    "th": "กลับสู่ Desktop",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 166,
+    "th": "ออกจากคอมพิวเตอร์",
+    "source": "missions/mission_01/scenes/netplan_edu.tscn"
+  },
+  {
+    "id": 167,
+    "th": "จุดที่ %d: %s\nคลิกเพื่อเลือกอุปกรณ์",
+    "source": "missions/mission_01/scripts/equipment_point.gd"
+  },
+  {
+    "id": 168,
+    "th": "ยืนยันจุดนี้",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 169,
+    "th": "จุดที่ %d · %s",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 170,
+    "th": "ตำแหน่งติดตั้ง: ",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 171,
+    "th": " — คลิกอุปกรณ์ที่ต้องการเลือก แล้วตอบว่าเลือกเพราะอะไร",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 172,
+    "th": "จุดนี้ผ่านการตรวจสอบแล้ว เปลี่ยนอุปกรณ์ไม่ได้",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 173,
+    "th": "ตรวจแล้ว: อุปกรณ์ถูก แต่เหตุผลยังไม่ถูก — เลือกเหตุผลใหม่",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 174,
+    "th": "ตรวจแล้ว: อุปกรณ์นี้ไม่เหมาะกับจุดนี้ — เลือกอุปกรณ์ใหม่",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 175,
+    "th": "เปลี่ยนอุปกรณ์หรือเหตุผลภายหลังได้ แต่ระบบนับเหตุผลครั้งแรกที่ยืนยันของแต่ละอุปกรณ์",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 176,
+    "th": "ปิด",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 177,
+    "th": "เลือก %s เพราะ…",
+    "source": "missions/mission_01/scripts/equipment_popup.gd"
+  },
+  {
+    "id": 178,
+    "th": "หัวหน้างาน Data Center|มีงานใหม่เข้ามาพอดี โรงเรียนกำลังเตรียมห้องคอมพิวเตอร์ห้องใหม่ มี**เครื่องนักเรียน 20 เครื่อง** และ**เครื่องครูอีก 1 เครื่อง**",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 179,
+    "th": "หัวหน้างาน Data Center|ตำแหน่งโต๊ะ จุดติดตั้ง และเส้นทางเดินสาย LAN ถูกกำหนดไว้เรียบร้อยแล้ว แต่เรายังต้อง**เลือกอุปกรณ์เครือข่าย**ให้เหมาะสมกับการใช้งาน",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 180,
+    "th": "หัวหน้างาน Data Center|ช่วยไปที่**คอมพิวเตอร์ของคุณ** เปิดไฟล์ Project ของห้องคอมใหม่ใน **NetPlan EDU** แล้วเลือกอุปกรณ์ให้ถูกต้อง**ทั้ง 3 จุด**ด้วยนะ",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 181,
+    "th": "คุณ|รับทราบครับ ผมจะตรวจสอบความต้องการและเลือกอุปกรณ์ให้เหมาะสมกับแต่ละจุด",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 182,
+    "th": "คุณ|ผมตรวจสอบและเลือกอุปกรณ์สำหรับห้องคอมใหม่เรียบร้อยแล้วครับ",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 183,
+    "th": "หัวหน้างาน Data Center|ดีมาก **การเลือกอุปกรณ์ให้ตรงกับหน้าที่**เป็นพื้นฐานสำคัญของการวางแผนระบบเครือข่าย แบบที่เลือกสามารถนำไปใช้เตรียมการติดตั้งในขั้นตอนต่อไปได้",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 184,
+    "th": "หัวหน้างาน Data Center|ยังเลือกอุปกรณ์ไม่ครบหรือยังไม่ถูกต้องนะ กลับไปตรวจสอบใน **NetPlan EDU** ที่คอมพิวเตอร์ของคุณก่อน",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 185,
+    "th": "ได้รับภารกิจ: เลือกอุปกรณ์เครือข่ายห้องคอมใหม่",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 186,
+    "th": "หัวหน้างาน Data Center",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 187,
+    "th": "คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 188,
+    "th": "กด F เพื่อคุยกับหัวหน้างาน Data Center",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 189,
+    "th": "ไปที่คอมพิวเตอร์ของคุณ (%s) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ให้ครบ 3 จุด",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 190,
+    "th": "กด F เพื่อคุยกับหัวหน้างาน",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 191,
+    "th": "ออกจากคอมพิวเตอร์ แล้วกลับไปรายงานผลกับหัวหน้างาน Data Center",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 192,
+    "th": "กด F เพื่อรายงานผลกับหัวหน้างาน",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 193,
+    "th": "แบบผ่านการตรวจสอบแล้ว — กลับไปรายงานหัวหน้างาน",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 194,
+    "th": "ด่านที่ 1  ·  ออกแบบเครือข่าย — เลือกอุปกรณ์เครือข่ายห้องคอม",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 195,
+    "th": "%d ครั้ง",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 196,
+    "th": "จุดที่ตรวจแล้วเคยผิด",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 197,
+    "th": "%d จาก %d จุด",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 198,
+    "th": "ถูกหักคะแนนเพราะตรวจแล้วผิด",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 199,
+    "th": "%d คะแนน (ครั้งละ %d)",
+    "source": "missions/mission_01/scripts/mission_01_controller.gd"
+  },
+  {
+    "id": 200,
+    "th": "ยังไม่มีข้อมูลบันทึกของภารกิจที่ 1",
+    "source": "missions/mission_01/scripts/mission_01_test_bench.gd"
+  },
+  {
+    "id": 201,
+    "th": "ภารกิจที่ 1 สำเร็จแล้ว — คะแนน %d, ตรวจสอบ %d ครั้ง",
+    "source": "missions/mission_01/scripts/mission_01_test_bench.gd"
+  },
+  {
+    "id": 202,
+    "th": "มีข้อมูลบันทึก: เลือกแล้ว %d/3 จุด, ตรวจสอบ %d ครั้ง",
+    "source": "missions/mission_01/scripts/mission_01_test_bench.gd"
+  },
+  {
+    "id": 203,
+    "th": "จุดที่ %d: ตรวจแบบแล้วยังไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)",
+    "source": "missions/mission_01/scripts/mission_01_validator.gd"
+  },
+  {
+    "id": 204,
+    "th": "จุดที่ %d: เลือก %s",
+    "source": "missions/mission_01/scripts/mission_01_validator.gd"
+  },
+  {
+    "id": 205,
+    "th": " — อุปกรณ์นี้ไม่เหมาะกับจุดนี้",
+    "source": "missions/mission_01/scripts/mission_01_validator.gd"
+  },
+  {
+    "id": 206,
+    "th": " — อุปกรณ์ถูก แต่เหตุผลไม่ถูก",
+    "source": "missions/mission_01/scripts/mission_01_validator.gd"
+  },
+  {
+    "id": 207,
+    "th": " (เข้าใจผิดว่า: %s)",
+    "source": "missions/mission_01/scripts/mission_01_validator.gd"
+  },
+  {
+    "id": 208,
+    "th": "เลือกอุปกรณ์จุดที่ %d แล้ว",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 209,
+    "th": "กรุณาเลือกอุปกรณ์ให้ครบทั้ง 3 จุด",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 210,
+    "th": "พบจุดที่ต้องแก้ไข",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 211,
+    "th": "คลิกจุดสีทองบนผังห้อง (หรือการ์ดด้านบน) เลือกอุปกรณ์ ตอบเหตุผล แล้วกด \"ยืนยันจุดนี้\" เมื่อครบ 3 จุดให้กด \"ตรวจสอบแบบ\"",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 212,
+    "th": "%s (ยังไม่ได้เลือก: %s)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 213,
+    "th": "ยังเลือกอุปกรณ์ไม่ครบ จุดที่ยังไม่ได้เลือก: %s",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 214,
+    "th": "ทุกจุดถูกต้อง ภารกิจสำเร็จ",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 215,
+    "th": "%s (จุดที่ %s)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 216,
+    "th": "จุดสีแดงยังไม่ถูกต้อง การ์ดด้านบนบอกว่าต้องแก้อุปกรณ์หรือเหตุผล คลิกจุดนั้นเพื่อแก้ แล้วกด \"ตรวจสอบแบบ\" อีกครั้ง",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 217,
+    "th": "รายละเอียดภารกิจ",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 218,
+    "th": "ทำทีละจุด",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 219,
+    "th": "บันทึก Project",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 220,
+    "th": "ปิดโปรแกรม",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 221,
+    "th": "ย้อนกลับ (ใช้ไม่ได้ในภารกิจนี้)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 222,
+    "th": "ทำซ้ำ (ใช้ไม่ได้ในภารกิจนี้)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 223,
+    "th": "เน้นเส้นทางสาย LAN (ดูอย่างเดียว)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 224,
+    "th": "วิธีทำภารกิจ",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 225,
+    "th": "จุดที่ %d: %s",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 226,
+    "th": "เลือกครบ 3 จุดแล้ว กด \"ตรวจสอบแบบ\" เพื่อตรวจคำตอบ",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 227,
+    "th": "บันทึก Project แล้ว",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 228,
+    "th": "1. คลิกจุดสีทองบนผังห้อง (หรือการ์ดด้านขวา)\n2. คลิกรูปอุปกรณ์ที่ต้องการเลือก\n3. ตอบว่าเลือกอุปกรณ์นี้เพราะอะไร (4 ตัวเลือก) แล้วกด \"ยืนยันจุดนี้\"\n4. ทำครบ 3 จุดแล้วกด \"ตรวจสอบแบบ\" จุดสีแดงคือจุดที่ต้องแก้ไข (การ์ดบอกว่าผิดที่อุปกรณ์หรือเหตุผล)\n\nคะแนนความถูกต้องเต็ม %d คะแนน — จุดจะถูกต้องเมื่อทั้งอุปกรณ์และเหตุผลถูก จุดที่ตรวจแล้วยังผิด ถูกหักจุดละ %d คะแนนทุกครั้งที่ตรวจ\nคะแนนกระบวนการมาจากอุปกรณ์และเหตุผลที่ยืนยันครั้งแรก ส่วนคะแนนเวลามาจากเวลาที่ใช้ทั้งภารกิจ\n\nEsc: ปิดหน้าต่างเลือกอุปกรณ์ → ปิดโปรแกรม",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 229,
+    "th": "กำลังเน้นเส้นทางสาย LAN — เส้นทางถูกกำหนดไว้แล้ว ดูได้อย่างเดียว แก้ไขไม่ได้",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 230,
+    "th": " — เลือกอุปกรณ์เครือข่ายห้องคอม",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 231,
+    "th": "เลือกอุปกรณ์ถูกต้องครบ 3 จุด — ออกจากคอมพิวเตอร์แล้วกลับไปรายงานหัวหน้างาน",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 232,
+    "th": "จำนวนครั้งที่ตรวจสอบ: %d ครั้ง",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 233,
+    "th": "จำนวนจุดที่เคยผิด: %d จุด",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 234,
+    "th": "%d/%d จุด",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 235,
+    "th": "ทำต่อที่จุดนี้ — คลิกเพื่อเลือกอุปกรณ์",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 236,
+    "th": "ยังไม่เลือก",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 237,
+    "th": "เลือกแล้ว: ",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 238,
+    "th": " — อุปกรณ์ถูก แต่เหตุผลยังไม่ถูก",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 239,
+    "th": " — อุปกรณ์ไม่เหมาะกับจุดนี้",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 240,
+    "th": " — ถูกต้อง",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 241,
+    "th": "ความถูกต้อง: ยังไม่ได้ตรวจสอบ (เต็ม %d)",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 242,
+    "th": "ความถูกต้อง: %d / %d",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 243,
+    "th": "ตรวจสอบแล้ว: %d ครั้ง",
+    "source": "missions/mission_01/scripts/netplan_edu.gd"
+  },
+  {
+    "id": 244,
+    "th": "ประตู",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 245,
+    "th": "กระดาน (หน้าห้อง)",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 246,
+    "th": "ห้องคอม · ครู 1 เครื่อง · นักเรียน 20 เครื่อง",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 247,
+    "th": "เครือข่าย",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 248,
+    "th": "ภายนอก",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 249,
+    "th": "โต๊ะครู",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 250,
+    "th": "เลือกแล้ว",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 251,
+    "th": "ต้องแก้ไข",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 252,
+    "th": "ถูกต้อง",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 253,
+    "th": "สาย LAN (ล็อกไว้ แก้ไขไม่ได้)",
+    "source": "missions/mission_01/scripts/room_plan_view.gd"
+  },
+  {
+    "id": 254,
+    "th": "0.5 เมตร",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 255,
+    "th": "Switched Hub 24 Port → คอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 256,
+    "th": "6 เมตร",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 257,
+    "th": "ตัดสาย",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 258,
+    "th": "ตัดสาย UTP Cat6 ยาว %s ด้วยใบมีดของคีมย้ำสาย",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 259,
+    "th": "ปอกฉนวน",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 260,
+    "th": "ปอกฉนวนด้านนอกออกประมาณ 2.5 ซม. ด้วยคีมปอกสาย",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 261,
+    "th": "คลายเกลียว",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 262,
+    "th": "คลายเกลียวสายแต่ละคู่ แล้วจัดเส้นลวดทั้ง 8 เส้นให้ตรง",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 263,
+    "th": "เรียงสี T568B",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 264,
+    "th": "ตัดปลายให้เสมอ",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 265,
+    "th": "ตัดปลายสายทั้ง 8 เส้นให้เสมอกัน เหลือยาวประมาณ 1.3 ซม.",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 266,
+    "th": "เสียบหัว RJ45",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 267,
+    "th": "เสียบสายเข้าหัว RJ45 ให้ครบทั้ง 8 เส้น โดยไม่ให้ตำแหน่งสลับกัน",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 268,
+    "th": "ย้ำหัว",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 269,
+    "th": "ใส่หัว RJ45 ในช่องของคีมย้ำสาย แล้วบีบให้สุด",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 270,
+    "th": "เรียงสายตามมาตรฐาน T568B จากขา 1 ถึงขา 8 (มองจากด้านบน ขา 1 อยู่ซ้ายสุด)\nคลิกสีเพื่อวางลงขาถัดไป คลิกที่ขาเพื่อเอาสายออก — ยืนยันแล้วแก้ไม่ได้",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 271,
+    "th": "เข้าหัวสาย LAN",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 272,
+    "th": "ลุกจากโต๊ะ (Esc)",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 273,
+    "th": "เข้าหัวครบทั้ง 2 เส้นแล้ว",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 274,
+    "th": "สายเส้นที่ %d: %s  ·  ปลายที่ %d จาก 2",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 275,
+    "th": "เส้น %s ปลาย %s",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 276,
+    "th": "[เสร็จ] ",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 277,
+    "th": "[กำลังทำ] ",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 278,
+    "th": "ขั้นที่ %d จาก %d:  %s",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 279,
+    "th": "  (เสร็จ)",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 280,
+    "th": "ขา %d (ว่าง)",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 281,
+    "th": "สายที่ยังไม่ได้วาง",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 282,
+    "th": "ล้างทั้งหมด",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 283,
+    "th": "ยืนยันการเรียงสี",
+    "source": "missions/mission_02/scripts/crimp_panel.gd"
+  },
+  {
+    "id": 284,
+    "th": "เสียบสายเส้นที่ 1 เข้า Router",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 285,
+    "th": "เสียบปลายอีกด้านเข้า Switched Hub พอร์ต 1",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 286,
+    "th": "เสียบสายเส้นที่ 2 เข้า Switched Hub พอร์ต 2",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 287,
+    "th": "เดินสายเส้นที่ 2 ไปยังคอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 288,
+    "th": "สายเส้นที่ 1 (Router → Switched Hub) — เลือกพอร์ตของ Router ที่จะเสียบ (เลือกได้ครั้งเดียว)",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 289,
+    "th": "เสียบหัวอีกด้านของสายเส้นที่ 1 เข้าพอร์ต 1 ของ Switched Hub 24 Port ตามใบงาน",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 290,
+    "th": "เสียบหัวด้านหนึ่งของสายเส้นที่ 2 (Switched Hub → คอมพิวเตอร์ครู) เข้าพอร์ต 2",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 291,
+    "th": "เดินสายเส้นที่ 2 ลงตามผนังและใต้โต๊ะครู ตามเส้นทางเดินสายที่กำหนดไว้ ไปยังด้านหลังคอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 292,
+    "th": "ติดตั้งสาย LAN ที่ Wall Rack",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 293,
+    "th": "ออกจากตู้ (Esc)",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 294,
+    "th": "ตรวจไฟสถานะพอร์ต",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 295,
+    "th": "ดูไฟ Link ของพอร์ตที่ใช้งาน",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 296,
+    "th": "สังเกตไฟสถานะ (Link) ของ Switched Hub พอร์ต 1 และ 2 และพอร์ตของ Router ที่เสียบสายไว้ ไฟเขียวติดแสดงว่ามีการเชื่อมต่อ",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 297,
+    "th": "ตรวจแล้ว",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 298,
+    "th": "ติดตั้งที่ตู้เรียบร้อยแล้ว ต่อไปไปเสียบสายที่คอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/install_panel.gd"
+  },
+  {
+    "id": 299,
+    "th": "หัวหน้างาน Data Center|แบบอุปกรณ์ของห้องคอมใหม่ผ่านแล้ว ทีมติดตั้ง**Router** กับ **Switched Hub 24 Port** ไว้ใน Wall Rack ให้แล้ว ขั้นต่อไปเราต้อง**เตรียมสาย LAN**สำหรับติดตั้ง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 300,
+    "th": "หัวหน้างาน Data Center|ใบงานนี้มีจุดเชื่อมต่อ **2 จุด** คือ **Router กับ Switched Hub** และ **Switched Hub กับคอมพิวเตอร์ครู** เลือกชนิดสายให้เหมาะกับแต่ละจุด แล้วเข้าหัวสายตามมาตรฐาน **T568B**",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 301,
+    "th": "หัวหน้างาน Data Center|อุปกรณ์อยู่บน**โต๊ะว่างในห้องนี้** หยิบให้ครบ แล้วตรวจสายด้วย **LAN Cable Tester** ให้เรียบร้อยก่อนนำไปติดตั้งที่ห้องคอม",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 302,
+    "th": "หัวหน้างาน Data Center|สายกับหัว RJ45 มีจำกัด งานนี้**ทำได้ครั้งเดียว** ค่อย ๆ ทำให้ถูกตั้งแต่แรกนะ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 303,
+    "th": "คุณ|รับทราบครับ ผมจะเลือกสาย เข้าหัว ตรวจสอบ และนำสายไปเชื่อมต่อให้ถูกต้อง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 304,
+    "th": "หัวหน้างาน Data Center|อุปกรณ์อยู่บน**โต๊ะว่างในห้องนี้** หยิบให้ครบ **5 อย่าง**ก่อนนะ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 305,
+    "th": "หัวหน้างาน Data Center|อุปกรณ์ครบแล้ว ทำงานตามใบงานต่อได้เลย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 306,
+    "th": "ได้รับภารกิจ: เข้าหัวและเชื่อมต่อสาย LAN",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 307,
+    "th": "ด่านที่ 2  ·  ประกอบและเชื่อมต่อสาย LAN — เข้าหัวและติดตั้งสาย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 308,
+    "th": "อ่านใบงาน แล้วเลือกชนิดสายให้ครบทั้ง 2 จุดเชื่อมต่อ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 309,
+    "th": "กด F เพื่อนั่งเข้าหัวสาย LAN",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 310,
+    "th": "กด F เพื่อตรวจสายด้วย LAN Cable Tester",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 311,
+    "th": "กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 312,
+    "th": "หยิบอุปกรณ์บนโต๊ะว่างในห้อง IT Support (%d/%d)\nยังขาด: %s",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 313,
+    "th": "ภารกิจที่ 2 เสร็จสิ้น",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 314,
+    "th": "คุณ|ผมเข้าหัว ตรวจสอบ และติดตั้งสาย LAN ทั้ง 2 เส้นตามใบงานแล้วครับ ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 315,
+    "th": "ไฟสถานะพอร์ตติดทั้งสองจุดครับ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 316,
+    "th": "แต่ไฟสถานะพอร์ตบางจุดไม่ติดครับ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 317,
+    "th": "หัวหน้างาน Data Center|ดีมาก **การเลือกชนิดสาย การเรียงสี การย้ำหัว และการตรวจสอบสายก่อนติดตั้ง**เป็นขั้นตอนสำคัญ ถ้าสายมีปัญหาจะทำให้เสียเวลาในการตรวจสอบระบบภายหลัง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 318,
+    "th": "หัวหน้างาน Data Center|สายเส้นที่ 1 ไปเสียบที่**พอร์ต WAN** ซึ่งเป็นช่องของ**สายอินเทอร์เน็ต** ตอนนี้ห้องคอมเลยออกอินเทอร์เน็ตไม่ได้",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 319,
+    "th": "หัวหน้างาน Data Center|ดีที่ตรวจเจอสายเสียก่อนติดตั้ง แต่สายที่เข้าหัวเอง**ยังใช้งานไม่ได้** ต้องใช้**สายสำรอง**แทน",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 320,
+    "th": "หัวหน้างาน Data Center|ไฟสถานะไม่ติดแสดงว่า**สายยังมีปัญหา** ควรตรวจด้วย Tester ให้ดีก่อนนำไปติดตั้งทุกครั้ง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 321,
+    "th": "หัวหน้างาน Data Center|งานนี้ยังใช้งานไม่ได้จริง ลองดู**จุดที่ผิดพลาด**ในสรุปผล แล้วฝึกเรียงสี **T568B** ให้คล่องนะ",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 322,
+    "th": "ผลงานใช้งานได้จริง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 323,
+    "th": "ใช่",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 324,
+    "th": "ไม่ใช่ (สายเรียงสีผิด หรือเสียบพอร์ตผิด)",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 325,
+    "th": "เลือกชนิดสาย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 326,
+    "th": "ถูก %d จาก 2 จุด",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 327,
+    "th": "ถูก %d จาก 32 ตำแหน่ง (4 ปลาย)",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 328,
+    "th": "อ่านผล LAN Cable Tester",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 329,
+    "th": "ถูก %d จาก 2 เส้น",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 330,
+    "th": "พอร์ตของ Router",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 331,
+    "th": "ใช้สายสำรอง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 332,
+    "th": "%d เส้น",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 333,
+    "th": "เข้าหัวสาย LAN ที่โต๊ะว่างในห้อง IT Support (เสร็จ %d/4 ปลาย)\nสายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 334,
+    "th": "ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester ที่โต๊ะว่าง (ตรวจแล้ว %d/2)",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 335,
+    "th": "เข้าหัวครบทั้ง 2 เส้นแล้ว — ต่อไปตรวจด้วย LAN Cable Tester",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 336,
+    "th": "นำสายทั้ง 2 เส้นไปติดตั้งที่ Wall Rack ในห้องคอมพิวเตอร์ (หลังโต๊ะครู)",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 337,
+    "th": "กด F เพื่อเปิดตู้ Wall Rack และติดตั้งสาย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 338,
+    "th": "เสียบสายเส้นที่ 2 เข้าการ์ดเครือข่ายด้านหลังคอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 339,
+    "th": "กด F เพื่อเสียบสายเข้าการ์ดเครือข่าย",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 340,
+    "th": "กลับไปที่ Wall Rack แล้วตรวจไฟสถานะพอร์ตของ Switched Hub",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 341,
+    "th": "กด F เพื่อดูไฟสถานะพอร์ตที่ Wall Rack",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 342,
+    "th": "บันทึกใบงานแล้ว — ไปหยิบอุปกรณ์บนโต๊ะว่าง",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 343,
+    "th": "หยิบอุปกรณ์ครบแล้ว",
+    "source": "missions/mission_02/scripts/mission_02_controller.gd"
+  },
+  {
+    "id": 344,
+    "th": "สาย UTP Cat6",
+    "source": "missions/mission_02/scripts/mission_02_props.gd"
+  },
+  {
+    "id": 345,
+    "th": "หัว RJ45",
+    "source": "missions/mission_02/scripts/mission_02_props.gd"
+  },
+  {
+    "id": 346,
+    "th": "คีมปอกสาย",
+    "source": "missions/mission_02/scripts/mission_02_props.gd"
+  },
+  {
+    "id": 347,
+    "th": "คีมย้ำสาย LAN",
+    "source": "missions/mission_02/scripts/mission_02_props.gd"
+  },
+  {
+    "id": 348,
+    "th": "เครื่องทดสอบสาย LAN",
+    "source": "missions/mission_02/scripts/mission_02_props.gd"
+  },
+  {
+    "id": 349,
+    "th": "Switched Hub → คอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 350,
+    "th": "จุดเชื่อมต่อที่ %d (%s): เลือก Crossover Cable — อุปกรณ์ต่างชนิดกันต้องใช้ Straight-Through Cable",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 351,
+    "th": "สายเส้นที่ %s ปลายที่ %s: เรียงสีไม่ตรง T568B ที่ขา %s",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 352,
+    "th": "สายเส้นที่ %d: อ่านผล Tester ผิด — ไฟตรงกันครบ สายใช้งานได้ แต่ตัดสินว่าต้องทิ้ง",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 353,
+    "th": "สายเส้นที่ %d: อ่านผล Tester ผิด — ไฟไม่ตรงกัน สายใช้งานไม่ได้ แต่ตัดสินว่าผ่าน",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 354,
+    "th": "เสียบสายเส้นที่ 1 เข้าพอร์ต WAN ของ Router — พอร์ต WAN ใช้กับสายอินเทอร์เน็ต ต้องเสียบพอร์ต LAN ห้องคอมจึงไม่มีอินเทอร์เน็ต",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 355,
+    "th": "สายเส้นที่ %d: สายที่เข้าหัวเองใช้งานไม่ได้ ต้องใช้สายสำรองแทน",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 356,
+    "th": "ผลงานจึงยังใช้งานไม่ได้จริง (คะแนนความถูกต้อง 0)",
+    "source": "missions/mission_02/scripts/mission_02_state.gd"
+  },
+  {
+    "id": 357,
+    "th": "เสียบสาย",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 358,
+    "th": "เปิดเครื่อง",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 359,
+    "th": "กดปุ่ม TEST",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 360,
+    "th": "ตัดสินผล",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 361,
+    "th": "เสียบหัวสายด้านหนึ่งเข้าตัวแม่ (MAIN) และอีกด้านเข้าตัวลูก (REMOTE)",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 362,
+    "th": "กดปุ่ม POWER เพื่อเปิดเครื่องทดสอบ",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 363,
+    "th": "กดปุ่ม TEST แล้วสังเกตไฟของตัวแม่และตัวลูก",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 364,
+    "th": "ดูไฟของตัวแม่ (MAIN) เทียบกับตัวลูก (REMOTE) ให้ครบทุกดวง แล้วตัดสินว่าสายเส้นนี้ใช้งานได้หรือไม่ (ตัดสินได้ครั้งเดียว)",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 365,
+    "th": "ตรวจสายด้วย LAN Cable Tester",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 366,
+    "th": "สายเส้นที่ %d ถูกทิ้งไป — หัวหน้างานส่งสายสำเร็จรูปสำรองมาให้แทน เพื่อนำไปติดตั้งให้เสร็จ",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 367,
+    "th": "ตรวจดูอีกครั้ง: ไฟของตัวแม่กับตัวลูกติดตรงกันครบทุกดวง สายเส้นที่ %d ใช้งานได้ จึงใช้สายเส้นนี้ต่อ",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 368,
+    "th": "บันทึกผล: สายเส้นที่ %d ผ่าน",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 369,
+    "th": "ตรวจครบทั้ง 2 เส้นแล้ว",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 370,
+    "th": "สายเส้นที่ %d จาก 2: %s",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 371,
+    "th": "ผ่าน — ใช้งานได้",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 372,
+    "th": "ไม่ผ่าน — ใช้ไม่ได้ ต้องทิ้ง",
+    "source": "missions/mission_02/scripts/tester_panel.gd"
+  },
+  {
+    "id": 373,
+    "th": "ขาวส้ม",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 374,
+    "th": "ส้ม",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 375,
+    "th": "ขาวเขียว",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 376,
+    "th": "เขียว",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 377,
+    "th": "ขาวน้ำเงิน",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 378,
+    "th": "น้ำเงิน",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 379,
+    "th": "ขาวน้ำตาล",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 380,
+    "th": "น้ำตาล",
+    "source": "missions/mission_02/scripts/wire_colors.gd"
+  },
+  {
+    "id": 381,
+    "th": "คอมพิวเตอร์ครู",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 382,
+    "th": "ใบงาน  ·  เตรียมสาย LAN ห้องคอมพิวเตอร์ใหม่",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 383,
+    "th": "เลือกชนิดสายให้เหมาะกับแต่ละจุดเชื่อมต่อ แล้วกด \"ยืนยันใบงาน\" (ตอบได้ครั้งเดียว)",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 384,
+    "th": "ยืนยันใบงาน",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 385,
+    "th": "จุดเชื่อมต่อที่ %d",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 386,
+    "th": "ปลาย %d:  %s",
+    "source": "missions/mission_02/scripts/work_order.gd"
+  },
+  {
+    "id": 387,
+    "th": "อนุญาตการเชื่อมต่อ",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 388,
+    "th": "ให้โปรแกรมนี้รับการเชื่อมต่อผ่านเครือข่ายได้",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 389,
+    "th": "โปรแกรมนี้ไม่ทราบผู้ผลิตและยังไม่ได้รับการยืนยัน ควรอนุญาตให้เชื่อมต่อหรือไม่",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 390,
+    "th": "ปิดกั้นการเชื่อมต่อ",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 391,
+    "th": "ไม่ให้โปรแกรมนี้เชื่อมต่อผ่านเครือข่าย",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 392,
+    "th": "ปิด Firewall ชั่วคราว",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 393,
+    "th": "หยุดการทำงานของ Firewall บนเครื่องนี้",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 394,
+    "th": "การปิด Firewall จะลดการป้องกันของคอมพิวเตอร์ ลองเลือกวิธีที่ยังคงการป้องกันไว้",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 395,
+    "th": "Quarantine — กักกันไฟล์",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 396,
+    "th": "ย้ายไฟล์ไปไว้ในพื้นที่กักกัน ไฟล์จะทำงานไม่ได้",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 397,
+    "th": "Allow — อนุญาตให้ไฟล์ทำงาน",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 398,
+    "th": "ปล่อยให้ไฟล์อยู่ในเครื่องและทำงานได้ตามปกติ",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 399,
+    "th": "ไฟล์นี้มีระดับความเสี่ยงสูง การอนุญาตอาจทำให้ไฟล์ทำงานในเครื่องได้",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 400,
+    "th": "Add Exclusion — ยกเว้นไฟล์จากการตรวจสอบ",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 401,
+    "th": "Anti-Virus จะไม่ตรวจไฟล์นี้อีก",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 402,
+    "th": "การเพิ่มข้อยกเว้นจะทำให้ Anti-Virus ไม่ตรวจสอบไฟล์นี้อีก ควรใช้กับไฟล์ที่ยืนยันแล้วว่าปลอดภัยเท่านั้น",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 403,
+    "th": "โปรแกรมไม่ทราบผู้ผลิตและกำลังขอเชื่อมต่อเข้ามาโดยไม่ได้รับการยืนยัน จึงไม่ควรอนุญาตหรือปิดระบบป้องกัน แต่ควรปิดกั้นการเชื่อมต่อไว้ก่อน — Firewall ใช้ควบคุมและปิดกั้นการเชื่อมต่อที่ไม่ได้รับอนุญาต",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 404,
+    "th": "เมื่อพบไฟล์ที่มีความเสี่ยงสูงและยังไม่ทราบว่าไฟล์ปลอดภัยหรือไม่ การกักกันช่วยป้องกันไม่ให้ไฟล์ทำงานและแยกไฟล์ออกจากพื้นที่ใช้งานปกติ — Anti-Virus ใช้ตรวจหาและจัดการไฟล์อันตราย",
+    "source": "missions/mission_05/data/mission_05_data.tres"
+  },
+  {
+    "id": 405,
+    "th": "ฉากทดสอบภารกิจที่ 5 (ในเกมจริง ผู้เล่นจะกลับมาเดินและหันกล้องได้ตามปกติ)",
+    "source": "missions/mission_05/scenes/mission_05_test.tscn"
+  },
+  {
+    "id": 406,
+    "th": "ล้างข้อมูลบันทึกภารกิจที่ 5 (สำหรับทดสอบใหม่)",
+    "source": "missions/mission_05/scenes/mission_05_test.tscn"
+  },
+  {
+    "id": 407,
+    "th": "ภารกิจที่ 5: ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 408,
+    "th": "จำลองเพื่อการศึกษา",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 409,
+    "th": "โปรแกรมจำลองภายในเกมเพื่อการศึกษาเท่านั้น ไม่ใช่ Windows Security จริง ไม่ได้สแกนเครื่องของคุณ และไม่เกี่ยวข้องกับ Microsoft",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 410,
+    "th": "โปรแกรมที่ไม่รู้จักกำลังขออนุญาตเชื่อมต่อผ่านเครือข่าย",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 411,
+    "th": "ส่งผลการตรวจสอบ",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 412,
+    "th": "ส่งผลการตรวจสอบแล้ว — ออกจากคอมพิวเตอร์ แล้วกลับไปรายงานหัวหน้างานที่ห้อง Data Center",
+    "source": "missions/mission_05/scripts/mission_05_data.gd"
+  },
+  {
+    "id": 413,
+    "th": "ยังไม่มีข้อมูลบันทึกของภารกิจที่ 5",
+    "source": "missions/mission_05/scripts/mission_05_test_bench.gd"
+  },
+  {
+    "id": 414,
+    "th": "ส่งผลการตรวจสอบแล้ว — คะแนน %d, เลือกผิด %d ครั้ง (ต่อไป: รายงานหัวหน้างานที่ห้อง Data Center)",
+    "source": "missions/mission_05/scripts/mission_05_test_bench.gd"
+  },
+  {
+    "id": 415,
+    "th": "มีข้อมูลบันทึก: Firewall %s, Anti-Virus %s, คะแนน %d",
+    "source": "missions/mission_05/scripts/mission_05_test_bench.gd"
+  },
+  {
+    "id": 416,
+    "th": "เรียบร้อย",
+    "source": "missions/mission_05/scripts/mission_05_test_bench.gd"
+  },
+  {
+    "id": 417,
+    "th": "ยังไม่เสร็จ",
+    "source": "missions/mission_05/scripts/mission_05_test_bench.gd"
+  },
+  {
+    "id": 418,
+    "th": "ตรวจสอบแล้ว %s ไฟล์",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 419,
+    "th": "หน้าแรก",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 420,
+    "th": "คะแนนภารกิจ  %d / %d",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 421,
+    "th": "ความปลอดภัยโดยรวม",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 422,
+    "th": "ภาพรวมการป้องกันของคอมพิวเตอร์เครื่องนี้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 423,
+    "th": "คอมพิวเตอร์เครื่องนี้ได้รับการป้องกันแล้ว",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 424,
+    "th": "ต้องดำเนินการ",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 425,
+    "th": "พบปัญหาด้านความปลอดภัย %d รายการ — เปิดแต่ละเมนูเพื่อตรวจสอบและแก้ไข",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 426,
+    "th": "ต้องดำเนินการ: มีโปรแกรมขอเชื่อมต่อเครือข่าย",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 427,
+    "th": "ยังไม่ได้ตรวจสอบเครื่องในวันนี้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 428,
+    "th": "ต้องดำเนินการ: Threats found: 1",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 429,
+    "th": "ต้องดำเนินการทั้ง Firewall และ Anti-Virus ให้ถูกต้องก่อน จึงจะส่งผลการตรวจสอบได้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 430,
+    "th": "ควบคุมว่าโปรแกรมใดเชื่อมต่อผ่านเครือข่ายได้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 431,
+    "th": "เลือกวิธีดำเนินการ",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 432,
+    "th": "ตรวจหาและจัดการไฟล์อันตรายในคอมพิวเตอร์",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 433,
+    "th": "กำลังสแกน (Quick scan)...",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 434,
+    "th": "ภัยคุกคามปัจจุบัน: ยังไม่ทราบ — ต้องสแกนก่อน",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 435,
+    "th": "Scan (สแกนด่วน)",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 436,
+    "th": "เลือกวิธีจัดการไฟล์นี้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 437,
+    "th": "ภัยคุกคามที่กำลังทำงาน",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 438,
+    "th": "พื้นที่กักกัน (Quarantine)",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 439,
+    "th": "Quarantined — ไฟล์ทำงานไม่ได้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 440,
+    "th": "คำใบ้: ",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 441,
+    "th": "ลองเลือกใหม่อีกครั้ง  (−%d คะแนน)",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 442,
+    "th": "เหตุผล: ",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 443,
+    "th": "คอมพิวเตอร์เครื่องนี้",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 444,
+    "th": "คลิกเพื่อเปิด",
+    "source": "missions/mission_05/scripts/windows_security.gd"
+  },
+  {
+    "id": 445,
+    "th": "ครูสาว|สวัสดีค่ะ ตอนนี้เปิดวิดีโอประกอบการสอนแล้วไม่มีเสียง ช่วยตรวจสอบให้หน่อยได้ไหมคะ",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 446,
+    "th": "ผู้เล่น|ได้ครับ ตอนนี้ผมต้องเฝ้าระบบอยู่ในห้อง Data Center ขอเชื่อมต่อไปตรวจสอบเครื่องจากระยะไกลนะครับ",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 447,
+    "th": "ผู้เล่น|กรุณาเปิด TeamViewer แล้วแจ้ง TeamViewer ID และ Password ที่แสดงอยู่บนหน้าจอครับ",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 448,
+    "th": "ครูสาว|เปิดแล้วค่ะ\nTeamViewer ID: 482 731 965\nPassword: N7q4P2",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 449,
+    "th": "ผู้เล่น|รับทราบครับ กรุณารอสักครู่ ผมจะเชื่อมต่อเข้าไปตรวจสอบ",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 450,
+    "th": "TeamViewer\nเครื่องทั้งสองต้องเปิดโปรแกรมและเชื่อมต่อเครือข่าย\nเครื่องปลายทางแจ้ง TeamViewer ID และ Password\nผู้ดูแลกรอก ID และ Password เพื่อขอเชื่อมต่อ",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 451,
+    "th": "AnyDesk\nเครื่องทั้งสองต้องเปิดโปรแกรมและเชื่อมต่อเครือข่าย\nเครื่องปลายทางแจ้ง AnyDesk Address\nผู้ดูแลกรอก Address และรอให้เครื่องปลายทางกด Accept",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 452,
+    "th": "ซอฟต์แวร์ควบคุมระยะไกล\nใช้มองเห็นและควบคุม Desktop ปลายทาง\nเหมาะสำหรับตรวจสอบและแก้ไขปัญหาด้านซอฟต์แวร์เบื้องต้น\nต้องได้รับอนุญาตจากผู้ใช้หรือผู้ดูแลเครื่องปลายทาง",
+    "source": "missions/mission_06/data/mission_06_data.tres"
+  },
+  {
+    "id": 453,
+    "th": "ภารกิจที่ 6 — TeamViewer (จำลอง)",
+    "source": "missions/mission_06/scenes/mission_06_test.tscn"
+  },
+  {
+    "id": 454,
+    "th": "ฉากทดสอบภารกิจที่ 6 (ในเกมจริง ผู้เล่นจะกลับมาเดินและหันกล้องได้ตามปกติ)",
+    "source": "missions/mission_06/scenes/mission_06_test.tscn"
+  },
+  {
+    "id": 455,
+    "th": "1) รับสายโทรศัพท์จากครูสาว (answer_call)",
+    "source": "missions/mission_06/scenes/mission_06_test.tscn"
+  },
+  {
+    "id": 456,
+    "th": "2) ใช้งานคอมพิวเตอร์ IT-PC-01 (open_computer)",
+    "source": "missions/mission_06/scenes/mission_06_test.tscn"
+  },
+  {
+    "id": 457,
+    "th": "ล้างข้อมูลบันทึกภารกิจที่ 6 (สำหรับทดสอบใหม่)",
+    "source": "missions/mission_06/scenes/mission_06_test.tscn"
+  },
+  {
+    "id": 458,
+    "th": "คลิก หรือกด F / Space เพื่อไปต่อ",
+    "source": "missions/mission_06/scripts/call_dialog.gd"
+  },
+  {
+    "id": 459,
+    "th": "คลิก หรือกด F / Space เพื่อวางสาย",
+    "source": "missions/mission_06/scripts/call_dialog.gd"
+  },
+  {
+    "id": 460,
+    "th": "กด F เพื่อรับสาย (โทรศัพท์ดัง)",
+    "source": "missions/mission_06/scripts/desk_phone.gd"
+  },
+  {
+    "id": 461,
+    "th": "สายโทรศัพท์ — ครูสาว (ห้องพักครู)",
+    "source": "missions/mission_06/scripts/mission_06_controller.gd"
+  },
+  {
+    "id": 462,
+    "th": "คะแนน %d / %d   •   กรอก ID ผิด %d ครั้ง   •   Password ผิด %d ครั้ง   •   ปิดโปรแกรมก่อนจบ Session %d ครั้ง",
+    "source": "missions/mission_06/scripts/mission_06_controller.gd"
+  },
+  {
+    "id": 463,
+    "th": "สรุปความรู้",
+    "source": "missions/mission_06/scripts/mission_06_controller.gd"
+  },
+  {
+    "id": 464,
+    "th": "ปิดหน้าสรุป",
+    "source": "missions/mission_06/scripts/mission_06_controller.gd"
+  },
+  {
+    "id": 465,
+    "th": "ภารกิจที่ 6: ช่วยเหลือผู้ใช้ด้วยซอฟต์แวร์ควบคุมเครื่องระยะไกล",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 466,
+    "th": "ได้รับภารกิจ: เชื่อมต่อเครื่องครูสาวด้วย TeamViewer และแก้ไขปัญหาเสียง",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 467,
+    "th": "ภารกิจสำเร็จ: ช่วยเหลือผู้ใช้ด้วยซอฟต์แวร์ควบคุมเครื่องระยะไกล",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 468,
+    "th": "โปรแกรมจำลองภายในเกมเพื่อการศึกษาเท่านั้น ไม่ใช่ TeamViewer จริง ไม่เชื่อมต่อคอมพิวเตอร์จริง ไม่ส่งข้อมูลออกจากเกม และไม่เกี่ยวข้องกับเจ้าของเครื่องหมายการค้า",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 469,
+    "th": "กรุณาพิมพ์ Partner ID ก่อนกด Connect",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 470,
+    "th": "ไม่พบเครื่องปลายทาง กรุณาตรวจสอบ TeamViewer ID แล้วลองอีกครั้ง",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 471,
+    "th": "ยังเชื่อมต่อไม่ได้ เครื่องปลายทางยังไม่ได้เปิด TeamViewer หรือยังไม่ได้อนุญาต (รับสายโทรศัพท์จากครูสาวก่อน)",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 472,
+    "th": "กรุณาพิมพ์ Password ก่อนกด Log On",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 473,
+    "th": "รหัสผ่านไม่ถูกต้อง กรุณาตรวจสอบข้อมูลจากผู้ใช้ปลายทาง",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 474,
+    "th": "ยังอยู่ใน Remote Session — กด End Session แล้วเลือก Disconnect ก่อนปิดโปรแกรม",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 475,
+    "th": "ปิดโปรแกรม TeamViewer ก่อนปิดคอมพิวเตอร์",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 476,
+    "th": "ต้องการยุติการควบคุมเครื่องปลายทางหรือไม่",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 477,
+    "th": "ยังปิดเสียงอยู่ (Mute) กดปุ่มลำโพงเพื่อเปิดเสียงก่อนทดสอบ",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 478,
+    "th": "เปิดเสียงแล้ว แต่ระดับเสียงยังเบาเกินไป กรุณาปรับให้อยู่ในระดับที่เหมาะสม",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 479,
+    "th": "ระดับเสียงดังเกินความจำเป็น กรุณาปรับให้อยู่ในช่วงที่กำหนด",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 480,
+    "th": "ได้ยินเสียงแล้วค่ะ ตอนนี้ใช้งานได้ตามปกติ ขอบคุณค่ะ",
+    "source": "missions/mission_06/scripts/mission_06_data.gd"
+  },
+  {
+    "id": 481,
+    "th": "ยังไม่มีข้อมูลบันทึกของภารกิจที่ 6 — กด \"รับสายโทรศัพท์\" ก่อน",
+    "source": "missions/mission_06/scripts/mission_06_test_bench.gd"
+  },
+  {
+    "id": 482,
+    "th": "ทำใน TeamViewer ครบแล้ว — คะแนน %d (ในเกมจริง: ปิดคอมพิวเตอร์แล้วจะขึ้นหน้าสรุป)",
+    "source": "missions/mission_06/scripts/mission_06_test_bench.gd"
+  },
+  {
+    "id": 483,
+    "th": "รับสายแล้ว: %s, ครูยืนยันเสียง: %s, จบ Session: %s, คะแนน %d",
+    "source": "missions/mission_06/scripts/mission_06_test_bench.gd"
+  },
+  {
+    "id": 484,
+    "th": "ยัง",
+    "source": "missions/mission_06/scripts/mission_06_test_bench.gd"
+  },
+  {
+    "id": 485,
+    "th": "%s  (−%d คะแนน)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 486,
+    "th": "พร้อมเชื่อมต่อ (Ready to connect)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 487,
+    "th": "%s      คะแนนภารกิจ %d / %d",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 488,
+    "th": "ข้อมูลของคอมพิวเตอร์เครื่องนี้ (IT-PC-01)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 489,
+    "th": "รายการตรวจสอบก่อนเชื่อมต่อ",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 490,
+    "th": "คอมพิวเตอร์ของผู้เล่นเปิดอยู่",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 491,
+    "th": "คอมพิวเตอร์ของครูสาวเปิดอยู่",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 492,
+    "th": "เครื่องทั้งสองเชื่อมต่อเครือข่าย",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 493,
+    "th": "เครื่องทั้งสองเปิด TeamViewer",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 494,
+    "th": "ครูสาวอนุญาตให้เจ้าหน้าที่เชื่อมต่อ",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 495,
+    "th": "พิมพ์ TeamViewer ID ของเครื่องปลายทางที่ได้รับจากผู้ใช้",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 496,
+    "th": "พิมพ์ Partner ID",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 497,
+    "th": "Remote control (ควบคุมเครื่องปลายทาง)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 498,
+    "th": "การเชื่อมต่อแบบนี้ใช้ TeamViewer ID และ Password ของเครื่องปลายทาง ไม่ต้องกรอก IP Address",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 499,
+    "th": "พิมพ์ Password ที่แสดงบนหน้าจอของเครื่องปลายทาง (ผู้ใช้ปลายทางเป็นผู้แจ้ง)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 500,
+    "th": "แสดงรหัสผ่าน",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 501,
+    "th": "กำลังเปิด Desktop ของ %s ...",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 502,
+    "th": "วิดีโอประกอบการสอน",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 503,
+    "th": "เอกสารการสอน",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 504,
+    "th": "วิดีโอประกอบการสอน.mp4 — Media Player",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 505,
+    "th": "บทที่ 8  ซอฟต์แวร์ช่วยงานระบบเครือข่าย",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 506,
+    "th": "ครูสาว (ทางโทรศัพท์)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 507,
+    "th": "เริ่ม",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 508,
+    "th": "ระดับเสียง (Speakers)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 509,
+    "th": "ระดับเสียง — Speakers",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 510,
+    "th": "เปิด/ปิดเสียง (Mute)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 511,
+    "th": "ทดสอบเสียง",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 512,
+    "th": "สถานะ: ปิดเสียงอยู่ (Muted)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 513,
+    "th": "สถานะ: เปิดเสียง",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 514,
+    "th": "กำลังเล่น — มีเสียงตามปกติ",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 515,
+    "th": "กำลังเล่น — ไม่ได้ยินเสียง",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 516,
+    "th": "Remote Session สิ้นสุดแล้ว",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 517,
+    "th": "แก้ไขปัญหาเสียงเรียบร้อยแล้ว ขั้นต่อไป: ปิดโปรแกรม TeamViewer แล้วปิดคอมพิวเตอร์ของคุณ (เริ่ม → ปิดเครื่อง)\nไม่ต้องปิดคอมพิวเตอร์ของครูสาว เพราะครูสาวยังต้องใช้งานต่อ",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 518,
+    "th": "ยังไม่ได้แก้ปัญหาเสียงของครูสาว เชื่อมต่อใหม่ได้จากหน้าหลัก (ต้องกรอก ID และ Password อีกครั้ง)",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 519,
+    "th": "กลับหน้าเชื่อมต่อ",
+    "source": "missions/mission_06/scripts/teamviewer_sim.gd"
+  },
+  {
+    "id": 520,
+    "th": "ห้องเรียนคอมพิวเตอร์",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 521,
+    "th": "ห้องเรียนวิทยาศาสตร์",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 522,
+    "th": "ห้องน้ำหญิง",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 523,
+    "th": "ห้องน้ำชาย",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 524,
+    "th": "ห้อง IT Support (Data Center)",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 525,
+    "th": "ห้องเก็บอุปกรณ์",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 526,
+    "th": "ห้องพักครู",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 527,
+    "th": "ห้อง Server",
+    "source": "scenes/main.tscn"
+  },
+  {
+    "id": 528,
+    "th": "Switch 8 พอร์ต",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 529,
+    "th": "เครื่องครู",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 530,
+    "th": "เครื่องนักเรียน",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 531,
+    "th": "ทุกเครื่องต่อกับสายหลักเส้นเดียว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 532,
+    "th": "Bus ใช้สายหลักเส้นเดียว ถ้าสายหลักขาดทั้งห้องจะใช้งานไม่ได้ และข้อมูลชนกันบ่อยเมื่อมีหลายเครื่อง",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 533,
+    "th": "เครื่องต่อกันเป็นวงกลม ส่งข้อมูลวนไป",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 534,
+    "th": "Ring ส่งข้อมูลวนต่อกันเป็นวง ถ้าเครื่องหรือสายจุดใดเสีย ทั้งวงอาจหยุดทำงาน และเพิ่มเครื่องได้ยาก",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 535,
+    "th": "ทุกเครื่องต่อเข้าอุปกรณ์ศูนย์กลาง (Switch)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 536,
+    "th": "ถูกต้อง! Star ใช้ Switch เป็นศูนย์กลาง ดูแลง่าย เพิ่มหรือถอดเครื่องสะดวก และถ้าสายเครื่องหนึ่งเสีย เครื่องอื่นยังใช้งานได้",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 537,
+    "th": "ทุกเครื่องต่อถึงกันหมดทุกคู่",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 538,
+    "th": "Mesh ต้องเดินสายจากทุกเครื่องถึงกันทุกคู่ ใช้สายและพอร์ตจำนวนมาก ค่าใช้จ่ายสูงเกินไปสำหรับห้องเรียน",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 539,
+    "th": "โจทย์: ห้องปฏิบัติการคอมพิวเตอร์มีเครื่องครู 1 เครื่อง และเครื่องนักเรียนหลายเครื่อง ทุกเครื่องต้องออกอินเทอร์เน็ตผ่าน Router ได้ ต้องดูแลรักษาง่าย เพิ่มเครื่องได้สะดวก และถ้าสายของเครื่องใดเครื่องหนึ่งเสีย เครื่องอื่นต้องยังใช้งานได้\n\nควรเลือกโครงสร้างเครือข่าย (Topology) แบบใด?",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 540,
+    "th": "อ่านโจทย์ แล้วเลือกโครงสร้างเครือข่ายที่เหมาะกับห้องคอมพิวเตอร์",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 541,
+    "th": "เวลา ",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 542,
+    "th": "Network Designer — ออกแบบโครงสร้างเครือข่าย",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 543,
+    "th": "เวลา 00:00",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 544,
+    "th": "ผิด: %s  (−%d คะแนน)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 545,
+    "th": "คะแนน %d",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 546,
+    "th": "ผิด %d ครั้ง",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 547,
+    "th": "%s ไม่เหมาะกับห้องคอมพิวเตอร์ — %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 548,
+    "th": "  ต่อไป: ลากอุปกรณ์ลงช่องเส้นประ แล้วเชื่อมสาย",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 549,
+    "th": "อุปกรณ์ (ลากไปวาง)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 550,
+    "th": "ตรวจคำตอบ",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 551,
+    "th": "คลิกพอร์ต 2 จุดเพื่อเชื่อมสาย • คลิกพอร์ตที่มีสายเพื่อถอดสาย • คลิกขวาที่อุปกรณ์เพื่อนำออก",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 552,
+    "th": "ช่อง Router",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 553,
+    "th": "ช่อง Switch (ศูนย์กลาง)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 554,
+    "th": "ช่องเครื่องครู",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 555,
+    "th": "ช่องเครื่องนักเรียน %d",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 556,
+    "th": "ลาก %s ไปวางในช่องที่เหมาะสม",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 557,
+    "th": "วางผิดตำแหน่ง — ต้องวาง %s ลงในกรอบเส้นประที่กำหนด",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 558,
+    "th": "%s มีอุปกรณ์อยู่แล้ว — คลิกขวาที่อุปกรณ์เพื่อนำออกก่อน",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 559,
+    "th": "วาง %s แล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 560,
+    "th": "Hub ส่งข้อมูลไปทุกพอร์ตพร้อมกัน ทำให้ข้อมูลชนกันและเครือข่ายช้า %s ควรใช้ %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 561,
+    "th": "Access Point ใช้กระจายสัญญาณ Wi-Fi แต่ผังนี้เป็นเครือข่ายแบบใช้สาย LAN (%s)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 562,
+    "th": "Server ไม่ได้อยู่ในโจทย์ห้องเรียนนี้ — %s ต้องใช้ %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 563,
+    "th": "Switch เชื่อมเครื่องภายในวง LAN แต่ออกอินเทอร์เน็ตเองไม่ได้ ช่องนี้ต้องใช้ Router",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 564,
+    "th": "Router มีพอร์ต LAN น้อย ไม่พอต่อทุกเครื่อง ศูนย์กลางของ Star ต้องใช้ Switch",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 565,
+    "th": "%s เป็นอุปกรณ์เครือข่าย ไม่ใช่เครื่องผู้ใช้ — %s ต้องใช้ %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 566,
+    "th": "%s ไม่ถูกต้อง — %s ต้องใช้ %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 567,
+    "th": "พอร์ต %s ของ %s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 568,
+    "th": "นำ %s ออกแล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 569,
+    "th": "ถอดสายออกจากพอร์ต %s แล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 570,
+    "th": "เลือกพอร์ต %s ของ %s แล้ว — คลิกพอร์ตปลายทาง (คลิกขวาที่พื้นที่ว่างเพื่อยกเลิก)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 571,
+    "th": "ยกเลิกการเชื่อมสาย",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 572,
+    "th": "พอร์ต %s มีสายเสียบอยู่แล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 573,
+    "th": "พอร์ตนี้มีสายเสียบอยู่แล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 574,
+    "th": "เชื่อมสาย %s (%s) ↔ %s (%s) แล้ว",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 575,
+    "th": "ต่อสายจากอุปกรณ์เข้าตัวเองไม่ได้",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 576,
+    "th": "เสียบผิดพอร์ต — สายจากอินเทอร์เน็ต (ISP) ต้องเข้าพอร์ต WAN ของ Router ไม่ใช่พอร์ต LAN",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 577,
+    "th": "อินเทอร์เน็ตต้องต่อเข้า Router ก่อนเสมอ เพราะ Router ทำหน้าที่เชื่อมเครือข่ายภายในกับภายนอก",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 578,
+    "th": "เสียบผิดพอร์ต — พอร์ต WAN ของ Router ใช้ต่ออินเทอร์เน็ต ให้ใช้พอร์ต LAN ต่อไปยัง Switch",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 579,
+    "th": "เสียบผิดพอร์ต — สายจาก Router ต้องเข้าพอร์ต Uplink ของ Switch (พอร์ต 1–7 ใช้ต่อเครื่องคอมพิวเตอร์)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 580,
+    "th": "เสียบผิดพอร์ต — พอร์ต Uplink ใช้ต่อกับ Router ให้เสียบเครื่องคอมพิวเตอร์ที่พอร์ต 1–7",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 581,
+    "th": "ใน Star Topology เครื่องคอมทุกเครื่องต้องต่อเข้า Switch ซึ่งเป็นศูนย์กลาง ไม่ใช่ต่อตรงเข้า Router",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 582,
+    "th": "การต่อเครื่องคอมถึงกันโดยตรงไม่ใช่ Star Topology — ทุกเครื่องต้องต่อผ่าน Switch",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 583,
+    "th": "การเชื่อมต่อนี้ไม่ตรงกับโครงสร้าง Internet → Router → Switch → เครื่องคอมพิวเตอร์",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 584,
+    "th": "ยังไม่ได้วาง %s ใน%s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 585,
+    "th": "จำนวนเครื่องนักเรียนต้องมี %d เครื่อง (ตอนนี้มี %d)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 586,
+    "th": "ยังไม่ได้ต่อสายจาก Internet เข้าพอร์ต WAN ของ Router",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 587,
+    "th": "ยังไม่ได้ต่อสายจากพอร์ต LAN ของ Router เข้าพอร์ต Uplink ของ Switch",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 588,
+    "th": "%s ยังไม่ได้ต่อสายเข้า Switch",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 589,
+    "th": "ช่อง",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 590,
+    "th": " (และอีก %d ข้อ)",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 591,
+    "th": "ยังไม่ถูกต้อง (−%d คะแนน): %s%s",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 592,
+    "th": "ตรวจคำตอบไม่ผ่าน",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 593,
+    "th": "คะแนน %d / %d\nเวลาที่ใช้ %s\nทำผิด %d ครั้ง",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 594,
+    "th": "ผังเครือข่ายถูกต้อง: Internet → Router → Switch → เครื่องครูและเครื่องนักเรียน",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 595,
+    "th": "กด Esc หรือ เริ่ม → ปิดเครื่อง เพื่อลุกจากคอมพิวเตอร์",
+    "source": "scripts/computer/apps/network_designer.gd"
+  },
+  {
+    "id": 596,
+    "th": "กด F เพื่อใช้งานคอมพิวเตอร์ (%s)",
+    "source": "scripts/computer/computer_station.gd"
+  },
+  {
+    "id": 597,
+    "th": "กำลังตั้งค่าระบบ (Set-up)...",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 598,
+    "th": "กำลังโหลดไดรเวอร์เครือข่าย...",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 599,
+    "th": "ยินดีต้อนรับ",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 600,
+    "th": "  เริ่ม  ",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 601,
+    "th": "Esc = ลุกจากเครื่อง",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 602,
+    "th": "ปิดเครื่อง (Shut down)",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 603,
+    "th": "ชื่อเครื่อง",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 604,
+    "th": "ระบบปฏิบัติการ",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 605,
+    "th": "ซีพียู",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 606,
+    "th": "หน่วยความจำ (RAM)",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 607,
+    "th": "ไดรฟ์ C:",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 608,
+    "th": "ว่าง 182 GB จาก 237 GB",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 609,
+    "th": "สถานะ",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 610,
+    "th": "เชื่อมต่อแล้ว (1.0 Gbps)",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 611,
+    "th": "ไม่ได้เสียบสาย LAN",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 612,
+    "th": "พบปัญหาด้านความปลอดภัย — ต้องดำเนินการ",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 613,
+    "th": "เปิด Windows Security",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 614,
+    "th": "ถังขยะว่างเปล่า",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 615,
+    "th": "พิมพ์คำสั่ง เช่น ipconfig, ping 192.168.1.1, help",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 616,
+    "th": "%s [Version 1.0]\nพิมพ์ help เพื่อดูคำสั่งทั้งหมด\n",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 617,
+    "th": "คำสั่งที่ใช้ได้:\n  ipconfig [/all]   ดูการตั้งค่า IP\n  ping <IP|ชื่อเครื่อง>  ทดสอบการเชื่อมต่อ\n  hostname          ดูชื่อเครื่อง\n  cls               ล้างหน้าจอ\n  exit              ปิดหน้าต่าง\n",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 618,
+    "th": "วิธีใช้: ping <IP address หรือ ชื่อเครื่อง>\n",
+    "source": "scripts/computer/desktop_os.gd"
+  },
+  {
+    "id": 619,
+    "th": "ยังไม่ผ่าน",
+    "source": "scripts/core/mission_score.gd"
+  },
+  {
+    "id": 620,
+    "th": "★★★ ดาวสีรุ้ง",
+    "source": "scripts/core/mission_score.gd"
+  },
+  {
+    "id": 621,
+    "th": "ออกแบบเครือข่าย",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 622,
+    "th": "ประกอบและเชื่อมต่อสาย LAN",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 623,
+    "th": "ตรวจรับระบบเครือข่าย",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 624,
+    "th": "ตรวจสอบและเปลี่ยนการ์ดเครือข่าย",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 625,
+    "th": "ความปลอดภัยของคอมพิวเตอร์",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 626,
+    "th": "ช่วยเหลือผ่าน Remote Desktop",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 627,
+    "th": "เสียงเพลงประกอบ",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 628,
+    "th": "เสียงภารกิจ / โทรศัพท์ / คอมพิวเตอร์ / เสียงพูด",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 629,
+    "th": "เสียงบรรยากาศ / เดิน / เปิด–ปิดประตู",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 630,
+    "th": "เลือกภารกิจ • ผ่านด่านด้วยคะแนนอย่างน้อย 50 เพื่อปลดล็อกด่านถัดไป",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 631,
+    "th": "\nกำลังพัฒนา",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 632,
+    "th": "\n🔒 ผ่านด่านก่อนหน้าก่อน",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 633,
+    "th": "\n%s  ·  สูงสุด %d",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 634,
+    "th": "โหมดทดสอบใน Editor: เปิดทุกด่านที่สร้างแล้ว (บนเว็บต้องผ่านด่านก่อนหน้า)",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 635,
+    "th": "ปรับเสียงแต่ละประเภท • บันทึกอัตโนมัติ",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 636,
+    "th": "AUDIO   /   เสียงในเกม",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 637,
+    "th": "Music: เพลงประกอบ  •  Sound Effects: ภารกิจและเสียงพูด  •  Ambience: บรรยากาศและการเคลื่อนไหว",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 638,
+    "th": "Level %d  /  กำลังโหลด",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 639,
+    "th": "กำลังส่งข้อมูล…  0%",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 640,
+    "th": "กำลังส่งข้อมูล…  %d%%",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 641,
+    "th": "ไม่สามารถโหลดฉากโรงเรียนได้",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 642,
+    "th": "กำลังเตรียมฉาก…  99%",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 643,
+    "th": "โหลดไม่สำเร็จ",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 644,
+    "th": "กลับเมนู",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 645,
+    "th": "ไม่พบฉากเกม",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 646,
+    "th": "Level %d  /  พร้อมแล้ว",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 647,
+    "th": "ส่งข้อมูลสำเร็จ  100%",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 648,
+    "th": "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 649,
+    "th": "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วอ่านใบงาน",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 650,
+    "th": "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 651,
+    "th": "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 652,
+    "th": "WASD เดิน • เมาส์มอง • F โต้ตอบ\nE กระเป๋า • F1 เปิดเมนูพักได้ทุกเวลา",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 653,
+    "th": "บันทึกด่านล่าสุดไม่ได้ — Continue อาจใช้ไม่ได้เมื่อปิดเกม",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 654,
+    "th": "START   /   เริ่มด่าน",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 655,
+    "th": "พักเกม • ภารกิจจะหยุดระหว่างเปิดเมนู",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 656,
+    "th": "Resume  /  เล่นต่อ",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 657,
+    "th": "Setting  /  ตั้งค่าเสียง",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 658,
+    "th": "Main Menu  /  กลับเมนูหลัก",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 659,
+    "th": "Exit  /  กลับ Lobby",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 660,
+    "th": "กลับเมนูหลัก?",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 661,
+    "th": "เก็บเฉพาะความคืบหน้าที่ระบบภารกิจบันทึกไว้\nตำแหน่งยืนและหน้าต่างที่เปิดจะไม่ถูกเก็บ",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 662,
+    "th": "กลับเมนูหลัก",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 663,
+    "th": "กลับหน้า Lobby?",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 664,
+    "th": "ออกจากเกม • เก็บเฉพาะความคืบหน้าที่ภารกิจบันทึกไว้",
+    "source": "scripts/game_flow.gd"
+  },
+  {
+    "id": 665,
+    "th": "เปิด",
+    "source": "scripts/interactive_door.gd"
+  },
+  {
+    "id": 666,
+    "th": "[F] %sประตู%s",
+    "source": "scripts/interactive_door.gd"
+  },
+  {
+    "id": 667,
+    "th": "เครื่องต้นทาง",
+    "source": "scripts/loading_delivery.gd"
+  },
+  {
+    "id": 668,
+    "th": "เครื่องปลายทาง",
+    "source": "scripts/loading_delivery.gd"
+  },
+  {
+    "id": 669,
+    "th": "หัวหน้างาน",
+    "source": "scripts/npc/talkable.gd"
+  },
+  {
+    "id": 670,
+    "th": "มีคนยืนขวางประตูอยู่",
+    "source": "scripts/player_controller.gd"
+  },
+  {
+    "id": 671,
+    "th": "กระเป๋าช่าง  /  INVENTORY",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 672,
+    "th": "NETSIM  •  TOOL CASE                                      24 ช่อง",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 673,
+    "th": "กระเป๋ายังว่าง — ยังไม่เชื่อมการเก็บอุปกรณ์ภารกิจ",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 674,
+    "th": "ถือของที่เลือก",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 675,
+    "th": "เก็บของ / มือเปล่า",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 676,
+    "th": "ทดลองถือ (ไม่ใช่ของภารกิจ)",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 677,
+    "th": "ทดลอง: ",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 678,
+    "th": "ปิดกระเป๋า  [E / Esc]",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 679,
+    "th": "ช่องว่าง — ยังไม่เชื่อมการเก็บอุปกรณ์ภารกิจ",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 680,
+    "th": " — ยังไม่มีโมเดลสำหรับถือ",
+    "source": "scripts/player_presentation.gd"
+  },
+  {
+    "id": 681,
+    "th": "กด F เพื่อหยิบ ",
+    "source": "scripts/props/pickup_item.gd"
+  },
+  {
+    "id": 682,
+    "th": "คลิก หรือกด F / Space เพื่อ",
+    "source": "scripts/ui/dialogue_box.gd"
+  },
+  {
+    "id": 683,
+    "th": "จบบทสนทนา",
+    "source": "scripts/ui/dialogue_box.gd"
+  },
+  {
+    "id": 684,
+    "th": "ไปต่อ",
+    "source": "scripts/ui/dialogue_box.gd"
+  },
+  {
+    "id": 685,
+    "th": "%d คะแนน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 686,
+    "th": "ผ่านด่าน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 687,
+    "th": "ยังไม่ผ่าน — ต้องได้ %d คะแนนขึ้นไป",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 688,
+    "th": "  •  ดาวสีรุ้ง!",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 689,
+    "th": "เล่นด่านนี้อีกครั้ง",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 690,
+    "th": "ไปด่านถัดไป",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 691,
+    "th": "ต้องผ่านด่านนี้ก่อน หรือด่านถัดไปยังไม่เปิด",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 692,
+    "th": "ดูรายละเอียด  ›",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 693,
+    "th": "รายละเอียดคะแนน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 694,
+    "th": "ดาวสีรุ้ง",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 695,
+    "th": "%d ดาว",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 696,
+    "th": "คะแนนรวม %d / 100  •  %s  •  %s",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 697,
+    "th": "ผ่าน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 698,
+    "th": "ความถูกต้องของผลงาน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 699,
+    "th": "กระบวนการทำงาน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 700,
+    "th": "ประสิทธิภาพด้านเวลา",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 701,
+    "th": "เวลาที่ใช้",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 702,
+    "th": "การตัดสินใจ",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 703,
+    "th": "ถูก %d  •  ผิด %d  จาก %d ครั้ง",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 704,
+    "th": "คะแนนสูงสุดของด่านนี้",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 705,
+    "th": "เล่นมาแล้ว",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 706,
+    "th": "จุดที่ผิดพลาด",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 707,
+    "th": "ไม่มี ทำได้ถูกต้องทุกขั้นตอน",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 708,
+    "th": "‹  ย้อนกลับ",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 709,
+    "th": "%d:%02d นาที",
+    "source": "scripts/ui/mission_summary.gd"
+  },
+  {
+    "id": 710,
+    "th": "ซ่อน/แสดงภารกิจ (Tab)",
+    "source": "scripts/ui/objective_hud.gd"
+  },
+  {
+    "id": 711,
+    "th": "ภารกิจตอนนี้",
+    "source": "scripts/ui/objective_hud.gd"
+  },
+  {
+    "id": 712,
+    "th": "ภารกิจ",
+    "source": "scripts/ui/objective_hud.gd"
+  },
+  {
+    "id": 713,
+    "th": "(กด Tab เพื่อเปิด)",
+    "source": "scripts/ui/objective_hud.gd"
+  },
+  {
+    "id": 714,
+    "th": "(กด Tab เพื่อซ่อน)",
+    "source": "scripts/ui/objective_hud.gd"
+  }
+]

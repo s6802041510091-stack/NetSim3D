@@ -56,6 +56,7 @@ var _points := {}
 
 
 func _ready() -> void:
+	get_node("/root/L10n").language_changed.connect(queue_redraw)
 	clip_contents = true
 	resized.connect(_relayout)
 	_relayout()
@@ -98,6 +99,7 @@ func _r(rect: Rect2) -> Rect2:
 
 ## Text in plan units. `align` is relative to `at`: centre, left edge or right edge.
 func _text(text: String, at: Vector2, font_size: float, color: Color, align := HORIZONTAL_ALIGNMENT_CENTER, bold := false) -> void:
+	text = GameLocale.text(text)
 	var font: Font = NetPlanTheme.FONT_BOLD if bold else NetPlanTheme.FONT_REGULAR
 	var fs := maxi(11, int(round(font_size * _scale)))
 	var pos := plan_to_local(at)
@@ -144,8 +146,9 @@ func _draw_room() -> void:
 
 func _draw_external() -> void:
 	draw_style_box(NetPlanTheme.box(Color(0.90, 0.95, 1.0), NetPlanTheme.LAN, int(14 * _scale)), _r(EXTERNAL))
-	_text("เครือข่าย", EXTERNAL.get_center() + Vector2(0, -12), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
-	_text("ภายนอก", EXTERNAL.get_center() + Vector2(0, 8), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
+	var english: bool = get_node("/root/L10n").locale == "en"
+	_text("External" if english else "เครือข่าย", EXTERNAL.get_center() + Vector2(0, -12), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
+	_text("Network" if english else "ภายนอก", EXTERNAL.get_center() + Vector2(0, 8), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
 	_text("(Internet)", EXTERNAL.get_center() + Vector2(0, 28), 13, NetPlanTheme.INK_SOFT)
 
 
@@ -164,7 +167,8 @@ func _draw_rack_and_teacher() -> void:
 	draw_rect(_r(TEACHER_DESK), _faded(Color(0.80, 0.68, 0.52)))
 	_draw_pc(TEACHER_DESK.position + Vector2(36, 12), Color(0.35, 0.25, 0.60))
 	draw_circle(plan_to_local(TEACHER_DESK.get_center() + Vector2(0, 34)), 9 * _scale, _faded(Color(0.45, 0.48, 0.55)))
-	_text("โต๊ะครู", TEACHER_DESK.position + Vector2(100, 30), 14, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER, true)
+	var label_at := TEACHER_DESK.get_center() + Vector2(0, 10) if get_node("/root/L10n").locale == "en" else TEACHER_DESK.position + Vector2(100, 30)
+	_text("โต๊ะครู", label_at, 14, NetPlanTheme.INK_SOFT, HORIZONTAL_ALIGNMENT_CENTER, true)
 
 
 func _draw_pc(center_plan: Vector2, color: Color) -> void:
@@ -221,8 +225,8 @@ func _draw_legend() -> void:
 	var x := 12.0
 	for item in items:
 		draw_circle(Vector2(x + 7, y), 7, item[0])
-		draw_string(font, Vector2(x + 18, y + fs * 0.36), item[1], HORIZONTAL_ALIGNMENT_LEFT, -1, fs, NetPlanTheme.INK)
+		draw_string(font, Vector2(x + 18, y + fs * 0.36), GameLocale.text(item[1]), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, NetPlanTheme.INK)
 		x += 26.0 + font.get_string_size(item[1], HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + 12.0
 	draw_line(Vector2(x, y), Vector2(x + 20, y), NetPlanTheme.LAN, 3.0)
 	var lan_text := "สาย LAN (ล็อกไว้ แก้ไขไม่ได้)"
-	draw_string(font, Vector2(x + 26, y + fs * 0.36), lan_text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, NetPlanTheme.INK)
+	draw_string(font, Vector2(x + 26, y + fs * 0.36), GameLocale.text(lan_text), HORIZONTAL_ALIGNMENT_LEFT, -1, fs, NetPlanTheme.INK)

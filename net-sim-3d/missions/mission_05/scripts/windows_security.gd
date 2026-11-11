@@ -618,7 +618,7 @@ func _blocked_diagram() -> Control:
 		d.draw_string(font, left.position + Vector2(10, 42), "Incoming connection", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, SecurityTheme.INK_SOFT)
 		d.draw_rect(right, Color(1, 1, 1))
 		d.draw_rect(right, SecurityTheme.BORDER, false, 1.0)
-		d.draw_string(font, right.position + Vector2(10, 22), "คอมพิวเตอร์เครื่องนี้", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, SecurityTheme.INK)
+		d.draw_string(font, right.position + Vector2(10, 22), GameLocale.text("คอมพิวเตอร์เครื่องนี้"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, SecurityTheme.INK)
 		d.draw_string(font, right.position + Vector2(10, 42), "Firewall: Active", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, SecurityTheme.OK)
 		var mid := (left.end.x + right.position.x) * 0.5
 		d.draw_dashed_line(Vector2(left.end.x, y), Vector2(mid - 22, y), SecurityTheme.DANGER, 2.0, 7.0)
