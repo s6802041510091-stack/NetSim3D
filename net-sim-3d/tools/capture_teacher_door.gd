@@ -40,6 +40,16 @@ func _run() -> void:
 		camera.global_position = view[1]
 		camera.look_at(view[2])
 		await _shot(view[0])
+	# The two plants moved out of the middle of the teachers' room.
+	camera.global_position = Vector3(5.0, 1.65, -18.5)
+	camera.look_at(Vector3(8.4, 0.6, -22.4))
+	await _shot("plant_1_desk2")
+	camera.global_position = Vector3(5.0, 1.65, -10.5)
+	camera.look_at(Vector3(8.4, 0.6, -13.4))
+	await _shot("plant_2_desk4")
+	camera.global_position = Vector3(1.0, 1.65, -10.5)
+	camera.look_at(Vector3(5.5, 0.6, -22.0))
+	await _shot("teachers_room_middle")
 	# The supervisor from the same angle, for comparison (same typing pose).
 	var sup: Node3D = map.get_node("ITSupportSupervisor")
 	camera.global_position = sup.global_transform * Vector3(0.75, 1.35, 0.05)
