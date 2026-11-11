@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/teacher_female_khaki_160cm.glb" id="1"]
+
+[sub_resource type="CapsuleShape3D" id="Capsule"]
+radius = 0.26
+height = 1.6
+
+[node name="TeacherFemale" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.8, 0)
+shape = SubResource("Capsule")
+
+[node name="Visual" parent="." instance=ExtResource("1")]

@@ -93,6 +93,8 @@ func _run() -> void:
 	_check(map.get_node_or_null("Mission02Props") == null, "Level 3: no Mission 2 props")
 	var teacher3: Node3D = map.get_node("TeacherMale")
 	_check(not teacher3 is NpcCharacter and teacher3.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level 3: the male teacher stays in the computer room")
+	var female3 := map.get_node("TeacherFemale") as NpcCharacter
+	_check(female3 != null and female3.seated and female3.get_node_or_null("Talk") != null, "Level 3: the female teacher works at her desk (idle)")
 	map.queue_free()
 	await _frames(2)
 
@@ -469,12 +471,17 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 	await create_timer(PlugBoard.PLUGGED_HOLD + PlugBoard.VIEW_TIME).timeout
 
 
-## Levels 1-2: the male teacher sits working at STAFF-PC-02 in the teachers' room.
+## Levels 1-2: both teachers sit working at their desks in the teachers' room
+## (STAFF-PC-02 / STAFF-PC-01), idle (greeting on F), their computers in use.
 func _check_teacher_seated(map: Node3D, level_name: String) -> void:
-	var teacher := map.get_node("TeacherMale") as NpcCharacter
-	var station: ComputerStation = (map.get_node("Computers") as ComputerManager).find_host(TeacherSeat.DESK_HOST)
-	_check(teacher != null and teacher.seated and teacher.work_at_desk and teacher.global_position.distance_to(TeacherSeat.SEAT) < 0.01, "%s: the male teacher sits at his desk in the teachers' room" % level_name)
-	_check(station != null and station.collision_layer == 0, "%s: his computer is in use (the player cannot sit at it)" % level_name)
+	var computers := map.get_node("Computers") as ComputerManager
+	for id in ["male", "female"]:
+		var info: Dictionary = StaffRoomLife.TEACHERS[id]
+		var teacher := map.get_node(String(info["node"])) as NpcCharacter
+		var station: ComputerStation = computers.find_host(String(info["host"]))
+		_check(teacher != null and teacher.seated and teacher.work_at_desk and teacher.global_position.distance_to(info["seat"]) < 0.01, "%s: the %s teacher sits at the desk in the teachers' room" % [level_name, id])
+		_check(station != null and station.collision_layer == 0, "%s: the %s teacher's computer is in use" % [level_name, id])
+		_check(teacher != null and teacher.get_node_or_null("Talk") is Talkable and (teacher.get_node("Talk") as Talkable).prompt.contains("ทักทาย"), "%s: the %s teacher can be greeted" % [level_name, id])
 
 
 ## True when `at` is on screen and left of the (open) step panel.

@@ -33,7 +33,14 @@ func _run() -> void:
 	camera.fov = 65.0
 	map.add_child(camera)
 	camera.make_current()
-	var seat := TeacherSeat.SEAT
+	var female_seat := StaffRoomLife.seat_of("female")
+	for view in [["female_side", female_seat + Vector3(-0.2, 1.4, 1.3), female_seat + Vector3(0.45, 0.75, 0.0)],
+			["female_hands", female_seat + Vector3(0.05, 1.3, -0.7), female_seat + Vector3(0.5, 0.76, 0.0)],
+			["female_office", Vector3(6.35, 1.65, -26.2), female_seat + Vector3(0.4, 0.8, 0.0)]]:
+		camera.global_position = view[1]
+		camera.look_at(view[2])
+		await _shot(view[0])
+	var seat := StaffRoomLife.seat_of("male")
 	for view in [["teacher_side", seat + Vector3(-0.2, 1.5, 1.4), seat + Vector3(0.45, 0.8, 0.0)],
 			["teacher_back", seat + Vector3(-1.3, 1.6, 0.4), seat + Vector3(0.5, 0.85, 0.0)],
 			["teacher_hands", seat + Vector3(0.05, 1.35, -0.75), seat + Vector3(0.5, 0.78, 0.0)]]:
