@@ -70,7 +70,9 @@ func _ready() -> void:
 		push_error("Student rig missing: " + student_id)
 		return
 	_apply_pose(_standing_pose())
-	StudentThighs.add_to(get_node("Visual"))
+	# Seated thighs fill the skirt opening; only for characters who sit.
+	if _sits():
+		StudentThighs.add_to(get_node("Visual"))
 	_support = StudentPoseSupport.new()
 	_support.setup(self)
 	_phase = phase_offset
@@ -172,7 +174,8 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector3.ZERO
 			_hold_physics(delta)
 	var moving := walking and not blocked and _speed > .05
-	_walk_blend = move_toward(_walk_blend, clampf(_speed / maxf(stroll_speed, .1), 0, 1) if moving else 0.0, delta * 2.5)
+	var pace: float = current_step().get("speed", stroll_speed) if not routine.is_empty() else stroll_speed
+	_walk_blend = move_toward(_walk_blend, clampf(_speed / maxf(pace, .1), 0, 1) * clampf(pace / .6, .45, 1.0) if moving else 0.0, delta * 2.5)
 
 func _arrival_yaw() -> Variant:
 	var step := current_step()
@@ -258,7 +261,7 @@ func _walk_physics(delta: float) -> void:
 		var yaw := atan2(direction.x, direction.z)
 		var off := absf(angle_difference(rotation.y, yaw))
 		rotation.y = rotate_toward(rotation.y, yaw, WALK_TURN_RATE * delta)
-		var wanted := stroll_speed
+		var wanted: float = step.get("speed", stroll_speed)
 		if not via:
 			# Ease into the stop instead of braking at the last step.
 			wanted = minf(wanted, sqrt(2.0 * ACCEL * .75 * dist) + .04)
@@ -297,7 +300,7 @@ func _avoid_people(wanted: Vector3) -> Vector3:
 	var steer := wanted
 	_yield_scale = 1.0
 	var people: Array[Node3D] = []
-	people.assign(manager.students)
+	people.assign(manager.people() if manager.has_method("people") else manager.students)
 	if is_instance_valid(manager.player):
 		people.append(manager.player)
 	for other: Node3D in people:
@@ -316,6 +319,13 @@ func _avoid_people(wanted: Vector3) -> Vector3:
 			var t := clampf(-offset.dot(rel_v) / maxf(rel_v.length_squared(), .0001), 0.0, 2.0)
 			var closest := offset + rel_v * t
 			var gap := closest.length()
+			# Catching up with someone going the same way: fall in behind
+			# at their pace instead of squeezing past in the lane.
+			var ahead_now := wanted.dot(offset)
+			var their_pace := other_v.dot(wanted)
+			if ahead_now > 0 and ahead_now < 1.6 and (offset - wanted * ahead_now).length() < .6 and their_pace > .45:
+				_yield_scale = minf(_yield_scale, clampf(their_pace / maxf(_speed, .1) * clampf((ahead_now - .7) / .6, .3, 1.0), .1, 1.0))
+				continue
 			if gap < .8:
 				var right := wanted.cross(Vector3.UP)
 				var away := -signf(right.dot(closest))
@@ -369,7 +379,8 @@ func _arrive() -> void:
 		return
 	if step.get("hide", false):
 		_set_hidden(true)
-		_closing = 6.0
+		if step.has("door"):
+			_closing = 6.0
 	if step.has("bench"):
 		_bench = manager.bench_for(step["bench"])
 		if _bench:
@@ -613,3 +624,7 @@ func _look_target() -> float:
 func _yaw_to(point: Vector3, limit: float) -> float:
 	var to := global_transform.basis.inverse() * (point - global_position)
 	return clampf(atan2(to.x, to.z), -limit, limit)
+
+## Whether this character ever sits down (the seated-thigh fix is only for them).
+func _sits() -> bool:
+	return true

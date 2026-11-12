@@ -112,7 +112,7 @@ func _run() -> void:
 		for door_name in DOORS:
 			var d := life.door(door_name)
 			var in_use := false
-			for student in life.students:
+			for student in life.people():
 				in_use = in_use or student.current_step().get("door", "") == door_name or student._closing > 0
 			if d.is_open and not d.is_moving and not in_use:
 				door_open_idle[door_name] = float(door_open_idle.get(door_name, 0.0)) + dt

@@ -51,6 +51,8 @@ var reserved := {} # spot key -> student
 var groups := {} # chat key -> {"members": [a, b], "speaker": s, "next": seconds}
 var history := {} # student id -> recent plan kinds, newest last
 var _serial := 0
+var cleaner: CleanerCharacter
+var cleaner_log: Array[String] = [] # finished jobs, for the tools
 
 func _ready() -> void:
 	if random_seed != 0:
@@ -60,10 +62,21 @@ func _ready() -> void:
 	player = get_parent().get_node_or_null("ITSupportPlayer")
 	furnishings = get_parent().get_node("CorridorFurnishings")
 	for child in get_children():
-		if child is StudentCharacter:
+		if child is CleanerCharacter:
+			cleaner = child
+		elif child is StudentCharacter:
 			students.append(child)
 	# After the doors and map collision are ready (they come later in the tree).
 	_opening_scene.call_deferred()
+	if cleaner:
+		_cleaner_start.call_deferred()
+
+## Students and the housekeeper: everyone who walks the corridor.
+func people() -> Array[StudentCharacter]:
+	var all: Array[StudentCharacter] = students.duplicate()
+	if cleaner:
+		all.append(cleaner)
+	return all
 
 ## Everyone starts settled, with staggered stays so they never all leave together.
 func _opening_scene() -> void:
@@ -209,6 +222,8 @@ func walkers(except: StudentCharacter = null) -> int:
 ## Asked when a settled student's time is up. Returns extra seconds to stay
 ## (too many people walking, or staying on after a friend leaves), else 0.
 func hold_extension(s: StudentCharacter) -> float:
+	if s == cleaner:
+		return 0.0
 	if s.chat_group != "":
 		var friend := chat_partner(s)
 		groups.erase(s.chat_group)
@@ -225,6 +240,9 @@ func hold_extension(s: StudentCharacter) -> float:
 	return 0.0
 
 func plan_finished(s: StudentCharacter) -> void:
+	if s == cleaner:
+		s.start_routine(self, _cleaner_plan())
+		return
 	_release(s)
 	s.start_routine(self, next_plan(s))
 
@@ -371,11 +389,11 @@ func _room_plan(s: StudentCharacter, room: String, stay: float) -> Array[Diction
 ## Someone visible is on the way in or out of this room (one at a time
 ## through a doorway, and the science shoe rack is part of the doorway).
 func room_busy(room: String, except: StudentCharacter) -> bool:
-	for other in students:
+	for other in people():
 		if other == except or other.hidden:
 			continue
 		for i in range(other.step_index, other.routine.size()):
-			if other.routine[i].get("door", "") == room:
+			if other.routine[i].get("door", "") == room or other.routine[i].get("room", "") == room:
 				return true
 	return false
 
@@ -448,7 +466,7 @@ func _capsule_free(p: Vector3, s: StudentCharacter = null, also_ignore: StudentC
 	query.exclude = skip
 	if not get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty():
 		return false
-	for other in students:
+	for other in people():
 		if other == s or other == also_ignore:
 			continue
 		# Keep a comfortable gap to where people are and where they are going.
@@ -495,3 +513,123 @@ func _pick_weighted(weights: Dictionary) -> String:
 		if r <= 0:
 			return k
 	return weights.keys()[-1]
+
+# --- Housekeeper ---------------------------------------------------------------
+# Cycle: mop two corridor sections -> mop the other restroom (if no student is
+# in it; otherwise mop one more section and try again) -> back out -> ...
+# She always stays in sight: the restrooms have no closet to rest in.
+
+const CLEAN_SECTIONS := [Vector2(8.6, 1.6), Vector2(1.6, -5.4), Vector2(-5.4, -12.4),
+	Vector2(-12.4, -19.4), Vector2(-19.4, -26.4), Vector2(-26.4, -33.4), Vector2(-33.4, -40.4)]
+const CLEAN_PASSES := [-7.3, -6.15, -5.0]
+## Inside each restroom: the way round the privacy wall and the mopping passes
+## (z) between the cubicle fronts and the basins.
+const RESTROOM_CLEAN := {
+	"FemaleWCDoor": {"around": [Vector3(-10.6, .02, -13.35), Vector3(-12.0, .02, -13.0)],
+		"passes": [-12.95, -14.25, -15.55], "x": Vector2(-12.0, -20.3)},
+	"MaleWCDoor": {"around": [Vector3(-10.6, .02, -21.1), Vector3(-12.0, .02, -20.6)],
+		"passes": [-20.15, -21.1, -22.05, -23.0], "x": Vector2(-12.0, -20.2)},
+}
+var _cleaner_room := "MaleWCDoor" # the restroom she mopped last
+var _cleaner_sections_left := 0
+var _section_cleaned := {} # section index -> time it was last mopped
+var _clock := 0.0
+
+func _process(delta: float) -> void:
+	_clock += delta
+
+## She starts the level out in the corridor, already mopping.
+func _cleaner_start() -> void:
+	cleaner.global_position = Vector3(CLEAN_PASSES[0], .02, -15.0)
+	cleaner.rotation.y = PI
+	_cleaner_sections_left = 1
+	cleaner.start_routine(self, _section_plan())
+
+func _cleaner_plan() -> Array[Dictionary]:
+	if _cleaner_sections_left <= 0:
+		var room := "MaleWCDoor" if _cleaner_room == "FemaleWCDoor" else "FemaleWCDoor"
+		if _restroom_empty(room):
+			_cleaner_room = room
+			_cleaner_sections_left = 2
+			return _restroom_clean(room)
+	_cleaner_sections_left -= 1
+	return _section_plan()
+
+## Nobody in it, on the way in, or planning to go.
+func _restroom_empty(room: String) -> bool:
+	for key in reserved:
+		if String(key).begins_with("room:" + room + ":"):
+			return false
+	return not room_busy(room, cleaner)
+
+func _door_points(room: String) -> Array[Vector3]:
+	var z := door(room).get_doorway_center().z
+	return [Vector3(-8.4, .02, z), Vector3(-10.45, .02, z)]
+
+func _restroom_clean(room: String) -> Array[Dictionary]:
+	var info: Dictionary = RESTROOM_CLEAN[room]
+	var points := _door_points(room)
+	var plan := path(cleaner.global_position, points[0])
+	plan.append({"point": points[0], "activity": "door", "door": room, "door_op": "open", "room": room})
+	plan.append({"point": points[1], "activity": "door", "door": room, "door_op": "close", "room": room})
+	for p: Vector3 in info["around"]:
+		plan.append({"point": p, "via": true, "room": room})
+	var x: Vector2 = info["x"]
+	var forward := true
+	for z: float in info["passes"]:
+		var a := Vector3(x.x if forward else x.y, .02, z)
+		var b := Vector3(x.y if forward else x.x, .02, z)
+		plan.append({"point": a, "via": true, "mop": true, "speed": CleanerCharacter.MOP_SPEED, "room": room})
+		plan.append({"point": b, "via": true, "mop": true, "speed": CleanerCharacter.MOP_SPEED, "room": room})
+		forward = not forward
+	# Back out the way she came in, closing the door behind her.
+	plan.append_array(_restroom_exit(room))
+	cleaner_log.append("clean:" + room)
+	return plan
+
+func _restroom_exit(room: String) -> Array[Dictionary]:
+	var info: Dictionary = RESTROOM_CLEAN[room]
+	var points := _door_points(room)
+	var plan: Array[Dictionary] = []
+	var around: Array = info["around"]
+	plan.append({"point": Vector3(-12.0, .02, around[1].z), "via": true, "room": room})
+	plan.append({"point": around[0], "via": true, "room": room})
+	plan.append({"point": points[1], "activity": "door", "door": room, "door_op": "open", "room": room})
+	plan.append({"point": points[0], "activity": "door", "door": room, "door_op": "close"})
+	return plan
+
+## Three slow passes down a stretch of corridor, starting at its nearer end.
+func _section_plan() -> Array[Dictionary]:
+	var at := cleaner.global_position
+	var best := 0
+	var best_score := INF
+	for i in CLEAN_SECTIONS.size():
+		var r: Vector2 = CLEAN_SECTIONS[i]
+		var mid := (r.x + r.y) * .5
+		# Prefer stretches not mopped for a while, and not too far away.
+		var score := absf(mid - at.z) - (_clock - float(_section_cleaned.get(i, -1000.0))) * .05
+		if score < best_score:
+			best_score = score
+			best = i
+	_section_cleaned[best] = _clock
+	var r: Vector2 = CLEAN_SECTIONS[best]
+	var start_z := r.x if absf(r.x - at.z) < absf(r.y - at.z) else r.y
+	var end_z := r.y if start_z == r.x else r.x
+	var passes: Array = CLEAN_PASSES.duplicate()
+	if absf(passes[-1] - at.x) < absf(passes[0] - at.x):
+		passes.reverse()
+	var plan := path(at, Vector3(passes[0], .02, start_z))
+	plan.append({"point": Vector3(passes[0], .02, start_z), "via": true})
+	var z_from := start_z
+	var z_to := end_z
+	for x: float in passes:
+		plan.append({"point": Vector3(x, .02, z_from), "via": true, "mop": true, "speed": CleanerCharacter.MOP_SPEED})
+		plan.append({"point": Vector3(x, .02, z_to), "via": true, "mop": true, "speed": CleanerCharacter.MOP_SPEED})
+		var t := z_from
+		z_from = z_to
+		z_to = t
+	# A short look over the wet floor before moving on.
+	var last: Vector3 = plan[-1]["point"]
+	plan.append({"point": last, "activity": "idle", "seconds": 1.5})
+	cleaner_log.append("section:%d" % best)
+	return plan

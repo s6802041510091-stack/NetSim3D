@@ -18,6 +18,18 @@ Seven students are instanced in `scenes/npc/corridor_students.tscn`, which is pa
 - `scripts/npc/student_character.gd` follows a plan of steps (`via` pass-through points, `anchor` long stays, `bench`/`slot`, `door`/`door_op`, `hide`). It reuses the approved rig, bench pose, foot contacts and cloth correction unchanged.
 - Doors are the existing `InteractiveDoor` nodes (`set_open`), so the door swing, collision and sounds are the same as when the player opens them.
 
+## Housekeeper (agreed with the user 2026-11-12)
+
+`Cleaner` in `corridor_students.tscn` uses the approved `cleaner_female_apron_160cm.glb` and `cleaner_mop.glb` (copied to `assets/models/cleaner/`). `scripts/npc/cleaner_character.gd` extends the student character (walking, doors, avoidance) and adds the mop.
+
+- She is always in sight: the restrooms have no closet, so she never hides or rests out of view. She starts each level already mopping the corridor.
+- Cycle: mops two corridor stretches → mops the other restroom (in, passes, back out, door shut) → two more stretches → and so on. If a student is in that restroom, she mops one more corridor stretch first and tries again.
+- Mopping: 0.22 m/s, three passes per corridor stretch (x −7.3, −6.15, −5.0), three or four passes between the cubicles and the basins in a restroom, swinging the mop slowly left and right (one swing every 3.4 s, 22 cm each side) while she looks down at the floor she is mopping. Between jobs she carries it upright at her right side. Both hands grip the handle by arm IK, and the fingers wrap round it.
+- She opens and shuts the restroom doors herself. Students don't go into a restroom while she is mopping it. Students avoid her, and she waits for the player.
+- She is not counted in the students' three-walker limit.
+
+Checks: `tools/validate_cleaner.gd [-- seed]` (16 in-game minutes) and `tools/capture_cleaner.gd` (pictures in `Preview/โถงทางเดิน/cleaner/`).
+
 ## Girls' thighs and skirt (runtime fix)
 
 The female models have bare legs only from the ankle to just above the knee; seated, the cut leg ends showed under the knee-length skirt. `scripts/npc/student_thighs.gd` now adds, at load time:

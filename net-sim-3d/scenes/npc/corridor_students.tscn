@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/npc/student_life.gd" id="1_life"]
 [ext_resource type="Script" path="res://scripts/npc/student_character.gd" id="2_character"]
@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://assets/models/students/student_female_bob_cut.glb" id="5_bob"]
 [ext_resource type="PackedScene" path="res://assets/models/students/student_female_wendy_cut.glb" id="6_wendy"]
 [ext_resource type="PackedScene" path="res://assets/models/students/student_female_layer_cut.glb" id="7_layer"]
+[ext_resource type="Script" path="res://scripts/npc/cleaner_character.gd" id="8_cleaner"]
+[ext_resource type="PackedScene" path="res://assets/models/cleaner/cleaner_female_apron_160cm.glb" id="9_cleaner_model"]
 
 [sub_resource type="CapsuleShape3D" id="MaleCapsule"]
 radius = 0.22
@@ -125,3 +127,18 @@ position = Vector3(0, 0.79, 0)
 shape = SubResource("FemaleCapsule")
 
 [node name="Visual" parent="FemaleBobB" instance=ExtResource("5_bob")]
+
+[node name="Cleaner" type="CharacterBody3D" parent="."]
+position = Vector3(-20.55, 0.02, -16.15)
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("8_cleaner")
+student_id = "cleaner"
+stroll_speed = 0.7
+phase_offset = 2.9
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cleaner"]
+position = Vector3(0, 0.79, 0)
+shape = SubResource("FemaleCapsule")
+
+[node name="Visual" parent="Cleaner" instance=ExtResource("9_cleaner_model")]
