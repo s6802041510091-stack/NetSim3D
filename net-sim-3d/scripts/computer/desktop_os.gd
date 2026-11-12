@@ -10,6 +10,10 @@ signal desktop_ready
 ## Emitted when a program window opens, e.g. ("netplan_edu", NetPlanEdu).
 ## The mission system connects here to follow the player's progress.
 signal app_opened(app_id: String, app: Node)
+## A Command Prompt line that was run (after the mission guard let it through).
+signal command_run(line: String)
+## A ping finished: what was typed, the address pinged and the replies (0-4).
+signal ping_done(target: String, address: String, received: int)
 
 const BOOT_TIME := 2.0
 ## Mission 1 program (NetPlan EDU). Shown only on computers that have "netplan_edu" installed.
@@ -55,6 +59,15 @@ var _teamviewer_icon: Control
 var _teamviewer: Control
 var _session := 0
 var _tween: Tween
+## Set by a mission to check actions first: func(action: String, args:
+## PackedStringArray) -> String. "" lets the action run; any other text is
+## shown instead (the action is blocked). Actions are Command Prompt commands
+## (lower case) and "network_edit" (the edit button in Network Settings,
+## shown only while a guard is set).
+var command_guard: Callable
+## Space on the right taken by a mission panel (px): new windows open in the
+## rest of the screen so the panel does not cover them.
+var reserved_right := 0.0
 
 
 func _ready() -> void:
@@ -493,6 +506,7 @@ func _open_window(id: String, title: String, size: Vector2, build_content: Calla
 	style.content_margin_bottom = 0
 	window.add_theme_stylebox_override("panel", style)
 	var view := _root.get_viewport_rect().size
+	view.x -= reserved_right
 	if maximized:
 		# Fill the desktop above the taskbar.
 		size = Vector2(view.x - 16.0, view.y - 48.0 - 16.0)
@@ -599,7 +613,24 @@ func _open_network() -> void:
 			["Default Gateway", station.gateway if ok else "-"],
 			["DNS Server", station.dns_server if ok else "-"],
 			["MAC Address", station.mac_address],
-		]))
+		])
+		if command_guard.is_valid():
+			# Mission 3: an edit button that the mission refuses (and scores).
+			var grid: Control = body.get_child(0)
+			body.remove_child(grid)
+			var column := VBoxContainer.new()
+			column.add_theme_constant_override("separation", 10)
+			body.add_child(column)
+			column.add_child(grid)
+			var edit := Button.new()
+			edit.name = "EditIpButton"
+			edit.text = "แก้ไขการตั้งค่า IP..."
+			column.add_child(edit)
+			var notice := _label("", 14, Color(0.7, 0.15, 0.1))
+			notice.name = "EditIpNotice"
+			notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			column.add_child(notice)
+			edit.pressed.connect(func(): notice.text = String(command_guard.call("network_edit", PackedStringArray()))))
 
 
 func _build_security_toast() -> void:
@@ -768,7 +799,7 @@ func _open_cmd() -> void:
 		_cmd_output.add_theme_font_override("normal_font", mono)
 		column.add_child(_cmd_output)
 		_cmd_input = LineEdit.new()
-		_cmd_input.placeholder_text = "พิมพ์คำสั่ง เช่น ipconfig, ping 192.168.1.1, help"
+		_cmd_input.placeholder_text = "พิมพ์คำสั่ง เช่น ipconfig, ping <IP address>, help"
 		_cmd_input.text_submitted.connect(_on_cmd_submitted)
 		column.add_child(_cmd_input))
 	if not existed:
@@ -795,6 +826,12 @@ func run_command(line: String) -> void:
 		return
 	var command := parts[0].to_lower()
 	var args := parts.slice(1)
+	if command_guard.is_valid():
+		var refusal := String(command_guard.call(command, args))
+		if refusal != "":
+			_cmd_print(refusal + "\n")
+			return
+	command_run.emit(line.strip_edges())
 	match command:
 		"help":
 			_cmd_print("คำสั่งที่ใช้ได้:\n  ipconfig [/all]   ดูการตั้งค่า IP\n  ping <IP|ชื่อเครื่อง>  ทดสอบการเชื่อมต่อ\n  hostname          ดูชื่อเครื่อง\n  cls               ล้างหน้าจอ\n  exit              ปิดหน้าต่าง\n")
@@ -846,7 +883,7 @@ func _cmd_ping(target: String) -> void:
 		reachable = true
 	elif host != null:
 		address = host.ip_address
-		reachable = station.network_connected and host.network_connected
+		reachable = station.network_connected and host.network_connected and not host.link_fault
 	elif target == station.gateway or target == "8.8.8.8" or target == station.dns_server:
 		reachable = station.network_connected
 	elif target.to_lower() in ["google.com", "www.google.com"]:
@@ -860,8 +897,11 @@ func _cmd_ping(target: String) -> void:
 		_cmd_print("\nPinging %s with 32 bytes of data:\nPING: transmit failed. General failure.\n" % address)
 		return
 
+	if station.link_fault and address != "127.0.0.1":
+		reachable = false
 	_cmd_print("\nPinging %s with 32 bytes of data:" % address)
 	var received := 0
+	var times: Array[int] = []
 	for i in 4:
 		await get_tree().create_timer(0.45).timeout
 		if session != _session or _cmd_output == null:
@@ -869,7 +909,16 @@ func _cmd_ping(target: String) -> void:
 		if reachable:
 			received += 1
 			var ms := 1 if address.begins_with("192.168.") or address == "127.0.0.1" else randi_range(18, 32)
+			times.append(ms)
 			_cmd_print("Reply from %s: bytes=32 time=%dms TTL=%d" % [address, ms, 128 if address.begins_with("192.168.") or address == "127.0.0.1" else 117])
 		else:
 			_cmd_print("Request timed out.")
-	_cmd_print("\nPing statistics for %s:\n    Packets: Sent = 4, Received = %d, Lost = %d (%d%% loss)\n" % [address, received, 4 - received, (4 - received) * 25])
+	# Same statistics block as Windows' ping.
+	var stats := "\nPing statistics for %s:\n    Packets: Sent = 4, Received = %d, Lost = %d (%d%% loss)," % [address, received, 4 - received, (4 - received) * 25]
+	if not times.is_empty():
+		var total := 0
+		for t in times:
+			total += t
+		stats += "\nApproximate round trip times in milli-seconds:\n    Minimum = %dms, Maximum = %dms, Average = %dms" % [times.min(), times.max(), roundi(float(total) / times.size())]
+	_cmd_print(stats + "\n")
+	ping_done.emit(target, address, received)

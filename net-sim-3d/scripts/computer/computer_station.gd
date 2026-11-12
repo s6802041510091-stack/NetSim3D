@@ -20,6 +20,9 @@ var dns_server := "8.8.8.8"
 var mac_address := "00-1A-2B-00-00-01"
 ## Missions can unplug a computer's LAN cable by setting this to false.
 var network_connected := true
+## Mission 3: the cable is in (link up, ipconfig normal) but a bad crimp lets
+## nothing through, so every ping from or to this computer times out.
+var link_fault := false
 ## Programs installed on this computer (desktop icons). Set by ComputerManager.
 var installed_apps := PackedStringArray()
 

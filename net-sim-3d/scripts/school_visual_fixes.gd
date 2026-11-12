@@ -6,10 +6,20 @@ extends Node3D
 ## Recess the wall to the underside of the slab on a local mesh copy. This also
 ## avoids duplicate vertical faces along the slab edge. Collision stays intact.
 ## Also: the computer room door frame (see _fix_computer_room_door_frame) and
-## two plants in the middle of the teachers' room (_move_teachers_room_plants).
+## two plants in the middle of the teachers' room (_move_teachers_room_plants),
+## and the red guest chair beside the female teacher's desk is removed
+## (the user asked on 2026-11-12; it has no collider).
+const REMOVED_IN_GAME := ["TR_Guest_Chair_1"]
+
+
 func _ready() -> void:
 	_fix_computer_room_door_frame()
 	_move_teachers_room_plants()
+	if not Engine.is_editor_hint():
+		for prop_name: String in REMOVED_IN_GAME:
+			var prop := get_node_or_null(prop_name)
+			if prop:
+				prop.queue_free()
 	var wall := get_node_or_null("StairShell_Lower_EastWall") as MeshInstance3D
 	var threshold := get_node_or_null("StairShell_Entrance_Threshold") as MeshInstance3D
 	if wall == null or threshold == null:

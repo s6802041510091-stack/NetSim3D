@@ -193,7 +193,7 @@ func _enter(next: Stage) -> void:
 	stage = next
 	match stage:
 		Stage.BRIEFING:
-			hud.set_objective("คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)")
+			_show_steps()
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
 		Stage.GATHER:
@@ -229,7 +229,7 @@ func _enter(next: Stage) -> void:
 				props.crimp_station.layout.set_cables_visible(false)
 			_set_install_step("rack")
 		Stage.REPORT:
-			hud.set_objective("กลับไปรายงานผลกับหัวหน้างาน Data Center ในห้อง IT Support")
+			_show_steps()
 			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
 			rack_spot.set_prompt("")
 			pc_spot.set_prompt("")
@@ -246,8 +246,7 @@ func _refresh_gather() -> void:
 	if props == null or stage != Stage.GATHER:
 		return
 	var cables := state.cable_types.size()
-	hud.set_objective("ไปที่ห้องเก็บอุปกรณ์ (มุมห้อง IT Support)\n%s หยิบสาย LAN จากกล่องสายให้ครบ 2 จุดเชื่อมต่อ (%d/2)\n%s หยิบเครื่องมือเข้าหัวสายจากลิ้นชัก \"ชุดเข้าหัวสาย\"\nแล้วนำไปเข้าหัวสายที่โต๊ะว่างในห้อง IT Support" % [
-		"✓" if cables == 2 else "•", cables, "✓" if drawer_seen else "•"])
+	_show_steps()
 	if cables < 2:
 		var a: Vector3 = props.cable_boxes[Mission02State.STRAIGHT].global_position
 		var b: Vector3 = props.cable_boxes[Mission02State.CROSSOVER].global_position
@@ -413,14 +412,64 @@ func finish(player: Node = null) -> MissionScore:
 func _refresh_crimp_objective() -> void:
 	if stage != Stage.CRIMP:
 		return
-	var done := crimp_panel.end_index
-	hud.set_objective("เข้าหัวสาย LAN ที่โต๊ะว่างในห้อง IT Support (เสร็จ %d/4 ปลาย)\nสายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย" % done)
+	_show_steps()
 
 
 func _refresh_test_objective() -> void:
 	if stage != Stage.TEST:
 		return
-	hud.set_objective("ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester ที่โต๊ะว่าง (ตรวจแล้ว %d/2)" % mini(tester_panel.cable - 1, 2))
+	_show_steps()
+
+
+## The step tracker (ObjectiveHUD.set_steps, the same in every level). Only
+## the objective panel: it reads the mission's progress and changes nothing.
+const STEP_HEADING := "เข้าหัวและเชื่อมต่อสาย LAN"
+const STEP_HINTS := [
+	"ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด F",
+	"กล่องสายอยู่บนโต๊ะกลางห้องเก็บอุปกรณ์ (มุมห้อง IT Support)",
+	"ลิ้นชัก \"ชุดเข้าหัวสาย\" อยู่ในห้องเก็บอุปกรณ์",
+	"สายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย",
+	"ที่โต๊ะว่าง: เสียบสาย เปิดเครื่อง กด TEST แล้วตัดสินผล",
+	"Wall Rack อยู่หลังโต๊ะครูในห้องคอมพิวเตอร์",
+	"เสียบเข้าการ์ดเครือข่ายด้านหลังคอมพิวเตอร์ครู",
+	"กลับไปที่ Wall Rack แล้วดูไฟสถานะพอร์ตของ Switched Hub",
+	"กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด F",
+]
+
+
+func _show_steps() -> void:
+	var texts := [
+		"รับภารกิจจากหัวหน้างาน Data Center",
+		"หยิบสาย LAN จากกล่องสายให้ครบ 2 จุดเชื่อมต่อ (%d/2)" % state.cable_types.size(),
+		"หยิบเครื่องมือเข้าหัวสายจากลิ้นชัก \"ชุดเข้าหัวสาย\"",
+		"เข้าหัวสาย LAN ที่โต๊ะว่างในห้อง IT Support (เสร็จ %d/4 ปลาย)" % crimp_panel.end_index,
+		"ตรวจสายทั้ง 2 เส้นด้วย LAN Cable Tester (ตรวจแล้ว %d/2)" % (mini(tester_panel.cable - 1, 2) if stage >= Stage.TEST else 0),
+		"ติดตั้งสายที่ Wall Rack ในห้องคอมพิวเตอร์",
+		"เสียบสายเส้นที่ 2 เข้าคอมพิวเตอร์ครู",
+		"ตรวจไฟสถานะพอร์ตที่ Wall Rack",
+		"รายงานผลกับหัวหน้างาน Data Center",
+	]
+	var installing := stage == Stage.INSTALL
+	var done := [
+		stage > Stage.BRIEFING,
+		state.cable_types_done() or stage > Stage.GATHER,
+		drawer_seen or stage > Stage.GATHER,
+		stage > Stage.CRIMP,
+		stage > Stage.TEST,
+		stage > Stage.INSTALL or (installing and install_step in ["pc", "leds"]),
+		stage > Stage.INSTALL or (installing and install_step == "leds"),
+		stage > Stage.INSTALL,
+		stage == Stage.DONE,
+	]
+	var step_list := ObjectiveHUD.from_done(texts, done)
+	var hint := ""
+	for i in step_list.size():
+		if step_list[i][1] == ObjectiveHUD.STEP_ACTIVE:
+			hint = STEP_HINTS[i]
+	# Everything gathered: carry it to the desk.
+	if stage == Stage.GATHER and done[1] and done[2]:
+		hint = "นำสายและเครื่องมือไปที่โต๊ะว่างในห้อง IT Support แล้วกด F เพื่อนั่ง"
+	hud.set_steps(step_list, hint, STEP_HEADING, "ภารกิจที่ 2")
 
 
 ## Sits at the desk: crimping (the cable end) or testing (the tester),
@@ -507,17 +556,17 @@ func _set_install_step(step: String) -> void:
 	pc_spot.set_prompt("")
 	match step:
 		"rack":
-			hud.set_objective("นำสายทั้ง 2 เส้นไปติดตั้งที่ Wall Rack ในห้องคอมพิวเตอร์ (หลังโต๊ะครู)")
+			_show_steps()
 			rack_spot.set_prompt("กด F เพื่อเปิดตู้ Wall Rack และติดตั้งสาย")
 			if rack:
 				marker.point_at_position(rack.global_position, 0.45)
 		"pc":
-			hud.set_objective("เสียบสายเส้นที่ 2 เข้าการ์ดเครือข่ายด้านหลังคอมพิวเตอร์ครู")
+			_show_steps()
 			pc_spot.set_prompt("กด F เพื่อเสียบสายเข้าการ์ดเครือข่าย")
 			if pc_port:
 				marker.point_at_position(pc_port.global_position, 0.35)
 		"leds":
-			hud.set_objective("กลับไปที่ Wall Rack แล้วตรวจไฟสถานะพอร์ตของ Switched Hub")
+			_show_steps()
 			rack_spot.set_prompt("กด F เพื่อดูไฟสถานะพอร์ตที่ Wall Rack")
 			if rack:
 				marker.point_at_position(rack.global_position, 0.45)

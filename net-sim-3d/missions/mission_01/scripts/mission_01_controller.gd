@@ -97,21 +97,31 @@ func _enter(next: Stage) -> void:
 	stage = next
 	match stage:
 		Stage.BRIEFING:
-			hud.set_objective("คุยกับหัวหน้างาน Data Center ในห้อง IT Support (มองที่หัวหน้างานแล้วกด F)")
+			_show_steps(0, "ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด F")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
 		Stage.DESIGN:
-			hud.set_objective("ไปที่คอมพิวเตอร์ของคุณ (%s) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ให้ครบ 3 จุด" % PLAYER_COMPUTER)
+			_show_steps(1, "นั่งที่คอมพิวเตอร์ของคุณ (F) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ทั้ง 3 จุด")
 			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
 			_point_at_computer()
 		Stage.REPORT:
-			hud.set_objective("ออกจากคอมพิวเตอร์ แล้วกลับไปรายงานผลกับหัวหน้างาน Data Center")
+			_show_steps(2, "ออกจากคอมพิวเตอร์ (Esc) แล้วมองที่หัวหน้างานแล้วกด F")
 			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
 			_point_at_supervisor()
 		Stage.DONE:
 			hud.set_objective("")
 			_set_prompt("")
 			marker.clear()
+
+
+## The step tracker (ObjectiveHUD.set_steps, the same in every level).
+func _show_steps(current: int, hint: String) -> void:
+	var texts := [
+		"รับภารกิจจากหัวหน้างาน Data Center",
+		"เลือกอุปกรณ์เครือข่ายใน NetPlan EDU ที่คอมพิวเตอร์ของคุณ (%s)" % PLAYER_COMPUTER,
+		"รายงานผลกับหัวหน้างาน Data Center",
+	]
+	hud.set_steps(ObjectiveHUD.sequence(texts, current), hint, "เลือกอุปกรณ์เครือข่ายสำหรับห้องคอมพิวเตอร์", "ภารกิจที่ 1")
 
 
 func _point_at_supervisor() -> void:

@@ -5,10 +5,31 @@ extends CanvasLayer
 ## (e.g. "ได้รับภารกิจ: ..."). Missions call set_objective() as the story moves on.
 ## The panel folds to a small "ภารกิจ" tab with Tab or its arrow button, and
 ## missions can fold it automatically while the player uses a computer.
+##
+## The standard for every level is set_steps(): the whole mission as numbered
+## steps in order — done = green with ✓, the current step = blue (with a short
+## hint below it), steps not reached yet = faint grey.
 
 signal collapsed_changed(collapsed: bool)
 
-const PANEL_WIDTH := 300.0
+const PANEL_WIDTH := 330.0
+const STEP_DONE := "done"
+const STEP_ACTIVE := "active"
+const STEP_TODO := "todo"
+const COLOR_DONE := Color(0.5, 0.88, 0.6)
+const COLOR_ACTIVE := Color(0.5, 0.76, 1.0)
+const COLOR_TODO := Color(1, 1, 1, 0.38)
+const COLOR_HINT := Color(0.82, 0.87, 0.95)
+
+## Space kept free on the right (e.g. for a SidePanel), so the panel moves left of it.
+var right_inset := 0.0:
+	set(value):
+		right_inset = value
+		_refresh()
+## The steps shown now: [[text, STEP_DONE / STEP_ACTIVE / STEP_TODO], ...]
+var steps: Array = []
+var _heading: Label
+var _steps_box: VBoxContainer
 
 var objective_text: String = ""
 var collapsed := false
@@ -53,6 +74,16 @@ func _ready() -> void:
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.custom_minimum_size = Vector2(PANEL_WIDTH - 60, 0)
 	col.add_child(_objective_label)
+	_heading = GameUI.label("", 16, Color.WHITE, true)
+	_heading.name = "Heading"
+	_heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_heading.custom_minimum_size = Vector2(PANEL_WIDTH - 60, 0)
+	col.add_child(_heading)
+	_steps_box = VBoxContainer.new()
+	_steps_box.name = "Steps"
+	_steps_box.add_theme_constant_override("separation", 3)
+	_steps_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_steps_box)
 	_toggle = Button.new()
 	_toggle.name = "ToggleButton"
 	_toggle.set_meta("sound", "") # toggle() plays the fold sound
@@ -96,10 +127,104 @@ func set_objective(text: String, title: String = "ภารกิจตอนน
 	if text != objective_text and text != "":
 		Sound.play("objective")
 	objective_text = text
+	steps = []
+	_clear_steps()
+	_heading.text = ""
 	_objective_title.set_meta("title", title)
 	# Keep names such as "IT-PC-01" on one line (word joiner after each hyphen).
 	_objective_label.text = DialogueBox.keep_together(text).replace("-", "-⁠")
 	_refresh()
+
+
+## Step states for a mission done in order: before `current` done, `current`
+## active, after it not reached yet (current >= size: all done).
+static func sequence(texts: Array, current: int) -> Array:
+	var out := []
+	for i in texts.size():
+		out.append([texts[i], STEP_DONE if i < current else (STEP_ACTIVE if i == current else STEP_TODO)])
+	return out
+
+
+## Step states from what is finished: done ones green, the first unfinished
+## one active, the rest not reached yet.
+static func from_done(texts: Array, done: Array) -> Array:
+	var out := []
+	var active_given := false
+	for i in texts.size():
+		var finished: bool = i < done.size() and bool(done[i])
+		var state := STEP_DONE if finished else (STEP_TODO if active_given else STEP_ACTIVE)
+		if state == STEP_ACTIVE:
+			active_given = true
+		out.append([texts[i], state])
+	return out
+
+
+## The standard tracker: `step_list` = [[text, state], ...] (see sequence()),
+## `hint` = what to do now (under the active step), `heading` = the mission's
+## name, `title` = the small header ("ภารกิจที่ 3"). objective_text holds the
+## same words as plain text.
+func set_steps(step_list: Array, hint: String = "", heading: String = "", title: String = "ภารกิจตอนนี้") -> void:
+	var plain := PackedStringArray()
+	if heading != "":
+		plain.append(heading)
+	for i in step_list.size():
+		var mark := "✓" if step_list[i][1] == STEP_DONE else ("▸" if step_list[i][1] == STEP_ACTIVE else "•")
+		plain.append("%s %d. %s" % [mark, i + 1, step_list[i][0]])
+		if step_list[i][1] == STEP_ACTIVE and hint != "":
+			plain.append(hint)
+	var text := "\n".join(plain)
+	if text != objective_text:
+		Sound.play("objective")
+	objective_text = text
+	steps = step_list.duplicate(true)
+	_objective_title.set_meta("title", title)
+	_objective_label.text = ""
+	_heading.text = heading
+	_clear_steps()
+	for i in step_list.size():
+		var state: String = step_list[i][1]
+		var color := COLOR_DONE if state == STEP_DONE else (COLOR_ACTIVE if state == STEP_ACTIVE else COLOR_TODO)
+		var row := HBoxContainer.new()
+		row.name = "Step%d" % (i + 1)
+		row.add_theme_constant_override("separation", 6)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_steps_box.add_child(row)
+		var mark := GameUI.label("✓" if state == STEP_DONE else ("▸" if state == STEP_ACTIVE else ""), 16, color, true)
+		mark.custom_minimum_size = Vector2(16, 0)
+		row.add_child(mark)
+		var label := GameUI.label("%d. %s" % [i + 1, DialogueBox.keep_together(String(step_list[i][0])).replace("-", "-⁠")], 16, color, state == STEP_ACTIVE)
+		label.name = "Text"
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.custom_minimum_size = Vector2(PANEL_WIDTH - 82, 0)
+		row.add_child(label)
+		if state == STEP_ACTIVE and hint != "":
+			var hint_label := GameUI.label(DialogueBox.keep_together(hint).replace("-", "-⁠"), 14, COLOR_HINT)
+			hint_label.name = "Hint"
+			hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			hint_label.custom_minimum_size = Vector2(PANEL_WIDTH - 82, 0)
+			var indent := MarginContainer.new()
+			indent.add_theme_constant_override("margin_left", 40)
+			indent.add_theme_constant_override("margin_bottom", 3)
+			indent.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			indent.add_child(hint_label)
+			_steps_box.add_child(indent)
+	_refresh()
+	# Wrapped lines know their height only after layout: fit the panel again.
+	_refit_later()
+
+
+func _refit_later() -> void:
+	await get_tree().process_frame
+	_refresh()
+
+
+func _clear_steps() -> void:
+	if _steps_box == null:
+		return
+	for child in _steps_box.get_children():
+		_steps_box.remove_child(child)
+		child.queue_free()
 
 
 func toggle() -> void:
@@ -142,17 +267,22 @@ func _refresh() -> void:
 	var title := String(_objective_title.get_meta("title", "ภารกิจตอนนี้"))
 	_objective_title.text = "ภารกิจ" if collapsed else title
 	_objective_hint.text = "(กด Tab เพื่อเปิด)" if collapsed else "(กด Tab เพื่อซ่อน)"
-	_objective_label.visible = not collapsed
+	_objective_label.visible = not collapsed and steps.is_empty()
+	_heading.visible = not collapsed and _heading.text != ""
+	_steps_box.visible = not collapsed and not steps.is_empty()
 	_objective_panel.custom_minimum_size = Vector2(0 if collapsed else PANEL_WIDTH, 0)
 	# Always in the top-right corner (clear of desktop icons), open or folded.
 	_objective_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
 	_objective_panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
 	_objective_panel.size = Vector2.ZERO # Shrink to fit when folding.
 	_objective_panel.offset_top = 20
-	_objective_panel.offset_right = -20
-	_objective_panel.offset_left = -20 - _objective_panel.get_combined_minimum_size().x
+	_objective_panel.offset_right = -20 - right_inset
+	_objective_panel.offset_left = -20 - right_inset - _objective_panel.get_combined_minimum_size().x
 	_objective_panel.visible = objective_text != ""
 	_toggle.queue_redraw()
+	# The toast stays centred in the free part of the screen.
+	_toast_panel.offset_left = -340 - right_inset * 0.5
+	_toast_panel.offset_right = 240 - right_inset * 0.5
 
 
 func _input(event: InputEvent) -> void:

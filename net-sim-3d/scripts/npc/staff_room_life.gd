@@ -26,7 +26,8 @@ const TEACHERS := {
 	"male": {
 		"node": "TeacherMale",
 		"name": "ครูประจำห้องคอมพิวเตอร์",
-		"host": "STAFF-PC-02", # cubicle 2, chair TR_Chair_2
+		"host": "STAFF-PC-02", # cubicle 2
+		"chair": "TR_Chair_2",
 		"seat": Vector3(7.76, 0.02, -21.39),
 		"drop": 0.46, # the 180 cm model's hips are higher
 		"forward": 0.1,
@@ -42,7 +43,8 @@ const TEACHERS := {
 	"female": {
 		"node": "TeacherFemale",
 		"name": "ครูสาว",
-		"host": "STAFF-PC-01", # the office behind the long partition, chair TR_Chair_1
+		"host": "STAFF-PC-01", # the office behind the long partition
+		"chair": "TR_Chair_1",
 		"seat": Vector3(7.76, 0.02, -27.94),
 		"drop": 0.36, # 160 cm
 		"forward": 0.1,
@@ -75,6 +77,9 @@ static func setup(world: Node, for_level: int) -> void:
 	if world.get_node_or_null("TeacherFemale") == null:
 		var female: Node3D = (load(FEMALE_SCENE) as PackedScene).instantiate()
 		female.name = "TeacherFemale"
+		# Her model has no thighs under the knee-length skirt (like the female
+		# students): seated, the skirt opens and the legs looked cut off.
+		StudentThighs.add_to(female.get_node("Visual"))
 		world.add_child(female)
 	for id: String in TEACHERS:
 		var info: Dictionary = TEACHERS[id]
@@ -117,7 +122,24 @@ static func _seat(world: Node, teacher: CharacterBody3D, info: Dictionary) -> vo
 		if not String(info["host"]) in hosts:
 			hosts.append(String(info["host"]))
 			computers.set("npc_used_hosts", hosts)
+	if info.has("chair"):
+		align_chair(world, String(info["chair"]), info["seat"], teacher.rotation.y)
 
+
+## Slides a desk chair of the map model sideways so its seat is centred under
+## a teacher seated at `seat` facing `yaw` (the chairs in the model stand
+## ~17 cm beside the typing position, so he looked seated next to the chair).
+## Chairs are visual only (no collider). Works before the world is in the tree.
+static func align_chair(world: Node, chair_name: String, seat: Vector3, yaw: float) -> void:
+	var visual := world.get_node_or_null("MapVisual") as Node3D
+	var chair := visual.get_node_or_null(chair_name) as MeshInstance3D if visual else null
+	if chair == null:
+		return
+	var to_world := visual.transform * chair.transform
+	var center := to_world * chair.get_aabb().get_center()
+	var side := Basis(Vector3.UP, yaw).x
+	var shift := side * side.dot(seat - center)
+	chair.position += visual.basis.inverse() * shift
 
 func _ready() -> void:
 	dialogue = DialogueBox.new()

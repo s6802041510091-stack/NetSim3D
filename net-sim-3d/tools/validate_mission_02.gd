@@ -92,7 +92,7 @@ func _run() -> void:
 	_check(pc_port.plugged and pc_port.link_on, "Level 3: teacher PC cabled")
 	_check(map.get_node_or_null("Mission02Props") == null, "Level 3: no Mission 2 props")
 	var teacher3: Node3D = map.get_node("TeacherMale")
-	_check(not teacher3 is NpcCharacter and teacher3.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level 3: the male teacher stays in the computer room")
+	_check(teacher3 is NpcCharacter and (teacher3 as NpcCharacter).seated and teacher3.global_position.distance_to(Vector3(6.78, 0.02, -8.88)) < 0.05, "Level 3: the male teacher works at TEACHER-PC in the computer room")
 	var female3 := map.get_node("TeacherFemale") as NpcCharacter
 	_check(female3 != null and female3.seated and female3.get_node_or_null("Talk") != null, "Level 3: the female teacher works at her desk (idle)")
 	map.queue_free()
