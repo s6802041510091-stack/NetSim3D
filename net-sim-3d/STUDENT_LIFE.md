@@ -1,38 +1,34 @@
 # Corridor student life
 
-Five approved characters are instanced in `scenes/npc/corridor_students.tscn`, which is part of `scenes/main.tscn` and therefore shared by all six levels.
+Seven students are instanced in `scenes/npc/corridor_students.tscn`, which is part of `scenes/main.tscn` and therefore shared by all six levels. `mullet_b` and `bob_b` reuse the mullet and bob-cut models with a different hair tone (`hair_tint`); replace them when new character models exist.
 
-| Character | Repeating routine |
-| --- | --- |
-| Male mullet | Walk the west side, pause, rest on BenchLeft03, visit the science shoe rack, return. |
-| Male two-block | Meet Wendy, chat, rest on BenchRight01, check the computer-class shoe rack, return. |
-| Female bob | Rest on BenchLeft01, visit the computer-class shoe rack, look toward the south-end windows, return. |
-| Female Wendy | Meet the two-block student, chat, walk farther down the corridor, rest on BenchRight03, return. |
-| Female layer | Walk toward the north-end windows, pause, rest on BenchRight04, pause opposite the stairs, return. |
+## Behaviour (agreed with the user 2026-11-12)
+
+- Students mostly stay put: about 60–90 s on a bench, against a wall, at a corridor window looking into the classrooms, or chatting with a friend. Inside the restroom 35–60 s, inside the science room 60–100 s.
+- At most three are walking at once. A student whose time is up waits a little longer when the corridor is busy.
+- Walkers keep to the left-hand lane of their direction (x −7.35 going toward the IT end, x −4.95 going toward the computer-room end) and pass through corners without stopping or turning on the spot. Speeds are 0.72–0.85 m/s with gentle acceleration, turning and a 1.7 s sit/stand.
+- Standing spots are only against walls, at least 0.9 m from doorways and clear of the stair opening. Nobody stops in the walkway.
+- Conversations: two friends standing by a wall or sitting on the same bench. A student may walk over to a friend who is settled and sit or stand beside them. Speakers take turns. After a talk, one may stay a little longer.
+- Rooms: girls use the women's restroom, boys the men's; anyone may use the science room (shoes off at the science shoe rack first, on again after). The student opens the door, steps in, disappears behind it and shuts it; later opens it, comes out and shuts it again. One person passes through a doorway at a time.
+- Students glance at the player when the player passes close by, look down while resting on a bench, and step aside early for other walkers. They wait for the player rather than push.
 
 ## Implementation
 
-- Approved exports copied unchanged from `D:/NetSim3D/3Dmodel/ใช้ร่วมกัน/exports/characters/student_*.glb` to `assets/models/students/`. All five have the MakeHuman rig, 163 bones. No Blender character sources are changed.
-- `scripts/npc/student_life.gd` defines individual world-space routes, activity times and the chat partner pair. Scene properties expose each student's speed and animation phase.
-- `scripts/npc/student_character.gd` extends the existing `NpcCharacter` to reuse its rig and arm IK. Walking uses CharacterBody3D collisions; authored clear routes cover this school corridor. Nearby students steer to pass and yield to the player. Students are solid on the existing character collision layer.
-- Individual rhythms/speeds, opposite arm/leg gait, breathing, looking around, looking down at the shoe racks, chat gestures, blended sitting/standing. Hands rest on knees when seated. Each seat is assigned to only one student.
-- `student_pose_support.gd` adds world-space foot contacts during sitting/standing, scale-aware pelvis height, relaxed arm IK that preserves the shirt shoulder seams, and local corrective garment blend shapes. These are per-instance runtime mesh copies; approved Blender/GLB files are unchanged. Walking grounds the supporting sole. The two chatting students alternate speaking/listening gestures; there is no voice-synchronized lip animation.
-- A temporary collision exception applies only between the sitting student and that student's bench. The physical capsule and player collision remain active. A seated student waits for a clear exit before standing.
-- Routines respect game pause; entering a new level starts the ambient loops again. No changes to scoring, objectives, mission dialogue or computer apps.
-- Skeletal posing runs at 20 Hz within 24m of the current camera; physics movement remains active farther away. Students use existing approved geometry and textures; this change does not include asset size reduction or a new web export.
+- `scripts/npc/student_life.gd` is the director: spots, reservations, walker budget, chat groups and the plan for each student's next activity. Its `random_seed` export (0 = random each run) makes runs repeatable.
+- `scripts/npc/student_character.gd` follows a plan of steps (`via` pass-through points, `anchor` long stays, `bench`/`slot`, `door`/`door_op`, `hide`). It reuses the approved rig, bench pose, foot contacts and cloth correction unchanged.
+- Doors are the existing `InteractiveDoor` nodes (`set_open`), so the door swing, collision and sounds are the same as when the player opens them.
 
-## Checks and actual captures
+## Girls' thighs and skirt (runtime fix)
 
-Run `tools/validate_students.gd` to exercise several full loops, route clearance, five rigs, five bench activities, paired conversation, player yielding, solid NPC collision and pause/resume.
+The female models have bare legs only from the ankle to just above the knee; seated, the cut leg ends showed under the knee-length skirt. `scripts/npc/student_thighs.gd` now adds, at load time:
 
-Validation passed: all five completed at least two full loops; paired chat, all five bench activities, player yield/resume, physical NPC collision and pause checks passed. Distant students also update their seated/standing posture even when regular gait posing is culled.
+- a skinned thigh from the cut up to the hip, inside the skirt, coloured from the leg's own skin texture;
+- skirt skinning that hands its lower part to the thigh bones, so the skirt lies over the thighs when seated instead of hanging from the waist. Thigh and skirt use the same hip/thigh hand-over, so they fold alike at the hip.
 
-The subsequent animation audit found and fixed transient foot penetration and fabric/seat intersections. `tools/validate_student_pose_contacts.gd` now passes 210 sit/stand samples, 120 walking phases and a player entering the swept stand-up path. See `Preview/โถงทางเดิน/students/ANIMATION_AUDIT.md` for measurements and visual evidence.
+The GLB files are unchanged. `tools/capture_seated_students.gd` seats all seven students and saves player-view, low-front and side pictures (and the girls standing) to `Preview/โถงทางเดิน/students/seated/`.
 
-`tools/capture_students.gd` records the actual running Godot scene in `D:/NetSim3D/Preview/โถงทางเดิน/students/`:
+## Checks
 
-- `corridor-students.png`
-- `bench-rest.png`
-- `friends-chat.png`
+`tools/validate_students.gd [-- seed]` runs eight in-game minutes and checks: seven rigs, standing spots and lanes clear of walls and furniture, at most three walkers, settled people only against walls, doors shut after use, stays (median), conversations, room visits, capsule/arm clearance, pause, yielding to the player and solid collision.
 
-Open the normal Godot project and press F5 to see the students while playing. The ambient activity does not add interaction prompts or required tasks.
+Result on 2026-11-12: 20 of 21 random seeds passed. The one failure (seed 15) is a 2–3 cm arm/shoulder brush between two students near BenchLeft04 and is still open.
