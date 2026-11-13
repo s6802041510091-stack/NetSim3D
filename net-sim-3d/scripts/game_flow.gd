@@ -6,7 +6,7 @@ extends Node
 const MAP := "res://scenes/main.tscn"
 const MENU := "res://scenes/start_menu.tscn"
 var save_file := SavePaths.file("menu.cfg")
-const AVAILABLE := [1, 2, 3, 5, 6]
+const AVAILABLE := [1, 2, 3, 4, 5, 6]
 const TITLES := ["เลือกอุปกรณ์เครือข่าย", "เข้าหัวสาย LAN", "ตรวจเครือข่ายด้วย ping", "เปลี่ยนการ์ดเครือข่าย", "ป้องกันภัยคอมพิวเตอร์", "ช่วยเหลือระยะไกล"]
 const TITLES_EN := ["Choose Devices", "Crimp LAN Cables", "Ping Test", "Replace the NIC", "Firewall & Antivirus", "Remote Help"]
 const AUDIO := {"Music": "เสียงเพลงประกอบ", "SoundEffect": "เสียงภารกิจ / โทรศัพท์ / คอมพิวเตอร์ / เสียงพูด", "Sound": "เสียงบรรยากาศ / เดิน / เปิด–ปิดประตู"}
@@ -370,6 +370,7 @@ func configure_level(world: Node, level: int) -> void:
 	computers.netplan_edu_hosts = PackedStringArray(["IT-PC-01"]) if level == 1 else PackedStringArray()
 	computers.windows_security_hosts = PackedStringArray(["PC-R3-L2"]) if level == 5 else PackedStringArray()
 	computers.teamviewer_hosts = PackedStringArray(["IT-PC-01"]) if level == 6 else PackedStringArray()
+	computers.browser_hosts = PackedStringArray(["STAFF-PC-01", "STAFF-PC-03"]) if level == 4 else PackedStringArray()
 	# Installed equipment follows the story: empty in Level 1, installed but not
 	# cabled in Level 2, cabled from Level 3 on.
 	var rack := world.get_node_or_null("ComputerRoomRack")
@@ -402,6 +403,12 @@ func configure_level(world: Node, level: int) -> void:
 		mission_03.name = "Mission03"
 		world.add_child(mission_03)
 		_connect_level_end(mission_03, level)
+	if level == 4:
+		# The female teacher's PC has a broken network card (NIC).
+		var mission_04: Node = load("res://missions/mission_04/scripts/mission_04_controller.gd").new()
+		mission_04.name = "Mission04"
+		world.add_child(mission_04)
+		_connect_level_end(mission_04, level)
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)
@@ -528,7 +535,7 @@ func _begin_level() -> void:
 	paused_menu = false
 	_layer.hide()
 	Sound.music("level")
-	var hints := {1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 2: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วอ่านใบงาน", 3: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วไปตรวจเครื่องในห้องคอมพิวเตอร์",5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
+	var hints := {4: "รับโทรศัพท์ที่โต๊ะของคุณในห้อง IT Support แล้วไปช่วยครูสาวที่ห้องพักครู", 1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 2: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วอ่านใบงาน", 3: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วไปตรวจเครื่องในห้องคอมพิวเตอร์",5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
 	_controls_help.open(String(hints.get(current_level, "")))
 
 func _input(event: InputEvent) -> void:

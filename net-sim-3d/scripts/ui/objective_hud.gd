@@ -30,6 +30,11 @@ var right_inset := 0.0:
 var steps: Array = []
 var _heading: Label
 var _steps_box: VBoxContainer
+## The step list scrolls (mouse wheel) when it is taller than this.
+const STEPS_MAX_HEIGHT := 250.0
+const WHEEL_STEP := 36.0
+var _steps_scroll: ScrollContainer
+var _active_row: Control
 
 var objective_text: String = ""
 var collapsed := false
@@ -83,7 +88,13 @@ func _ready() -> void:
 	_steps_box.name = "Steps"
 	_steps_box.add_theme_constant_override("separation", 3)
 	_steps_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_child(_steps_box)
+	_steps_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_steps_scroll = ScrollContainer.new()
+	_steps_scroll.name = "StepsScroll"
+	_steps_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_steps_scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_steps_scroll)
+	_steps_scroll.add_child(_steps_box)
 	_toggle = Button.new()
 	_toggle.name = "ToggleButton"
 	_toggle.set_meta("sound", "") # toggle() plays the fold sound
@@ -189,6 +200,8 @@ func set_steps(step_list: Array, hint: String = "", heading: String = "", title:
 		row.add_theme_constant_override("separation", 6)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_steps_box.add_child(row)
+		if state == STEP_ACTIVE:
+			_active_row = row
 		var mark := GameUI.label("✓" if state == STEP_DONE else ("▸" if state == STEP_ACTIVE else ""), 16, color, true)
 		mark.custom_minimum_size = Vector2(16, 0)
 		row.add_child(mark)
@@ -217,11 +230,21 @@ func set_steps(step_list: Array, hint: String = "", heading: String = "", title:
 func _refit_later() -> void:
 	await get_tree().process_frame
 	_refresh()
+	await get_tree().process_frame
+	# Keep the current step in view.
+	if is_instance_valid(_active_row) and _active_row.get_parent() == _steps_box:
+		_steps_scroll.scroll_vertical = int(maxf(_active_row.position.y - 40.0, 0.0))
+
+
+## True when the steps do not all fit and the wheel scrolls them.
+func steps_scrollable() -> bool:
+	return _steps_box != null and _steps_box.get_combined_minimum_size().y > STEPS_MAX_HEIGHT + 1.0
 
 
 func _clear_steps() -> void:
 	if _steps_box == null:
 		return
+	_active_row = null
 	for child in _steps_box.get_children():
 		_steps_box.remove_child(child)
 		child.queue_free()
@@ -266,10 +289,12 @@ func _refresh() -> void:
 		return
 	var title := String(_objective_title.get_meta("title", "ภารกิจตอนนี้"))
 	_objective_title.text = "ภารกิจ" if collapsed else title
-	_objective_hint.text = "(กด Tab เพื่อเปิด)" if collapsed else "(กด Tab เพื่อซ่อน)"
+	_objective_hint.text = "(กด Tab เพื่อเปิด)" if collapsed else ("(Tab ซ่อน • ล้อเมาส์เลื่อน)" if steps_scrollable() else "(กด Tab เพื่อซ่อน)")
 	_objective_label.visible = not collapsed and steps.is_empty()
 	_heading.visible = not collapsed and _heading.text != ""
 	_steps_box.visible = not collapsed and not steps.is_empty()
+	_steps_scroll.visible = _steps_box.visible
+	_steps_scroll.custom_minimum_size = Vector2(PANEL_WIDTH - 60, minf(_steps_box.get_combined_minimum_size().y, STEPS_MAX_HEIGHT))
 	_objective_panel.custom_minimum_size = Vector2(0 if collapsed else PANEL_WIDTH, 0)
 	# Always in the top-right corner (clear of desktop icons), open or folded.
 	_objective_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
@@ -286,7 +311,15 @@ func _refresh() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not _objective_panel.visible or not event is InputEventKey:
+	if not _objective_panel.visible:
+		return
+	# Mouse wheel: scroll a long step list (works with the mouse captured).
+	if event is InputEventMouseButton and event.pressed and not collapsed and steps_scrollable():
+		var wheel := (event as InputEventMouseButton).button_index
+		if wheel == MOUSE_BUTTON_WHEEL_UP or wheel == MOUSE_BUTTON_WHEEL_DOWN:
+			_steps_scroll.scroll_vertical += int(WHEEL_STEP * (-1.0 if wheel == MOUSE_BUTTON_WHEEL_UP else 1.0))
+			return
+	if not event is InputEventKey:
 		return
 	var key := event as InputEventKey
 	if not key.pressed or key.echo or key.keycode != KEY_TAB:

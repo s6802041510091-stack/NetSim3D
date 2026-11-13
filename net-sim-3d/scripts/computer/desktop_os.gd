@@ -14,6 +14,8 @@ signal app_opened(app_id: String, app: Node)
 signal command_run(line: String)
 ## A ping finished: what was typed, the address pinged and the replies (0-4).
 signal ping_done(target: String, address: String, received: int)
+## The simulated web browser loaded a page (Mission 4): ok = it opened.
+signal page_opened(url: String, ok: bool)
 
 const BOOT_TIME := 2.0
 ## Mission 1 program (NetPlan EDU). Shown only on computers that have "netplan_edu" installed.
@@ -57,6 +59,9 @@ var _winsec: Control
 var _security_toast: PanelContainer
 var _teamviewer_icon: Control
 var _teamviewer: Control
+var _browser_icon: Control
+## Address the browser opens first.
+const HOME_URL := "www.school.ac.th"
 var _session := 0
 var _tween: Tween
 ## Set by a mission to check actions first: func(action: String, args:
@@ -123,6 +128,7 @@ func _show_desktop() -> void:
 	_netplan_icon.visible = station.has_app("netplan_edu")
 	_winsec_icon.visible = station.has_app("windows_security")
 	_teamviewer_icon.visible = station.has_app("teamviewer")
+	_browser_icon.visible = station.has_app("browser")
 	for app_id: String in _app_menu_buttons:
 		_app_menu_buttons[app_id].visible = station.has_app(app_id)
 	for app_id: String in _taskbar_buttons:
@@ -240,6 +246,9 @@ func _build_desktop() -> void:
 	_teamviewer_icon = _desktop_icon("teamviewer", "TeamViewer", open_teamviewer)
 	_teamviewer_icon.name = "TeamViewerIcon"
 	icons.add_child(_teamviewer_icon)
+	_browser_icon = _desktop_icon("browser", "Web Browser", open_browser)
+	_browser_icon.name = "BrowserIcon"
+	icons.add_child(_browser_icon)
 	icons.add_child(_desktop_icon("bin", "Recycle Bin", _open_recycle_bin))
 
 	_window_layer = Control.new()
@@ -291,7 +300,7 @@ func _build_taskbar() -> void:
 	search.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	search.add_theme_stylebox_override("normal", _flat(Color("eff7ffcf"), 18))
 	row.add_child(search)
-	for item in [["this_pc", "folder", "This PC", _open_this_pc], ["cmd", "cmd", "Command Prompt", _open_cmd], ["netplan_edu", "netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "windows_security", "Windows Security", open_windows_security], ["teamviewer", "teamviewer", "TeamViewer", open_teamviewer]]:
+	for item in [["this_pc", "folder", "This PC", _open_this_pc], ["cmd", "cmd", "Command Prompt", _open_cmd], ["netplan_edu", "netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "windows_security", "Windows Security", open_windows_security], ["teamviewer", "teamviewer", "TeamViewer", open_teamviewer], ["browser", "browser", "Web Browser", open_browser]]:
 		var id: String = item[0]
 		var button := _task_button(item[1], item[2], _taskbar_action.bind(id, item[3]))
 		button.name = "Taskbar_" + id
@@ -363,7 +372,7 @@ func _build_taskbar() -> void:
 		var entry := _menu_button(item[0], item[1])
 		_menu_entries.append(entry)
 		menu.add_child(entry)
-	for item in [["netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "Windows Security", open_windows_security], ["teamviewer", "TeamViewer", open_teamviewer]]:
+	for item in [["netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "Windows Security", open_windows_security], ["teamviewer", "TeamViewer", open_teamviewer], ["browser", "Web Browser", open_browser]]:
 		var app_button := _menu_button(item[1], item[2])
 		_app_menu_buttons[item[0]] = app_button
 		app_button.set_meta("app_id", item[0])
@@ -713,6 +722,64 @@ func open_teamviewer() -> Control:
 	app.connect("minimize_requested", func(): app.visible = false)
 	app_opened.emit("teamviewer", app)
 	return app
+
+
+## A simple web browser (Mission 4: test the Internet after the repair).
+## Installed only where a mission asks for it ("browser" in installed_apps).
+func open_browser() -> Control:
+	if station == null or not station.has_app("browser"):
+		return null
+	var existed := _windows.has("browser")
+	var window := _open_window("browser", "Web Browser", Vector2(720, 450), func(body):
+		var column := VBoxContainer.new()
+		column.add_theme_constant_override("separation", 8)
+		body.add_child(column)
+		var bar := HBoxContainer.new()
+		column.add_child(bar)
+		var address := LineEdit.new()
+		address.name = "Address"
+		address.text = HOME_URL
+		address.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		bar.add_child(address)
+		var go := Button.new()
+		go.text = "ไป"
+		bar.add_child(go)
+		var page := VBoxContainer.new()
+		page.name = "Page"
+		page.custom_minimum_size = Vector2(680, 330)
+		page.add_theme_constant_override("separation", 8)
+		column.add_child(page)
+		address.text_submitted.connect(func(url: String): _load_page(page, url))
+		go.pressed.connect(func(): _load_page(page, address.text)))
+	if not existed:
+		_load_page(window.find_child("Page", true, false), HOME_URL)
+	window.move_to_front()
+	return window
+
+
+## Shows the page, or the "no Internet" page when this computer has no link.
+func _load_page(page: Control, url: String) -> void:
+	if page == null:
+		return
+	for child in page.get_children():
+		page.remove_child(child)
+		child.queue_free()
+	var ok := station.network_connected and not station.link_fault
+	if ok:
+		var head := PanelContainer.new()
+		head.add_theme_stylebox_override("panel", _flat(Color("1d5fa8"), 6))
+		page.add_child(head)
+		var title := _label("โรงเรียนตัวอย่างวิทยา — เว็บไซต์โรงเรียน", 22, Color.WHITE)
+		head.add_child(title)
+		page.add_child(_label("ข่าวประชาสัมพันธ์", 18, COLOR_TITLE))
+		for line in ["• ประกาศตารางสอบกลางภาค ภาคเรียนที่ 2", "• ห้องปฏิบัติการคอมพิวเตอร์พร้อมใช้งานแล้ว", "• กิจกรรมวันวิทยาศาสตร์ สัปดาห์หน้า"]:
+			page.add_child(_label(line, 16, COLOR_TEXT))
+		page.add_child(_label("เชื่อมต่อสำเร็จ: " + url.strip_edges(), 13, Color(0.2, 0.5, 0.3)))
+	else:
+		page.add_child(_label("ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้", 24, COLOR_TEXT))
+		page.add_child(_label("ตรวจสอบสายเครือข่าย, โมเด็ม และเราเตอร์", 16, Color(0.35, 0.4, 0.48)))
+		page.add_child(_label("ERR_INTERNET_DISCONNECTED", 13, Color(0.45, 0.48, 0.55)))
+	page_opened.emit(url.strip_edges(), ok)
 
 
 ## Opens Windows Security (Mission 5) full screen above the taskbar. Returns the
