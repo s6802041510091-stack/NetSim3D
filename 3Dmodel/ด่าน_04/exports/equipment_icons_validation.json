@@ -1,0 +1,130 @@
+[
+  {
+    "file": "tool_cable_tester.png",
+    "alias": "cable_tester.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      46,
+      81,
+      464,
+      429
+    ],
+    "transparent_pixels": 61415
+  },
+  {
+    "file": "tool_crimper.png",
+    "alias": "crimper.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      177,
+      464,
+      333
+    ],
+    "transparent_pixels": 210280
+  },
+  {
+    "file": "tool_stripper.png",
+    "alias": "stripper.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      71,
+      464,
+      438
+    ],
+    "transparent_pixels": 61091
+  },
+  {
+    "file": "tool_screwdriver.png",
+    "alias": "screwdriver.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      210,
+      464,
+      301
+    ],
+    "transparent_pixels": 223799
+  },
+  {
+    "file": "part_nic.png",
+    "alias": "nic.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      97,
+      464,
+      413
+    ],
+    "transparent_pixels": 158086
+  },
+  {
+    "file": "part_ram.png",
+    "alias": "ram.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      181,
+      464,
+      329
+    ],
+    "transparent_pixels": 227631
+  },
+  {
+    "file": "part_gpu.png",
+    "alias": "gpu.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      47,
+      140,
+      464,
+      370
+    ],
+    "transparent_pixels": 163472
+  },
+  {
+    "file": "part_usb_wifi.png",
+    "alias": "usb_wifi.png",
+    "size": [
+      512,
+      512
+    ],
+    "channels": 4,
+    "opaque_bounds": [
+      171,
+      47,
+      340,
+      464
+    ],
+    "transparent_pixels": 86730
+  }
+]

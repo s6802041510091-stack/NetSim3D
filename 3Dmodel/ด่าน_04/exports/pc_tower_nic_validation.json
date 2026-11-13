@@ -1,0 +1,52 @@
+{
+  "triangles": 18668,
+  "per_object_triangles": {
+    "Case_Body": 2649,
+    "Power_Button": 92,
+    "Power_LED": 60,
+    "Interior": 12281,
+    "Side_Cover": 56,
+    "Cover_Screw_2": 400,
+    "Cover_Screw_1": 400,
+    "Power_Cable_Plug": 1796,
+    "NIC_Card": 762,
+    "NIC_Bracket_Screw": 160,
+    "NIC_Link_LED": 12
+  },
+  "contract_objects": 14,
+  "original_origins_and_dimensions": "preserved within 0.002 mm",
+  "texture_size": [
+    1024,
+    1024
+  ],
+  "texture_count": 1,
+  "cable_min_z_m": 0.0040000006556510925,
+  "cable_max_z_m": 0.11431405693292618,
+  "rear_slot_aperture_mm": [
+    -12.8,
+    76.8,
+    116.7,
+    135.3
+  ],
+  "glb_bytes": 1233200,
+  "glb_triangles": 18668,
+  "glb_texture_sizes": [
+    [
+      1024,
+      1024
+    ]
+  ],
+  "source_contract": "passed for all 14 objects",
+  "glb_contract": "passed for all 14 objects",
+  "no_unapplied_modifiers": "passed",
+  "pbr_materials": "passed",
+  "nic_extraction": "clear from 10 to 300 mm, every 5 mm, cover/screw removed",
+  "rear_panel_opaque_samples": 4714,
+  "rear_panel": "passed",
+  "cable_above_table": "passed",
+  "dimensions_blender_m": [
+    0.19,
+    0.4,
+    0.4
+  ]
+}
