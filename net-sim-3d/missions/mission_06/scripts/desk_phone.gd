@@ -15,11 +15,17 @@ const COLLISION_LAYER := 8
 	set(value):
 		ringing = value
 		_update_light()
+		_update_ring_sound()
+
+## The ring (assets/audio/generated/phone_ring.wav, a 3 s loop), heard from
+## the phone in the room: plays while ringing, stops when answered.
+const RING_SOUND := "res://assets/audio/generated/phone_ring.wav"
 
 @onready var _ring_light: MeshInstance3D = get_node_or_null("RingLight")
 @onready var _handset: Node3D = get_node_or_null("Handset")
 var _time := 0.0
 var _handset_home := Vector3.ZERO
+var _ring_player: AudioStreamPlayer3D
 
 
 func _ready() -> void:
@@ -28,7 +34,29 @@ func _ready() -> void:
 	set_meta(META_KEY, self)
 	if _handset:
 		_handset_home = _handset.position
+	_ring_player = AudioStreamPlayer3D.new()
+	_ring_player.name = "RingSound"
+	var stream := load(RING_SOUND) as AudioStream if ResourceLoader.exists(RING_SOUND) else null
+	if stream is AudioStreamWAV:
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+	_ring_player.stream = stream
+	_ring_player.bus = "SoundEffect"
+	_ring_player.volume_db = -2.0
+	_ring_player.unit_size = 4.0
+	_ring_player.max_distance = 28.0
+	add_child(_ring_player)
 	_update_light()
+	_update_ring_sound()
+
+
+## Ringing -> the ring loops; answered (ringing = false) -> silent at once.
+func _update_ring_sound() -> void:
+	if _ring_player == null or not is_inside_tree():
+		return
+	if ringing and not _ring_player.playing and _ring_player.stream:
+		_ring_player.play()
+	elif not ringing and _ring_player.playing:
+		_ring_player.stop()
 
 
 func _process(delta: float) -> void:

@@ -274,3 +274,23 @@ writeWav("popup_soft", (() => {
 	writeWav("jingle_fail", out, false, 0.7);
 }
 writeWav("star", bell(note("E6"), 0.9), false, 0.7);
+
+// Desk telephone ring (loop, 3 s): two short electronic trills — two tones
+// warbling at ~20 Hz — then a pause, like an office phone.
+{
+	const out = buf(3.0);
+	const burst = (start, len) => {
+		const n = Math.round(len * RATE), at = Math.round(start * RATE);
+		for (let i = 0; i < n && at + i < out.length; i++) {
+			const t = i / RATE;
+			const warble = Math.sin(2 * Math.PI * 20 * t) > 0 ? 1 : 0;
+			const f = warble ? 1240 : 1060;
+			let v = Math.sin(2 * Math.PI * f * t) * 0.8 + Math.sin(2 * Math.PI * f * 2 * t) * 0.15;
+			const edge = Math.min(1, t / 0.01, (len - t) / 0.02);
+			out[at + i] += v * Math.max(0, edge);
+		}
+	};
+	burst(0.0, 0.4);
+	burst(0.6, 0.4);
+	writeWav("phone_ring", out, true, 0.7);
+}
