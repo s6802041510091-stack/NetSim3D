@@ -1,47 +1,43 @@
 class_name Mission05Data
 extends Resource
 
-## Everything Mission 5 needs that is not code: texts, the simulated alert,
-## the scan result, the answer buttons and the score rules.
+## Everything Mission 5 needs that is not code: names in the simulated alert
+## and scan, the answers and their hints (the score is Mission05State).
 ## Saved as missions/mission_05/data/mission_05_data.tres (edit in the Inspector).
 ## All file and program names are made up for the game — nothing real is scanned.
+## The program itself is in English like the real Windows 11 (user,
+## 2026-11-13); the hints are Thai and shown by the game, not by the program.
 
 @export var mission_id: String = "mission_05"
 @export var mission_title: String = "ภารกิจที่ 5: ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน"
 @export var app_name: String = "Windows Security"
-@export var app_note: String = "จำลองเพื่อการศึกษา"
 @export_multiline var disclaimer: String = "โปรแกรมจำลองภายในเกมเพื่อการศึกษาเท่านั้น ไม่ใช่ Windows Security จริง ไม่ได้สแกนเครื่องของคุณ และไม่เกี่ยวข้องกับ Microsoft"
 
-@export_group("Score")
-@export var start_score: int = 100
-## Points taken for every wrong choice (Firewall or Anti-Virus).
-@export var penalty_per_wrong: int = 10
-
 @export_group("Firewall")
-@export var firewall_alert: String = "โปรแกรมที่ไม่รู้จักกำลังขออนุญาตเชื่อมต่อผ่านเครือข่าย"
-## Rows shown under the alert: label -> value.
-@export var firewall_details: Dictionary = {
-	"Application": "Unknown_Update.exe",
-	"Publisher": "Unknown",
-	"Connection": "Incoming connection",
-	"Status": "Waiting for permission",
-}
+## The program that asks to connect (Windows Security Alert).
+@export var firewall_app: String = "Unknown_Update.exe"
+@export var firewall_publisher: String = "Unknown"
+@export var firewall_path: String = "C:\\Users\\Student\\Downloads\\Unknown_Update.exe"
+## ids: allow (Allow access), block (Cancel — right), disable (switch off).
 @export var firewall_choices: Array[SecurityChoice] = []
-@export var firewall_done_message: String = "Unauthorized connection blocked"
 @export_multiline var firewall_reason: String = ""
 
 @export_group("Anti-Virus")
 ## Seconds the simulated scan takes (the design asks for 3–5 s).
 @export_range(1.0, 10.0, 0.5) var scan_seconds: float = 4.0
 @export var threat_file: String = "Student_Game_Crack.exe"
+@export var threat_path: String = "C:\\Users\\Student\\Downloads\\Student_Game_Crack.exe"
+## Detection name in the style Windows uses (made up).
+@export var threat_name: String = "HackTool:Win32/GameCrack.A"
 @export var threat_risk: String = "High"
+## ids: remove, quarantine (right), allow (on device), exclude (Add an
+## exclusion), realtime_off (Real-time protection switched off).
 @export var threat_choices: Array[SecurityChoice] = []
-@export var threat_done_message: String = "Threat quarantined"
 @export_multiline var threat_reason: String = ""
 
 @export_group("Report")
 @export var submit_button_text: String = "ส่งผลการตรวจสอบ"
-@export_multiline var submitted_message: String = "ส่งผลการตรวจสอบแล้ว — ออกจากคอมพิวเตอร์ แล้วกลับไปรายงานหัวหน้างานที่ห้อง Data Center"
+@export_multiline var submitted_message: String = "ส่งผลการตรวจสอบแล้ว — ออกจากคอมพิวเตอร์ แล้วแจ้งผลกับครูประจำห้องคอมพิวเตอร์"
 
 
 func get_firewall_choice(id: String) -> SecurityChoice:
@@ -61,10 +57,12 @@ func _find(list: Array[SecurityChoice], id: String) -> SecurityChoice:
 
 ## Returns "" when the data is usable, otherwise what is wrong with it.
 func validate_data() -> String:
+	var needed := {"Firewall": ["allow", "block", "disable"], "Anti-Virus": ["remove", "quarantine", "allow", "exclude", "realtime_off"]}
 	for pair in [["Firewall", firewall_choices], ["Anti-Virus", threat_choices]]:
 		var list: Array = pair[1]
-		if list.size() != 3:
-			return "%s needs 3 choices (found %d)" % [pair[0], list.size()]
+		for id in needed[pair[0]]:
+			if _find(list, id) == null:
+				return "%s needs the choice '%s'" % [pair[0], id]
 		var correct := 0
 		for c in list:
 			if c.is_correct:

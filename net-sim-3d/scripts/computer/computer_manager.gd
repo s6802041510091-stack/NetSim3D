@@ -26,9 +26,6 @@ extends Node3D
 @export var npc_used_hosts: PackedStringArray = ["IT-HEAD-PC"]
 ## Screens that are not part of the map model (a MeshInstance3D in another scene).
 @export var extra_screen_paths: Array[NodePath] = []
-## Where Mission 5 progress is saved. Empty = the default file from SavePaths
-## (the same file Mission05SaveStore uses).
-@export var mission_05_save_path: String = ""
 
 ## Names for the computers that are not student PCs (Godot turns ".001" into "_001").
 const NAMED_SCREENS := {
@@ -80,20 +77,12 @@ func _ready() -> void:
 			station.installed_apps.append("browser")
 		if station.hostname in windows_security_hosts:
 			station.installed_apps.append("windows_security")
-			station.set_screen_alert(not _mission_05_protected())
+			# Level 5 always starts with the security warning (nothing is
+			# carried over between plays); Windows Security clears it.
+			station.set_screen_alert(true)
 		if station.hostname in npc_used_hosts:
 			station.collision_layer = 0
 		stations.append(station)
-
-
-## True when the saved Mission 5 progress says the target computer is already fixed.
-## Read by path (no class dependency) so the computers still work without the mission files.
-func _mission_05_protected() -> bool:
-	var path := mission_05_save_path if not mission_05_save_path.is_empty() else SavePaths.file("mission_05_save.json")
-	if not FileAccess.file_exists(path):
-		return false
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	return parsed is Dictionary and bool(parsed.get("protected", false))
 
 
 func _assign_identity(station: ComputerStation, screen_name: String, index: int) -> void:

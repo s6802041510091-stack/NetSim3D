@@ -1,40 +1,58 @@
 class_name Mission05State
-extends Resource
+extends RefCounted
 
-## Progress of Mission 5 for one player. Plain data only — WindowsSecurity
-## changes it, Mission05SaveStore writes it to disk. to_dict()/from_dict()
-## let a future shared save system store it instead.
+## What the player did in Mission 5 and the score (ภารกิจ/ด่าน_05/README.md,
+## agreed with the user on 2026-11-13). A fresh state every time the level
+## starts (no progress is carried over between plays).
+##   correctness 30: Firewall 15 + Anti-Virus 15 — the right answer on the 1st
+##                   try is full, on the 2nd 8, later 0
+##   process 50:     5 decisions x 10:
+##                   (a) the connection problem: the first section opened is
+##                       Firewall & network protection
+##                   (b) never turned the Firewall off
+##                   (c) the suspicious file: after the firewall is fixed, the
+##                       first other section opened is Virus & threat protection
+##                   (d) never Remove / Allow on device / Add exclusion /
+##                       real-time protection off — Quarantine first
+##                   (e) the status was Protected when "ส่งผลการตรวจสอบ" was first pressed
+##   time 20:        measured for real
+## Windows Security looks like the real Windows 11 program (user, 2026-11-13),
+## so the decisions are made in its own pages: the sidebar/tiles, the firewall
+## alert (Allow access / Cancel), the firewall switch, the threat actions
+## (Remove / Quarantine / Allow on device), the exclusions page.
 
 enum ScanStatus { NOT_SCANNED, SCANNED }
 
-const SAVE_VERSION := 1
+const DECISION_POINTS := 10
+const PART_POINTS := 15
+const PART_POINTS_2ND := 8
+## Firewall answers: Allow access / Cancel (keeps it blocked) / switch off.
+const FIREWALL_RIGHT := "block"
+const FIREWALL_OFF := "disable"
+## Anti-Virus answers: quarantine / remove / allow (on device) / exclude
+## (Add an exclusion) / realtime_off (Real-time protection switched off).
+const THREAT_RIGHT := "quarantine"
+## Sections of Windows Security (the sidebar).
+const TOOL_FIREWALL := "firewall"
+const TOOL_VIRUS := "virus"
 
-@export var app_opened: bool = false
-@export var firewall_blocked: bool = false
-@export var scan_status: ScanStatus = ScanStatus.NOT_SCANNED
-@export var threat_quarantined: bool = false
-@export var score: int = 100
-## Every wrong choice in order, e.g. ["firewall:allow", "threat:exclude"].
-@export var wrong_choices: PackedStringArray = PackedStringArray()
-## True after the player pressed "ส่งผลการตรวจสอบ" in the program.
-@export var report_submitted: bool = false
-## For the mission system: set when the player has reported to the Data Center supervisor.
-@export var reported_to_supervisor: bool = false
-## For a future reward system: set once the reward for this mission is given.
-@export var reward_claimed: bool = false
-
-
-func reset(data: Mission05Data) -> void:
-	app_opened = false
-	firewall_blocked = false
-	scan_status = ScanStatus.NOT_SCANNED
-	threat_quarantined = false
-	score = data.start_score
-	wrong_choices = PackedStringArray()
-	report_submitted = false
-	reported_to_supervisor = false
-	reward_claimed = false
-	emit_changed()
+var app_opened := false
+## The player has opened the right section for each problem.
+var conn_matched := false
+var file_matched := false
+## The first section opened for each problem ("" = none yet).
+var conn_tool_first := ""
+var file_tool_first := ""
+var firewall_blocked := false
+var scan_status: ScanStatus = ScanStatus.NOT_SCANNED
+var threat_quarantined := false
+## Every answer in order (the last one is the right one).
+var firewall_choices := PackedStringArray()
+var threat_choices := PackedStringArray()
+## Status when "ส่งผลการตรวจสอบ" was first pressed: "protected" / "early".
+var submit_first := ""
+var report_submitted := false
+var told_teacher := false
 
 
 ## Security status: Protected (both parts done).
@@ -42,49 +60,114 @@ func is_protected() -> bool:
 	return firewall_blocked and scan_status == ScanStatus.SCANNED and threat_quarantined
 
 
+## A section of the program was opened (Home does not count). Before the
+## firewall is fixed the first one is decision (a); after it, the first one
+## other than the Firewall is decision (c).
+func note_section(section: String) -> void:
+	if section == "" or section == "home":
+		return
+	if not firewall_blocked:
+		if conn_tool_first == "":
+			conn_tool_first = section
+		if section == TOOL_FIREWALL:
+			conn_matched = true
+	elif not threat_quarantined and section != TOOL_FIREWALL:
+		if file_tool_first == "":
+			file_tool_first = section
+		if section == TOOL_VIRUS:
+			file_matched = true
+
+
+func note_firewall(id: String) -> bool:
+	firewall_choices.append(id)
+	firewall_blocked = firewall_blocked or id == FIREWALL_RIGHT
+	return id == FIREWALL_RIGHT
+
+
+func note_threat(id: String) -> bool:
+	threat_choices.append(id)
+	threat_quarantined = threat_quarantined or id == THREAT_RIGHT
+	return id == THREAT_RIGHT
+
+
+## "ส่งผลการตรวจสอบ" pressed. True when the report is accepted (Protected).
+func note_submit() -> bool:
+	if submit_first == "":
+		submit_first = "protected" if is_protected() else "early"
+	if is_protected():
+		report_submitted = true
+	return report_submitted
+
+
+## Every wrong pick (sections, answers, early submit).
 func wrong_count() -> int:
-	return wrong_choices.size()
+	var n := 0
+	n += firewall_choices.size() - int(FIREWALL_RIGHT in firewall_choices)
+	n += threat_choices.size() - int(THREAT_RIGHT in threat_choices)
+	n += int(conn_tool_first != "" and conn_tool_first != TOOL_FIREWALL)
+	n += int(file_tool_first != "" and file_tool_first != TOOL_VIRUS)
+	n += int(submit_first == "early")
+	return n
 
 
-func add_wrong(part: String, choice_id: String, penalty: int) -> void:
-	wrong_choices.append("%s:%s" % [part, choice_id])
-	score = maxi(0, score - penalty)
-	emit_changed()
+static func _part_points(choices: PackedStringArray, right: String) -> int:
+	match choices.find(right):
+		0:
+			return PART_POINTS
+		1:
+			return PART_POINTS_2ND
+	return 0
 
 
-# ---------------------------------------------------------------- save format
-
-func to_dict() -> Dictionary:
-	return {
-		"version": SAVE_VERSION,
-		"app_opened": app_opened,
-		"firewall_blocked": firewall_blocked,
-		"scan_completed": scan_status == ScanStatus.SCANNED,
-		"threat_quarantined": threat_quarantined,
-		"score": score,
-		"wrong_choices": Array(wrong_choices),
-		"protected": is_protected(),
-		"report_submitted": report_submitted,
-		"reported_to_supervisor": reported_to_supervisor,
-		"reward_claimed": reward_claimed,
-	}
+func correctness_points() -> int:
+	return _part_points(firewall_choices, FIREWALL_RIGHT) + _part_points(threat_choices, THREAT_RIGHT)
 
 
-## Loads values saved by to_dict(). Broken values are ignored, so an old or
-## damaged save never crashes the mission.
-func from_dict(d: Dictionary, data: Mission05Data) -> void:
-	reset(data)
-	app_opened = bool(d.get("app_opened", false))
-	firewall_blocked = bool(d.get("firewall_blocked", false))
-	scan_status = ScanStatus.SCANNED if bool(d.get("scan_completed", false)) else ScanStatus.NOT_SCANNED
-	# A file can only be quarantined after a scan found it.
-	threat_quarantined = scan_status == ScanStatus.SCANNED and bool(d.get("threat_quarantined", false))
-	score = clampi(int(d.get("score", data.start_score)), 0, data.start_score)
-	var w: Variant = d.get("wrong_choices", [])
-	if w is Array:
-		for v in w:
-			wrong_choices.append(str(v))
-	report_submitted = is_protected() and bool(d.get("report_submitted", false))
-	reported_to_supervisor = report_submitted and bool(d.get("reported_to_supervisor", false))
-	reward_claimed = bool(d.get("reward_claimed", false))
-	emit_changed()
+func decision_counts() -> Vector2i:
+	var ok := 0
+	ok += int(conn_tool_first == TOOL_FIREWALL)
+	ok += int(firewall_blocked and not FIREWALL_OFF in firewall_choices)
+	ok += int(file_tool_first == TOOL_VIRUS)
+	ok += int(threat_quarantined and threat_choices.size() > 0 and threat_choices[0] == THREAT_RIGHT)
+	ok += int(submit_first == "protected")
+	return Vector2i(ok, 5)
+
+
+func process_points() -> int:
+	return decision_counts().x * DECISION_POINTS
+
+
+func mission_score(elapsed_sec: float, time_full_sec: float, time_zero_sec: float) -> MissionScore:
+	var counts := decision_counts()
+	var score := MissionScore.compute(correctness_points(), counts.x, counts.y, elapsed_sec, time_full_sec, time_zero_sec)
+	score.mistakes = mistakes()
+	return score
+
+
+## How many tries the right answer took (0 = not answered yet).
+static func tries(choices: PackedStringArray, right: String) -> int:
+	return choices.find(right) + 1
+
+
+## Short Thai lines for the summary's "จุดที่ผิดพลาด".
+func mistakes() -> PackedStringArray:
+	var out := PackedStringArray()
+	if conn_tool_first != "" and conn_tool_first != TOOL_FIREWALL:
+		out.append("เปิดส่วนอื่นก่อน Firewall & network protection — การควบคุมการเชื่อมต่อผ่านเครือข่ายเป็นหน้าที่ของ Firewall")
+	if "allow" in firewall_choices:
+		out.append("กด Allow access ให้โปรแกรมที่ไม่ทราบผู้ผลิต — ควรกด Cancel ให้การเชื่อมต่อยังถูกปิดกั้นไว้")
+	if FIREWALL_OFF in firewall_choices:
+		out.append("ปิด Microsoft Defender Firewall — การปิด Firewall ทำให้เครื่องไม่มีการป้องกันการเชื่อมต่อ")
+	if file_tool_first != "" and file_tool_first != TOOL_VIRUS:
+		out.append("เปิดส่วนอื่นก่อน Virus & threat protection — การตรวจหาและจัดการไฟล์อันตรายเป็นหน้าที่ของ Anti-Virus")
+	if "remove" in threat_choices:
+		out.append("เลือก Remove ทั้งที่ยังไม่ได้ยืนยันว่าไฟล์อันตราย — ควรกักกัน (Quarantine) ไว้ก่อน เพราะยังกู้คืนได้")
+	if "allow" in threat_choices:
+		out.append("เลือก Allow on device ให้ไฟล์ความเสี่ยงสูงทำงาน — ควรกักกัน (Quarantine) ไว้ก่อน")
+	if "exclude" in threat_choices:
+		out.append("เพิ่มไฟล์เป็น Exclusion — ข้อยกเว้นใช้กับไฟล์ที่ยืนยันแล้วว่าปลอดภัยเท่านั้น")
+	if "realtime_off" in threat_choices:
+		out.append("ปิด Real-time protection — ทำให้ Anti-Virus ไม่เฝ้าระวังไฟล์ในเครื่อง")
+	if submit_first == "early":
+		out.append("กดส่งผลการตรวจสอบก่อนทุกส่วนเป็นสีเขียว — ควรตรวจสถานะหลังแก้ไขก่อนส่งผล")
+	return out

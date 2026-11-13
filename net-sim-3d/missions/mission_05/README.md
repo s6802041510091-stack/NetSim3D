@@ -1,75 +1,23 @@
-# ภารกิจที่ 5 — Windows Security (จำลอง) ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน
+# ด่าน 05 — ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน (Windows Security จำลอง)
 
-โปรแกรมจำลองบนคอมพิวเตอร์ในเกม ภารกิจนี้มีโปรแกรมเดียวคือ **Windows Security (จำลองเพื่อการศึกษา)**
-ไม่มีการเปิด Windows Security จริง ไม่มีการสแกนเครื่องจริง และไม่มีไฟล์อันตรายจริง ชื่อไฟล์และโปรแกรมทั้งหมดเป็นข้อมูลสมมติ
-ในตัวโปรแกรมมีข้อความ "จำลองเพื่อการศึกษา" และหมายเหตุว่าไม่เกี่ยวข้องกับ Microsoft
+บทภารกิจอยู่ที่ `../../../ภารกิจ/ด่าน_05/README.md` (ตกลงรายละเอียดกับผู้พัฒนา 13 พ.ย. 2569)
 
-เอกสารออกแบบภารกิจ: `D:\Project-1\ภารกิจที่5\ภารกิจที่5_ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน.docx`
+โปรแกรมจำลองเพื่อการศึกษา ไม่มีการเปิด Windows Security จริง ไม่มีการสแกนเครื่องจริง และไม่มีไฟล์อันตรายจริง ชื่อไฟล์และโปรแกรมเป็นข้อมูลสมมติทั้งหมด
 
-## ขั้นตอนในเกม (ส่วนที่ไฟล์ชุดนี้ทำ)
+- `scripts/mission_05_controller.gd` — ลำดับด่าน 8 ขั้น (แท็บติดตามมาตรฐาน `ObjectiveHUD.set_steps`): รับสายครูผู้ชาย → ไปที่ PC-R3-L2 (จอสีแดง) → เปิด Windows Security → จัดการการเชื่อมต่อ → สแกน → จัดการไฟล์ → ตรวจสถานะแล้วส่งผล → แจ้งครู (ครูนั่งที่ TEACHER-PC ในห้องคอม ใช้ `Mission03Controller.seat_teacher` แบบอ่านอย่างเดียว) ไม่มีขั้นรายงานหัวหน้างาน
+- `scripts/mission_05_state.gd` — สิ่งที่ผู้เล่นทำและคะแนน 30/50/20 เริ่มใหม่ทุกครั้งที่เข้าด่าน (ไม่เก็บความคืบหน้าข้ามรอบ)
+  - ความถูกต้อง 30: Firewall 15 + Quarantine 15 (ถูกครั้งแรกเต็ม ครั้งที่สอง 8 หลังจากนั้น 0)
+  - กระบวนการ 50 = 5 จุด × 10: (ก) เปิด Firewall & network protection เป็นส่วนแรก (ข) ไม่เคยปิด Firewall (ค) หลังแก้ Firewall เปิด Virus & threat protection เป็นส่วนแรก (ง) เลือก Quarantine ตั้งแต่ครั้งแรก (ไม่เคย Remove / Allow on device / Add an exclusion / ปิด Real-time protection) (จ) ทุกส่วนเป็นสีเขียวตอนกดส่งผลครั้งแรก
+  - เวลา 20: ค่าชั่วคราว เต็มเมื่อเสร็จใน 5 นาที เป็น 0 ที่ 15 นาที
+- `scripts/windows_security.gd` — ตัวโปรแกรม หน้าตาและการทำงานแบบ Windows Security ของ Windows 11 เป็นภาษาอังกฤษล้วน (ผู้พัฒนาสั่ง 13 พ.ย. 2569) ไอคอนวาดด้วยโค้ดทั้งหมด ไม่ใช้ภาพของ Microsoft
+  - แถบซ้ายมี Home, Virus & threat protection, Account protection, Firewall & network protection, App & browser control, Device security, Device performance & health, Family options, Protection history และ Settings ส่วนที่ไม่เกี่ยวกับภารกิจเป็นตัวหลอก (เขียวทั้งหมด)
+  - Home "Security at a glance": การ์ด Firewall และ Virus ขึ้น "Actions recommended" ทั้งคู่ — ส่วนแรกที่เปิดก่อนแก้ Firewall = จุดตัดสินใจ (ก), ส่วนแรกที่เปิดหลังแก้ Firewall = (ค)
+  - Firewall: หน้าต่าง "Windows Security Alert" ของ `Unknown_Update.exe` ปุ่ม Allow access (ผิด) / Cancel (ถูก ปิดกั้นไว้) และสวิตช์ Microsoft Defender Firewall ในหน้า Domain/Private/Public network (ปิด = ผิด แล้วเด้งกลับเป็น On)
+  - Virus: Quick scan (กดได้หลังตอบหน้าต่าง Firewall แล้ว) → พบ `HackTool:Win32/GameCrack.A` คลิกดูรายละเอียด เลือก Remove / Quarantine / Allow on device แล้วกด Start actions (ถูก = Quarantine) กับดักเพิ่มเติม: Manage settings → Real-time protection Off, Exclusions → Add an exclusion → File
+  - คำใบ้ภาษาไทยและปุ่ม "ส่งผลการตรวจสอบ" เป็นแผงของเกม (สีเข้ม) แยกจากหน้าต่าง Windows คำตอบที่ผิดจะไม่ถูกนำไปใช้ ปุ่มส่งผลกดได้ตลอด ถ้ายังไม่เขียวทุกส่วนจะขึ้นคำใบ้และไม่รับผล ความคืบหน้าอยู่ใน `WindowsSecurity.shared_state` ซึ่งตัวควบคุมด่านเป็นผู้ตั้งค่า (ปิดแล้วเปิดโปรแกรมใหม่ได้)
+- `data/mission_05_data.tres` + `scripts/mission_05_data.gd`, `scripts/security_choice.gd` — ข้อความ ตัวเลือก คำใบ้ เหตุผล เวลาสแกน (แก้ใน Inspector ได้)
+- `scripts/security_theme.gd` — สี ฟอนต์ และไอคอนที่วาดเอง
+- `scenes/windows_security.tscn` — scene ของโปรแกรม (กด F6 เปิดดูเดี่ยว ๆ ได้ จะใช้สถานะใหม่ของตัวเอง)
+- ไฟล์ร่วมที่เกี่ยวข้อง: `scripts/computer/desktop_os.gd` (ไอคอน การแจ้งเตือนมุมขวาล่างแบบ Windows 11 `_build_security_toast()`, `open_windows_security()`), `scripts/computer/computer_station.gd` (จอสีแดง), `scripts/computer/computer_manager.gd` (ติดตั้งโปรแกรมและจอสีแดงที่เครื่องเป้าหมาย), `scripts/game_flow.gd` (`configure_level` ด่าน 5)
 
-1. เครื่องเป้าหมายคือ **PC-R3-L2** (ห้องคอมพิวเตอร์ แถว 3 ฝั่งซ้าย ที่นั่ง 2) จอจะเรืองแสงสีแดงจนกว่าจะแก้ไขเสร็จ ผู้เล่นจึงหาเครื่องเจอได้ง่าย
-2. กด E ที่เครื่องนั้น: กล้องซูมเข้าจอ ล็อกการเดิน แสดงหน้า Set-up 2 วินาที แล้วเข้า Desktop (ระบบ DesktopOS เดิม)
-3. Desktop มีไอคอน **Windows Security** และมีหน้าต่างแจ้งเตือนมุมขวาล่าง "พบปัญหาด้านความปลอดภัย — ต้องดำเนินการ"
-4. หน้าแรกของโปรแกรมแสดงสถานะสีแดง **ต้องดำเนินการ**
-5. **Firewall & network protection**: มีโปรแกรม `Unknown_Update.exe` ขอเชื่อมต่อ ต้องเลือก **ปิดกั้นการเชื่อมต่อ**
-6. **Virus & threat protection**: กด Scan (ประมาณ 4 วินาที) พบไฟล์ `Student_Game_Crack.exe` ต้องเลือก **Quarantine**
-7. ทำครบทั้งสองส่วน หน้าแรกจะเปลี่ยนเป็นสีเขียว **Security status: Protected** และปุ่ม **ส่งผลการตรวจสอบ** จะกดได้
-8. กดส่งผล ระบบออกจากคอมพิวเตอร์ให้อัตโนมัติ และผู้เล่นกลับมาเดินได้ตามปกติ
-
-เลือกผิด: ขึ้นคำใบ้ (ไม่เฉลย) หัก 10 คะแนน แล้วเลือกใหม่ได้ ภารกิจไม่ล้มเหลว
-Esc: ปิดโปรแกรม แล้วกด Esc อีกครั้งเพื่อออกจากคอมพิวเตอร์
-
-**ยังไม่ได้ทำ (ส่วนของระบบภารกิจ):** บทสนทนากับหัวหน้างาน Data Center ข้อความ "ได้รับภารกิจ" / "ภารกิจสำเร็จ" และเครื่องหมายจุดหมาย ให้ระบบภารกิจหลักฟังสัญญาณด้านล่างแล้วทำต่อ
-
-## ไฟล์
-
-| ไฟล์ | หน้าที่ |
-|---|---|
-| `missions/mission_05/scenes/windows_security.tscn` | **Scene หลัก** (ตัวโปรแกรม Windows Security จำลอง) |
-| `missions/mission_05/scenes/mission_05_test.tscn` | ฉากทดสอบ (กด F6) ใช้ DesktopOS จริง ไม่ต้องโหลดแผนที่ 3D |
-| `missions/mission_05/data/mission_05_data.tres` | ข้อความ ตัวเลือก คำใบ้ เหตุผล คะแนน และเวลาสแกน (แก้ใน Inspector ได้) |
-| `missions/mission_05/scripts/windows_security.gd` | ตัวโปรแกรม: หน้าแรก Firewall Virus และหน้าสรุป |
-| `missions/mission_05/scripts/security_choice.gd` | Resource ของปุ่มตัวเลือก 1 ปุ่ม (ข้อความ ถูก/ผิด คำใบ้) |
-| `missions/mission_05/scripts/mission_05_data.gd` | Resource ข้อมูลภารกิจทั้งหมด |
-| `missions/mission_05/scripts/mission_05_state.gd` | สถานะผู้เล่น (ทำส่วนไหนแล้ว คะแนน ตัวเลือกที่ผิด ส่งผลแล้วหรือยัง) |
-| `missions/mission_05/scripts/mission_05_save_store.gd` | บันทึก/โหลด JSON ใน `mission_05_save.json` (โฟลเดอร์จาก `SavePaths`: Editor = `net-sim-3d/.saves/`, เว็บ = `user://netsim3d/`) |
-| `missions/mission_05/scripts/security_theme.gd` | สี ฟอนต์ Sarabun และไอคอนที่วาดเอง (โล่ เครื่องหมายถูก) |
-| `missions/mission_05/scripts/mission_05_test_bench.gd` | ฉากทดสอบ: `open_computer()`, `open_mission()`, `exit_computer()` |
-| `tools/validate_mission_05.gd` | ทดสอบอัตโนมัติทั้งภารกิจในแผนที่จริง |
-
-ไฟล์เดิมที่แก้: `scripts/computer/desktop_os.gd` (ไอคอน หน้าต่างแจ้งเตือน `open_windows_security()`),
-`scripts/computer/computer_station.gd` (จอสีแดง `set_screen_alert()`), `scripts/computer/computer_manager.gd` (เลือกเครื่องเป้าหมาย)
-
-## สัญญาณ (Signals) สำหรับระบบภารกิจหลัก
-
-- `DesktopOS.app_opened("windows_security", app)` — ผู้เล่นเปิดโปรแกรมแล้ว
-- `WindowsSecurity.firewall_choice_made(choice_id, correct)`, `scan_started`, `scan_finished(threats_found)`, `threat_choice_made(choice_id, correct)`
-- `WindowsSecurity.mistake_made(hint, penalty)`
-- `WindowsSecurity.protected_reached` — สถานะเป็น Protected
-- `WindowsSecurity.report_submitted(score, wrong_count)` — กดส่งผลการตรวจสอบแล้ว (ต่อไป: ไปรายงานหัวหน้างาน)
-- `WindowsSecurity.computer_exit_requested`, `close_requested`, `minimize_requested`
-
-เมื่อผู้เล่นรายงานหัวหน้างานแล้ว ให้ระบบภารกิจตั้ง `Mission05State.reported_to_supervisor = true` แล้วบันทึก
-
-## กติกาคะแนน
-
-- เริ่ม 100 คะแนน เลือกผิดครั้งละ 10 คะแนน (ทั้ง Firewall และ Anti-Virus) ไม่ต่ำกว่า 0
-- เลือกผิดไม่ทำให้ภารกิจล้มเหลว ได้คำใบ้แล้วเลือกใหม่ได้ คำใบ้ไม่บอกคำตอบ
-- ส่งผลได้เมื่อทำถูกทั้งสองส่วนเท่านั้น คะแนนไม่ขึ้นกับความเร็ว
-
-## ข้อมูลที่บันทึก
-
-`app_opened`, `firewall_blocked`, `scan_completed`, `threat_quarantined`, `score`, `wrong_choices`, `protected`, `report_submitted`, `reported_to_supervisor`, `reward_claimed`
-ถ้ามีระบบ Save กลางในอนาคต ให้เรียก `Mission05State.to_dict()` / `from_dict()` แทน `Mission05SaveStore`
-
-## ทดสอบ
-
-- เปิด `missions/mission_05/scenes/mission_05_test.tscn` แล้วกด F6 (ปุ่ม "ล้างข้อมูลบันทึก" ใช้เริ่มใหม่)
-- หรือรันเกมหลัก (F5) แล้วเดินไปที่เครื่อง PC-R3-L2 ในห้องคอมพิวเตอร์ (จอสีแดง)
-- ทดสอบอัตโนมัติ: `godot --headless --path net-sim-3d -s res://tools/validate_mission_05.gd`
-
-## ตั้งค่า
-
-- เปลี่ยนเครื่องเป้าหมาย: `main.tscn` → node `Computers` → Inspector → `Windows Security Hosts` (ค่าเริ่มต้น `["PC-R3-L2"]`)
-- แก้ข้อความ ตัวเลือก คำใบ้ คะแนน เวลาสแกน: เปิด `missions/mission_05/data/mission_05_data.tres` ใน Inspector
+ทดสอบ: `godot --headless --path net-sim-3d -s res://tools/validate_mission_05.gd` • ภาพ: `tools/capture_mission_05.gd` (ต้องมีหน้าต่าง)

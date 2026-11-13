@@ -650,38 +650,55 @@ func _build_security_toast() -> void:
 	_security_toast.anchor_right = 1.0
 	_security_toast.anchor_top = 1.0
 	_security_toast.anchor_bottom = 1.0
-	_security_toast.offset_left = -380.0
+	_security_toast.offset_left = -376.0
 	_security_toast.offset_right = -12.0
-	_security_toast.offset_top = -48.0 - 12.0 - 118.0
+	_security_toast.offset_top = -48.0 - 12.0 - 150.0
 	_security_toast.offset_bottom = -48.0 - 12.0
-	var style := _flat(Color(0.13, 0.14, 0.18, 0.97), 6)
-	style.border_color = Color(0.85, 0.2, 0.2)
-	style.border_width_left = 5
-	style.content_margin_left = 14
+	# A Windows 11 notification (Mission 5 program is in English like the real one).
+	var style := _flat(Color(0.93, 0.93, 0.93, 0.98), 8)
+	style.border_color = Color(0.78, 0.78, 0.78)
+	style.set_border_width_all(1)
+	style.shadow_color = Color(0, 0, 0, 0.22)
+	style.shadow_size = 12
+	style.content_margin_left = 16
 	style.content_margin_right = 10
 	style.content_margin_top = 10
-	style.content_margin_bottom = 10
+	style.content_margin_bottom = 14
 	_security_toast.add_theme_stylebox_override("panel", style)
 	_security_toast.visible = false
 	_desktop.add_child(_security_toast)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 6)
+	column.add_theme_constant_override("separation", 4)
 	_security_toast.add_child(column)
 	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 8)
 	column.add_child(head)
-	var title := _label("Windows Security", 16, Color.WHITE)
+	var logo := Control.new()
+	logo.custom_minimum_size = Vector2(16, 16)
+	logo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	logo.draw.connect(func():
+		var c := logo.size * 0.5
+		logo.draw_colored_polygon(PackedVector2Array([c + Vector2(0, -8), c + Vector2(6.5, -5), c + Vector2(6, 2), c + Vector2(0, 8), c + Vector2(-6, 2), c + Vector2(-6.5, -5)]), Color(0.0, 0.37, 0.72)))
+	head.add_child(logo)
+	var title := _label("Windows Security", 13, Color(0.2, 0.2, 0.2))
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(title)
 	var dismiss := Button.new()
 	dismiss.text = " x "
 	dismiss.flat = true
-	dismiss.add_theme_color_override("font_color", Color(0.8, 0.82, 0.86))
+	dismiss.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
 	dismiss.pressed.connect(func(): _security_toast.visible = false)
 	head.add_child(dismiss)
-	column.add_child(_label("พบปัญหาด้านความปลอดภัย — ต้องดำเนินการ", 15, Color(1.0, 0.72, 0.72)))
+	column.add_child(_label("Actions recommended", 16, Color(0.08, 0.08, 0.08)))
+	var body := _label("Windows Security found items on this device that need your attention.", 14, Color(0.3, 0.3, 0.3))
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(body)
 	var open := Button.new()
 	open.name = "OpenSecurityButton"
-	open.text = "เปิด Windows Security"
+	open.text = "Open Windows Security"
+	open.add_theme_color_override("font_color", Color(0.1, 0.1, 0.1))
+	open.add_theme_stylebox_override("normal", _flat(Color(0.98, 0.98, 0.98), 4))
+	open.add_theme_stylebox_override("hover", _flat(Color(1, 1, 1), 4))
 	open.pressed.connect(func():
 		_security_toast.visible = false
 		open_windows_security())

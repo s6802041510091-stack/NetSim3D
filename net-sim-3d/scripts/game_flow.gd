@@ -409,6 +409,14 @@ func configure_level(world: Node, level: int) -> void:
 		mission_04.name = "Mission04"
 		world.add_child(mission_04)
 		_connect_level_end(mission_04, level)
+	if level == 5:
+		# Windows Security on PC-R3-L2; the male teacher works at TEACHER-PC
+		# in the computer room (seated as in Level 3) and phones the player.
+		load("res://missions/mission_03/scripts/mission_03_controller.gd").call("seat_teacher", world)
+		var mission_05: Node = load("res://missions/mission_05/scripts/mission_05_controller.gd").new()
+		mission_05.name = "Mission05"
+		world.add_child(mission_05)
+		_connect_level_end(mission_05, level)
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)

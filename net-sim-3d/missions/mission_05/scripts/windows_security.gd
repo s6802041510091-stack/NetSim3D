@@ -2,31 +2,47 @@ class_name WindowsSecurity
 extends PanelContainer
 
 ## Windows Security (simulated, for teaching) — the only program in Mission 5.
+## Looks and works like the Windows 11 program, in English (user, 2026-11-13):
 ##
-##   Home      red "ต้องดำเนินการ" until both parts are fixed, then
-##             "Security status: Protected" and the "ส่งผลการตรวจสอบ" button.
-##   Firewall  an unknown program asks to connect: allow / block / turn the
-##             firewall off. Only "block" is right.
-##   Virus     scan (a few seconds), one high-risk file is found:
-##             quarantine / allow / add exclusion. Only "quarantine" is right.
+##   Home      "Security at a glance": tiles with status badges. Before the
+##             fix both Firewall and Virus show "Actions recommended".
+##   Sidebar   Home, Virus & threat protection, Account protection, Firewall &
+##             network protection, App & browser control, Device security,
+##             Device performance & health, Family options, Protection
+##             history, Settings. The first section the player opens for each
+##             problem is a decision (Mission05State.note_section).
+##   Firewall  network profiles (Domain / Private / Public). A "Windows
+##             Security Alert" asks about Unknown_Update.exe: Allow access
+##             (wrong) / Cancel (keeps it blocked — right). Switching the
+##             firewall off on a profile page is wrong (it switches back on).
+##   Virus     Quick scan (a few seconds, only after the firewall alert), one
+##             threat found: Remove / Quarantine / Allow on device + "Start
+##             actions". Settings: Real-time protection switch (off = wrong),
+##             Exclusions -> Add an exclusion -> File (wrong).
 ##
-## A wrong choice shows a hint (never the answer), costs points, and the player
-## picks again. Nothing here touches the real computer: no real Windows Security,
-## no real scan and no real harmful file — every name is made up for the game.
+## A wrong answer is not applied: the game shows a Thai hint (never the
+## answer) in its own panel, outside the Windows look, and the player tries
+## again. "ส่งผลการตรวจสอบ" is also a game panel. Mission05State records
+## everything for the 30/50/20 score. Nothing here touches the real computer:
+## no real Windows Security, no real scan, no real harmful file — every name
+## is made up for the game. No Microsoft artwork: every icon is drawn in code.
 ##
 ## data    -> Mission05Data   (missions/mission_05/data/mission_05_data.tres)
-## progress-> Mission05State  saved by Mission05SaveStore
+## progress-> Mission05State  (shared_state, owned by Mission05Controller for
+##            one play of the level; the program may be closed and opened again)
 ## Runs on the simulated desktop: DesktopOS.open_windows_security().
 
 signal firewall_choice_made(choice_id: String, correct: bool)
 signal scan_started
 signal scan_finished(threats_found: int)
 signal threat_choice_made(choice_id: String, correct: bool)
-signal mistake_made(hint: String, penalty: int)
-## Both parts fixed: Security status is Protected.
+## A sidebar section / page was opened ("firewall", "virus", "account", ...).
+signal section_opened(section: String)
+signal mistake_made(hint: String)
+## Both parts fixed: every tile is green.
 signal protected_reached
-## "ส่งผลการตรวจสอบ" pressed. The mission system listens to this.
-signal report_submitted(score: int, wrong_count: int)
+## "ส่งผลการตรวจสอบ" accepted (Protected). The mission system listens to this.
+signal report_submitted
 ## Asks the desktop to switch the computer off (player goes back to first person).
 signal computer_exit_requested
 signal close_requested
@@ -34,39 +50,84 @@ signal minimize_requested
 
 const DATA_PATH := "res://missions/mission_05/data/mission_05_data.tres"
 
-enum Page { HOME, FIREWALL, VIRUS }
+enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY, SETTINGS, FW_PROFILE, AV_SETTINGS, EXCLUSIONS }
+
+## Sidebar: page, glyph, title.
+const NAV := [
+	[Page.HOME, "home", "Home"],
+	[Page.VIRUS, "virus", "Virus & threat protection"],
+	[Page.ACCOUNT, "account", "Account protection"],
+	[Page.FIREWALL, "firewall", "Firewall & network protection"],
+	[Page.APP, "app", "App & browser control"],
+	[Page.DEVICE, "device", "Device security"],
+	[Page.HEALTH, "health", "Device performance & health"],
+	[Page.FAMILY, "family", "Family options"],
+	[Page.HISTORY, "history", "Protection history"],
+]
+## Which section each page belongs to (for the decisions).
+const SECTION := {
+	Page.HOME: "home", Page.VIRUS: "virus", Page.ACCOUNT: "account", Page.FIREWALL: "firewall",
+	Page.APP: "app", Page.DEVICE: "device", Page.HEALTH: "health", Page.FAMILY: "family",
+	Page.HISTORY: "history", Page.SETTINGS: "settings", Page.FW_PROFILE: "firewall",
+	Page.AV_SETTINGS: "virus", Page.EXCLUSIONS: "virus",
+}
+const SUBMIT_EARLY_HINT := "ยังมีส่วนที่ต้องดำเนินการอยู่ ตรวจสอบสถานะในหน้า Home ให้ทุกส่วนเป็นสีเขียวก่อนส่งผล"
 
 ## Made-up paths shown while the scan runs.
 const SCAN_PATHS := [
-	"C:\\Windows\\System32\\drivers",
-	"C:\\Program Files\\School Apps",
+	"C:\\Windows\\System32\\drivers\\etc",
+	"C:\\Program Files\\School Apps\\Typing",
 	"C:\\Users\\Student\\Documents",
 	"C:\\Users\\Student\\Downloads",
 	"C:\\Users\\Student\\Desktop",
 	"C:\\Users\\Public\\Pictures",
 ]
+const SCAN_FILES := 48213
+const DOWNLOADS := ["Student_Game_Crack.exe", "Unknown_Update.exe", "Homework_Week3.docx", "Typing_Practice.pdf"]
+const PROFILES := {
+	"Domain": "Networks at a workplace that are joined to a domain.",
+	"Private": "Networks at home or work, where you know and trust the people and devices on the network.",
+	"Public": "Networks in public places such as airports or coffee shops.",
+}
+const ACTIVE_PROFILE := "Public"
+
+## The progress of this play, set by Mission05Controller. When it is null (the
+## scene run on its own with F6) the program starts with its own fresh state.
+static var shared_state: Mission05State
 
 @export var data: Mission05Data
-## Load and save progress with Mission05SaveStore. Tests turn this off.
-@export var use_save_file: bool = true
 ## Handle Esc here. Inside DesktopOS the desktop calls handle_escape() instead;
 ## when this scene runs on its own (F6) it is switched on automatically.
 @export var handle_escape_itself: bool = false
 ## Seconds between pressing "ส่งผลการตรวจสอบ" and leaving the computer.
 @export var exit_delay: float = 1.8
 
-var state: Mission05State = Mission05State.new()
+var state: Mission05State
 var page: Page = Page.HOME
+## The network profile shown on Page.FW_PROFILE.
+var profile := ACTIVE_PROFILE
 var scanning: bool = false
 var scan_progress: float = 0.0
+## The threat's details are open, and the action picked in them.
+var threat_expanded := false
+var threat_pick := ""
 
-var _hint := {"page": -1, "text": ""}
+var _hint := ""
 var _content: VBoxContainer
+var _scroll: ScrollContainer
 var _nav := {}
-var _score_label: Label
 var _scan_bar: ProgressBar
 var _scan_count: Label
 var _scan_path: Label
+var _scan_left: Label
+var _alert: Control
+var _picker: Control
+var _picker_pick := ""
+var _add_menu_open := false
+var _hint_panel: PanelContainer
+var _hint_label: Label
+var _submit_button: Button
+var _submit_note: Label
 var _exit_timer: SceneTreeTimer
 
 
@@ -80,15 +141,13 @@ func _ready() -> void:
 	if get_tree().current_scene == self:
 		handle_escape_itself = true
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if use_save_file:
-		Mission05SaveStore.load_into(state, data)
-	else:
-		state.reset(data)
-	if not state.app_opened:
-		state.app_opened = true
-		_save()
-	add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, SecurityTheme.BORDER, 0, 0, 0))
+	state = shared_state if shared_state != null else Mission05State.new()
+	state.app_opened = true
+	add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, Color(0.75, 0.75, 0.75), 0, 0, 0))
 	_build_frame()
+	_build_alert()
+	_build_picker()
+	_build_game_panels()
 	open_page(Page.HOME)
 
 
@@ -98,8 +157,9 @@ func _process(delta: float) -> void:
 	scan_progress = minf(1.0, scan_progress + delta / maxf(0.1, data.scan_seconds))
 	if is_instance_valid(_scan_bar):
 		_scan_bar.value = scan_progress * 100.0
-		_scan_count.text = "ตรวจสอบแล้ว %s ไฟล์" % _thousands(int(scan_progress * 48213))
+		_scan_count.text = "%s files scanned" % _thousands(int(scan_progress * SCAN_FILES))
 		_scan_path.text = SCAN_PATHS[int(scan_progress * 23) % SCAN_PATHS.size()]
+		_scan_left.text = "Estimated time remaining: 00:00:%02d" % ceili((1.0 - scan_progress) * data.scan_seconds)
 	if scan_progress >= 1.0:
 		_finish_scan()
 
@@ -112,10 +172,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 # ================================================================ public API
 
-## Esc closes the program (it has no pop-ups). Returns true when used.
+## Esc closes an open dialog first, then the program. Returns true when used.
 func handle_escape() -> bool:
 	if not visible:
 		return false
+	if _picker.visible:
+		_picker.visible = false
+		return true
+	if _alert.visible:
+		_alert.visible = false
+		return true
 	close_program()
 	return true
 
@@ -127,70 +193,105 @@ func close_program() -> void:
 
 func open_page(target: Page) -> void:
 	page = target
+	_add_menu_open = false
+	var section: String = SECTION[target]
+	state.note_section(section)
+	section_opened.emit(section)
+	if target == Page.FIREWALL and firewall_pending():
+		_alert.visible = true
 	_refresh()
+
+
+## A network profile page (Domain / Private / Public).
+func open_profile(profile_name: String) -> void:
+	profile = profile_name
+	open_page(Page.FW_PROFILE)
 
 
 func is_protected() -> bool:
 	return state.is_protected()
 
 
-## Firewall answer. Returns true when it was the right one (block).
+## The firewall alert about the unknown program still needs an answer.
+func firewall_pending() -> bool:
+	return not state.firewall_blocked
+
+
+func alert_visible() -> bool:
+	return _alert.visible
+
+
+func picker_visible() -> bool:
+	return _picker.visible
+
+
+## Firewall answers: "allow" (Allow access), "block" (Cancel in the alert),
+## "disable" (the profile switch turned off). Returns true when right.
 func choose_firewall(choice_id: String) -> bool:
-	if state.firewall_blocked:
-		return false
 	var choice := data.get_firewall_choice(choice_id)
 	if choice == null:
 		return false
+	if choice_id != Mission05State.FIREWALL_OFF and (state.firewall_blocked or not state.conn_matched):
+		return false
+	state.note_firewall(choice_id)
 	firewall_choice_made.emit(choice_id, choice.is_correct)
 	if choice.is_correct:
-		state.firewall_blocked = true
+		_alert.visible = false
 		_clear_hint()
 		_after_fix()
 	else:
-		_wrong("firewall", choice, Page.FIREWALL)
+		_wrong(choice.hint)
 	_refresh()
 	return choice.is_correct
 
 
-## Starts the simulated scan. Returns false if it is already running or done.
+## Quick scan. Only once the firewall alert is answered (the mission's order).
 func start_scan() -> bool:
-	if scanning or state.scan_status == Mission05State.ScanStatus.SCANNED:
+	if scanning or state.scan_status == Mission05State.ScanStatus.SCANNED or not state.firewall_blocked:
 		return false
+	if page != Page.VIRUS:
+		open_page(Page.VIRUS)
 	scanning = true
 	scan_progress = 0.0
-	page = Page.VIRUS
 	scan_started.emit()
 	_refresh()
 	return true
 
 
-## Anti-Virus answer for the file the scan found. True when right (quarantine).
+## Anti-Virus answers: "remove" / "quarantine" / "allow" (the threat's actions,
+## after the scan), "exclude" (Add an exclusion), "realtime_off" (the switch).
+## A wrong one is not applied. Returns true when right (quarantine).
 func choose_threat(choice_id: String) -> bool:
-	if state.scan_status != Mission05State.ScanStatus.SCANNED or state.threat_quarantined:
-		return false
 	var choice := data.get_threat_choice(choice_id)
-	if choice == null:
+	if choice == null or state.threat_quarantined:
 		return false
+	if choice_id in ["remove", "quarantine", "allow"] and state.scan_status != Mission05State.ScanStatus.SCANNED:
+		return false
+	state.note_threat(choice_id)
 	threat_choice_made.emit(choice_id, choice.is_correct)
+	_picker.visible = false
+	threat_pick = ""
 	if choice.is_correct:
-		state.threat_quarantined = true
+		threat_expanded = false
 		_clear_hint()
 		_after_fix()
 	else:
-		_wrong("threat", choice, Page.VIRUS)
+		_wrong(choice.hint)
 	_refresh()
 	return choice.is_correct
 
 
-## "ส่งผลการตรวจสอบ". Only works once the computer is Protected.
+## "ส่งผลการตรวจสอบ". Accepted only once the computer is Protected; earlier it
+## shows a hint (and decision (e) is lost).
 func submit_report() -> bool:
-	if not state.is_protected() or state.report_submitted:
+	if state.report_submitted:
 		return false
-	state.report_submitted = true
-	_save()
-	page = Page.HOME
-	_refresh()
-	report_submitted.emit(state.score, state.wrong_count())
+	if not state.note_submit():
+		_wrong(SUBMIT_EARLY_HINT)
+		return false
+	_clear_hint()
+	_refresh_game_panels()
+	report_submitted.emit()
 	_exit_timer = get_tree().create_timer(exit_delay)
 	_exit_timer.timeout.connect(func():
 		if is_inside_tree():
@@ -199,24 +300,23 @@ func submit_report() -> bool:
 
 
 func current_hint() -> String:
-	return _hint.text if _hint.page == page else ""
+	return _hint
 
 
 # ================================================================ state changes
 
-func _wrong(part: String, choice: SecurityChoice, on_page: Page) -> void:
-	state.add_wrong(part, choice.choice_id, data.penalty_per_wrong)
-	_hint = {"page": on_page, "text": choice.hint}
-	_save()
-	mistake_made.emit(choice.hint, data.penalty_per_wrong)
+func _wrong(hint: String) -> void:
+	_hint = hint
+	_refresh_game_panels()
+	mistake_made.emit(hint)
 
 
 func _clear_hint() -> void:
-	_hint = {"page": -1, "text": ""}
+	_hint = ""
+	_refresh_game_panels()
 
 
 func _after_fix() -> void:
-	_save()
 	if state.is_protected():
 		protected_reached.emit()
 
@@ -224,14 +324,9 @@ func _after_fix() -> void:
 func _finish_scan() -> void:
 	scanning = false
 	state.scan_status = Mission05State.ScanStatus.SCANNED
-	_save()
+	threat_expanded = false
 	scan_finished.emit(1)
 	_refresh()
-
-
-func _save() -> void:
-	if use_save_file:
-		Mission05SaveStore.save(state)
 
 
 # ================================================================ frame
@@ -241,52 +336,51 @@ func _build_frame() -> void:
 	column.add_theme_constant_override("separation", 0)
 	add_child(column)
 	column.add_child(_title_bar())
-
 	var body := HBoxContainer.new()
 	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_theme_constant_override("separation", 0)
 	column.add_child(body)
 	body.add_child(_sidebar())
-
-	var scroll := ScrollContainer.new()
-	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	body.add_child(scroll)
+	var content_bg := PanelContainer.new()
+	content_bg.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content_bg.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.CONTENT, Color(0, 0, 0, 0), 0, 0, 0))
+	body.add_child(content_bg)
+	_scroll = ScrollContainer.new()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	content_bg.add_child(_scroll)
 	var margin := MarginContainer.new()
 	margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	for side in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + side, 36)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 24)
-	scroll.add_child(margin)
+	margin.add_theme_constant_override("margin_left", 36)
+	margin.add_theme_constant_override("margin_right", 40)
+	margin.add_theme_constant_override("margin_top", 24)
+	margin.add_theme_constant_override("margin_bottom", 120)
+	_scroll.add_child(margin)
 	_content = VBoxContainer.new()
 	_content.name = "Content"
 	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_content.add_theme_constant_override("separation", 10)
+	_content.add_theme_constant_override("separation", 8)
 	margin.add_child(_content)
 
 
 func _title_bar() -> Control:
 	var bar := PanelContainer.new()
 	bar.name = "TitleBar"
-	bar.custom_minimum_size = Vector2(0, 40)
-	bar.add_theme_stylebox_override("panel", SecurityTheme.box(Color(0.93, 0.94, 0.96), Color(0, 0, 0, 0), 0, 10, 4))
+	bar.custom_minimum_size = Vector2(0, 36)
+	bar.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, Color(0, 0, 0, 0), 0, 12, 0))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
 	bar.add_child(row)
 	var logo := Control.new()
-	logo.custom_minimum_size = Vector2(26, 26)
+	logo.custom_minimum_size = Vector2(18, 18)
 	logo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	logo.draw.connect(func(): SecurityTheme.draw_shield(logo, logo.size * 0.5, 24.0, SecurityTheme.ACCENT))
+	logo.draw.connect(func(): SecurityTheme.draw_shield(logo, logo.size * 0.5, 17.0, SecurityTheme.ACCENT))
 	row.add_child(logo)
-	var title := _label(data.app_name, 16, SecurityTheme.INK, true)
+	var title := _label(data.app_name, 13, SecurityTheme.INK)
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(title)
-	var note := _label("(%s)" % data.app_note, 14, SecurityTheme.INK_SOFT)
-	note.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(note)
 	row.add_child(_window_button("MinimizeButton", "min", func(): minimize_requested.emit()))
+	row.add_child(_window_button("MaximizeButton", "max", func(): pass))
 	row.add_child(_window_button("CloseButton", "close", close_program))
 	return bar
 
@@ -294,76 +388,107 @@ func _title_bar() -> Control:
 func _window_button(node_name: String, kind: String, action: Callable) -> Button:
 	var b := Button.new()
 	b.name = node_name
-	b.custom_minimum_size = Vector2(44, 32)
+	b.custom_minimum_size = Vector2(46, 36)
 	b.focus_mode = Control.FOCUS_NONE
 	b.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
-	var hover := SecurityTheme.box(Color(0.76, 0.15, 0.15) if kind == "close" else Color(0, 0, 0, 0.08), Color(0, 0, 0, 0), 0)
+	var hover := SecurityTheme.box(Color(0.77, 0.17, 0.11) if kind == "close" else Color(0, 0, 0, 0.06), Color(0, 0, 0, 0), 0)
 	b.add_theme_stylebox_override("hover", hover)
 	b.add_theme_stylebox_override("pressed", hover)
 	b.pressed.connect(action)
-	b.draw.connect(func():
-		var c := b.size * 0.5
-		var color := Color.WHITE if kind == "close" and b.is_hovered() else SecurityTheme.INK
-		if kind == "close":
-			SecurityTheme.draw_cross(b, c, 22.0, color, 1.6)
-		else:
-			b.draw_line(c + Vector2(-7, 0), c + Vector2(7, 0), color, 1.6))
+	b.draw.connect(_draw_window_button.bind(b, kind))
 	return b
+
+
+static func _draw_window_button(b: Button, kind: String) -> void:
+	var c := b.size * 0.5
+	var color := Color.WHITE if kind == "close" and b.is_hovered() else SecurityTheme.INK
+	match kind:
+		"close":
+			SecurityTheme.draw_cross(b, c, 16.0, color, 1.0)
+		"max":
+			b.draw_rect(Rect2(c - Vector2(5, 5), Vector2(10, 10)), color, false, 1.0)
+		_:
+			b.draw_line(c + Vector2(-5, 0), c + Vector2(5, 0), color, 1.0)
 
 
 func _sidebar() -> Control:
 	var panel := PanelContainer.new()
 	panel.name = "Sidebar"
 	panel.custom_minimum_size = Vector2(290, 0)
-	panel.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.SIDEBAR, Color(0, 0, 0, 0), 0, 8, 14))
+	panel.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.SIDEBAR, Color(0, 0, 0, 0), 0, 6, 4))
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 4)
+	col.add_theme_constant_override("separation", 2)
 	panel.add_child(col)
-	for item in [[Page.HOME, "หน้าแรก"], [Page.FIREWALL, "Firewall & network protection"], [Page.VIRUS, "Virus & threat protection"]]:
-		col.add_child(_nav_item(item[0], item[1]))
+	for kind in ["back", "menu"]:
+		var b := Button.new()
+		b.name = "Nav_" + kind
+		b.custom_minimum_size = Vector2(40, 36)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		b.focus_mode = Control.FOCUS_NONE
+		b.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.HOVER, Color(0, 0, 0, 0), 4))
+		b.add_theme_stylebox_override("pressed", SecurityTheme.box(SecurityTheme.SELECTED, Color(0, 0, 0, 0), 4))
+		b.draw.connect(func(): SecurityTheme.draw_glyph(b, kind, b.size * 0.5, 15.0, SecurityTheme.INK if kind == "menu" or page != Page.HOME else Color(SecurityTheme.INK, 0.35)))
+		if kind == "back":
+			b.pressed.connect(_go_back)
+		col.add_child(b)
+	for item in NAV:
+		col.add_child(_nav_item(item[0], item[1], item[2]))
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(spacer)
-	_score_label = _label("", 16, SecurityTheme.INK, true)
-	_score_label.name = "ScoreLabel"
-	col.add_child(_score_label)
-	var disclaimer := _label(data.disclaimer, 12, SecurityTheme.INK_SOFT)
-	disclaimer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	disclaimer.custom_minimum_size = Vector2(270, 0)
-	col.add_child(disclaimer)
+	col.add_child(_nav_item(Page.SETTINGS, "settings", "Settings"))
+	var note := _label("Simulated for education. Not affiliated with Microsoft.", 11, SecurityTheme.INK_SOFT)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(270, 0)
+	col.add_child(note)
 	return panel
 
 
-func _nav_item(target: Page, text: String) -> Button:
+func _go_back() -> void:
+	match page:
+		Page.FW_PROFILE:
+			open_page(Page.FIREWALL)
+		Page.AV_SETTINGS:
+			open_page(Page.VIRUS)
+		Page.EXCLUSIONS:
+			open_page(Page.AV_SETTINGS)
+		Page.HOME:
+			pass
+		_:
+			open_page(Page.HOME)
+
+
+func _nav_item(target: Page, kind: String, text: String) -> Button:
 	var b := Button.new()
 	b.name = "Nav_%s" % Page.keys()[target]
 	b.text = text
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(0, 42)
-	# Room on the left for the status dot.
-	b.add_theme_stylebox_override("normal", SecurityTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 4, 36, 6))
-	b.add_theme_stylebox_override("hover", SecurityTheme.box(Color(0, 0, 0, 0.05), Color(0, 0, 0, 0), 4, 36, 6))
-	b.add_theme_stylebox_override("pressed", SecurityTheme.box(Color(0, 0, 0, 0.08), Color(0, 0, 0, 0), 4, 36, 6))
+	b.custom_minimum_size = Vector2(0, 38)
+	b.add_theme_font_size_override("font_size", 14)
+	b.add_theme_stylebox_override("normal", SecurityTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 4, 46, 4))
+	b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.HOVER, Color(0, 0, 0, 0), 4, 46, 4))
+	b.add_theme_stylebox_override("pressed", SecurityTheme.box(SecurityTheme.SELECTED, Color(0, 0, 0, 0), 4, 46, 4))
 	b.pressed.connect(func(): open_page(target))
 	b.draw.connect(func():
-		if page == target:
-			b.draw_rect(Rect2(0, 8, 4, b.size.y - 16), SecurityTheme.ACCENT)
-		b.draw_circle(Vector2(20, b.size.y * 0.5), 6.0, _page_color(target)))
+		var selected := _nav_selected() == target
+		if selected:
+			b.draw_style_box(SecurityTheme.box(SecurityTheme.SELECTED, Color(0, 0, 0, 0), 4), Rect2(Vector2.ZERO, b.size))
+			b.draw_style_box(SecurityTheme.box(SecurityTheme.ACCENT, Color(0, 0, 0, 0), 2), Rect2(0, b.size.y * 0.5 - 8, 3, 16))
+		SecurityTheme.draw_glyph(b, kind, Vector2(24, b.size.y * 0.5), 16.0, SecurityTheme.INK))
 	_nav[target] = b
 	return b
 
 
-## Colour of the status dot for each page.
-func _page_color(target: Page) -> Color:
-	match target:
-		Page.FIREWALL:
-			return SecurityTheme.OK if state.firewall_blocked else SecurityTheme.DANGER
-		Page.VIRUS:
-			if state.threat_quarantined:
-				return SecurityTheme.OK
-			return SecurityTheme.DANGER if state.scan_status == Mission05State.ScanStatus.SCANNED else SecurityTheme.WARNING
-	return SecurityTheme.OK if state.is_protected() else SecurityTheme.DANGER
+## The sidebar item lit for the current page (sub-pages light their section).
+func _nav_selected() -> Page:
+	match page:
+		Page.FW_PROFILE:
+			return Page.FIREWALL
+		Page.AV_SETTINGS, Page.EXCLUSIONS:
+			return Page.VIRUS
+	return page
 
 
 # ================================================================ pages
@@ -378,297 +503,834 @@ func _refresh() -> void:
 	match page:
 		Page.HOME:
 			_page_home()
-		Page.FIREWALL:
-			_page_firewall()
 		Page.VIRUS:
 			_page_virus()
-	_score_label.text = "คะแนนภารกิจ  %d / %d" % [state.score, data.start_score]
+		Page.ACCOUNT:
+			_page_account()
+		Page.FIREWALL:
+			_page_firewall()
+		Page.APP:
+			_page_app()
+		Page.DEVICE:
+			_page_device()
+		Page.HEALTH:
+			_page_health()
+		Page.FAMILY:
+			_page_family()
+		Page.HISTORY:
+			_page_history()
+		Page.SETTINGS:
+			_page_settings()
+		Page.FW_PROFILE:
+			_page_profile()
+		Page.AV_SETTINGS:
+			_page_av_settings()
+		Page.EXCLUSIONS:
+			_page_exclusions()
 	for b in _nav.values():
-		b.add_theme_color_override("font_color", SecurityTheme.ACCENT if b == _nav[page] else SecurityTheme.INK)
 		b.queue_redraw()
+	_refresh_alert()
+	_refresh_game_panels()
 
 
 func _page_home() -> void:
-	_heading("ความปลอดภัยโดยรวม", "ภาพรวมการป้องกันของคอมพิวเตอร์เครื่องนี้")
-	var safe := state.is_protected()
-	var issues := int(not state.firewall_blocked) + int(not state.threat_quarantined)
-
-	var hero := PanelContainer.new()
-	hero.name = "StatusHero"
-	hero.add_theme_stylebox_override("panel", SecurityTheme.status_box(SecurityTheme.OK_BG if safe else SecurityTheme.DANGER_BG, SecurityTheme.OK if safe else SecurityTheme.DANGER))
-	_content.add_child(hero)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 18)
-	hero.add_child(row)
-	var shield := Control.new()
-	shield.custom_minimum_size = Vector2(64, 64)
-	shield.draw.connect(func(): SecurityTheme.draw_shield(shield, shield.size * 0.5, 60.0, SecurityTheme.OK if safe else SecurityTheme.DANGER, "check" if safe else "alert"))
-	row.add_child(shield)
-	var text := VBoxContainer.new()
-	text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(text)
-	if safe:
-		text.add_child(_label("Security status: Protected", 26, SecurityTheme.OK, true))
-		text.add_child(_label("คอมพิวเตอร์เครื่องนี้ได้รับการป้องกันแล้ว", 16, SecurityTheme.INK_SOFT))
-		var list := VBoxContainer.new()
-		list.add_theme_constant_override("separation", 4)
-		for line in ["Firewall is active", "Unauthorized connection blocked", "Virus scan completed", "Threat quarantined"]:
-			list.add_child(_icon_row("check", SecurityTheme.OK, line, SecurityTheme.INK))
-		text.add_child(list)
-	else:
-		text.add_child(_label("ต้องดำเนินการ", 26, SecurityTheme.DANGER, true))
-		text.add_child(_label("พบปัญหาด้านความปลอดภัย %d รายการ — เปิดแต่ละเมนูเพื่อตรวจสอบและแก้ไข" % issues, 16, SecurityTheme.INK))
-
-	var tiles := HBoxContainer.new()
-	tiles.add_theme_constant_override("separation", 14)
-	_content.add_child(tiles)
-	var fw_text := data.firewall_done_message if state.firewall_blocked else "ต้องดำเนินการ: มีโปรแกรมขอเชื่อมต่อเครือข่าย"
-	tiles.add_child(_tile("TileFirewall", "Firewall & network protection", fw_text, _page_color(Page.FIREWALL), Page.FIREWALL))
-	var av_text := "ยังไม่ได้ตรวจสอบเครื่องในวันนี้"
-	if state.threat_quarantined:
-		av_text = data.threat_done_message
-	elif state.scan_status == Mission05State.ScanStatus.SCANNED:
-		av_text = "ต้องดำเนินการ: Threats found: 1"
-	tiles.add_child(_tile("TileVirus", "Virus & threat protection", av_text, _page_color(Page.VIRUS), Page.VIRUS))
-
-	var submit := Button.new()
-	submit.name = "SubmitButton"
-	submit.text = data.submit_button_text
-	submit.custom_minimum_size = Vector2(260, 46)
-	submit.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	submit.disabled = not safe or state.report_submitted
-	if not submit.disabled:
-		_style_primary(submit)
-	submit.pressed.connect(submit_report)
-	_content.add_child(submit)
-	if state.report_submitted:
-		var done := _label(data.submitted_message, 16, SecurityTheme.OK, true)
-		done.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_content.add_child(done)
-	elif not safe:
-		_content.add_child(_label("ต้องดำเนินการทั้ง Firewall และ Anti-Virus ให้ถูกต้องก่อน จึงจะส่งผลการตรวจสอบได้", 14, SecurityTheme.INK_SOFT))
+	_title("Security at a glance", "See what's happening with the security and health of your device\nand take any actions needed.")
+	var grid := GridContainer.new()
+	grid.name = "Tiles"
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 12)
+	_content.add_child(grid)
+	var virus_badge := "ok"
+	var virus_text := "No action needed."
+	if not state.threat_quarantined:
+		virus_badge = "bad" if state.scan_status == Mission05State.ScanStatus.SCANNED else "warn"
+		virus_text = "Threats found.\nStart the recommended actions." if virus_badge == "bad" else "Actions recommended."
+	grid.add_child(_tile("TileVirus", "virus", "Virus & threat protection", virus_text, virus_badge, Page.VIRUS))
+	grid.add_child(_tile("TileAccount", "account", "Account protection", "No action needed.", "ok", Page.ACCOUNT))
+	grid.add_child(_tile("TileFirewall", "firewall", "Firewall & network protection", "No action needed." if state.firewall_blocked else "Actions recommended.", "ok" if state.firewall_blocked else "warn", Page.FIREWALL))
+	grid.add_child(_tile("TileApp", "app", "App & browser control", "No action needed.", "ok", Page.APP))
+	grid.add_child(_tile("TileDevice", "device", "Device security", "View status and manage hardware\nsecurity features.", "", Page.DEVICE))
+	grid.add_child(_tile("TileHealth", "health", "Device performance & health", "No action needed.", "ok", Page.HEALTH))
+	grid.add_child(_tile("TileFamily", "family", "Family options", "Manage how your family uses their\ndevices.", "", Page.FAMILY))
 
 
-func _page_firewall() -> void:
-	_heading("Firewall & network protection", "ควบคุมว่าโปรแกรมใดเชื่อมต่อผ่านเครือข่ายได้")
-	if not state.firewall_blocked:
-		var alert := _card(SecurityTheme.DANGER_BG, SecurityTheme.DANGER, "FirewallAlert")
-		alert.add_child(_icon_row("alert", SecurityTheme.DANGER, data.firewall_alert, SecurityTheme.DANGER, 20, true))
-		alert.add_child(_details(data.firewall_details))
-		_hint_card() # Above the buttons so it is seen without scrolling.
-		_content.add_child(_label("เลือกวิธีดำเนินการ", 18, SecurityTheme.INK, true))
-		_choices("FirewallChoices", data.firewall_choices, choose_firewall)
-		return
-
-	var done := _card(SecurityTheme.OK_BG, SecurityTheme.OK, "FirewallDone")
-	done.add_child(_icon_row("check", SecurityTheme.OK, data.firewall_done_message, SecurityTheme.OK, 22, true))
-	done.add_child(_blocked_diagram())
-	var details := data.firewall_details.duplicate()
-	details["Status"] = "Blocked"
-	done.add_child(_details(details))
-	done.add_child(_icon_row("check", SecurityTheme.OK, "Firewall is active", SecurityTheme.INK))
-	_reason(data.firewall_reason)
+func _tile(node_name: String, kind: String, title: String, status: String, badge: String, target: Page) -> Button:
+	var b := Button.new()
+	b.name = node_name
+	b.custom_minimum_size = Vector2(250, 178)
+	b.focus_mode = Control.FOCUS_NONE
+	b.add_theme_stylebox_override("normal", SecurityTheme.box(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 6))
+	b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.HOVER, Color(0, 0, 0, 0), 6))
+	b.add_theme_stylebox_override("pressed", SecurityTheme.box(SecurityTheme.SELECTED, Color(0, 0, 0, 0), 6))
+	b.pressed.connect(func(): open_page(target))
+	var col := VBoxContainer.new()
+	col.set_anchors_preset(Control.PRESET_FULL_RECT)
+	col.offset_top = 18
+	col.alignment = BoxContainer.ALIGNMENT_BEGIN
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_theme_constant_override("separation", 8)
+	b.add_child(col)
+	var icon := SecurityTheme.glyph(kind, 58.0, SecurityTheme.INK, badge)
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	col.add_child(icon)
+	var t := _label(title, 16, SecurityTheme.INK, true)
+	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(t)
+	var s := _label(status, 13, SecurityTheme.INK_SOFT)
+	s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(s)
+	return b
 
 
 func _page_virus() -> void:
-	_heading("Virus & threat protection", "ตรวจหาและจัดการไฟล์อันตรายในคอมพิวเตอร์")
+	_title("Virus & threat protection", "Protection for your device against threats.", "virus")
+	_section("history", "Current threats")
+	var box := _block()
 	if scanning:
-		var card := _card(SecurityTheme.INFO_BG, SecurityTheme.ACCENT, "ScanProgress")
-		card.add_child(_label("กำลังสแกน (Quick scan)...", 20, SecurityTheme.ACCENT, true))
+		box.add_child(_label("Quick scan running...", 15, SecurityTheme.INK, true))
+		_scan_left = _label("", 14, SecurityTheme.INK_SOFT)
+		box.add_child(_scan_left)
 		_scan_bar = ProgressBar.new()
 		_scan_bar.name = "ScanBar"
-		_scan_bar.custom_minimum_size = Vector2(0, 14)
+		_scan_bar.custom_minimum_size = Vector2(360, 4)
+		_scan_bar.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		_scan_bar.show_percentage = false
 		_scan_bar.value = scan_progress * 100.0
-		card.add_child(_scan_bar)
-		_scan_count = _label("", 15, SecurityTheme.INK)
-		card.add_child(_scan_count)
-		_scan_path = _label("", 14, SecurityTheme.INK_SOFT)
-		card.add_child(_scan_path)
-		return
-
-	if state.scan_status == Mission05State.ScanStatus.NOT_SCANNED:
-		var card := _card(SecurityTheme.WARNING_BG, SecurityTheme.WARNING, "NotScanned")
-		card.add_child(_icon_row("alert", SecurityTheme.WARNING, "ยังไม่ได้ตรวจสอบเครื่องในวันนี้", SecurityTheme.INK, 20, true))
-		card.add_child(_label("ภัยคุกคามปัจจุบัน: ยังไม่ทราบ — ต้องสแกนก่อน", 15, SecurityTheme.INK_SOFT))
+		box.add_child(_scan_bar)
+		_scan_count = _label("", 14, SecurityTheme.INK_SOFT)
+		box.add_child(_scan_count)
+		_scan_path = _label("", 13, SecurityTheme.INK_SOFT)
+		box.add_child(_scan_path)
+		var cancel := Button.new()
+		cancel.text = "Cancel"
+		cancel.disabled = true
+		cancel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		box.add_child(cancel)
+	elif state.scan_status == Mission05State.ScanStatus.NOT_SCANNED:
+		box.add_child(_status_row("warn", "Your device hasn't been scanned in 7 days.", "No scan results available. Run a quick scan to check for threats."))
+		box.add_child(_label("Last scan: 7 days ago (quick scan)", 14, SecurityTheme.INK_SOFT))
 		var scan := Button.new()
-		scan.name = "ScanButton"
-		scan.text = "Scan (สแกนด่วน)"
-		scan.custom_minimum_size = Vector2(220, 44)
+		scan.name = "QuickScanButton"
+		scan.text = "Quick scan"
+		scan.custom_minimum_size = Vector2(120, 32)
 		scan.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		_style_primary(scan)
+		SecurityTheme.style_accent(scan)
+		scan.disabled = not state.firewall_blocked
 		scan.pressed.connect(start_scan)
-		card.add_child(scan)
-		return
+		box.add_child(scan)
+		if not state.firewall_blocked:
+			box.add_child(_label("Another security action is waiting: Firewall & network protection.", 13, SecurityTheme.WARNING_INK))
+		_links(box, ["Scan options", "Allowed threats", "Protection history"])
+	elif not state.threat_quarantined:
+		box.add_child(_status_row("bad", "Threats found.", "Start the recommended actions."))
+		box.add_child(_label("Threats found: 1   ·   Last scan: %s (quick scan)   ·   %s files scanned" % [_today(), _thousands(SCAN_FILES)], 14, SecurityTheme.INK_SOFT))
+		_threat_list(box)
+		var start := Button.new()
+		start.name = "StartActionsButton"
+		start.text = "Start actions"
+		start.custom_minimum_size = Vector2(130, 32)
+		start.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		SecurityTheme.style_accent(start)
+		start.disabled = threat_pick == ""
+		start.pressed.connect(func(): choose_threat(threat_pick))
+		box.add_child(start)
+		_links(box, ["Scan options", "Allowed threats", "Protection history"])
+	else:
+		box.add_child(_status_row("ok", "No current threats.", "Last scan: %s (quick scan)\n1 threat found and quarantined.\n%s files scanned." % [_today(), _thousands(SCAN_FILES)]))
+		var done := _label(data.threat_file + " — Threat quarantined", 14, SecurityTheme.OK, true)
+		done.name = "QuarantinedNote"
+		box.add_child(done)
+		var quick := Button.new()
+		quick.text = "Quick scan"
+		quick.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		SecurityTheme.style_accent(quick)
+		box.add_child(quick)
+		_links(box, ["Scan options", "Allowed threats", "Protection history"])
+	_section("settings", "Virus & threat protection settings")
+	var settings := _block()
+	settings.add_child(_label("No action needed.", 14, SecurityTheme.INK_SOFT))
+	_links(settings, ["Manage settings"], [func(): open_page(Page.AV_SETTINGS)])
+	_section("history", "Virus & threat protection updates")
+	var updates := _block()
+	updates.add_child(_label("Security intelligence is up to date.\nLast update: %s 7:42 AM" % _today(), 14, SecurityTheme.INK_SOFT))
+	_links(updates, ["Protection updates"])
 
+
+## The threat found by the scan: a row that opens its details and actions.
+func _threat_list(parent: Control) -> void:
+	var card := PanelContainer.new()
+	card.name = "ThreatCard"
+	card.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.CARD, SecurityTheme.BORDER, 6, 16, 10))
+	parent.add_child(card)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 6)
+	card.add_child(col)
+	var row := Button.new()
+	row.name = "ThreatRow"
+	row.custom_minimum_size = Vector2(0, 44)
+	row.focus_mode = Control.FOCUS_NONE
+	for s in ["normal", "hover", "pressed"]:
+		row.add_theme_stylebox_override(s, StyleBoxEmpty.new() if s == "normal" else SecurityTheme.box(SecurityTheme.HOVER, Color(0, 0, 0, 0), 4))
+	row.pressed.connect(func():
+		threat_expanded = not threat_expanded
+		_refresh())
+	col.add_child(row)
+	var line := HBoxContainer.new()
+	line.set_anchors_preset(Control.PRESET_FULL_RECT)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	line.add_theme_constant_override("separation", 12)
+	row.add_child(line)
+	line.add_child(SecurityTheme.icon("bad", Color.WHITE, 16))
+	var name_col := VBoxContainer.new()
+	name_col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	name_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_col.add_theme_constant_override("separation", 0)
+	line.add_child(name_col)
+	name_col.add_child(_label(data.threat_name, 15, SecurityTheme.INK, true))
+	name_col.add_child(_label("%s 3:01 PM (Active)" % _today(), 13, SecurityTheme.INK_SOFT))
+	var level := _label(data.threat_risk, 14, SecurityTheme.DANGER, true)
+	level.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	line.add_child(level)
+	var chevron := Control.new()
+	chevron.custom_minimum_size = Vector2(20, 20)
+	chevron.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	chevron.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var up := threat_expanded
+	chevron.draw.connect(func():
+		var c := chevron.size * 0.5
+		var dy := -3.0 if up else 3.0
+		chevron.draw_polyline(PackedVector2Array([c + Vector2(-5, -dy), c + Vector2(0, dy), c + Vector2(5, -dy)]), SecurityTheme.INK_SOFT, 1.5, true))
+	line.add_child(chevron)
+	if not threat_expanded:
+		return
+	col.add_child(_details({
+		"Alert level": data.threat_risk,
+		"Status": "Active",
+		"Date": "%s 3:01 PM" % _today(),
+		"Category": "Tool",
+		"Details": "This program has potentially unwanted behavior.",
+		"Affected items": "file: " + data.threat_path,
+	}))
+	col.add_child(_label("Actions", 14, SecurityTheme.INK, true))
+	var group := ButtonGroup.new()
+	for id in ["remove", "quarantine", "allow"]:
+		var choice := data.get_threat_choice(id)
+		var rb := CheckBox.new()
+		rb.name = "Action_" + id
+		rb.text = choice.label
+		rb.button_group = group
+		rb.focus_mode = Control.FOCUS_NONE
+		rb.button_pressed = threat_pick == id
+		rb.toggled.connect(func(on: bool):
+			if on:
+				threat_pick = id
+				var start := find_child("StartActionsButton", true, false) as Button
+				if start:
+					start.disabled = false)
+		col.add_child(rb)
+
+
+func _page_firewall() -> void:
+	_title("Firewall & network protection", "Who and what can access your networks.", "firewall")
+	if firewall_pending():
+		var banner := _banner(SecurityTheme.WARNING_BG, "warn", "Windows Defender Firewall has blocked some features of %s." % data.firewall_app, "FirewallBanner")
+		var review := Button.new()
+		review.name = "ReviewButton"
+		review.text = "Review"
+		review.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		review.pressed.connect(func():
+			_alert.visible = true
+			_refresh_alert())
+		banner.add_child(review)
+	else:
+		var done := _banner(SecurityTheme.OK_BG, "ok", "Unauthorized connection blocked: %s can't access your networks." % data.firewall_app, "FirewallDone")
+		done.add_child(_label("Microsoft Defender Firewall is on for all networks.", 13, SecurityTheme.INK_SOFT))
+	for p: String in ["Domain", "Private", "Public"]:
+		_content.add_child(_profile_row(p))
+	_content.add_child(_spacer(10))
+	_links(_content, ["Allow an app through firewall", "Network and Internet troubleshooter", "Firewall notification settings", "Advanced settings", "Restore firewalls to default"])
+
+
+func _profile_row(p: String) -> Button:
+	var b := Button.new()
+	b.name = "Profile_" + p
+	b.custom_minimum_size = Vector2(0, 58)
+	b.focus_mode = Control.FOCUS_NONE
+	b.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+	b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.HOVER, Color(0, 0, 0, 0), 4))
+	b.add_theme_stylebox_override("pressed", SecurityTheme.box(SecurityTheme.SELECTED, Color(0, 0, 0, 0), 4))
+	b.pressed.connect(func(): open_profile(p))
+	var row := HBoxContainer.new()
+	row.set_anchors_preset(Control.PRESET_FULL_RECT)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_theme_constant_override("separation", 14)
+	b.add_child(row)
+	var kinds := {"Domain": "device", "Private": "home", "Public": "firewall"}
+	var g := SecurityTheme.glyph(kinds[p], 28.0)
+	row.add_child(g)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 0)
+	row.add_child(col)
+	col.add_child(_label("%s network%s" % [p, " (active)" if p == ACTIVE_PROFILE else ""], 15, SecurityTheme.LINK))
+	col.add_child(_label("Firewall is on.", 14, SecurityTheme.INK_SOFT))
+	return b
+
+
+func _page_profile() -> void:
+	var active := profile == ACTIVE_PROFILE
+	_title("%s network" % profile, PROFILES[profile], "firewall")
+	var nets := _block()
+	nets.add_child(_label("Active %s networks" % profile.to_lower(), 15, SecurityTheme.INK, true))
+	nets.add_child(_label("SCHOOL-LAN" if active else "Not connected", 14, SecurityTheme.INK_SOFT))
+	var fw := _block()
+	fw.add_child(_label("Microsoft Defender Firewall", 15, SecurityTheme.INK, true))
+	fw.add_child(_label("Helps protect your device while on a %s network." % profile.to_lower(), 14, SecurityTheme.INK_SOFT))
+	var t := SecurityTheme.toggle(true, func(on: bool):
+		if not on:
+			choose_firewall(Mission05State.FIREWALL_OFF))
+	t.name = "FirewallToggle"
+	fw.add_child(t)
+	var inc := _block()
+	inc.add_child(_label("Incoming connections", 15, SecurityTheme.INK, true))
+	var cb := CheckBox.new()
+	cb.text = "Blocks all incoming connections, including those in the list of allowed apps."
+	cb.focus_mode = Control.FOCUS_NONE
+	inc.add_child(cb)
+
+
+func _page_av_settings() -> void:
+	_title("Virus & threat protection settings", "View and update virus & threat protection settings for Microsoft\nDefender Antivirus.", "settings")
+	var rt := _block()
+	rt.add_child(_label("Real-time protection", 15, SecurityTheme.INK, true))
+	var text := _label("Locates and stops malware from installing or running on your device. You can turn off this setting for a short time before it turns back on automatically.", 14, SecurityTheme.INK_SOFT)
+	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rt.add_child(text)
+	var t := SecurityTheme.toggle(true, func(on: bool):
+		if not on:
+			choose_threat("realtime_off")
+			_refresh())
+	t.name = "RealtimeToggle"
+	rt.add_child(t)
+	for item in [["Cloud-delivered protection", "Provides increased and faster protection with access to the latest protection data in the cloud."], ["Automatic sample submission", "Send sample files to Microsoft to help protect you and others from potential threats."], ["Tamper Protection", "Prevents others from tampering with important security features."]]:
+		var blk := _block()
+		blk.add_child(_label(item[0], 15, SecurityTheme.INK, true))
+		blk.add_child(_label("This setting is managed by your administrator.", 13, SecurityTheme.INK_SOFT))
+		var d := _label(item[1], 14, SecurityTheme.INK_SOFT)
+		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		blk.add_child(d)
+		var locked := SecurityTheme.toggle(true, func(_on: bool): pass)
+		(locked.get_node("Switch") as Button).disabled = true
+		locked.modulate = Color(1, 1, 1, 0.5)
+		blk.add_child(locked)
+	var ex := _block()
+	ex.add_child(_label("Exclusions", 15, SecurityTheme.INK, true))
+	var ed := _label("Microsoft Defender Antivirus won't scan items that have been excluded. Excluded items could contain threats that make your device vulnerable.", 14, SecurityTheme.INK_SOFT)
+	ed.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	ex.add_child(ed)
+	_links(ex, ["Add or remove exclusions"], [func(): open_page(Page.EXCLUSIONS)])
+
+
+func _page_exclusions() -> void:
+	_title("Exclusions", "Add or remove items that you want to exclude from Microsoft\nDefender Antivirus scans.", "virus")
+	var add := Button.new()
+	add.name = "AddExclusionButton"
+	add.text = "+   Add an exclusion"
+	add.custom_minimum_size = Vector2(200, 34)
+	add.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	add.pressed.connect(func():
+		_add_menu_open = not _add_menu_open
+		_refresh())
+	_content.add_child(add)
+	if _add_menu_open:
+		var menu := PanelContainer.new()
+		menu.name = "AddExclusionMenu"
+		menu.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		menu.custom_minimum_size = Vector2(200, 0)
+		menu.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.CARD, SecurityTheme.BORDER, 6, 4, 4))
+		_content.add_child(menu)
+		var col := VBoxContainer.new()
+		menu.add_child(col)
+		for kind in ["File", "Folder", "File type", "Process"]:
+			var b := Button.new()
+			b.name = "Exclude_" + kind.replace(" ", "")
+			b.text = kind
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+			b.pressed.connect(func():
+				_add_menu_open = false
+				open_picker())
+			col.add_child(b)
+	_content.add_child(_spacer(6))
+	_content.add_child(_label("No exclusions.", 14, SecurityTheme.INK_SOFT))
+
+
+func _page_account() -> void:
+	_title("Account protection", "Security for your account and sign-in.", "account")
+	_status_block("account", "Microsoft account", "ok", "Signed in with a local school account.", ["Account info"])
+	_status_block("account", "Windows Hello", "ok", "No action needed.", ["Sign-in options"])
+	_status_block("account", "Dynamic lock", "", "Windows can lock when devices paired to your PC go out of range.", ["Dynamic lock settings"])
+
+
+func _page_app() -> void:
+	_title("App & browser control", "App protection and online security.", "app")
+	_status_block("app", "Smart App Control", "", "Smart App Control adds significant protection from new and emerging threats by blocking apps that are malicious or untrusted.", ["Smart App Control settings"])
+	_status_block("app", "Reputation-based protection", "ok", "No action needed.", ["Reputation-based protection settings"])
+	_status_block("app", "Exploit protection", "ok", "No action needed.", ["Exploit protection settings"])
+
+
+func _page_device() -> void:
+	_title("Device security", "Security that comes built into your device.", "device")
+	_status_block("device", "Core isolation", "ok", "Virtualization-based security is running to protect the core parts of your device.", ["Core isolation details"])
+	_status_block("device", "Security processor", "ok", "Your security processor, called the trusted platform module (TPM), is providing additional encryption for your device.", ["Security processor details"])
+	_status_block("device", "Secure boot", "ok", "Secure boot is on. This helps prevent malicious software from loading when your device starts.", [])
+
+
+func _page_health() -> void:
+	_title("Device performance & health", "Reports on the health of your device.", "health")
+	_content.add_child(_label("Health report", 18, SecurityTheme.INK, true))
+	_content.add_child(_label("Last scan: %s 7:40 AM" % _today(), 14, SecurityTheme.INK_SOFT))
+	for item in ["Storage capacity", "Apps and software", "Windows Time service"]:
+		_content.add_child(_status_row("ok", item, "No problems found."))
+
+
+func _page_family() -> void:
+	_title("Family options", "Get what you need to simplify your family's digital life.", "family")
+	_status_block("family", "Parental controls", "", "Help protect your kids online. Choose which websites your kids can visit as they explore the web.", ["View family settings"])
+	_status_block("family", "See your family's devices at a glance", "", "View the health and safety status of your family's devices.", ["View devices"])
+
+
+func _page_history() -> void:
+	_title("Protection history", "View the latest protection actions and recommendations from\nWindows Security.", "history")
 	if not state.threat_quarantined:
-		var found := _card(SecurityTheme.DANGER_BG, SecurityTheme.DANGER, "ThreatFound")
-		found.add_child(_icon_row("alert", SecurityTheme.DANGER, "Threats found: 1", SecurityTheme.DANGER, 20, true))
-		found.add_child(_details({"File": data.threat_file, "Risk level": data.threat_risk, "Status": "Action required"}, {"Risk level": SecurityTheme.DANGER}))
-		_hint_card()
-		_content.add_child(_label("เลือกวิธีจัดการไฟล์นี้", 18, SecurityTheme.INK, true))
-		_choices("ThreatChoices", data.threat_choices, choose_threat)
+		_content.add_child(_label("No recent actions.", 14, SecurityTheme.INK_SOFT))
 		return
+	var card := PanelContainer.new()
+	card.name = "HistoryEntry"
+	card.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.CARD, SecurityTheme.BORDER, 6, 16, 12))
+	_content.add_child(card)
+	var col := VBoxContainer.new()
+	card.add_child(col)
+	col.add_child(_status_row("ok", "Threat quarantined", "%s 3:02 PM" % _today()))
+	col.add_child(_details({"Detected": data.threat_name, "Alert level": data.threat_risk, "Status": "Quarantined", "Affected items": "file: " + data.threat_path}))
+	col.add_child(_label("Quarantined files are in a restricted location where they can't harm your device.", 13, SecurityTheme.INK_SOFT))
 
-	var done := _card(SecurityTheme.OK_BG, SecurityTheme.OK, "ThreatDone")
-	done.add_child(_icon_row("check", SecurityTheme.OK, data.threat_done_message, SecurityTheme.OK, 22, true))
-	done.add_child(_details({"Threats found": "1", "ภัยคุกคามที่กำลังทำงาน": "0", "Virus scan": "Completed"}))
-	var quarantine := _card(Color(1, 1, 1), SecurityTheme.BORDER, "QuarantineList")
-	quarantine.add_child(_label("พื้นที่กักกัน (Quarantine)", 16, SecurityTheme.INK, true))
-	quarantine.add_child(_details({data.threat_file: "Quarantined — ไฟล์ทำงานไม่ได้"}))
-	_reason(data.threat_reason)
+
+func _page_settings() -> void:
+	_title("Settings", "", "settings")
+	_status_block("settings", "Notifications", "", "Windows Security will send notifications with critical information about the health and security of your device.", ["Manage notifications"])
+	_status_block("settings", "About", "", "Windows Security (simulated for education)\nNot affiliated with Microsoft. Nothing on your real computer is scanned.", [])
+
+
+# ================================================================ firewall alert
+
+func _build_alert() -> void:
+	_alert = Control.new()
+	_alert.name = "FirewallAlert"
+	_alert.visible = false
+	_alert.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_alert)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.18)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_alert.add_child(dim)
+	var win := PanelContainer.new()
+	win.name = "AlertWindow"
+	win.set_anchors_preset(Control.PRESET_CENTER)
+	win.custom_minimum_size = Vector2(560, 0)
+	win.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	win.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var sb := SecurityTheme.box(SecurityTheme.CARD, Color(0.6, 0.6, 0.6), 8, 0, 0)
+	sb.shadow_color = Color(0, 0, 0, 0.25)
+	sb.shadow_size = 18
+	win.add_theme_stylebox_override("panel", sb)
+	_alert.add_child(win)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	win.add_child(col)
+	var bar := HBoxContainer.new()
+	bar.custom_minimum_size = Vector2(0, 34)
+	col.add_child(bar)
+	var pad := Control.new()
+	pad.custom_minimum_size = Vector2(12, 0)
+	bar.add_child(pad)
+	var t := _label("Windows Security Alert", 13, SecurityTheme.INK)
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	bar.add_child(t)
+	bar.add_child(_window_button("AlertClose", "close", func(): _alert.visible = false))
+	var body := MarginContainer.new()
+	for side in ["left", "right"]:
+		body.add_theme_constant_override("margin_" + side, 22)
+	body.add_theme_constant_override("margin_top", 8)
+	body.add_theme_constant_override("margin_bottom", 16)
+	col.add_child(body)
+	var inner := VBoxContainer.new()
+	inner.add_theme_constant_override("separation", 10)
+	body.add_child(inner)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	inner.add_child(head)
+	var shield := Control.new()
+	shield.custom_minimum_size = Vector2(40, 40)
+	shield.draw.connect(func():
+		SecurityTheme.draw_shield(shield, shield.size * 0.5, 38.0, SecurityTheme.ACCENT)
+		SecurityTheme.draw_badge(shield, "warn", shield.size * 0.5 + Vector2(10, 10), 18.0))
+	head.add_child(shield)
+	var h := _label("Windows Defender Firewall has blocked some features of this app", 18, SecurityTheme.INK, true)
+	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(h)
+	var d := _label("Windows Defender Firewall has blocked some features of %s on all public and private networks." % data.firewall_app, 14, SecurityTheme.INK)
+	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	inner.add_child(d)
+	inner.add_child(_details({"Name:": data.firewall_app, "Publisher:": data.firewall_publisher, "Path:": data.firewall_path}))
+	inner.add_child(_label("Allow %s to communicate on these networks:" % data.firewall_app, 14, SecurityTheme.INK))
+	for item in [["Private networks, such as my home or work network", true], ["Public networks, such as those in airports and coffee shops (not\nrecommended because these networks often have little or no security)", false]]:
+		var cb := CheckBox.new()
+		cb.text = item[0]
+		cb.button_pressed = item[1]
+		cb.focus_mode = Control.FOCUS_NONE
+		inner.add_child(cb)
+	var risk := Button.new()
+	risk.text = "What are the risks of allowing an app through a firewall?"
+	SecurityTheme.style_link(risk)
+	inner.add_child(risk)
+	var foot := PanelContainer.new()
+	foot.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, Color(0, 0, 0, 0), 0, 16, 12))
+	col.add_child(foot)
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_END
+	buttons.add_theme_constant_override("separation", 8)
+	foot.add_child(buttons)
+	var allow := Button.new()
+	allow.name = "AllowAccessButton"
+	allow.text = data.get_firewall_choice("allow").label
+	allow.custom_minimum_size = Vector2(130, 32)
+	SecurityTheme.style_accent(allow)
+	allow.pressed.connect(func(): choose_firewall("allow"))
+	buttons.add_child(allow)
+	var cancel := Button.new()
+	cancel.name = "CancelButton"
+	cancel.text = data.get_firewall_choice("block").label
+	cancel.custom_minimum_size = Vector2(110, 32)
+	cancel.pressed.connect(func(): choose_firewall("block"))
+	buttons.add_child(cancel)
+
+
+func _refresh_alert() -> void:
+	if not firewall_pending():
+		_alert.visible = false
+
+
+# ================================================================ file picker (Add an exclusion)
+
+func open_picker() -> void:
+	_picker_pick = ""
+	_picker.visible = true
+	_refresh_picker()
+
+
+func _build_picker() -> void:
+	_picker = Control.new()
+	_picker.name = "FilePicker"
+	_picker.visible = false
+	_picker.mouse_filter = Control.MOUSE_FILTER_STOP
+	add_child(_picker)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.12)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_picker.add_child(dim)
+	var win := PanelContainer.new()
+	win.name = "PickerWindow"
+	win.set_anchors_preset(Control.PRESET_CENTER)
+	win.custom_minimum_size = Vector2(620, 380)
+	win.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	win.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var sb := SecurityTheme.box(SecurityTheme.CARD, Color(0.6, 0.6, 0.6), 8, 0, 0)
+	sb.shadow_color = Color(0, 0, 0, 0.25)
+	sb.shadow_size = 18
+	win.add_theme_stylebox_override("panel", sb)
+	_picker.add_child(win)
+	var m := MarginContainer.new()
+	for side in ["left", "right", "bottom"]:
+		m.add_theme_constant_override("margin_" + side, 14)
+	win.add_child(m)
+	var col := VBoxContainer.new()
+	col.name = "PickerColumn"
+	col.add_theme_constant_override("separation", 6)
+	m.add_child(col)
+
+
+func _refresh_picker() -> void:
+	var col := _picker.find_child("PickerColumn", true, false) as VBoxContainer
+	for c in col.get_children():
+		col.remove_child(c)
+		c.queue_free()
+	var bar := HBoxContainer.new()
+	bar.custom_minimum_size = Vector2(0, 34)
+	col.add_child(bar)
+	var title := _label("Open", 13, SecurityTheme.INK)
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	bar.add_child(title)
+	bar.add_child(_window_button("PickerClose", "close", func(): _picker.visible = false))
+	var path := _label("This PC  ›  Local Disk (C:)  ›  Users  ›  Student  ›  Downloads", 14, SecurityTheme.INK)
+	col.add_child(path)
+	var list := VBoxContainer.new()
+	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 0)
+	col.add_child(list)
+	for f: String in DOWNLOADS:
+		var b := Button.new()
+		b.name = "File_" + f.get_basename()
+		b.text = "          " + f
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.custom_minimum_size = Vector2(0, 32)
+		b.focus_mode = Control.FOCUS_NONE
+		var picked := _picker_pick == f
+		b.add_theme_stylebox_override("normal", SecurityTheme.box(SecurityTheme.INFO_BG if picked else Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 12, 4))
+		b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.INFO_BG, Color(0, 0, 0, 0), 0, 12, 4))
+		b.draw.connect(func(): SecurityTheme.draw_glyph(b, "file", Vector2(30, b.size.y * 0.5), 16.0, SecurityTheme.INK_SOFT))
+		b.pressed.connect(func():
+			_picker_pick = f
+			_refresh_picker())
+		list.add_child(b)
+	var foot := HBoxContainer.new()
+	foot.alignment = BoxContainer.ALIGNMENT_END
+	foot.add_theme_constant_override("separation", 8)
+	col.add_child(foot)
+	var name_box := _label("File name:  " + _picker_pick, 14, SecurityTheme.INK)
+	name_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	foot.add_child(name_box)
+	var open := Button.new()
+	open.name = "PickerOpen"
+	open.text = "Open"
+	open.custom_minimum_size = Vector2(100, 32)
+	SecurityTheme.style_accent(open)
+	open.disabled = _picker_pick == ""
+	open.pressed.connect(func(): choose_threat("exclude"))
+	foot.add_child(open)
+	var cancel := Button.new()
+	cancel.text = "Cancel"
+	cancel.custom_minimum_size = Vector2(100, 32)
+	cancel.pressed.connect(func(): _picker.visible = false)
+	foot.add_child(cancel)
+	var pad := Control.new()
+	pad.custom_minimum_size = Vector2(8, 8)
+	col.add_child(pad)
+
+
+# ================================================================ game panels (Thai, outside the Windows look)
+
+func _build_game_panels() -> void:
+	var layer := Control.new()
+	layer.name = "GameLayer"
+	layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(layer)
+	_hint_panel = PanelContainer.new()
+	_hint_panel.name = "HintPanel"
+	_hint_panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.07, 0.09, 0.13, 0.94), Color(1.0, 0.76, 0.2, 0.9), 8, 16, 10))
+	# Bottom left, over the sidebar: never on top of a dialog's buttons.
+	_hint_panel.anchor_left = 0.0
+	_hint_panel.anchor_right = 0.0
+	_hint_panel.anchor_top = 1.0
+	_hint_panel.anchor_bottom = 1.0
+	_hint_panel.offset_left = 10
+	_hint_panel.offset_right = 318
+	_hint_panel.offset_top = -150
+	_hint_panel.offset_bottom = -10
+	_hint_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_hint_panel.visible = false
+	layer.add_child(_hint_panel)
+	var hint_row := HBoxContainer.new()
+	hint_row.add_theme_constant_override("separation", 10)
+	_hint_panel.add_child(hint_row)
+	var hint_col := VBoxContainer.new()
+	hint_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hint_row.add_child(hint_col)
+	hint_col.add_child(GameUI.label("คำใบ้", 14, Color(1.0, 0.8, 0.35), true))
+	_hint_label = GameUI.label("", 16, Color.WHITE)
+	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_col.add_child(_hint_label)
+	hint_col.add_child(GameUI.label("ลองเลือกใหม่อีกครั้ง", 13, Color(0.75, 0.8, 0.9)))
+	var hide := Button.new()
+	hide.name = "HintClose"
+	hide.text = " x "
+	hide.flat = true
+	hide.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	hide.add_theme_color_override("font_color", Color(0.8, 0.82, 0.86))
+	hide.pressed.connect(func(): _hint_panel.visible = false)
+	hint_row.add_child(hide)
+
+	var submit_panel := PanelContainer.new()
+	submit_panel.name = "SubmitPanel"
+	submit_panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.07, 0.09, 0.13, 0.94), Color(0.4, 0.6, 0.95, 0.7), 8, 14, 10))
+	submit_panel.anchor_left = 1.0
+	submit_panel.anchor_right = 1.0
+	submit_panel.anchor_top = 1.0
+	submit_panel.anchor_bottom = 1.0
+	submit_panel.offset_left = -250
+	submit_panel.offset_right = -16
+	submit_panel.offset_top = -110
+	submit_panel.offset_bottom = -16
+	submit_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	layer.add_child(submit_panel)
+	var sc := VBoxContainer.new()
+	sc.add_theme_constant_override("separation", 6)
+	submit_panel.add_child(sc)
+	_submit_note = GameUI.label("เมื่อทุกส่วนเป็นสีเขียวแล้ว", 13, Color(0.75, 0.8, 0.9))
+	_submit_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sc.add_child(_submit_note)
+	_submit_button = Button.new()
+	_submit_button.name = "SubmitButton"
+	_submit_button.text = data.submit_button_text
+	_submit_button.custom_minimum_size = Vector2(0, 38)
+	_submit_button.focus_mode = Control.FOCUS_NONE
+	_submit_button.add_theme_font_override("font", GameUI.FONT_BOLD)
+	_submit_button.add_theme_font_size_override("font_size", 16)
+	_submit_button.add_theme_stylebox_override("normal", GameUI.box(Color(0.16, 0.45, 0.85), Color(0, 0, 0, 0), 6, 12, 6))
+	_submit_button.add_theme_stylebox_override("hover", GameUI.box(Color(0.22, 0.52, 0.92), Color(0, 0, 0, 0), 6, 12, 6))
+	_submit_button.add_theme_stylebox_override("pressed", GameUI.box(Color(0.12, 0.38, 0.75), Color(0, 0, 0, 0), 6, 12, 6))
+	_submit_button.add_theme_stylebox_override("disabled", GameUI.box(Color(0.25, 0.3, 0.38), Color(0, 0, 0, 0), 6, 12, 6))
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_disabled_color"]:
+		_submit_button.add_theme_color_override(c, Color.WHITE)
+	_submit_button.pressed.connect(submit_report)
+	sc.add_child(_submit_button)
+
+
+func _refresh_game_panels() -> void:
+	if _hint_panel == null:
+		return
+	_hint_label.text = _hint
+	_hint_panel.visible = _hint != ""
+	_submit_button.disabled = state.report_submitted
+	_submit_note.text = data.submitted_message if state.report_submitted else "เมื่อทุกส่วนเป็นสีเขียวแล้ว"
 
 
 # ================================================================ widgets
 
-func _heading(title: String, subtitle: String) -> void:
-	_content.add_child(_label(title, 26, SecurityTheme.INK, true))
-	_content.add_child(_label(subtitle, 15, SecurityTheme.INK_SOFT))
+## Page title with the section's icon above it, like the real program.
+func _title(title: String, subtitle: String, kind: String = "") -> void:
+	if kind != "":
+		var g := SecurityTheme.glyph(kind, 44.0)
+		g.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		_content.add_child(g)
+	_content.add_child(_label(title, 28, SecurityTheme.INK, true))
+	if subtitle != "":
+		_content.add_child(_label(subtitle, 14, SecurityTheme.INK_SOFT))
+	_content.add_child(_spacer(10))
 
 
-func _card(bg: Color, strip: Color, node_name: String) -> VBoxContainer:
-	var card := PanelContainer.new()
-	card.name = node_name
-	card.add_theme_stylebox_override("panel", SecurityTheme.status_box(bg, strip))
-	_content.add_child(card)
+func _section(kind: String, title: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	row.add_child(SecurityTheme.glyph(kind, 22.0))
+	row.add_child(_label(title, 18, SecurityTheme.INK, true))
+	_content.add_child(_spacer(6))
+	_content.add_child(row)
+
+
+## A block of content under a section heading (indented like the real one).
+func _block() -> VBoxContainer:
+	var m := MarginContainer.new()
+	m.add_theme_constant_override("margin_left", 32)
+	m.add_theme_constant_override("margin_bottom", 10)
+	_content.add_child(m)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 10)
-	card.add_child(col)
+	col.add_theme_constant_override("separation", 6)
+	m.add_child(col)
 	return col
 
 
-func _icon_row(kind: String, color: Color, text: String, text_color: Color, size: float = 18.0, bold: bool = false) -> HBoxContainer:
+## A section with a status badge, a line of text and links (static pages).
+func _status_block(kind: String, title: String, badge: String, text: String, links: Array) -> void:
+	_section(kind, title)
+	var b := _block()
+	if badge != "":
+		b.add_child(_status_row(badge, text, ""))
+	else:
+		var l := _label(text, 14, SecurityTheme.INK_SOFT)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(560, 0)
+		b.add_child(l)
+	if not links.is_empty():
+		_links(b, links)
+
+
+func _status_row(badge: String, text: String, sub: String) -> HBoxContainer:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
-	row.add_child(SecurityTheme.icon(kind, color, size))
-	var l := _label(text, 18 if bold else 16, text_color, bold)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(l)
+	var icon := SecurityTheme.icon(badge, Color.WHITE, 16)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(icon)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 0)
+	row.add_child(col)
+	col.add_child(_label(text, 14, SecurityTheme.INK))
+	if sub != "":
+		col.add_child(_label(sub, 14, SecurityTheme.INK_SOFT))
 	return row
 
 
-func _details(rows: Dictionary, colors: Dictionary = {}) -> GridContainer:
+## A card with a status badge on the left (banners on the firewall page).
+func _banner(bg: Color, badge: String, text: String, node_name: String) -> VBoxContainer:
+	var card := PanelContainer.new()
+	card.name = node_name
+	card.add_theme_stylebox_override("panel", SecurityTheme.box(bg, Color(0, 0, 0, 0), 6, 16, 12))
+	_content.add_child(card)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	card.add_child(row)
+	var icon := SecurityTheme.icon(badge, Color.WHITE, 18)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(icon)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 6)
+	row.add_child(col)
+	var l := _label(text, 14, SecurityTheme.INK)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	col.add_child(l)
+	return col
+
+
+## Blue links; `actions` (optional, same order) are called when clicked.
+func _links(parent: Control, texts: Array, actions: Array = []) -> void:
+	for i in texts.size():
+		var b := Button.new()
+		b.name = "Link_" + String(texts[i]).replace(" ", "")
+		b.text = texts[i]
+		b.focus_mode = Control.FOCUS_NONE
+		b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		b.add_theme_font_size_override("font_size", 14)
+		SecurityTheme.style_link(b)
+		if i < actions.size():
+			b.pressed.connect(actions[i])
+		parent.add_child(b)
+
+
+func _details(rows: Dictionary) -> GridContainer:
 	var grid := GridContainer.new()
 	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 28)
-	grid.add_theme_constant_override("v_separation", 6)
+	grid.add_theme_constant_override("h_separation", 24)
+	grid.add_theme_constant_override("v_separation", 4)
 	for key in rows:
-		grid.add_child(_label(str(key), 15, SecurityTheme.INK_SOFT))
-		grid.add_child(_label(str(rows[key]), 15, colors.get(key, SecurityTheme.INK), colors.has(key)))
+		grid.add_child(_label(str(key), 14, SecurityTheme.INK_SOFT))
+		var v := _label(str(rows[key]), 14, SecurityTheme.INK)
+		v.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		v.custom_minimum_size = Vector2(420, 0)
+		grid.add_child(v)
 	return grid
 
 
-func _choices(node_name: String, list: Array[SecurityChoice], action: Callable) -> void:
-	var col := VBoxContainer.new()
-	col.name = node_name
-	col.add_theme_constant_override("separation", 8)
-	_content.add_child(col)
-	for choice in list:
-		var b := Button.new()
-		b.name = "Choice_" + choice.choice_id
-		b.custom_minimum_size = Vector2(0, 52)
-		b.focus_mode = Control.FOCUS_NONE
-		b.pressed.connect(func(): action.call(choice.choice_id))
-		var text := VBoxContainer.new()
-		text.set_anchors_preset(Control.PRESET_FULL_RECT)
-		text.offset_left = 16
-		text.offset_top = 6
-		text.alignment = BoxContainer.ALIGNMENT_CENTER
-		text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		text.add_theme_constant_override("separation", 0)
-		b.add_child(text)
-		text.add_child(_label(choice.label, 17, SecurityTheme.INK, true))
-		text.add_child(_label(choice.description, 14, SecurityTheme.INK_SOFT))
-		col.add_child(b)
-
-
-func _hint_card() -> void:
-	var hint := current_hint()
-	if hint == "":
-		return
-	var card := _card(SecurityTheme.WARNING_BG, SecurityTheme.WARNING, "HintCard")
-	card.add_child(_icon_row("alert", SecurityTheme.WARNING, "คำใบ้: " + hint, SecurityTheme.INK, 20, true))
-	card.add_child(_label("ลองเลือกใหม่อีกครั้ง  (−%d คะแนน)" % data.penalty_per_wrong, 14, SecurityTheme.DANGER))
-
-
-func _reason(text: String) -> void:
-	if text.strip_edges() == "":
-		return
-	var card := _card(SecurityTheme.INFO_BG, SecurityTheme.ACCENT, "Reason")
-	var l := _label("เหตุผล: " + text, 15, SecurityTheme.INK)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	card.add_child(l)
-
-
-## Internet -> blocked by the firewall -> this computer.
-func _blocked_diagram() -> Control:
-	var d := Control.new()
-	d.name = "BlockedDiagram"
-	d.custom_minimum_size = Vector2(0, 92)
-	d.draw.connect(func():
-		var w := d.size.x
-		var y := 46.0
-		var font := SecurityTheme.FONT_REGULAR
-		var left := Rect2(10, y - 26, 190, 52)
-		var right := Rect2(minf(w - 200, 560), y - 26, 190, 52)
-		d.draw_rect(left, Color(1, 1, 1))
-		d.draw_rect(left, SecurityTheme.BORDER, false, 1.0)
-		d.draw_string(font, left.position + Vector2(10, 22), "Unknown_Update.exe", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, SecurityTheme.INK)
-		d.draw_string(font, left.position + Vector2(10, 42), "Incoming connection", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, SecurityTheme.INK_SOFT)
-		d.draw_rect(right, Color(1, 1, 1))
-		d.draw_rect(right, SecurityTheme.BORDER, false, 1.0)
-		d.draw_string(font, right.position + Vector2(10, 22), GameLocale.text("คอมพิวเตอร์เครื่องนี้"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, SecurityTheme.INK)
-		d.draw_string(font, right.position + Vector2(10, 42), "Firewall: Active", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, SecurityTheme.OK)
-		var mid := (left.end.x + right.position.x) * 0.5
-		d.draw_dashed_line(Vector2(left.end.x, y), Vector2(mid - 22, y), SecurityTheme.DANGER, 2.0, 7.0)
-		d.draw_line(Vector2(mid + 22, y), Vector2(right.position.x, y), Color(SecurityTheme.INK_SOFT, 0.4), 2.0)
-		SecurityTheme.draw_shield(d, Vector2(mid, y), 40.0, SecurityTheme.OK)
-		SecurityTheme.draw_cross(d, Vector2(mid, y - 2), 26.0, Color.WHITE, 3.0)
-		d.draw_string(font, Vector2(mid - 30, y + 40), "Blocked", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, SecurityTheme.DANGER))
-	return d
-
-
-func _tile(node_name: String, title: String, status: String, color: Color, target: Page) -> Button:
-	var b := Button.new()
-	b.name = node_name
-	b.custom_minimum_size = Vector2(320, 110)
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.focus_mode = Control.FOCUS_NONE
-	b.pressed.connect(func(): open_page(target))
-	var col := VBoxContainer.new()
-	col.set_anchors_preset(Control.PRESET_FULL_RECT)
-	col.offset_left = 16
-	col.offset_right = -12
-	col.offset_top = 12
-	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	col.add_theme_constant_override("separation", 6)
-	b.add_child(col)
-	col.add_child(_label(title, 17, SecurityTheme.INK, true))
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(SecurityTheme.icon("check" if color == SecurityTheme.OK else "alert", color, 18))
-	var l := _label(status, 15, color)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(l)
-	col.add_child(row)
-	col.add_child(_label("คลิกเพื่อเปิด", 13, SecurityTheme.ACCENT))
-	return b
-
-
-func _style_primary(b: Button) -> void:
-	var s := SecurityTheme.box(SecurityTheme.ACCENT, SecurityTheme.ACCENT.darkened(0.2), 4, 16, 8)
-	var h := s.duplicate() as StyleBoxFlat
-	h.bg_color = SecurityTheme.ACCENT.lightened(0.12)
-	b.add_theme_stylebox_override("normal", s)
-	b.add_theme_stylebox_override("hover", h)
-	b.add_theme_stylebox_override("pressed", h)
-	for c in ["font_color", "font_hover_color", "font_pressed_color"]:
-		b.add_theme_color_override(c, Color.WHITE)
-	b.add_theme_font_override("font", SecurityTheme.FONT_BOLD)
-	b.add_theme_font_size_override("font_size", 17)
+func _spacer(h: float) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size = Vector2(0, h)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
 
 
 func _label(text: String, size: int, color: Color, bold: bool = false) -> Label:
@@ -680,6 +1342,12 @@ func _label(text: String, size: int, color: Color, bold: bool = false) -> Label:
 		l.add_theme_font_override("font", SecurityTheme.FONT_BOLD)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
+
+
+## Today as Windows shows it in en-US: M/D/YYYY.
+static func _today() -> String:
+	var d := Time.get_date_dict_from_system()
+	return "%d/%d/%d" % [d.month, d.day, d.year]
 
 
 static func _thousands(n: int) -> String:
