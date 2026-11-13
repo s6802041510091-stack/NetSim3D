@@ -61,7 +61,8 @@ var _teamviewer_icon: Control
 var _teamviewer: Control
 var _browser_icon: Control
 ## Address the browser opens first.
-const HOME_URL := "www.school.ac.th"
+const HOME_URL := "www.college.ac.th"
+const COLLEGE_BROWSER := preload("res://scripts/computer/college_browser.gd")
 var _session := 0
 var _tween: Tween
 ## Set by a mission to check actions first: func(action: String, args:
@@ -730,28 +731,56 @@ func open_browser() -> Control:
 	if station == null or not station.has_app("browser"):
 		return null
 	var existed := _windows.has("browser")
-	var window := _open_window("browser", "Web Browser", Vector2(720, 450), func(body):
+	var available := _root.get_viewport_rect().size - Vector2(reserved_right, 48)
+	var browser_size := Vector2(minf(1040, available.x - 32), minf(600, available.y - 32))
+	var window := _open_window("browser", "Web Browser — วิทยาลัยเทคนิคตัวอย่าง", browser_size, func(body):
+		for side in ["left", "right", "top", "bottom"]:
+			body.add_theme_constant_override("margin_" + side, 0)
 		var column := VBoxContainer.new()
-		column.add_theme_constant_override("separation", 8)
+		column.add_theme_constant_override("separation", 0)
 		body.add_child(column)
+		var toolbar := PanelContainer.new()
+		toolbar.add_theme_stylebox_override("panel", _flat(Color("e8eff9"), 0))
+		column.add_child(toolbar)
 		var bar := HBoxContainer.new()
-		column.add_child(bar)
+		bar.add_theme_constant_override("separation", 8)
+		toolbar.add_child(bar)
+		var home := COLLEGE_BROWSER.button("⌂", false)
+		home.tooltip_text = "หน้าแรกวิทยาลัย"
+		bar.add_child(home)
+		var reload := COLLEGE_BROWSER.button("↻", false)
+		reload.tooltip_text = "โหลดหน้าเว็บอีกครั้ง"
+		bar.add_child(reload)
 		var address := LineEdit.new()
 		address.name = "Address"
 		address.text = HOME_URL
 		address.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		address.custom_minimum_size.y = 36
+		address.add_theme_color_override("font_color", COLOR_TEXT)
+		address.add_theme_color_override("caret_color", COLOR_TITLE)
+		address.add_theme_stylebox_override("normal", _flat(Color.WHITE, 18))
+		address.add_theme_stylebox_override("focus", _flat(Color("f6f9ff"), 18))
 		bar.add_child(address)
-		var go := Button.new()
-		go.text = "ไป"
+		var go := COLLEGE_BROWSER.button("ไป", true)
 		bar.add_child(go)
+		var scroll := ScrollContainer.new()
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		column.add_child(scroll)
 		var page := VBoxContainer.new()
 		page.name = "Page"
-		page.custom_minimum_size = Vector2(680, 330)
-		page.add_theme_constant_override("separation", 8)
-		column.add_child(page)
+		page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		page.add_theme_constant_override("separation", 0)
+		scroll.add_child(page)
+		home.pressed.connect(func():
+			address.text = HOME_URL
+			_load_page(page, HOME_URL))
+		reload.pressed.connect(func(): _load_page(page, address.text))
 		address.text_submitted.connect(func(url: String): _load_page(page, url))
 		go.pressed.connect(func(): _load_page(page, address.text)))
 	if not existed:
+		window.position = Vector2(maxf(8, (available.x - browser_size.x) * 0.5), 16)
 		_load_page(window.find_child("Page", true, false), HOME_URL)
 	window.move_to_front()
 	return window
@@ -765,16 +794,11 @@ func _load_page(page: Control, url: String) -> void:
 		page.remove_child(child)
 		child.queue_free()
 	var ok := station.network_connected and not station.link_fault
+	var scroll := page.get_parent() as ScrollContainer
+	if scroll:
+		scroll.scroll_vertical = 0
 	if ok:
-		var head := PanelContainer.new()
-		head.add_theme_stylebox_override("panel", _flat(Color("1d5fa8"), 6))
-		page.add_child(head)
-		var title := _label("โรงเรียนตัวอย่างวิทยา — เว็บไซต์โรงเรียน", 22, Color.WHITE)
-		head.add_child(title)
-		page.add_child(_label("ข่าวประชาสัมพันธ์", 18, COLOR_TITLE))
-		for line in ["• ประกาศตารางสอบกลางภาค ภาคเรียนที่ 2", "• ห้องปฏิบัติการคอมพิวเตอร์พร้อมใช้งานแล้ว", "• กิจกรรมวันวิทยาศาสตร์ สัปดาห์หน้า"]:
-			page.add_child(_label(line, 16, COLOR_TEXT))
-		page.add_child(_label("เชื่อมต่อสำเร็จ: " + url.strip_edges(), 13, Color(0.2, 0.5, 0.3)))
+		COLLEGE_BROWSER.build(page, url.strip_edges())
 	else:
 		page.add_child(_label("ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้", 24, COLOR_TEXT))
 		page.add_child(_label("ตรวจสอบสายเครือข่าย, โมเด็ม และเราเตอร์", 16, Color(0.35, 0.4, 0.48)))
