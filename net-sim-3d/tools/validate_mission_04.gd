@@ -137,23 +137,45 @@ func _run() -> void:
 	mission.choice.pick("crimper")
 	_check(mission.choice.is_open() and (mission.choice.buttons["crimper"] as Button).disabled, "wrong tool: hint, choose again")
 	mission.choice.pick("cable_tester")
-	_check(not mission.choice.is_open() and not mission.tower.port.plugged, "tester chosen: cable off the PC")
+	_check(await _wait_until(func(): return mission._click_waiting, 4.0), "tester: click the plug at her PC to pull it out")
+	_check(mission._click_layer.visible and mission._click_hint.text.contains("ถอด"), "click hint shown: " + mission._click_hint.text)
+	mission.click_now()
+	_check(await _wait_until(func(): return mission.board.active, 5.0), "heads on the desk: plug them into the tester by hand")
+	_check(not mission.tower.port.plugged, "cable off her PC")
+	_check(mission.board.plug_into("end1", "MAIN") and mission.board.plug_into("end2", "REMOTE"), "both heads go into MAIN and REMOTE")
+	_check(await _wait_until(func(): return mission._click_waiting and mission._click_hint.text.contains("POWER"), 4.0), "then click POWER on the tester")
+	mission.click_now()
+	_check(await _wait_until(func(): return mission._click_waiting and mission._click_hint.text.contains("TEST"), 3.0), "then click TEST")
+	mission.click_now()
 	_check(await _wait_until(func(): return mission.dialogue.choosing, 8.0), "the verdict question after the scan")
 	_check(mission.tester != null and mission.tester.is_on, "tester powered and testing")
 	mission.dialogue.choose(1)
 	await create_timer(1.6).timeout
 	_check(mission.state.verdict_first == "cable_bad" and mission.dialogue.choosing, "wrong verdict noted, asked again")
 	mission.dialogue.choose(0)
-	_check(await _wait_until(func(): return mission.stage == Mission04Controller.Stage.SWAP, 5.0), "cable OK: swap stage")
-	_check(mission.tower.port.plugged, "cable back in her PC")
+	for i in 2:
+		_check(await _wait_until(func(): return mission._click_waiting, 4.0), "pull head %d out of the tester" % (i + 1))
+		mission.click_now()
+	_check(await _wait_until(func(): return mission.stage == Mission04Controller.Stage.SWAP and not mission._busy, 5.0), "cable OK: swap stage")
+	_check(not mission.tower.port.plugged, "the cable is in the tool case, not in her PC")
 
-	# 5. Swap test at STAFF-PC-03.
+	# 5. Swap test at STAFF-PC-03: plug by hand, conclude, pull out, plug back.
 	mission.use_swap_pc(player)
+	_check(await _wait_until(func(): return mission.board.active, 4.0), "STAFF-PC-03: plug the cable in by hand")
+	mission.board.plug_into("cable", "nic")
 	_check(await _wait_until(func(): return mission.choice.is_open(), 6.0), "conclusion asked")
-	_check(pc3.network_connected and mission.swap_tower.port.link_on, "STAFF-PC-03 online with the same cable")
+	_check(pc3.network_connected and mission.swap_tower.port.link_on and mission.swap_tower.port.plugged, "STAFF-PC-03 online with the same cable")
 	mission.choice.pick("nic_suspect")
-	_check(await _wait_until(func(): return mission.stage == Mission04Controller.Stage.ANALYZE and mission.choice.is_open(), 4.0), "analysis with the evidence")
-	_check(not pc3.network_connected and mission.tower.port.plugged, "cable returned")
+	_check(await _wait_until(func(): return mission._click_waiting, 4.0), "pull the cable out of STAFF-PC-03")
+	mission.click_now()
+	_check(await _wait_until(func(): return mission.cable_home_pending and not mission._busy, 4.0), "carry the cable back to her PC")
+	_check(not pc3.network_connected and not mission.swap_tower.port.plugged, "STAFF-PC-03 unplugged")
+	_check(mission.tower_spot.get_prompt_text().contains("กลับ"), "her PC asks for the cable: " + mission.tower_spot.get_prompt_text())
+	mission.use_tower(player)
+	_check(await _wait_until(func(): return mission.board.active, 4.0), "plug it back in by hand")
+	mission.board.plug_into("cable", "nic")
+	_check(await _wait_until(func(): return mission.stage == Mission04Controller.Stage.ANALYZE and mission.choice.is_open(), 6.0), "analysis with the evidence")
+	_check(mission.tower.port.plugged and not mission.tower.port.link_on, "cable back in her PC, still no LED")
 	_check(mission.choice.ids.size() == 5, "5 options")
 
 	# 6. Analysis: a wrong one first, then the NIC.
@@ -172,7 +194,54 @@ func _run() -> void:
 
 	# 8. Replace.
 	var eye_home: Transform3D = player.camera.transform
-	await mission.use_tower(player)
+	_check(mission.tower.has_service(), "her PC model has the parts for the hands-on repair")
+	mission.use_tower(player)
+	# Every step is a click (or plugging the LAN cable by hand); count them.
+	var steps := 0
+	var hints := PackedStringArray()
+	var orbit_checked := false
+	var t0 := Time.get_ticks_msec()
+	while mission.stage == Mission04Controller.Stage.REPLACE and Time.get_ticks_msec() - t0 < 90000:
+		if mission._click_waiting:
+			hints.append(mission._click_hint.text)
+			if mission._click_hint.text.contains("ปิดเครื่องก่อน"):
+				_check(mission.tower.powered, "PC still on before the Power click")
+			mission.click_now()
+			steps += 1
+		elif mission._drag_waiting:
+			hints.append(mission._click_hint.text)
+			mission.drag_now()
+			steps += 1
+		elif mission._hold_waiting:
+			if not orbit_checked:
+				orbit_checked = true
+				var before: Vector3 = player.camera.global_position
+				var wheel := InputEventMouseButton.new()
+				wheel.button_index = MOUSE_BUTTON_WHEEL_UP
+				wheel.pressed = true
+				var used: bool = mission._orbit_on and mission._orbit_input(wheel)
+				var turn := InputEventMouseButton.new()
+				turn.button_index = MOUSE_BUTTON_RIGHT
+				turn.pressed = true
+				mission._orbit_input(turn)
+				var move := InputEventMouseMotion.new()
+				move.relative = Vector2(60, 0)
+				mission._orbit_input(move)
+				turn.pressed = false
+				mission._orbit_input(turn)
+				_check(used and player.camera.global_position.distance_to(before) > 0.005, "free look: zoom and orbit move the camera during the repair")
+			hints.append(mission._click_hint.text)
+			mission.hold_now()
+			steps += 1
+		elif mission.board.active and not mission.board.is_plugged("cable"):
+			mission.board.plug_into("cable", "nic")
+			steps += 1
+		await process_frame
+	_check(hints.size() >= 16 and " / ".join(hints).contains("คายประจุ"), "repair includes the anti-static touch")
+	_check(steps >= 17, "repair by hand: %d steps (%s)" % [steps, " / ".join(hints)])
+	_check(mission.tower.find_child("Cover_Screw_1", true, false).visible and mission.tower.find_child("Cover_Screw_2", true, false).visible, "cover screws are back in")
+	_check(mission.tower.find_child("Side_Cover", true, false).visible, "side cover is back on")
+	await create_timer(0.5).timeout
 	_check(not player.camera.top_level and player.camera.transform.is_equal_approx(eye_home), "camera back at the player's eyes after the repair")
 	_check(mission.stage == Mission04Controller.Stage.VERIFY and pc.network_connected and mission.tower.port.link_on and mission.tower.powered, "new NIC: LED on, PC online")
 

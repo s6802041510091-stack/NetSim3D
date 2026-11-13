@@ -30,6 +30,18 @@ const MODEL := "res://assets/models/mission_04/pc_tower_nic.glb"
 ## A clean copy of the model's NIC_Card for the spare card.
 var _card_template: Node3D
 var work_light: Light3D
+## The model's parts the player works on in the repair minigame (GPT's
+## pc_tower_interactions.json): name -> {"node", "axis" (case local), "travel",
+## "rest" (Transform3D local)}. Empty for the simple case.
+var service := {}
+const SERVICE_PARTS := {
+	"Cover_Screw_1": [Vector3(0, 0, -1), 0.012],
+	"Cover_Screw_2": [Vector3(0, 0, -1), 0.012],
+	"NIC_Bracket_Screw": [Vector3(-1, 0, 0), 0.012],
+	"Power_Button": [Vector3(0, 0, -1), 0.001],
+	"Power_Cable_Plug": [Vector3(0, 0, -1), 0.045],
+	"PCIe_Slot_Target": [Vector3.ZERO, 0.0],
+}
 
 
 func _init() -> void:
@@ -264,6 +276,10 @@ func use_model() -> bool:
 	_nic_home = card.position
 	_card_template = card.duplicate() as Node3D
 	_attach_model_port(card)
+	for part_name: String in SERVICE_PARTS:
+		var node := model.find_child(part_name, true, false) as Node3D
+		if node:
+			service[part_name] = {"node": node, "axis": SERVICE_PARTS[part_name][0], "travel": SERVICE_PARTS[part_name][1], "rest": node.transform}
 	work_light = OmniLight3D.new()
 	work_light.name = "WorkLight"
 	work_light.position = Vector3(-0.3, 0.32, 0.05)
@@ -330,6 +346,200 @@ class ModelPort extends NetworkPort:
 		super.set_link(on)
 		if led_mesh:
 			led_mesh.material_override = _on if on else _off
+
+
+# ---------------------------------------------------------------- repair by hand
+
+## True when the model has every part the hands-on repair needs.
+func has_service() -> bool:
+	return service.size() == SERVICE_PARTS.size()
+
+
+## Where a part is when in place (world), even while it is taken out.
+func rest_position(part_name: String) -> Vector3:
+	var entry: Dictionary = service[part_name]
+	var node: Node3D = entry["node"]
+	return node.get_parent().global_transform * (entry["rest"] as Transform3D).origin
+
+
+func press_power_button() -> void:
+	var entry: Dictionary = service["Power_Button"]
+	var node: Node3D = entry["node"]
+	var rest: Transform3D = entry["rest"]
+	var axis: Vector3 = entry["axis"]
+	Sound.play("click")
+	await _tween_local(node, rest.translated(-axis * 0.004), 0.08)
+	await _tween_local(node, rest, 0.12)
+
+
+## Turns a screw out along its axis (a few turns) and puts it aside.
+func unscrew(part_name: String) -> void:
+	var entry: Dictionary = service[part_name]
+	var node: Node3D = entry["node"]
+	var rest: Transform3D = entry["rest"]
+	var axis: Vector3 = entry["axis"]
+	var travel: float = entry["travel"]
+	Sound.play("crimp")
+	var t := create_tween()
+	t.tween_method(func(k: float):
+		node.transform = Transform3D(Basis(axis, -k * TAU * 4.0) * rest.basis, rest.origin + axis * travel * k), 0.0, 1.0, 0.9)
+	await t.finished
+	node.visible = false
+
+
+## Puts a screw back and turns it in.
+func screw_in(part_name: String) -> void:
+	var entry: Dictionary = service[part_name]
+	var node: Node3D = entry["node"]
+	var rest: Transform3D = entry["rest"]
+	var axis: Vector3 = entry["axis"]
+	var travel: float = entry["travel"]
+	node.visible = true
+	var t := create_tween()
+	t.tween_method(func(k: float):
+		node.transform = Transform3D(Basis(axis, -k * TAU * 4.0) * rest.basis, rest.origin + axis * travel * k), 1.0, 0.0, 0.9)
+	await t.finished
+	Sound.play("crimp")
+	node.transform = rest
+
+
+func unplug_power_cable() -> void:
+	var entry: Dictionary = service["Power_Cable_Plug"]
+	var node: Node3D = entry["node"]
+	var rest: Transform3D = entry["rest"]
+	await _tween_local(node, rest.translated(entry["axis"] * float(entry["travel"])), 0.4)
+
+
+func plug_power_cable() -> void:
+	var entry: Dictionary = service["Power_Cable_Plug"]
+	await _tween_local(entry["node"], entry["rest"], 0.4)
+	Sound.play("crimp")
+
+
+func open_cover() -> void:
+	if work_light:
+		work_light.visible = true
+	await _tween(cover, "position", _cover_home + Vector3(-0.12, 0, 0), STEP_TIME)
+	cover.visible = false
+
+
+func close_cover() -> void:
+	cover.visible = true
+	await _tween(cover, "position", _cover_home, STEP_TIME)
+	if work_light:
+		work_light.visible = false
+
+
+## The broken card comes straight out of its slot (away from the board).
+func remove_card() -> void:
+	port.unplug()
+	await _tween(nic, "position", _nic_home + Vector3(-0.05, 0.0, 0.0), STEP_TIME)
+	await _tween(nic, "position", _nic_home + Vector3(-0.26, 0.06, 0.04), STEP_TIME * 0.6)
+	nic.queue_free()
+
+
+## The spare card goes into the slot (its port is dark until power-on).
+func insert_card() -> void:
+	var holder := nic.get_parent() if is_instance_valid(nic) and nic.get_parent() else self
+	nic = _new_card()
+	holder.add_child(nic)
+	nic.position = _nic_home + Vector3(-0.26, 0.06, 0.04)
+	await _tween(nic, "position", _nic_home + Vector3(-0.05, 0.0, 0.0), STEP_TIME * 0.6)
+	await _tween(nic, "position", _nic_home, STEP_TIME)
+	port.set_link(false)
+
+
+## Hands-on repair (k = 0 in place .. 1 fully out), driven by the player's
+## key hold or mouse drag.
+func set_screw(part_name: String, k: float) -> void:
+	var entry: Dictionary = service[part_name]
+	var rest: Transform3D = entry["rest"]
+	var axis: Vector3 = entry["axis"]
+	(entry["node"] as Node3D).transform = Transform3D(Basis(axis, -k * TAU * 4.0) * rest.basis, rest.origin + axis * float(entry["travel"]) * k)
+
+
+func take_screw(part_name: String) -> void:
+	(service[part_name]["node"] as Node3D).visible = false
+
+
+## The screw is back at its hole, still out (ready to be turned in).
+func return_screw(part_name: String) -> void:
+	set_screw(part_name, 1.0)
+	(service[part_name]["node"] as Node3D).visible = true
+
+
+func set_power_plug(k: float) -> void:
+	var entry: Dictionary = service["Power_Cable_Plug"]
+	(entry["node"] as Node3D).transform = (entry["rest"] as Transform3D).translated(entry["axis"] * float(entry["travel"]) * k)
+
+
+func set_cover(k: float) -> void:
+	if work_light:
+		work_light.visible = true
+	cover.position = _cover_home + Vector3(-0.12 * k, 0, 0)
+
+
+func cover_removed() -> void:
+	cover.visible = false
+
+
+func cover_back() -> void:
+	cover.visible = true
+	set_cover(1.0)
+
+
+func cover_closed() -> void:
+	cover.position = _cover_home
+	if work_light:
+		work_light.visible = false
+
+
+## A bare metal point of the frame (top rear edge, inside), for the
+## anti-static touch.
+func frame_point() -> Vector3:
+	return global_transform * Vector3(-SIZE.x * 0.5 + 0.01, SIZE.y - 0.02, -SIZE.z * 0.5 + 0.03)
+
+
+func set_card_out(k: float) -> void:
+	port.unplug()
+	nic.position = _nic_home + Vector3(-0.06 * k, 0, 0)
+
+
+## The old card is put aside.
+func card_away() -> void:
+	await _tween(nic, "position", _nic_home + Vector3(-0.26, 0.06, 0.04), STEP_TIME * 0.6)
+	nic.queue_free()
+
+
+const SPARE_OFFSET := Vector3(-0.12, 0.05, 0.0)
+
+
+## Where the new card waits before the player drags it into the slot.
+func spare_start() -> Vector3:
+	return nic.get_parent().global_transform * (_nic_home + SPARE_OFFSET) if is_instance_valid(nic) else global_transform * (_nic_home + SPARE_OFFSET)
+
+
+func show_spare() -> void:
+	var holder := nic.get_parent() if is_instance_valid(nic) and nic.get_parent() else self
+	nic = _new_card()
+	holder.add_child(nic)
+	nic.position = _nic_home + SPARE_OFFSET
+	port.set_link(false)
+
+
+func set_card_in(k: float) -> void:
+	nic.position = (_nic_home + SPARE_OFFSET).lerp(_nic_home, k)
+
+
+func card_seated() -> void:
+	nic.position = _nic_home
+	Sound.play("crimp")
+
+
+func _tween_local(node: Node3D, to: Transform3D, seconds: float) -> void:
+	var t := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(node, "transform", to, seconds)
+	await t.finished
 
 
 func _step(on_step: Callable, index: int, text: String) -> void:

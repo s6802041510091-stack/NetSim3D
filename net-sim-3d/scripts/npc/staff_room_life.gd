@@ -80,6 +80,17 @@ static func setup(world: Node, for_level: int) -> void:
 		# Her model has no thighs under the knee-length skirt (like the female
 		# students): seated, the skirt opens and the legs looked cut off.
 		StudentThighs.add_to(female.get_node("Visual"))
+		# Seated, those bare thighs showed through the skirt (user, 2026-11-13).
+		# A knee-length skirt covers the thighs when sitting: draw the added
+		# thighs in the skirt's fabric, and the skirt a little thicker.
+		var skirt_material: Material = null
+		for mesh in female.get_node("Visual").find_children("*", "MeshInstance3D", true, false):
+			if "skirt" in String(mesh.name):
+				skirt_material = (mesh as MeshInstance3D).get_active_material(0)
+				_inflate(mesh as MeshInstance3D, SKIRT_INFLATE)
+		var thighs := female.get_node("Visual").find_child("Thighs (runtime)", true, false) as MeshInstance3D
+		if thighs and skirt_material:
+			thighs.material_override = skirt_material
 		world.add_child(female)
 	for id: String in TEACHERS:
 		var info: Dictionary = TEACHERS[id]
@@ -95,6 +106,33 @@ static func setup(world: Node, for_level: int) -> void:
 		if not has_role:
 			life.idle[id] = teacher
 	world.add_child(life)
+
+
+## How far (m) the female teacher's skirt is pushed out along its normals.
+const SKIRT_INFLATE := 0.006
+
+
+## Pushes every vertex of a skinned mesh out along its normal (a copy of the
+## mesh; the GLB stays unchanged).
+static func _inflate(instance: MeshInstance3D, amount: float) -> void:
+	var old := instance.mesh
+	if old == null:
+		return
+	var new_mesh := ArrayMesh.new()
+	for surface in old.get_surface_count():
+		var arrays := old.surface_get_arrays(surface)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+		if normals.size() == vertices.size():
+			for i in vertices.size():
+				vertices[i] += normals[i] * amount
+			arrays[Mesh.ARRAY_VERTEX] = vertices
+		# Keep 8 bone weights per vertex (the skirt follows the thighs).
+		var bones: PackedInt32Array = arrays[Mesh.ARRAY_BONES] if arrays[Mesh.ARRAY_BONES] != null else PackedInt32Array()
+		var eight := vertices.size() > 0 and bones.size() == vertices.size() * 8
+		new_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, [], {}, Mesh.ARRAY_FLAG_USE_8_BONE_WEIGHTS if eight else 0)
+		new_mesh.surface_set_material(new_mesh.get_surface_count() - 1, old.surface_get_material(surface))
+	instance.mesh = new_mesh
 
 
 static func _seat(world: Node, teacher: CharacterBody3D, info: Dictionary) -> void:
