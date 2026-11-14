@@ -2,19 +2,28 @@ class_name Mission05Controller
 extends Node
 
 ## Runs Level 5 in the school map (added by GameFlow.configure_level),
-## ภารกิจ/ด่าน_05/README.md as agreed with the user on 2026-11-13:
+## ภารกิจ/ด่าน_05/README.md — v2.1 agreed with the user on 2026-11-15:
 ##   1. the desk phone in IT Support rings: the computer-room teacher (male)
-##      says PC-R3-L2 shows a security warning -> the timer starts
-##   2. go to PC-R3-L2 in the computer room (its screen glows red), sit down
+##      says PC-R3-L2 shows a security warning and that the class needs the
+##      school's SchoolLab Classroom -> the timer starts
+##   2. go to PC-R3-L2 in the computer room (its monitor shows a Windows
+##      Security warning: SecurityWarningScreen), sit down
 ##   3. open Windows Security (simulated) from the desktop
-##   4. problem 1 -> Firewall, block the unknown connection
-##   5. problem 2 -> Anti-Virus, scan
-##   6. quarantine the file found
-##   7. check the status is Protected, press "ส่งผลการตรวจสอบ"
-##   8. tell the teacher (he works at TEACHER-PC in the same room)
+##   4. Firewall & network protection: the two "Windows Security Alert"
+##      dialogs come up — SchoolLab Classroom (allow on Private) then
+##      Unknown_Update.exe (Cancel); checking "Allow an app through firewall"
+##      afterwards is a process point
+##   5. Virus & threat protection: Quick scan
+##   6. quarantine the threat (two affected files)
+##   7. check the status (Protection history is a process point), press
+##      "ส่งผลการตรวจสอบ"
+##   8. tell the teacher (he works at TEACHER-PC in the same room) and answer
+##      his "how do we stop this happening again?"
 ##   -> score (Mission05State, 30/50/20) -> summary
-## No supervisor report in this level, and nothing is carried over between
-## plays: every start is a fresh Mission05State.
+## No quiz pop-ups on the desktop (user 2026-11-15): what the player checks in
+## the program is the evidence. No supervisor report in this level, and
+## nothing is carried over between plays. The hints, the arrow and the step
+## tracker stay as in the other levels (user 2026-11-14).
 
 signal call_answered
 signal finished(score: MissionScore)
@@ -28,24 +37,41 @@ const HOST := "PC-R3-L2"
 const RECEIVED := "ได้รับภารกิจ: ตรวจสอบความปลอดภัยของคอมพิวเตอร์นักเรียน"
 const COMPLETED := "ภารกิจสำเร็จ: ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน"
 const SUMMARY_TITLE := "ด่านที่ 5  ·  ตรวจสอบความปลอดภัยคอมพิวเตอร์ห้องเรียน"
-## Time score (placeholder until play-testing): full up to 5 min, 0 at 15 min.
-const TIME_FULL_SEC := 300.0
-const TIME_ZERO_SEC := 900.0
+## Time score (placeholder until play-testing, user 2026-11-15): full up to
+## 7 min, 0 at 17 min.
+const TIME_FULL_SEC := 420.0
+const TIME_ZERO_SEC := 1020.0
+## Pause after a wrong answer before the question comes back with its hint.
+const RETRY_DELAY := 0.6
 
 ## "**...**" marks the important words, shown in gold by DialogueBox.
 const CALL := [
-	"ครูประจำห้องคอมพิวเตอร์|สวัสดีครับ ผมครูประจำห้องคอมนะครับ คอมพิวเตอร์นักเรียนเครื่อง **PC-R3-L2** ขึ้น**ข้อความเตือนด้านความปลอดภัย** ผมยังไม่กล้าให้นักเรียนใช้ ช่วยมาตรวจสอบให้หน่อยได้ไหมครับ",
+	"ครูประจำห้องคอมพิวเตอร์|สวัสดีครับ ผมครูประจำห้องคอมนะครับ คอมพิวเตอร์นักเรียนเครื่อง **PC-R3-L2** ขึ้น**ข้อความเตือนด้านความปลอดภัย** ผมยังไม่กล้าให้นักเรียนใช้",
+	"ครูประจำห้องคอมพิวเตอร์|อ้อ เมื่อเช้าผมเพิ่งลงโปรแกรม **SchoolLab Classroom** ของโรงเรียนไว้ทุกเครื่อง คาบนี้**ต้องใช้ส่งหน้าจอผมไปที่เครื่องนักเรียน** ช่วยมาดูให้หน่อยได้ไหมครับ",
 	"คุณ|ได้ครับ ผมจะไปตรวจสอบให้",
 ]
+## The moment the player walks into the computer room (user 2026-11-15).
+const GREET := [
+	"ครูประจำห้องคอมพิวเตอร์|อ้าว คุณช่างมาพอดีเลย คอมที่เสียคือ**คอมเครื่องนี้**ครับ",
+]
+## The computer room (x from its door at -3.11, z between its end walls).
+const ROOM_MIN := Vector2(-2.7, -11.5)
+const ROOM_MAX := Vector2(10.0, 10.0)
+## The watching student looks at the player within this distance (m).
+const WATCHER_LOOK := 2.4
 const WHERE := [
-	"ครูประจำห้องคอมพิวเตอร์|เครื่องที่ขึ้นข้อความเตือนคือ **PC-R3-L2** ครับ อยู่**แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2** จอเป็นสีแดงอยู่",
+	"ครูประจำห้องคอมพิวเตอร์|เครื่องที่ขึ้นข้อความเตือนคือ **PC-R3-L2** ครับ อยู่**แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2** หน้าจอขึ้น**กล่องเตือนสีแดงของ Windows Security** อยู่ครับ",
 ]
 const WAITING := [
-	"ครูประจำห้องคอมพิวเตอร์|ตามสบายเลยครับ ตรวจเสร็จแล้วบอกผมด้วยนะครับ",
+	"ครูประจำห้องคอมพิวเตอร์|ตามสบายเลยครับ ตรวจเสร็จแล้วบอกผมด้วยนะครับ คาบนี้ผมต้องใช้ **SchoolLab Classroom** ด้วยนะครับ",
 ]
+## The teacher asks; the player then CHOOSES what to report (user 2026-11-15).
 const TELL := [
-	"คุณ|ตรวจสอบเรียบร้อยแล้วครับ ผม**ปิดกั้นการเชื่อมต่อ**จากโปรแกรมที่ไม่รู้จัก และ**กักกันไฟล์ต้องสงสัย**ที่ตรวจพบแล้ว เครื่องกลับมาอยู่ในสถานะ**ได้รับการป้องกัน**แล้วครับ",
-	"ครูประจำห้องคอมพิวเตอร์|ขอบคุณมากครับ แสดงว่า **Firewall** ช่วยกันการเชื่อมต่อแปลก ๆ ส่วน **Anti-Virus** ช่วยจัดการไฟล์อันตรายใช่ไหมครับ ตอนนี้ให้นักเรียนใช้เครื่องได้แล้ว",
+	"ครูประจำห้องคอมพิวเตอร์|ตรวจเสร็จแล้วเหรอครับ เครื่อง **PC-R3-L2** เป็นอย่างไรบ้างครับ",
+]
+## After the right report (the player's chosen words are said first).
+const THANKS := [
+	"ครูประจำห้องคอมพิวเตอร์|เข้าใจแล้วครับ ต่อไปนี้ผมจะดูแลและเตือนนักเรียนเกี่ยวกับการ**ดาวน์โหลดโปรแกรมภายนอก**นะครับ",
 ]
 const DONE_LINE := [
 	"ครูประจำห้องคอมพิวเตอร์|ขอบคุณอีกครั้งนะครับ",
@@ -57,7 +83,7 @@ const STEPS := [
 	"รับสายโทรศัพท์ที่โต๊ะทำงานในห้อง IT Support",
 	"ไปที่คอมพิวเตอร์นักเรียน PC-R3-L2 ในห้องคอมพิวเตอร์",
 	"เปิดโปรแกรม Windows Security",
-	"จัดการการเชื่อมต่อจากโปรแกรมที่ไม่รู้จัก",
+	"จัดการโปรแกรมที่ขอรับการเชื่อมต่อจากเครือข่าย",
 	"สแกนหาไฟล์ต้องสงสัย",
 	"จัดการไฟล์ที่ตรวจพบ",
 	"ตรวจสถานะความปลอดภัย แล้วส่งผลการตรวจสอบ",
@@ -69,6 +95,7 @@ enum Stage { CALL, GO, OPEN, FIREWALL, SCAN, QUARANTINE, SUBMIT, TELL, DONE }
 var stage := Stage.CALL
 var elapsed_sec := 0.0
 var state := Mission05State.new()
+var data: Mission05Data
 var score: MissionScore
 var hud: ObjectiveHUD
 var dialogue: DialogueBox
@@ -81,12 +108,24 @@ var teacher: Node3D
 var teacher_talk: Talkable
 ## The Windows Security window now open (null when closed).
 var app: WindowsSecurity
+## The question on screen ("" when none) and the data indexes of its buttons.
+var asking := ""
+var _order: Array[int] = []
+var _player: Node
 var _timing := false
 var _busy := false
+var player_node: Node3D
+## The owner of PC-R3-L2 (ClassroomStudents.WATCHER), null without one.
+var watcher: NpcCharacter
+## "moving" (stepping aside / back), "watching", "looking" (at the player),
+## "seated" (back at his PC after the fix).
+var watcher_state := ""
+var greeted := false
 
 
 func _ready() -> void:
 	var world := get_parent()
+	data = load(WindowsSecurity.DATA_PATH) as Mission05Data
 	# The program on the desktop works on this play's progress.
 	WindowsSecurity.shared_state = state
 	hud = ObjectiveHUD.new()
@@ -95,6 +134,7 @@ func _ready() -> void:
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
+	dialogue.chosen.connect(_on_chosen)
 	summary = MissionSummary.new()
 	summary.name = "MissionSummary"
 	add_child(summary)
@@ -125,6 +165,10 @@ func _ready() -> void:
 		teacher_talk.display_name = TEACHER
 		teacher.add_child(teacher_talk)
 		teacher_talk.talked.connect(_on_teacher_talked)
+	player_node = world.get_node_or_null("ITSupportPlayer") as Node3D
+	watcher = ClassroomStudents.watcher(world)
+	if watcher:
+		_watcher_step_aside.call_deferred()
 	_enter(Stage.CALL)
 
 
@@ -139,15 +183,28 @@ func _process(delta: float) -> void:
 	# The objective tab folds while the desktop has the screen.
 	var desktop_on := manager != null and manager.desktop != null and manager.desktop.visible
 	hud.set_auto_collapsed(desktop_on)
+	if player_node == null:
+		return
+	if stage == Stage.GO and not greeted and not _busy and in_computer_room(player_node.global_position):
+		greeted = true
+		_greet()
+	_watcher_watch(desktop_on)
+
+
+static func in_computer_room(p: Vector3) -> bool:
+	return p.x > ROOM_MIN.x and p.x < ROOM_MAX.x and p.z > ROOM_MIN.y and p.z < ROOM_MAX.y
 
 
 # ---------------------------------------------------------------- stages
 
 func _enter(next: Stage) -> void:
 	stage = next
-	# The computer can be used once the call is answered (the mission's order).
+	# The computer can be used once the call is answered (the mission's order);
+	# after the report its owner sits back down at it.
 	if station:
-		station.collision_layer = 0 if stage == Stage.CALL else ComputerStation.COLLISION_LAYER
+		station.collision_layer = 0 if stage == Stage.CALL or stage >= Stage.TELL else ComputerStation.COLLISION_LAYER
+	if stage == Stage.TELL and watcher:
+		_watcher_sit()
 	if teacher_talk:
 		match stage:
 			Stage.CALL, Stage.DONE:
@@ -167,7 +224,7 @@ func _sync() -> void:
 	var next := Stage.OPEN
 	if state.app_opened:
 		next = Stage.FIREWALL
-	if state.firewall_blocked:
+	if state.alerts_done():
 		next = Stage.SCAN
 	if state.scan_status == Mission05State.ScanStatus.SCANNED:
 		next = Stage.QUARANTINE
@@ -190,17 +247,20 @@ func _show_steps() -> void:
 		Stage.CALL:
 			hint = "โทรศัพท์บนโต๊ะทำงานของคุณในห้อง IT Support กำลังดัง มองที่โทรศัพท์แล้วกด F"
 		Stage.GO:
-			hint = "ห้องคอมพิวเตอร์ แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2 (จอสีแดง) กด F ที่คอมพิวเตอร์"
+			hint = "ห้องคอมพิวเตอร์ แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2 (หน้าจอขึ้นกล่องเตือน Threats found) กด F ที่คอมพิวเตอร์"
 		Stage.OPEN:
 			hint = "เปิดโปรแกรม Windows Security จากไอคอนบน Desktop"
 		Stage.FIREWALL:
-			hint = "มีโปรแกรมที่ไม่รู้จักขอเชื่อมต่อผ่านเครือข่าย เลือกส่วนที่ใช้จัดการปัญหานี้จากเมนูด้านซ้าย" if not state.conn_matched else "อ่านหน้าต่าง Windows Security Alert แล้วเลือกวิธีจัดการ"
+			if not state.conn_matched:
+				hint = "มีโปรแกรมขอรับการเชื่อมต่อจากเครือข่ายเข้ามาที่เครื่องนี้ (Incoming connection) เลือกส่วนที่ใช้จัดการปัญหานี้จากเมนูด้านซ้าย"
+			else:
+				hint = "อ่านข้อมูลในหน้าต่าง Windows Security Alert แล้วเลือกวิธีจัดการให้เหมาะกับแต่ละโปรแกรม"
 		Stage.SCAN:
 			hint = "ครูพบข้อความเตือนว่าอาจมีไฟล์อันตราย เลือกส่วนที่ใช้ตรวจหาไฟล์อันตรายจากเมนูด้านซ้าย" if not state.file_matched else "กด Quick scan แล้วรอจนสแกนเสร็จ"
 		Stage.QUARANTINE:
 			hint = "คลิกรายการภัยคุกคามเพื่อดูรายละเอียด เลือกวิธีจัดการ แล้วกด Start actions"
 		Stage.SUBMIT:
-			hint = "ตรวจสถานะในหน้า Home แล้วกด \"ส่งผลการตรวจสอบ\" (มุมขวาล่าง)"
+			hint = "ตรวจสถานะความปลอดภัยของเครื่อง แล้วกด \"ส่งผลการตรวจสอบ\" (มุมขวาล่าง)"
 		Stage.TELL:
 			hint = "ครูนั่งที่โต๊ะครูหน้าห้องคอมพิวเตอร์ กด F ที่ครู"
 	if _away_from_computer() and stage >= Stage.OPEN and stage <= Stage.SUBMIT:
@@ -215,6 +275,7 @@ func _away_from_computer() -> bool:
 func _refresh_marker() -> void:
 	if not _away_from_computer():
 		marker.clear()
+		_show_steps()
 		return
 	match stage:
 		Stage.CALL:
@@ -244,17 +305,85 @@ func _on_phone(player: Node) -> void:
 	_enter(Stage.GO)
 
 
+## Walking into the computer room: the teacher greets the player at once and
+## points out the broken computer (the arrow is already on it).
+func _greet() -> void:
+	_busy = true
+	if player_node.has_method("set_controls_locked"):
+		player_node.set_controls_locked(true)
+	# The line shows straight away; the teacher turns his head meanwhile.
+	if teacher and teacher.has_method("turn_to"):
+		teacher.call("turn_to", player_node)
+	dialogue.show_lines(PackedStringArray(GREET))
+	await dialogue.finished
+	if teacher and teacher.has_method("turn_back"):
+		teacher.call("turn_back")
+	if player_node.has_method("set_controls_locked"):
+		player_node.set_controls_locked(false)
+	_busy = false
+
+
+## At the start: the owner of PC-R3-L2 gets up and stands beside it.
+func _watcher_step_aside() -> void:
+	watcher_state = "moving"
+	await get_tree().process_frame
+	if not is_instance_valid(watcher):
+		return
+	await watcher.stand_up()
+	await watcher.walk_path([ClassroomStudents.WATCH_SPOT])
+	await watcher.face_yaw(_watcher_yaw())
+	if watcher_state == "moving":
+		watcher_state = "watching"
+
+
+## Facing the screen of PC-R3-L2 from the watching spot.
+static func _watcher_yaw() -> float:
+	var to := ClassroomStudents.screen_of(ClassroomStudents.WATCHER_HOST) - ClassroomStudents.WATCH_SPOT
+	return atan2(to.x, to.z)
+
+
+## Standing by the desk: he looks at the player when the player comes close,
+## and back at the screen while the player works at the computer.
+func _watcher_watch(desktop_on: bool) -> void:
+	if watcher == null or not is_instance_valid(watcher):
+		return
+	var near := not desktop_on and player_node.global_position.distance_to(watcher.global_position) < WATCHER_LOOK
+	if watcher_state == "watching" and near:
+		watcher_state = "looking"
+		watcher.turn_to(player_node)
+	elif watcher_state == "looking" and not near:
+		watcher_state = "watching"
+		watcher.turn_back()
+
+
+## The computer is fixed and the player has left it: back to his seat.
+func _watcher_sit() -> void:
+	if watcher_state == "seated" or watcher_state == "returning":
+		return
+	while watcher_state == "moving":
+		await get_tree().process_frame
+	watcher_state = "returning"
+	watcher.turn_back()
+	await get_tree().create_timer(watcher.turn_time + 0.1, false).timeout
+	var seat := ClassroomStudents.seat_of(ClassroomStudents.WATCHER_HOST)
+	await watcher.walk_path([seat + Vector3(0.0, 0.0, NpcCharacter.STAND_BACK)])
+	await watcher.sit_down()
+	watcher_state = "seated"
+
+
 func _on_teacher_talked(player: Node) -> void:
-	if _busy:
+	if _busy or asking != "":
 		return
 	match stage:
 		Stage.CALL:
 			return
 		Stage.TELL:
 			state.told_teacher = true
+			_player = player
 			await _say(player, teacher, PackedStringArray(TELL), false)
-			hud.show_toast(COMPLETED)
-			finish(player)
+			# Controls stay locked: the player chooses what to report.
+			_busy = true
+			ask_question("report")
 		Stage.DONE:
 			await _say(player, teacher, PackedStringArray(DONE_LINE))
 		Stage.GO:
@@ -287,28 +416,79 @@ func _on_app_changed(_a: Variant = null, _b: Variant = null, _c: Variant = null)
 	_sync()
 
 
+# ---------------------------------------------------------------- the teacher's question
+
+## Shows a question with its 4 answers shuffled, one per row; `hint` (after a
+## wrong answer) goes in the small line above it.
+func ask_question(id: String, hint: String = "") -> void:
+	var q := data.get_question(id)
+	if q == null:
+		return
+	asking = id
+	_order.clear()
+	for i in q.options.size():
+		_order.append(i)
+	_order.shuffle()
+	var answers := PackedStringArray()
+	for i in _order:
+		answers.append(q.options[i])
+	dialogue.ask(q.speaker + "|" + q.text, answers, PackedStringArray(), 0.0, ("คำใบ้: " + hint) if hint != "" else "", true)
+
+
+## The player picked button `pick` of the question on screen.
+func _on_chosen(pick: int) -> void:
+	if asking == "" or pick < 0 or pick >= _order.size():
+		return
+	var id := asking
+	asking = ""
+	var q := data.get_question(id)
+	var right := q.is_correct(_order[pick])
+	state.note_question(id, _order[pick], right)
+	if not right:
+		Sound.play("wrong")
+		await get_tree().create_timer(RETRY_DELAY, false).timeout
+		ask_question(id, q.hint)
+		return
+	Sound.play("correct")
+	# The player says the chosen report, then the teacher answers.
+	var lines := PackedStringArray(["คุณ|" + q.options[q.correct_index]])
+	lines.append_array(PackedStringArray(THANKS))
+	await _say(_player, teacher, lines, false)
+	hud.show_toast(COMPLETED)
+	finish(_player)
+
+
 # ---------------------------------------------------------------- end
 
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
+	_busy = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
 	var record := GameProgress.record_attempt(LEVEL, score, {
+		"alert_answers": state.alert_answers.duplicate(true),
 		"conn_tool_first": state.conn_tool_first, "file_tool_first": state.file_tool_first,
-		"firewall_choices": Array(state.firewall_choices), "threat_choices": Array(state.threat_choices),
-		"submit_first": state.submit_first})
+		"rules_checked": state.rules_checked,
+		"firewall_off_count": state.firewall_off_count,
+		"threat_choices": Array(state.threat_choices),
+		"history_checked": state.history_checked,
+		"submit_first": state.submit_first,
+		"report_answers": state.question_answers["report"].duplicate()})
 	_enter(Stage.DONE)
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)
 	var flow := get_tree().root.get_node_or_null("GameFlow")
 	var next_available: bool = flow != null and flow.call("next_level_available", LEVEL)
+	var d := state.process_decisions()
 	summary.show_result(SUMMARY_TITLE, score, record, next_available, [
-		["Firewall: ปิดกั้นการเชื่อมต่อ", _tries_text(Mission05State.tries(state.firewall_choices, Mission05State.FIREWALL_RIGHT))],
+		["SchoolLab Classroom: Allow (Private)", _tries_text(state.alert_tries(Mission05State.ALERT_SCHOOL))],
+		["Unknown_Update.exe: Cancel", _tries_text(state.alert_tries(Mission05State.ALERT_UNKNOWN))],
 		["Anti-Virus: Quarantine", _tries_text(Mission05State.tries(state.threat_choices, Mission05State.THREAT_RIGHT))],
-		["ปัญหาการเชื่อมต่อ → Firewall", "ถูกตั้งแต่ครั้งแรก" if state.conn_tool_first == Mission05State.TOOL_FIREWALL else "ผิดในครั้งแรก"],
-		["ไม่ปิด Firewall", "ถูก" if not Mission05State.FIREWALL_OFF in state.firewall_choices else "เคยเลือกปิด Firewall"],
-		["ไฟล์ต้องสงสัย → Anti-Virus", "ถูกตั้งแต่ครั้งแรก" if state.file_tool_first == Mission05State.TOOL_VIRUS else "ผิดในครั้งแรก"],
-		["ไม่ Allow / ไม่ Add Exclusion", "ถูก" if state.threat_choices.size() > 0 and state.threat_choices[0] == Mission05State.THREAT_RIGHT else "เคยเลือกผิด"],
-		["ตรวจสถานะก่อนส่งผล", "Protected" if state.submit_first == "protected" else "ส่งก่อนสถานะเป็น Protected"],
+		["ปัญหาการเชื่อมต่อ → Firewall", _first_text(d["firewall_first"])],
+		["ตรวจกฎใน Allow an app through firewall", "ตรวจแล้ว" if d["checked_rules"] else "ไม่ได้ตรวจ"],
+		["ไฟล์ต้องสงสัย → Anti-Virus", _first_text(d["virus_first"])],
+		["ไม่ลดระดับการป้องกัน", "ถูก" if d["kept_protection"] else "เคยปิดหรือยกเว้นการป้องกัน"],
+		["ยืนยันที่ Protection history ก่อนส่งผล", "ถูก" if d["checked_history"] else "ไม่ได้ตรวจก่อนส่งผล"],
+		["รายงานผลให้ครู", _first_text(d["report"])],
 	])
 	finished.emit(score)
 	return score
@@ -316,6 +496,10 @@ func finish(player: Node = null) -> MissionScore:
 
 static func _tries_text(tries: int) -> String:
 	return "ถูกในครั้งที่ %d" % tries if tries > 0 else "-"
+
+
+static func _first_text(ok: bool) -> String:
+	return "ถูกตั้งแต่ครั้งแรก" if ok else "ผิดในครั้งแรก"
 
 
 # ---------------------------------------------------------------- helpers

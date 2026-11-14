@@ -27,11 +27,32 @@ var link_fault := false
 var installed_apps := PackedStringArray()
 
 ## True while this computer shows a security warning (Mission 5 target):
-## its screen glows red in the room and the desktop pops up a warning.
+## its screen shows a Windows Security warning in the room
+## (SecurityWarningScreen) and the desktop pops up a warning.
 var screen_alert := false
 
+## The monitor model has no UVs, so the warning picture is mapped from the
+## screen's own box (model space x/y) and pulses gently to draw the eye.
+const WARNING_SHADER := """
+shader_type spatial;
+render_mode unshaded, cull_disabled;
+uniform sampler2D screen_tex : source_color, filter_linear;
+uniform vec3 box_pos;
+uniform vec3 box_size;
+varying vec2 screen_uv;
+void vertex() {
+	vec2 p = (VERTEX.xy - box_pos.xy) / box_size.xy;
+	screen_uv = vec2(p.x, 1.0 - p.y);
+}
+void fragment() {
+	float pulse = 0.88 + 0.12 * (0.5 + 0.5 * sin(TIME * 3.0));
+	ALBEDO = texture(screen_tex, screen_uv).rgb * pulse;
+}
+"""
+
 var _screen_on_material: StandardMaterial3D
-var _screen_alert_material: StandardMaterial3D
+var _screen_alert_material: Material
+var _warning_picture: SecurityWarningScreen
 
 
 func setup(p_manager: Node, p_screen: MeshInstance3D) -> void:
@@ -85,7 +106,7 @@ func set_screen_on(on: bool) -> void:
 		screen.material_override = _alert_material() if screen_alert else null
 
 
-## Turns the red "security warning" screen on or off (Mission 5).
+## Turns the "security warning" screen on or off (Mission 5).
 func set_screen_alert(on: bool) -> void:
 	screen_alert = on
 	if screen == null:
@@ -94,13 +115,20 @@ func set_screen_alert(on: bool) -> void:
 		screen.material_override = _alert_material() if on else null
 
 
-func _alert_material() -> StandardMaterial3D:
+func _alert_material() -> Material:
 	if _screen_alert_material == null:
-		_screen_alert_material = StandardMaterial3D.new()
-		_screen_alert_material.albedo_color = Color(0.45, 0.05, 0.05)
-		_screen_alert_material.emission_enabled = true
-		_screen_alert_material.emission = Color(0.9, 0.12, 0.1)
-		_screen_alert_material.emission_energy_multiplier = 1.4
+		_warning_picture = SecurityWarningScreen.new()
+		_warning_picture.name = "WarningPicture"
+		add_child(_warning_picture)
+		var shader := Shader.new()
+		shader.code = WARNING_SHADER
+		var material := ShaderMaterial.new()
+		material.shader = shader
+		material.set_shader_parameter("screen_tex", _warning_picture.get_texture())
+		var box := screen.get_aabb()
+		material.set_shader_parameter("box_pos", box.position)
+		material.set_shader_parameter("box_size", box.size)
+		_screen_alert_material = material
 	return _screen_alert_material
 
 

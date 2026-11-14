@@ -11,14 +11,19 @@ extends PanelContainer
 ##             Device performance & health, Family options, Protection
 ##             history, Settings. The first section the player opens for each
 ##             problem is a decision (Mission05State.note_section).
-##   Firewall  network profiles (Domain / Private / Public). A "Windows
-##             Security Alert" asks about Unknown_Update.exe: Allow access
-##             (wrong) / Cancel (keeps it blocked — right). Switching the
-##             firewall off on a profile page is wrong (it switches back on).
-##   Virus     Quick scan (a few seconds, only after the firewall alert), one
-##             threat found: Remove / Quarantine / Allow on device + "Start
-##             actions". Settings: Real-time protection switch (off = wrong),
-##             Exclusions -> Add an exclusion -> File (wrong).
+##   Firewall  network profiles (Domain / Private (active) / Public). Opening
+##             the page brings up the two "Windows Security Alert" dialogs
+##             (FirewallAlerts: SchoolLab Classroom first, then
+##             Unknown_Update.exe — user 2026-11-15); a banner with "Review"
+##             stays until both are answered. "Allow an app through firewall"
+##             lists the rules (checking them is a process point). Switching
+##             the firewall off on a profile page is wrong (it switches back on).
+##   Virus     Quick scan (a few seconds, only after the alerts), one threat
+##             found with two affected files: Remove / Quarantine / Allow on
+##             device + "Start actions". Settings: Real-time protection switch
+##             (off = wrong), Exclusions -> Add an exclusion -> File (wrong).
+##   History   after the quarantine: the entry that confirms it (opening it
+##             before the report is a process point).
 ##
 ## A wrong answer is not applied: the game shows a Thai hint (never the
 ## answer) in its own panel, outside the Windows look, and the player tries
@@ -32,6 +37,8 @@ extends PanelContainer
 ##            one play of the level; the program may be closed and opened again)
 ## Runs on the simulated desktop: DesktopOS.open_windows_security().
 
+## An alert answered (allow_private / allow_both / allow_public / allow_none /
+## block) or the firewall switch turned off ("disable").
 signal firewall_choice_made(choice_id: String, correct: bool)
 signal scan_started
 signal scan_finished(threats_found: int)
@@ -50,7 +57,7 @@ signal minimize_requested
 
 const DATA_PATH := "res://missions/mission_05/data/mission_05_data.tres"
 
-enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY, SETTINGS, FW_PROFILE, AV_SETTINGS, EXCLUSIONS }
+enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY, SETTINGS, FW_PROFILE, AV_SETTINGS, EXCLUSIONS, ALLOWED_APPS }
 
 ## Sidebar: page, glyph, title.
 const NAV := [
@@ -70,7 +77,16 @@ const SECTION := {
 	Page.APP: "app", Page.DEVICE: "device", Page.HEALTH: "health", Page.FAMILY: "family",
 	Page.HISTORY: "history", Page.SETTINGS: "settings", Page.FW_PROFILE: "firewall",
 	Page.AV_SETTINGS: "virus", Page.EXCLUSIONS: "virus",
+	Page.ALLOWED_APPS: Mission05State.TOOL_RULES,
 }
+## Built-in rules shown on "Allow an app through firewall" (name, private, public).
+const BUILTIN_RULES := [
+	["Core Networking", true, true],
+	["File and Printer Sharing", true, false],
+	["Microsoft Edge", true, true],
+	["Network Discovery", true, false],
+	["Remote Desktop", false, false],
+]
 const SUBMIT_EARLY_HINT := "ยังมีส่วนที่ต้องดำเนินการอยู่ ตรวจสอบสถานะในหน้า Home ให้ทุกส่วนเป็นสีเขียวก่อนส่งผล"
 
 ## Made-up paths shown while the scan runs.
@@ -84,12 +100,16 @@ const SCAN_PATHS := [
 ]
 const SCAN_FILES := 48213
 const DOWNLOADS := ["Student_Game_Crack.exe", "Unknown_Update.exe", "Homework_Week3.docx", "Typing_Practice.pdf"]
+## v2: the crack dropped Unknown_Update.exe, so one detection has both files.
+const AFFECTED_FILES := 2
 const PROFILES := {
 	"Domain": "Networks at a workplace that are joined to a domain.",
 	"Private": "Networks at home or work, where you know and trust the people and devices on the network.",
 	"Public": "Networks in public places such as airports or coffee shops.",
 }
-const ACTIVE_PROFILE := "Public"
+## The school network is a Private network (v2): SchoolLab must be allowed on
+## Private networks, so the program has to say which one is active.
+const ACTIVE_PROFILE := "Private"
 
 ## The progress of this play, set by Mission05Controller. When it is null (the
 ## scene run on its own with F6) the program starts with its own fresh state.
@@ -120,7 +140,8 @@ var _scan_bar: ProgressBar
 var _scan_count: Label
 var _scan_path: Label
 var _scan_left: Label
-var _alert: Control
+## The two firewall alerts (shown over the program from the Firewall page).
+var _alerts: FirewallAlerts
 var _picker: Control
 var _picker_pick := ""
 var _add_menu_open := false
@@ -145,7 +166,6 @@ func _ready() -> void:
 	state.app_opened = true
 	add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, Color(0.75, 0.75, 0.75), 0, 0, 0))
 	_build_frame()
-	_build_alert()
 	_build_picker()
 	_build_game_panels()
 	open_page(Page.HOME)
@@ -179,8 +199,9 @@ func handle_escape() -> bool:
 	if _picker.visible:
 		_picker.visible = false
 		return true
-	if _alert.visible:
-		_alert.visible = false
+	if alert_visible():
+		_alerts.dismissed = true
+		_alerts.refresh()
 		return true
 	close_program()
 	return true
@@ -197,9 +218,16 @@ func open_page(target: Page) -> void:
 	var section: String = SECTION[target]
 	state.note_section(section)
 	section_opened.emit(section)
+	# Like v1: the alerts come up on the Firewall page (user 2026-11-15).
 	if target == Page.FIREWALL and firewall_pending():
-		_alert.visible = true
+		show_alerts()
 	_refresh()
+
+
+## Redraws the current page (the alerts on the desktop changed the state).
+func refresh() -> void:
+	_refresh()
+	_after_fix()
 
 
 ## A network profile page (Domain / Private / Public).
@@ -212,42 +240,57 @@ func is_protected() -> bool:
 	return state.is_protected()
 
 
-## The firewall alert about the unknown program still needs an answer.
+## A firewall alert still needs an answer.
 func firewall_pending() -> bool:
-	return not state.firewall_blocked
+	return not state.alerts_done()
 
 
+## The program's own alerts are showing (only when it runs on its own).
 func alert_visible() -> bool:
-	return _alert.visible
+	return _alerts != null and _alerts.alert_visible()
 
 
 func picker_visible() -> bool:
 	return _picker.visible
 
 
-## Firewall answers: "allow" (Allow access), "block" (Cancel in the alert),
-## "disable" (the profile switch turned off). Returns true when right.
+## The alert dialogs (opening the Firewall page, or "Review").
+func show_alerts() -> void:
+	if not firewall_pending():
+		return
+	if _alerts == null:
+		_alerts = FirewallAlerts.new().setup(data, state)
+		_alerts.name = "FirewallAlerts"
+		add_child(_alerts)
+		_alerts.answered.connect(func(_k: String, id: String, ok: bool):
+			_clear_hint()
+			firewall_choice_made.emit(id, ok)
+			refresh())
+	_clear_hint()
+	_alerts.show_again()
+
+
+## The alerts' FirewallAlerts node (null until the Firewall page was opened).
+func alerts() -> FirewallAlerts:
+	return _alerts
+
+
+## The firewall switch on a network profile page ("disable"): always wrong,
+## recorded and not applied (it switches back on). The alerts' answers are in
+## FirewallAlerts. Returns false.
 func choose_firewall(choice_id: String) -> bool:
-	var choice := data.get_firewall_choice(choice_id)
-	if choice == null:
+	if choice_id != Mission05State.FIREWALL_OFF:
 		return false
-	if choice_id != Mission05State.FIREWALL_OFF and (state.firewall_blocked or not state.conn_matched):
-		return false
-	state.note_firewall(choice_id)
-	firewall_choice_made.emit(choice_id, choice.is_correct)
-	if choice.is_correct:
-		_alert.visible = false
-		_clear_hint()
-		_after_fix()
-	else:
-		_wrong(choice.hint)
+	state.note_firewall_off()
+	firewall_choice_made.emit(choice_id, false)
+	_wrong(data.get_firewall_choice(choice_id).hint)
 	_refresh()
-	return choice.is_correct
+	return false
 
 
-## Quick scan. Only once the firewall alert is answered (the mission's order).
+## Quick scan. Only once the alerts and the teacher's question are done (v2).
 func start_scan() -> bool:
-	if scanning or state.scan_status == Mission05State.ScanStatus.SCANNED or not state.firewall_blocked:
+	if scanning or state.scan_status == Mission05State.ScanStatus.SCANNED or not state.can_scan():
 		return false
 	if page != Page.VIRUS:
 		open_page(Page.VIRUS)
@@ -447,7 +490,7 @@ func _sidebar() -> Control:
 
 func _go_back() -> void:
 	match page:
-		Page.FW_PROFILE:
+		Page.FW_PROFILE, Page.ALLOWED_APPS:
 			open_page(Page.FIREWALL)
 		Page.AV_SETTINGS:
 			open_page(Page.VIRUS)
@@ -484,7 +527,7 @@ func _nav_item(target: Page, kind: String, text: String) -> Button:
 ## The sidebar item lit for the current page (sub-pages light their section).
 func _nav_selected() -> Page:
 	match page:
-		Page.FW_PROFILE:
+		Page.FW_PROFILE, Page.ALLOWED_APPS:
 			return Page.FIREWALL
 		Page.AV_SETTINGS, Page.EXCLUSIONS:
 			return Page.VIRUS
@@ -527,9 +570,12 @@ func _refresh() -> void:
 			_page_av_settings()
 		Page.EXCLUSIONS:
 			_page_exclusions()
+		Page.ALLOWED_APPS:
+			_page_allowed_apps()
 	for b in _nav.values():
 		b.queue_redraw()
-	_refresh_alert()
+	if _alerts:
+		_alerts.refresh()
 	_refresh_game_panels()
 
 
@@ -548,7 +594,8 @@ func _page_home() -> void:
 		virus_text = "Threats found.\nStart the recommended actions." if virus_badge == "bad" else "Actions recommended."
 	grid.add_child(_tile("TileVirus", "virus", "Virus & threat protection", virus_text, virus_badge, Page.VIRUS))
 	grid.add_child(_tile("TileAccount", "account", "Account protection", "No action needed.", "ok", Page.ACCOUNT))
-	grid.add_child(_tile("TileFirewall", "firewall", "Firewall & network protection", "No action needed." if state.firewall_blocked else "Actions recommended.", "ok" if state.firewall_blocked else "warn", Page.FIREWALL))
+	var fw_ok := state.alerts_done()
+	grid.add_child(_tile("TileFirewall", "firewall", "Firewall & network protection", "No action needed." if fw_ok else "Actions recommended.", "ok" if fw_ok else "warn", Page.FIREWALL))
 	grid.add_child(_tile("TileApp", "app", "App & browser control", "No action needed.", "ok", Page.APP))
 	grid.add_child(_tile("TileDevice", "device", "Device security", "View status and manage hardware\nsecurity features.", "", Page.DEVICE))
 	grid.add_child(_tile("TileHealth", "health", "Device performance & health", "No action needed.", "ok", Page.HEALTH))
@@ -616,10 +663,10 @@ func _page_virus() -> void:
 		scan.custom_minimum_size = Vector2(120, 32)
 		scan.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		SecurityTheme.style_accent(scan)
-		scan.disabled = not state.firewall_blocked
+		scan.disabled = not state.can_scan()
 		scan.pressed.connect(start_scan)
 		box.add_child(scan)
-		if not state.firewall_blocked:
+		if not state.alerts_done():
 			box.add_child(_label("Another security action is waiting: Firewall & network protection.", 13, SecurityTheme.WARNING_INK))
 		_links(box, ["Scan options", "Allowed threats", "Protection history"])
 	elif not state.threat_quarantined:
@@ -637,8 +684,8 @@ func _page_virus() -> void:
 		box.add_child(start)
 		_links(box, ["Scan options", "Allowed threats", "Protection history"])
 	else:
-		box.add_child(_status_row("ok", "No current threats.", "Last scan: %s (quick scan)\n1 threat found and quarantined.\n%s files scanned." % [_today(), _thousands(SCAN_FILES)]))
-		var done := _label(data.threat_file + " — Threat quarantined", 14, SecurityTheme.OK, true)
+		box.add_child(_status_row("ok", "No current threats.", "Last scan: %s (quick scan)\n1 threat found and quarantined (%d affected items).\n%s files scanned." % [_today(), AFFECTED_FILES, _thousands(SCAN_FILES)]))
+		var done := _label("%s, %s — Threat quarantined" % [data.threat_file, data.firewall_app], 14, SecurityTheme.OK, true)
 		done.name = "QuarantinedNote"
 		box.add_child(done)
 		var quick := Button.new()
@@ -710,7 +757,7 @@ func _threat_list(parent: Control) -> void:
 		"Date": "%s 3:01 PM" % _today(),
 		"Category": "Tool",
 		"Details": "This program has potentially unwanted behavior.",
-		"Affected items": "file: " + data.threat_path,
+		"Affected items": _affected_items(),
 	}))
 	col.add_child(_label("Actions", 14, SecurityTheme.INK, true))
 	var group := ButtonGroup.new()
@@ -731,25 +778,85 @@ func _threat_list(parent: Control) -> void:
 		col.add_child(rb)
 
 
+## Both files of the one detection (v2: the crack dropped Unknown_Update.exe).
+func _affected_items() -> String:
+	return "file: %s\nfile: %s" % [data.threat_path, data.firewall_path]
+
+
 func _page_firewall() -> void:
 	_title("Firewall & network protection", "Who and what can access your networks.", "firewall")
 	if firewall_pending():
-		var banner := _banner(SecurityTheme.WARNING_BG, "warn", "Windows Defender Firewall has blocked some features of %s." % data.firewall_app, "FirewallBanner")
+		var waiting := PackedStringArray()
+		for key: String in Mission05State.ALERT_ORDER:
+			if not state.alert_done(key):
+				waiting.append(data.school_app if key == Mission05State.ALERT_SCHOOL else data.firewall_app)
+		var banner := _banner(SecurityTheme.WARNING_BG, "warn", "Windows Defender Firewall has blocked some features of %s." % " and ".join(waiting), "FirewallBanner")
 		var review := Button.new()
 		review.name = "ReviewButton"
 		review.text = "Review"
 		review.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		review.pressed.connect(func():
-			_alert.visible = true
-			_refresh_alert())
+		review.pressed.connect(show_alerts)
 		banner.add_child(review)
 	else:
 		var done := _banner(SecurityTheme.OK_BG, "ok", "Unauthorized connection blocked: %s can't access your networks." % data.firewall_app, "FirewallDone")
+		var nets := "private and public networks" if "allow_both" in state.alert_answers[Mission05State.ALERT_SCHOOL] else "private networks"
+		done.add_child(_label("%s is allowed on %s." % [data.school_app, nets], 13, SecurityTheme.INK_SOFT))
 		done.add_child(_label("Microsoft Defender Firewall is on for all networks.", 13, SecurityTheme.INK_SOFT))
 	for p: String in ["Domain", "Private", "Public"]:
 		_content.add_child(_profile_row(p))
 	_content.add_child(_spacer(10))
-	_links(_content, ["Allow an app through firewall", "Network and Internet troubleshooter", "Firewall notification settings", "Advanced settings", "Restore firewalls to default"])
+	_links(_content, ["Allow an app through firewall", "Network and Internet troubleshooter", "Firewall notification settings", "Advanced settings", "Restore firewalls to default"], [func(): open_page(Page.ALLOWED_APPS)])
+
+
+## "Allow an app through firewall": the rules list, like the real "Allowed
+## apps" window (read-only until "Change settings", which the game does not
+## need). Shows what the alerts did: SchoolLab allowed, Unknown_Update blocked.
+## Opening it after the alerts is process point 2 (checking the result).
+func _page_allowed_apps() -> void:
+	_title("Allowed apps", "Allow apps to communicate through Windows Defender Firewall.\nTo add, change, or remove allowed apps and ports, click Change settings.", "firewall")
+	var change := Button.new()
+	change.name = "ChangeSettingsButton"
+	change.text = "Change settings"
+	change.disabled = true
+	change.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_content.add_child(change)
+	_content.add_child(_label("Allowed apps and features:", 14, SecurityTheme.INK, true))
+	var card := PanelContainer.new()
+	card.name = "AllowedAppsList"
+	card.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.CARD, SecurityTheme.BORDER, 4, 12, 8))
+	_content.add_child(card)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", 40)
+	grid.add_theme_constant_override("v_separation", 6)
+	card.add_child(grid)
+	for head in ["Name", "Private", "Public"]:
+		grid.add_child(_label(head, 14, SecurityTheme.INK_SOFT, true))
+	var rows: Array = BUILTIN_RULES.duplicate()
+	var school: Array = state.alert_answers[Mission05State.ALERT_SCHOOL]
+	if state.alert_done(Mission05State.ALERT_SCHOOL):
+		rows.append([data.school_app, true, "allow_both" in school])
+	if state.alert_done(Mission05State.ALERT_UNKNOWN):
+		rows.append([data.firewall_app, false, false])
+	rows.sort_custom(func(a, b): return String(a[0]).naturalnocasecmp_to(String(b[0])) < 0)
+	for r in rows:
+		var name_box := CheckBox.new()
+		name_box.name = "Rule_" + String(r[0]).replace(" ", "").replace(".", "")
+		name_box.text = r[0]
+		name_box.button_pressed = r[1] or r[2]
+		grid.add_child(_read_only(name_box))
+		for on in [r[1], r[2]]:
+			var cb := CheckBox.new()
+			cb.button_pressed = on
+			grid.add_child(_read_only(cb))
+	if not state.alerts_done():
+		_content.add_child(_label("Some apps are waiting for your decision in Windows Security Alert.", 13, SecurityTheme.WARNING_INK))
+	var another := Button.new()
+	another.name = "AllowAnotherButton"
+	another.text = "Allow another app..."
+	another.disabled = true
+	another.size_flags_horizontal = Control.SIZE_SHRINK_END
+	_content.add_child(another)
 
 
 func _profile_row(p: String) -> Button:
@@ -913,8 +1020,8 @@ func _page_history() -> void:
 	_content.add_child(card)
 	var col := VBoxContainer.new()
 	card.add_child(col)
-	col.add_child(_status_row("ok", "Threat quarantined", "%s 3:02 PM" % _today()))
-	col.add_child(_details({"Detected": data.threat_name, "Alert level": data.threat_risk, "Status": "Quarantined", "Affected items": "file: " + data.threat_path}))
+	col.add_child(_status_row("ok", "Threat quarantined", "%s 3:02 PM   ·   Affected items: %d" % [_today(), AFFECTED_FILES]))
+	col.add_child(_details({"Detected": data.threat_name, "Alert level": data.threat_risk, "Status": "Quarantined", "Affected items": _affected_items()}))
 	col.add_child(_label("Quarantined files are in a restricted location where they can't harm your device.", 13, SecurityTheme.INK_SOFT))
 
 
@@ -922,107 +1029,6 @@ func _page_settings() -> void:
 	_title("Settings", "", "settings")
 	_status_block("settings", "Notifications", "", "Windows Security will send notifications with critical information about the health and security of your device.", ["Manage notifications"])
 	_status_block("settings", "About", "", "Windows Security (simulated for education)\nNot affiliated with Microsoft. Nothing on your real computer is scanned.", [])
-
-
-# ================================================================ firewall alert
-
-func _build_alert() -> void:
-	_alert = Control.new()
-	_alert.name = "FirewallAlert"
-	_alert.visible = false
-	_alert.mouse_filter = Control.MOUSE_FILTER_STOP
-	add_child(_alert)
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.18)
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_alert.add_child(dim)
-	var win := PanelContainer.new()
-	win.name = "AlertWindow"
-	win.set_anchors_preset(Control.PRESET_CENTER)
-	win.custom_minimum_size = Vector2(560, 0)
-	win.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	win.grow_vertical = Control.GROW_DIRECTION_BOTH
-	var sb := SecurityTheme.box(SecurityTheme.CARD, Color(0.6, 0.6, 0.6), 8, 0, 0)
-	sb.shadow_color = Color(0, 0, 0, 0.25)
-	sb.shadow_size = 18
-	win.add_theme_stylebox_override("panel", sb)
-	_alert.add_child(win)
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 0)
-	win.add_child(col)
-	var bar := HBoxContainer.new()
-	bar.custom_minimum_size = Vector2(0, 34)
-	col.add_child(bar)
-	var pad := Control.new()
-	pad.custom_minimum_size = Vector2(12, 0)
-	bar.add_child(pad)
-	var t := _label("Windows Security Alert", 13, SecurityTheme.INK)
-	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	bar.add_child(t)
-	bar.add_child(_window_button("AlertClose", "close", func(): _alert.visible = false))
-	var body := MarginContainer.new()
-	for side in ["left", "right"]:
-		body.add_theme_constant_override("margin_" + side, 22)
-	body.add_theme_constant_override("margin_top", 8)
-	body.add_theme_constant_override("margin_bottom", 16)
-	col.add_child(body)
-	var inner := VBoxContainer.new()
-	inner.add_theme_constant_override("separation", 10)
-	body.add_child(inner)
-	var head := HBoxContainer.new()
-	head.add_theme_constant_override("separation", 14)
-	inner.add_child(head)
-	var shield := Control.new()
-	shield.custom_minimum_size = Vector2(40, 40)
-	shield.draw.connect(func():
-		SecurityTheme.draw_shield(shield, shield.size * 0.5, 38.0, SecurityTheme.ACCENT)
-		SecurityTheme.draw_badge(shield, "warn", shield.size * 0.5 + Vector2(10, 10), 18.0))
-	head.add_child(shield)
-	var h := _label("Windows Defender Firewall has blocked some features of this app", 18, SecurityTheme.INK, true)
-	h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(h)
-	var d := _label("Windows Defender Firewall has blocked some features of %s on all public and private networks." % data.firewall_app, 14, SecurityTheme.INK)
-	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	inner.add_child(d)
-	inner.add_child(_details({"Name:": data.firewall_app, "Publisher:": data.firewall_publisher, "Path:": data.firewall_path}))
-	inner.add_child(_label("Allow %s to communicate on these networks:" % data.firewall_app, 14, SecurityTheme.INK))
-	for item in [["Private networks, such as my home or work network", true], ["Public networks, such as those in airports and coffee shops (not\nrecommended because these networks often have little or no security)", false]]:
-		var cb := CheckBox.new()
-		cb.text = item[0]
-		cb.button_pressed = item[1]
-		cb.focus_mode = Control.FOCUS_NONE
-		inner.add_child(cb)
-	var risk := Button.new()
-	risk.text = "What are the risks of allowing an app through a firewall?"
-	SecurityTheme.style_link(risk)
-	inner.add_child(risk)
-	var foot := PanelContainer.new()
-	foot.add_theme_stylebox_override("panel", SecurityTheme.box(SecurityTheme.BG, Color(0, 0, 0, 0), 0, 16, 12))
-	col.add_child(foot)
-	var buttons := HBoxContainer.new()
-	buttons.alignment = BoxContainer.ALIGNMENT_END
-	buttons.add_theme_constant_override("separation", 8)
-	foot.add_child(buttons)
-	var allow := Button.new()
-	allow.name = "AllowAccessButton"
-	allow.text = data.get_firewall_choice("allow").label
-	allow.custom_minimum_size = Vector2(130, 32)
-	SecurityTheme.style_accent(allow)
-	allow.pressed.connect(func(): choose_firewall("allow"))
-	buttons.add_child(allow)
-	var cancel := Button.new()
-	cancel.name = "CancelButton"
-	cancel.text = data.get_firewall_choice("block").label
-	cancel.custom_minimum_size = Vector2(110, 32)
-	cancel.pressed.connect(func(): choose_firewall("block"))
-	buttons.add_child(cancel)
-
-
-func _refresh_alert() -> void:
-	if not firewall_pending():
-		_alert.visible = false
 
 
 # ================================================================ file picker (Add an exclusion)
@@ -1324,6 +1330,16 @@ func _details(rows: Dictionary) -> GridContainer:
 		v.custom_minimum_size = Vector2(420, 0)
 		grid.add_child(v)
 	return grid
+
+
+## A check box that shows its state clearly but cannot be clicked (the list
+## is read-only until "Change settings", which the game does not need).
+static func _read_only(cb: CheckBox) -> CheckBox:
+	cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cb.focus_mode = Control.FOCUS_NONE
+	for s in ["normal", "hover", "pressed", "hover_pressed"]:
+		cb.add_theme_stylebox_override(s, StyleBoxEmpty.new())
+	return cb
 
 
 func _spacer(h: float) -> Control:

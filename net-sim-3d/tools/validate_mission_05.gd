@@ -1,11 +1,16 @@
 extends SceneTree
 
-## Mission 5 checks: scoring rules, then the whole level played headless
-## (phone -> PC-R3-L2 -> Windows Security -> tell the teacher -> summary).
+## Mission 5 checks (v2.1, 2026-11-15): scoring rules, then the whole level
+## played headless (phone -> PC-R3-L2 -> Windows Security: Firewall alerts,
+## rules, scan, quarantine, history -> tell the teacher + report choice -> summary).
 ## Run: godot --headless --path net-sim-3d -s res://tools/validate_mission_05.gd
 ## Prints MISSION_05_VALID / MISSION_05_INVALID at the end.
 
 const TARGET := "PC-R3-L2"
+const FULL := Mission05Controller.TIME_FULL_SEC
+const ZERO := Mission05Controller.TIME_ZERO_SEC
+const SCHOOL := Mission05State.ALERT_SCHOOL
+const UNKNOWN := Mission05State.ALERT_UNKNOWN
 
 
 ## Collects every engine/script error printed while the test runs.
@@ -74,38 +79,75 @@ func _boot(manager: ComputerManager, station: ComputerStation, player: Node) -> 
 	await create_timer(manager.zoom_time + DesktopOS.BOOT_TIME + 0.4).timeout
 
 
+## Answers the teacher's question with its right (or a wrong) button.
+func _answer(mission: Mission05Controller, right: bool) -> void:
+	var q := mission.data.get_question(mission.asking)
+	for i in mission._order.size():
+		if (mission._order[i] == q.correct_index) == right:
+			mission.dialogue.choose(i)
+			return
+
+
 func _test_rules() -> void:
 	var s := Mission05State.new()
 	s.note_section("firewall")
-	s.note_firewall("block")
-	s.note_section("firewall") # the profile page after the fix does not count for (c)
+	_check(s.conn_tool_first == "firewall" and s.next_alert() == SCHOOL, "Firewall first; SchoolLab alert comes first")
+	_check(not s.note_alert(UNKNOWN, "block"), "the second alert waits for the first")
+	_check(s.note_alert(SCHOOL, "allow_private") and s.next_alert() == UNKNOWN, "SchoolLab: Allow on Private is right")
+	_check(not s.can_scan(), "no scan before both alerts")
+	_check(s.note_alert(UNKNOWN, "block") and s.alerts_done() and s.can_scan(), "Unknown_Update.exe: Cancel is right; scan opens")
+	s.note_section(Mission05State.TOOL_RULES)
+	_check(s.rules_checked and s.file_tool_first == "", "rules checked (a Firewall page: not the file decision)")
 	s.note_section("virus")
 	s.scan_status = Mission05State.ScanStatus.SCANNED
 	s.note_threat("quarantine")
+	s.note_section("history")
+	_check(s.history_checked, "Protection history checked after the quarantine")
 	_check(s.note_submit(), "perfect run: report accepted")
-	var best := s.mission_score(60.0, 300.0, 900.0)
-	_check(best.correctness == 30 and best.process == 50 and best.time == 20 and best.mistakes.is_empty(), "perfect run 30/50/20 (%d/%d/%d)" % [best.correctness, best.process, best.time])
+	s.told_teacher = true
+	_check(s.pending_question() == "report", "the report choice after talking to the teacher")
+	s.note_question("report", 0, true)
+	var best := s.mission_score(60.0, FULL, ZERO)
+	_check(best.correctness == 30 and best.process == 50 and best.time == 20 and best.mistakes.is_empty(), "perfect run 30/50/20 (%d/%d/%d) %s" % [best.correctness, best.process, best.time, best.mistakes])
+	_check(best.decisions_correct == 6 and best.decisions_total == 6, "6 process decisions")
+
+	var early_rules := Mission05State.new()
+	early_rules.note_section(Mission05State.TOOL_RULES)
+	_check(not early_rules.rules_checked and early_rules.conn_tool_first == "firewall", "rules page before the alerts: not the check (counts as Firewall)")
+
+	var both := Mission05State.new()
+	_check(both.note_alert(SCHOOL, "allow_both") and both.alert_tries(SCHOOL) == 1, "Private + Public is accepted (no harm in real life)")
+	_check(Mission05State.alert_answer(true, false, true) == "allow_public" and not Mission05State.is_alert_right(SCHOOL, "allow_public"), "Public only (no Private) is wrong")
+	_check(not Mission05State.is_alert_right(SCHOOL, "allow_none"), "no network ticked is wrong")
 
 	var w := Mission05State.new()
 	_check(not w.note_submit() and w.submit_first == "early", "submit before Protected is refused")
 	w.note_section("account")
 	w.note_section("firewall")
-	_check(w.conn_tool_first == "account" and w.conn_matched, "connection: Account first (wrong), then Firewall")
-	w.note_firewall("allow")
-	w.note_firewall("disable")
-	w.note_firewall("block")
+	w.note_alert(SCHOOL, "block")
+	w.note_alert(SCHOOL, "allow_none")
+	w.note_alert(SCHOOL, "allow_private")
+	w.note_alert(UNKNOWN, "allow_private")
+	w.note_firewall_off()
+	w.note_alert(UNKNOWN, "block")
 	w.note_section("app")
 	w.note_section("virus")
-	_check(w.file_tool_first == "app" and w.file_matched, "file: App & browser control first (wrong), then Virus")
+	_check(w.conn_tool_first == "account" and w.file_tool_first == "app", "wrong first sections recorded")
 	w.scan_status = Mission05State.ScanStatus.SCANNED
 	w.note_threat("realtime_off")
+	w.note_threat("remove")
 	w.note_threat("quarantine")
 	_check(w.note_submit(), "report accepted once Protected")
-	var bad := w.mission_score(60.0, 300.0, 900.0)
-	# Firewall right on the 3rd try 0 + quarantine on the 2nd 8; no decision right.
-	_check(bad.correctness == 8 and bad.process == 0, "mistakes: correctness 8, process 0 (%d/%d)" % [bad.correctness, bad.process])
-	_check(bad.mistakes.size() == 6 and w.wrong_count() == 6, "6 mistakes listed (%d): %s" % [w.wrong_count(), bad.mistakes])
-	_check(MissionScore.time_points(300.0, 300.0, 900.0) == 20 and MissionScore.time_points(900.0, 300.0, 900.0) == 0, "time: full at 5 min, 0 at 15 min")
+	w.told_teacher = true
+	w.note_question("report", 1, false)
+	w.note_question("report", 0, true)
+	var bad := w.mission_score(60.0, FULL, ZERO)
+	# SchoolLab 3rd try 0 + Unknown 2nd try 5 + Quarantine 3rd try 0 = 5; process 0.
+	_check(bad.correctness == 5 and bad.process == 0, "mistakes: correctness 5, process 0 (%d/%d)" % [bad.correctness, bad.process])
+	# school 2 + unknown 1 + 2 sections + switch 1 + threat 2 + early 1 + report 1
+	_check(w.wrong_count() == 10, "10 wrong picks (%d)" % w.wrong_count())
+	_check(bad.mistakes.size() == 12, "12 mistake lines (%d): %s" % [bad.mistakes.size(), bad.mistakes])
+	_check(MissionScore.time_points(420.0, FULL, ZERO) == 20 and MissionScore.time_points(1020.0, FULL, ZERO) == 0, "time: full at 7 min, 0 at 17 min")
 
 
 func _run() -> void:
@@ -142,16 +184,50 @@ func _run() -> void:
 	_check(target.collision_layer == 0, "the computer waits for the call (mission order)")
 	_check(mission.hud.steps.size() == 8 and mission.hud.steps[0][1] == ObjectiveHUD.STEP_ACTIVE and mission.hud.steps[1][1] == ObjectiveHUD.STEP_TODO, "tracker: 8 steps, the phone first")
 
-	# 1. The call.
+	# The class (user 2026-11-15): nobody in the corridor but the housekeeper;
+	# six students work at their PCs, PC-R3-L2's owner stands beside it.
+	var corridor := map.get_node("CorridorStudents") as StudentLife
+	_check(corridor.students.is_empty() and corridor.cleaner != null, "no students in the corridor (the housekeeper stays)")
+	var holder := map.get_node_or_null(ClassroomStudents.NODE)
+	_check(holder != null and holder.get_child_count() == ClassroomStudents.SEATS.size(), "%d students in the computer room" % ClassroomStudents.SEATS.size())
+	for id: String in ClassroomStudents.SEATS:
+		var s := holder.get_node_or_null(id) as NpcCharacter if holder else null
+		var host: String = ClassroomStudents.SEATS[id]
+		if id == ClassroomStudents.WATCHER:
+			continue
+		_check(s != null and s.seated and s.global_position.distance_to(ClassroomStudents.seat_of(host)) < 0.05 and host in manager.npc_used_hosts and manager.find_host(host).collision_layer == 0, "%s works at %s" % [id, host])
+	var watcher := mission.watcher
+	_check(watcher != null and not ClassroomStudents.WATCHER_HOST in manager.npc_used_hosts, "PC-R3-L2 stays free for the player")
+	_check(await _wait_until(func(): return mission.watcher_state == "watching", 6.0), "PC-R3-L2's owner gets up and stands beside it")
+	_check(watcher != null and not watcher.seated and watcher.global_position.distance_to(ClassroomStudents.WATCH_SPOT) < 0.1, "standing at the watching spot")
+
+	# 1. The call (the teacher needs SchoolLab Classroom).
 	mission.phone.use(player)
 	await _frames(2)
 	_check(mission.dialogue.is_open(), "the call opens")
+	mission.dialogue.advance(true)
+	mission.dialogue.advance(true)
+	_check(mission.dialogue._text.text.contains("SchoolLab Classroom"), "the teacher says the class needs SchoolLab Classroom")
 	await _finish_dialogue(mission.dialogue)
 	await _frames(2)
 	_check(mission.stage == Mission05Controller.Stage.GO and mission._timing and not mission.phone.ringing, "after the call: go to PC-R3-L2, timer running")
 	_check(target.collision_layer == ComputerStation.COLLISION_LAYER, "the computer can be used now")
-	_check(mission.marker.target == null or mission.marker.target != teacher, "arrow on the computer, not the teacher")
 	_check(mission.hud.steps[0][1] == ObjectiveHUD.STEP_DONE and mission.hud.steps[1][1] == ObjectiveHUD.STEP_ACTIVE, "step 1 green, step 2 current")
+
+	# Walking into the computer room: the teacher greets the player at once.
+	_check(not mission.greeted and not mission.dialogue.is_open(), "no greeting outside the room")
+	player.global_position = Vector3(-1.6, 0.02, -6.5)
+	_check(await _wait_until(func(): return mission.dialogue.is_open() and mission.dialogue._text.text.contains("คุณช่างมาพอดีเลย"), 2.0), "inside the room: the teacher greets the player")
+	_check(mission.greeted and player.controls_locked and mission.dialogue._speaker.text == Mission05Controller.TEACHER, "the greeting holds the player for a moment")
+	await _finish_dialogue(mission.dialogue)
+	await _frames(3)
+	_check(not player.controls_locked and not mission.dialogue.is_open(), "free to move after the greeting")
+	# Only once.
+	player.global_position = Vector3(-4.4, 0.02, -6.5)
+	await _frames(3)
+	player.global_position = Vector3(-1.6, 0.02, -6.5)
+	await _frames(5)
+	_check(not mission.dialogue.is_open(), "the greeting comes only once")
 
 	# The teacher points the player at the computer.
 	mission._on_teacher_talked(player)
@@ -160,152 +236,177 @@ func _run() -> void:
 	await _finish_dialogue(mission.dialogue)
 	await create_timer(0.6).timeout
 
-	# 2. Sit at PC-R3-L2.
+	# 2. Sit at PC-R3-L2: no quiz, no alert on the desktop (user 2026-11-15).
 	await _boot(manager, target, player)
 	_check(desktop.visible and desktop._winsec_icon.visible and desktop._security_toast.visible, "desktop with the icon and the warning pop-up")
-	_check(mission.stage == Mission05Controller.Stage.OPEN, "step 3: open Windows Security")
+	_check(mission.stage == Mission05Controller.Stage.OPEN and not mission.dialogue.is_open(), "step 3: open Windows Security (nothing asked on the desktop)")
 
-	# 3. Open the program (Windows 11 look, English).
+	# 3. The program (Windows 11 look, English).
 	var app := desktop.open_windows_security() as WindowsSecurity
 	await _frames(2)
 	_check(app != null and mission.app == app and mission.stage == Mission05Controller.Stage.FIREWALL, "program open, step 4")
+	_check(not app.alert_visible(), "no alert before the Firewall page")
 	var home := _text_of(app)
-	_check(home.contains("Security at a glance") and app.find_child("Tiles", true, false) != null, "Home: Security at a glance with tiles")
-	_check(home.count("Actions recommended.") == 2, "Firewall and Virus tiles both say Actions recommended")
+	_check(home.contains("Security at a glance") and home.count("Actions recommended.") == 2, "Home: Firewall and Virus tiles say Actions recommended")
 	for nav in ["Nav_HOME", "Nav_VIRUS", "Nav_ACCOUNT", "Nav_FIREWALL", "Nav_APP", "Nav_DEVICE", "Nav_HEALTH", "Nav_FAMILY", "Nav_HISTORY", "Nav_SETTINGS"]:
 		_check(app.find_child(nav, true, false) != null, "sidebar: " + nav)
 	_check(not home.contains("ต้องดำเนินการ") and not home.contains("ปัญหาที่พบ"), "no Thai inside the program")
 
-	# Early submit (game panel): refused with a hint (decision (e) lost).
-	var submit := app.find_child("SubmitButton", true, false) as Button
-	_check(submit != null and not submit.disabled, "submit can be pressed")
-	submit.pressed.emit()
+	# Early submit: refused with a hint (process 5 lost).
+	(app.find_child("SubmitButton", true, false) as Button).pressed.emit()
 	await _frames(2)
 	_check(not mission.state.report_submitted and mission.state.submit_first == "early" and app.current_hint() == WindowsSecurity.SUBMIT_EARLY_HINT, "early submit refused with a hint")
-	_check((app.find_child("HintPanel", true, false) as Control).visible, "the Thai hint shows in the game panel")
 
-	# Virus first (wrong for (a)); Quick scan waits for the firewall.
+	# Virus first: process 1 lost; Quick scan waits for the alerts.
 	app.open_page(WindowsSecurity.Page.VIRUS)
-	_check(mission.state.conn_tool_first == "virus", "opened Virus first: decision (a) lost")
+	_check(mission.state.conn_tool_first == "virus", "opened Virus first: process 1 lost")
 	var quick := app.find_child("QuickScanButton", true, false) as Button
-	_check(quick != null and quick.disabled and not app.start_scan(), "Quick scan waits for the firewall alert")
+	_check(quick != null and quick.disabled and not app.start_scan(), "Quick scan waits for the firewall alerts")
 
-	# 4. Firewall: the Windows Security Alert.
+	# 4. Firewall page: the alerts come up here.
 	app.open_page(WindowsSecurity.Page.FIREWALL)
-	_check(app.alert_visible() and mission.state.conn_matched, "Windows Security Alert pops up on the Firewall page")
+	var alerts := app.alerts()
+	_check(alerts != null and app.alert_visible() and alerts.current_alert() == SCHOOL and mission.state.conn_matched, "the SchoolLab alert pops up on the Firewall page")
+	_check((alerts.find_child("AlertBehind", true, false) as Control).visible, "the second alert peeks out behind it")
+	_check((alerts.find_child("Info_Name", true, false) as Label).text == data.school_app and (alerts.find_child("Info_Publisher", true, false) as Label).text == data.school_publisher, "SchoolLab: name and publisher")
+	_check((alerts.find_child("PrivateBox", true, false) as CheckBox).button_pressed and not (alerts.find_child("PublicBox", true, false) as CheckBox).button_pressed, "Private ticked by default, Public not")
 	var fw := _text_of(app)
-	_check(fw.contains("Windows Defender Firewall has blocked some features of this app") and fw.contains(data.firewall_app), "alert text and app name")
-	_check(fw.contains("Domain network") and fw.contains("Private network") and fw.contains("Public network (active)"), "network profiles listed")
-	(app.find_child("AllowAccessButton", true, false) as Button).pressed.emit()
-	await _frames(2)
-	_check(not mission.state.firewall_blocked and app.alert_visible() and app.current_hint() == data.get_firewall_choice("allow").hint, "Allow access: not applied, hint")
-	_check(not app.current_hint().contains("Cancel"), "hint does not give the answer")
-	(app.find_child("AlertClose", true, false) as Button).pressed.emit()
-	_check(not app.alert_visible() and app.find_child("ReviewButton", true, false) != null, "alert closed; Review button stays")
+	_check(fw.contains("Private network (active)") and not fw.contains("Public network (active)"), "the school network is Private (active)")
 
-	# Switching the firewall off on the profile page: wrong, switches back on.
-	app.open_profile("Public")
+	# SchoolLab: Cancel (wrong), Public only (wrong), close + Review, Private + Public.
+	_check(not alerts.press(false) and alerts.current_hint() == data.school_block_hint, "SchoolLab Cancel: not applied, hint")
+	_check(not alerts.current_hint().contains("Allow"), "hint does not give the answer")
+	_check(not alerts.press(true, false, true) and alerts.current_hint() == data.school_no_private_hint, "Allow on Public only: hint about the network type")
+	(alerts.find_child("AlertClose", true, false) as Button).pressed.emit()
 	await _frames(1)
-	var toggle := app.find_child("FirewallToggle", true, false)
-	_check(toggle != null, "Public network: firewall switch")
-	(toggle.get_node("Switch") as Button).pressed.emit()
-	await _frames(2)
-	_check(Mission05State.FIREWALL_OFF in mission.state.firewall_choices and app.current_hint() == data.get_firewall_choice("disable").hint, "switch off: recorded, hint")
-	var toggle2 := app.find_child("FirewallToggle", true, false)
-	_check(toggle2 != null and toggle2.get_node("Switch").get_meta("on") == true, "the switch is back on")
+	_check(not app.alert_visible() and app.find_child("ReviewButton", true, false) != null, "alert closed; Review button stays")
+	(app.find_child("ReviewButton", true, false) as Button).pressed.emit()
+	await _frames(1)
+	_check(app.alert_visible() and alerts.current_alert() == SCHOOL, "Review brings it back")
+	_check(alerts.press(true, true, true), "Private + Public: accepted")
+	_check(alerts.current_hint() == "" and alerts.current_note() == data.school_public_note, "a note (not a hint) about Public")
+	await _frames(1)
+	var behind := alerts.find_child("AlertBehind", true, false) as Control
+	_check(alerts.current_alert() == UNKNOWN and (behind == null or not behind.visible), "Unknown_Update.exe now in front")
+	_check((alerts.find_child("Info_Path", true, false) as Label).text == data.firewall_path, "Unknown_Update.exe: the Downloads path")
 
-	# Close and open again mid-way: progress is kept (same play).
+	# Unknown_Update.exe: Allow (wrong); the firewall switch (wrong); close and
+	# open the page again; then Cancel.
+	_check(not alerts.press(true) and alerts.current_hint() == data.get_firewall_choice("allow").hint, "Unknown_Update.exe Allow: hint about the unknown publisher")
+	app.open_profile("Private")
+	await _frames(1)
+	(app.find_child("FirewallToggle", true, false).get_node("Switch") as Button).pressed.emit()
+	await _frames(2)
+	_check(mission.state.firewall_off_count == 1 and app.current_hint() == data.get_firewall_choice("disable").hint, "switch off: recorded, hint")
+	_check(app.find_child("FirewallToggle", true, false).get_node("Switch").get_meta("on") == true, "the switch is back on")
 	app.close_program()
 	await _frames(2)
 	app = desktop.open_windows_security() as WindowsSecurity
 	await _frames(2)
-	_check(app.state == mission.state and mission.state.conn_matched and not mission.state.firewall_blocked, "reopened: progress kept")
+	_check(app.state == mission.state and not mission.state.alerts_done() and mission.state.alert_done(SCHOOL), "reopened: progress kept")
 	app.open_page(WindowsSecurity.Page.FIREWALL)
-	_check(app.alert_visible(), "alert again on the Firewall page")
-	(app.find_child("CancelButton", true, false) as Button).pressed.emit()
+	alerts = app.alerts()
+	_check(app.alert_visible() and alerts.current_alert() == UNKNOWN, "the Unknown_Update.exe alert again on the Firewall page")
+	_check(alerts.press(false), "Unknown_Update.exe Cancel is right")
 	await _frames(2)
-	_check(mission.state.firewall_blocked and not app.alert_visible() and _text_of(app).contains("Unauthorized connection blocked"), "Cancel keeps it blocked")
+	_check(mission.state.alerts_done() and not app.alert_visible(), "both alerts answered")
 	_check(mission.stage == Mission05Controller.Stage.SCAN and mission.hud.steps[3][1] == ObjectiveHUD.STEP_DONE, "step 4 green, step 5 current")
+	fw = _text_of(app)
+	_check(fw.contains("Unauthorized connection blocked") and fw.contains("allowed on private and public networks"), "Firewall page: blocked + SchoolLab allowed")
 
-	# 5. Virus & threat protection, Quick scan.
+	# The check (process 2): Allow an app through firewall.
+	(app.find_child("Link_Allowanappthroughfirewall", true, false) as Button).pressed.emit()
+	await _frames(1)
+	_check(app.page == WindowsSecurity.Page.ALLOWED_APPS and mission.state.rules_checked, "Allowed apps opened: rules checked")
+	var school_rule := app.find_child("Rule_SchoolLabClassroom", true, false) as CheckBox
+	var unknown_rule := app.find_child("Rule_Unknown_Updateexe", true, false) as CheckBox
+	_check(school_rule != null and school_rule.button_pressed and unknown_rule != null and not unknown_rule.button_pressed, "SchoolLab allowed, Unknown_Update.exe not")
+	_check(mission.state.file_tool_first == "", "the rules page is not the file decision")
+
+	# 5. Virus & threat protection first (process 3), Quick scan.
 	app.open_page(WindowsSecurity.Page.HOME)
 	_check(_text_of(app).count("Actions recommended.") == 1, "Home: Firewall tile green now")
 	(app.find_child("TileVirus", true, false) as Button).pressed.emit()
 	await _frames(1)
-	_check(app.page == WindowsSecurity.Page.VIRUS and mission.state.file_tool_first == "virus", "file problem -> Virus first: decision (c)")
+	_check(app.page == WindowsSecurity.Page.VIRUS and mission.state.file_tool_first == "virus", "file problem -> Virus first: process 3")
 	quick = app.find_child("QuickScanButton", true, false) as Button
 	_check(quick != null and not quick.disabled, "Quick scan enabled")
 	quick.pressed.emit()
 	_check(app.scanning, "scan starts")
 	await create_timer(2.0).timeout
-	_check(app.scanning and app.find_child("ScanBar", true, false) != null and _text_of(app).contains("Quick scan running"), "still scanning after 2 s (design: 3–5 s)")
+	_check(app.scanning and _text_of(app).contains("Quick scan running"), "still scanning after 2 s (design: 3–5 s)")
 	await create_timer(data.scan_seconds - 2.0 + 0.4).timeout
 	var av := _text_of(app)
 	_check(not app.scanning and av.contains("Threats found") and av.contains(data.threat_name), "scan result")
 	await _frames(2)
 	_check(mission.stage == Mission05Controller.Stage.QUARANTINE, "step 6: handle the file")
 
-	# Exclusions trap: Settings -> Exclusions -> Add an exclusion -> File.
+	# Exclusions trap.
 	(app.find_child("Link_Managesettings", true, false) as Button).pressed.emit()
 	await _frames(1)
-	_check(app.page == WindowsSecurity.Page.AV_SETTINGS and _text_of(app).contains("Real-time protection"), "Virus & threat protection settings")
 	(app.find_child("Link_Addorremoveexclusions", true, false) as Button).pressed.emit()
 	await _frames(1)
 	(app.find_child("AddExclusionButton", true, false) as Button).pressed.emit()
 	await _frames(1)
 	(app.find_child("Exclude_File", true, false) as Button).pressed.emit()
 	await _frames(1)
-	_check(app.picker_visible(), "file picker (Downloads)")
 	(app.find_child("File_Student_Game_Crack", true, false) as Button).pressed.emit()
 	await _frames(1)
 	(app.find_child("PickerOpen", true, false) as Button).pressed.emit()
 	await _frames(2)
-	_check("exclude" in mission.state.threat_choices and not app.picker_visible() and app.current_hint() == data.get_threat_choice("exclude").hint, "Add an exclusion: recorded, hint")
+	_check("exclude" in mission.state.threat_choices and app.current_hint() == data.get_threat_choice("exclude").hint, "Add an exclusion: recorded, hint")
 
-	# 6. The threat: Remove (wrong), then Quarantine.
+	# 6. The threat: details with two files; Quarantine.
 	app.open_page(WindowsSecurity.Page.VIRUS)
 	(app.find_child("ThreatRow", true, false) as Button).pressed.emit()
 	await _frames(1)
-	_check(_text_of(app).contains(data.threat_path), "threat details: affected file")
-	var start := app.find_child("StartActionsButton", true, false) as Button
-	_check(start != null and start.disabled, "Start actions waits for a choice")
-	(app.find_child("Action_remove", true, false) as CheckBox).button_pressed = true
-	(app.find_child("StartActionsButton", true, false) as Button).pressed.emit()
-	await _frames(2)
-	_check(not mission.state.threat_quarantined and app.current_hint() == data.get_threat_choice("remove").hint, "Remove: not applied, hint")
-	_check(app.find_child("Action_quarantine", true, false) != null, "the details stay open to choose again")
+	av = _text_of(app)
+	_check(av.contains(data.threat_path) and av.contains(data.firewall_path), "details: both files (the crack dropped Unknown_Update.exe)")
 	(app.find_child("Action_quarantine", true, false) as CheckBox).button_pressed = true
 	(app.find_child("StartActionsButton", true, false) as Button).pressed.emit()
 	await _frames(2)
-	_check(mission.state.threat_quarantined and _text_of(app).contains("No current threats.") and app.current_hint() == "", "quarantined, no current threats")
-	_check(not target.screen_alert, "the red warning screen is gone")
-	_check(mission.stage == Mission05Controller.Stage.SUBMIT, "step 7: check status and submit")
-	app.open_page(WindowsSecurity.Page.HISTORY)
-	_check(app.find_child("HistoryEntry", true, false) != null and _text_of(app).contains("Threat quarantined"), "Protection history: Threat quarantined")
+	_check(mission.state.threat_quarantined and _text_of(app).contains("No current threats.") and not target.screen_alert, "quarantined, warning screen gone")
+	_check(mission.stage == Mission05Controller.Stage.SUBMIT and not mission.dialogue.is_open(), "step 7, nothing asked on the computer")
 
-	# 7. Home all green, submit -> back to first person.
+	# 7. Protection history (process 5), Home all green, submit.
+	app.open_page(WindowsSecurity.Page.HISTORY)
+	_check(app.find_child("HistoryEntry", true, false) != null and _text_of(app).contains("Affected items: 2") and mission.state.history_checked, "Protection history: quarantined, 2 items, checked")
 	app.open_page(WindowsSecurity.Page.HOME)
 	home = _text_of(app)
 	_check(not home.contains("Actions recommended.") and not home.contains("Threats found"), "Home: every tile green")
 	(app.find_child("SubmitButton", true, false) as Button).pressed.emit()
 	await _frames(2)
 	_check(mission.state.report_submitted and mission.stage == Mission05Controller.Stage.TELL, "report accepted, step 8: tell the teacher")
-	_check(_text_of(app).contains("แจ้งผลกับครูประจำห้องคอมพิวเตอร์"), "the game panel says to tell the teacher")
 	await create_timer(app.exit_delay + manager.zoom_time + 0.5).timeout
 	_check(not desktop.visible and not player.controls_locked, "back to first person after submitting")
+	_check(target.collision_layer == 0, "PC-R3-L2 is its owner's again")
+	_check(await _wait_until(func(): return mission.watcher_state == "seated", 10.0), "the owner sits down at PC-R3-L2")
+	_check(watcher.seated and watcher.global_position.distance_to(ClassroomStudents.seat_of(ClassroomStudents.WATCHER_HOST)) < 0.05, "seated at his PC")
 	_check(mission.marker.target == teacher, "arrow on the teacher")
 
-	# 8. Tell the teacher -> summary.
+	# 8. Tell the teacher; his question (wrong, then right) -> summary.
 	mission._on_teacher_talked(player)
-	await create_timer(0.8).timeout
-	_check(mission.dialogue.is_open() and mission.dialogue._text.text.contains("ปิดกั้นการเชื่อมต่อ"), "the report dialogue")
+	_check(await _wait_until(func(): return mission.dialogue.is_open() and mission.dialogue._text.text.contains("PC-R3-L2"), 3.0), "the teacher asks how PC-R3-L2 is")
+	await _finish_dialogue(mission.dialogue)
+	_check(await _wait_until(func(): return mission.asking == "report" and mission.dialogue.choosing, 2.0), "the player chooses what to report")
+	_check(mission.dialogue._choices.vertical and mission.dialogue._choices.get_child_count() == 4 and player.controls_locked, "4 answers, one per row; the player stays put")
+	_answer(mission, false)
+	_check(await _wait_until(func(): return mission.asking == "report" and mission.dialogue.choosing, 2.0), "wrong report: asked again")
+	_check(mission.dialogue._header.text.contains(data.get_question("report").hint), "with the hint above it")
+	_answer(mission, true)
+	_check(await _wait_until(func(): return mission.dialogue.is_open() and not mission.dialogue.choosing and mission.dialogue._speaker.text == "คุณ" and mission.dialogue._text.text.contains("SchoolLab"), 3.0), "the player says the chosen report")
+	mission.dialogue.advance(true)
+	mission.dialogue.advance(true)
+	_check(mission.dialogue._speaker.text == Mission05Controller.TEACHER and mission.dialogue._text.text.contains("ดาวน์โหลดโปรแกรมภายนอก"), "the teacher will warn the students about outside downloads")
 	await _finish_dialogue(mission.dialogue)
 	await _frames(3)
 	var score := mission.score
-	# Firewall: allow, disable, block -> 3rd try 0. Threat: exclude, remove,
-	# quarantine -> 3rd try 0. Process: only (c) Virus right after the firewall.
-	_check(score != null and score.correctness == 0 and score.process == 10, "score: correctness 0, process 10 (%s)" % ["-" if score == null else "%d/%d/%d" % [score.correctness, score.process, score.time]])
-	_check(score != null and score.mistakes.size() == 6, "6 mistake lines: %s" % ["-" if score == null else str(score.mistakes)])
+	# Correctness: SchoolLab 3rd try 0 + Unknown 2nd try 5 + Quarantine 2nd
+	# (after the exclusion) 5 = 10. Process: rules 10 + Virus first 10 = 20
+	# (Virus opened before Firewall, switch off + exclusion, early submit,
+	# report wrong first).
+	_check(score != null and score.correctness == 10 and score.process == 20 and score.time == 20, "score 10/20/20 (%s)" % ["-" if score == null else "%d/%d/%d" % [score.correctness, score.process, score.time]])
+	_check(score != null and score.mistakes.size() == 8, "8 mistake lines: %s" % ["-" if score == null else str(score.mistakes)])
 	_check(mission.stage == Mission05Controller.Stage.DONE and mission.summary.visible and GameProgress.best_score(5) == score.total(), "summary shown, progress recorded")
 
 	var first_state := mission.state
@@ -320,7 +421,7 @@ func _run() -> void:
 	for i in 3:
 		await physics_frame
 	var again: Mission05Controller = map2.get_node("Mission05")
-	_check(again.state != first_state and WindowsSecurity.shared_state == again.state and not again.state.firewall_blocked and (map2.get_node("Computers") as ComputerManager).find_host(TARGET).screen_alert, "replay starts fresh, warning screen back")
+	_check(again.state != first_state and WindowsSecurity.shared_state == again.state and not again.state.alerts_done() and (map2.get_node("Computers") as ComputerManager).find_host(TARGET).screen_alert, "replay starts fresh, warning screen back")
 	map2.queue_free()
 	await _frames(3)
 

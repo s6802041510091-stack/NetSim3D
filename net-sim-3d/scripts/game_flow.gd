@@ -413,6 +413,9 @@ func configure_level(world: Node, level: int) -> void:
 		# Windows Security on PC-R3-L2; the male teacher works at TEACHER-PC
 		# in the computer room (seated as in Level 3) and phones the player.
 		load("res://missions/mission_03/scripts/mission_03_controller.gd").call("seat_teacher", world)
+		# The class works at the student PCs (no students in the corridor);
+		# PC-R3-L2's owner stands beside it until it is fixed.
+		ClassroomStudents.setup(world)
 		var mission_05: Node = load("res://missions/mission_05/scripts/mission_05_controller.gd").new()
 		mission_05.name = "Mission05"
 		world.add_child(mission_05)

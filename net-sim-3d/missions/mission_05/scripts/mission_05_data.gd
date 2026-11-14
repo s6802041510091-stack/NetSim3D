@@ -13,6 +13,18 @@ extends Resource
 @export var app_name: String = "Windows Security"
 @export_multiline var disclaimer: String = "โปรแกรมจำลองภายในเกมเพื่อการศึกษาเท่านั้น ไม่ใช่ Windows Security จริง ไม่ได้สแกนเครื่องของคุณ และไม่เกี่ยวข้องกับ Microsoft"
 
+@export_group("Firewall: SchoolLab (v2, allow)")
+## The school's program (v2, idea 1): the teacher says on the phone that the
+## class needs it. Its alert comes first; the right answer is Allow access
+## with Private networks ticked (Public as well is accepted with a note).
+@export var school_app: String = "SchoolLab Classroom"
+@export var school_publisher: String = "SchoolLab Education Co., Ltd."
+@export var school_path: String = "C:\\Program Files\\SchoolLab\\SchoolLab.exe"
+@export_multiline var school_block_hint: String = ""
+@export_multiline var school_no_private_hint: String = ""
+## Not a mistake (no damage in real life, user 2026-11-15) — just advice.
+@export_multiline var school_public_note: String = ""
+
 @export_group("Firewall")
 ## The program that asks to connect (Windows Security Alert).
 @export var firewall_app: String = "Unknown_Update.exe"
@@ -35,6 +47,12 @@ extends Resource
 @export var threat_choices: Array[SecurityChoice] = []
 @export_multiline var threat_reason: String = ""
 
+@export_group("Question")
+## Only "report": the player chooses what to tell the teacher in the room.
+## The quiz questions on the desktop were dropped (user 2026-11-15): the
+## checks inside Windows Security measure understanding instead.
+@export var questions: Array[SecurityQuestion] = []
+
 @export_group("Report")
 @export var submit_button_text: String = "ส่งผลการตรวจสอบ"
 @export_multiline var submitted_message: String = "ส่งผลการตรวจสอบแล้ว — ออกจากคอมพิวเตอร์ แล้วแจ้งผลกับครูประจำห้องคอมพิวเตอร์"
@@ -46,6 +64,13 @@ func get_firewall_choice(id: String) -> SecurityChoice:
 
 func get_threat_choice(id: String) -> SecurityChoice:
 	return _find(threat_choices, id)
+
+
+func get_question(id: String) -> SecurityQuestion:
+	for q in questions:
+		if q.question_id == id:
+			return q
+	return null
 
 
 func _find(list: Array[SecurityChoice], id: String) -> SecurityChoice:
@@ -71,4 +96,13 @@ func validate_data() -> String:
 				return "%s choice '%s' needs a hint" % [pair[0], c.choice_id]
 		if correct != 1:
 			return "%s needs exactly 1 correct choice (found %d)" % [pair[0], correct]
+	if school_block_hint.strip_edges() == "" or school_no_private_hint.strip_edges() == "" or school_public_note.strip_edges() == "":
+		return "SchoolLab needs its two hints and the Public note"
+	for id in Mission05State.QUESTION_ORDER:
+		var q := get_question(id)
+		if q == null:
+			return "the question '%s' is missing" % id
+		var p := q.problem()
+		if p != "":
+			return p
 	return ""

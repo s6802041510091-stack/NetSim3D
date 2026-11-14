@@ -29,7 +29,8 @@ var _header: Label
 var _reveal := -1.0 # characters shown so far while typing, -1 = whole line shown
 ## True while ask() waits for an answer (clicks and F do not skip it).
 var choosing := false
-var _choices: HBoxContainer
+## A plain BoxContainer so ask(stacked = true) can turn it vertical.
+var _choices: BoxContainer
 
 
 func _ready() -> void:
@@ -71,7 +72,7 @@ func _ready() -> void:
 	_text.add_theme_font_override("bold_font", GameUI.FONT_BOLD)
 	_text.add_theme_color_override("default_color", Color.WHITE)
 	col.add_child(_text)
-	_choices = HBoxContainer.new()
+	_choices = BoxContainer.new()
 	_choices.name = "Choices"
 	_choices.add_theme_constant_override("separation", 14)
 	_choices.visible = false
@@ -85,6 +86,9 @@ func _ready() -> void:
 func show_lines(dialogue_lines: PackedStringArray, header: String = "") -> void:
 	_end_choice()
 	_place(0.0)
+	# A question answered before its text finished typing must not leave the
+	# typewriter running: advance() would then only finish the OLD line.
+	_reveal = -1.0
 	lines = dialogue_lines
 	_header.text = header
 	_header.visible = header != ""
@@ -126,7 +130,8 @@ func advance(force: bool = false) -> void:
 ## One line ("ผู้พูด|ข้อความ") with a button per answer, side by side (the
 ## first on the left). `tones`: per button "ok" (green), "bad" (red) or ""
 ## (plain). `right_margin`: keep clear of a panel on the right (px).
-func ask(line: String, answers: PackedStringArray, tones: PackedStringArray = PackedStringArray(), right_margin := 0.0, header := "") -> void:
+## `stacked`: one long answer per row, numbered 1-4 (keys 1-4 pick them).
+func ask(line: String, answers: PackedStringArray, tones: PackedStringArray = PackedStringArray(), right_margin := 0.0, header := "", stacked := false) -> void:
 	lines = PackedStringArray([line])
 	index = 0
 	choosing = true
@@ -139,13 +144,23 @@ func ask(line: String, answers: PackedStringArray, tones: PackedStringArray = Pa
 	_text.visible_characters = 0
 	_hint.visible = false
 	for child in _choices.get_children():
+		_choices.remove_child(child)
 		child.queue_free()
+	_choices.vertical = stacked
+	_choices.add_theme_constant_override("separation", 8 if stacked else 14)
+	_panel.offset_top = -200 - (answers.size() * 46 if stacked else 0)
+	# Long wrapped answers grow the box upwards, never off the bottom of the screen.
+	_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN if stacked else Control.GROW_DIRECTION_END
 	for i in answers.size():
 		var tone := tones[i] if i < tones.size() else ""
 		var color := GameUI.OK if tone == "ok" else (GameUI.BAD if tone == "bad" else Color(0.3, 0.34, 0.42))
-		var b := GameUI.button(answers[i], true, 200)
+		var b := GameUI.button(("%d.  %s" % [i + 1, answers[i]]) if stacked else answers[i], true, 200)
 		b.name = "Choice%d" % i
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if stacked:
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			b.add_theme_font_size_override("font_size", 16)
 		b.set_meta("sound", "") # the caller plays its own sound
 		b.add_theme_stylebox_override("normal", GameUI.box(color, color.darkened(0.2), 8, 16, 8))
 		b.add_theme_stylebox_override("hover", GameUI.box(color.lightened(0.12), color.darkened(0.25), 8, 16, 8))
@@ -180,6 +195,8 @@ func _end_choice() -> void:
 	choosing = false
 	_choices.visible = false
 	_hint.visible = true
+	_panel.offset_top = -200
+	_panel.grow_vertical = Control.GROW_DIRECTION_END
 
 
 ## Centred at the bottom, or (right_margin > 0) across the space left of a panel.
@@ -250,9 +267,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	var go := event.is_action_pressed("interact") and not event.is_echo()
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_SPACE, KEY_ENTER, KEY_KP_ENTER]:
 		go = true
-	if choosing and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3]:
+	if choosing and event is InputEventKey and event.pressed and not event.echo and event.keycode in [KEY_1, KEY_2, KEY_3, KEY_4]:
 		get_viewport().set_input_as_handled()
-		var pick: int = [KEY_1, KEY_2, KEY_3].find((event as InputEventKey).keycode)
+		var pick: int = [KEY_1, KEY_2, KEY_3, KEY_4].find((event as InputEventKey).keycode)
 		if pick < _choices.get_child_count() and not is_typing():
 			choose(pick)
 		return

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="Mission05Data" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="Mission05Data" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://missions/mission_05/scripts/security_choice.gd" id="1_choice"]
 [ext_resource type="Script" path="res://missions/mission_05/scripts/mission_05_data.gd" id="2_data"]
+[ext_resource type="Script" path="res://missions/mission_05/scripts/security_question.gd" id="3_question"]
 
 [sub_resource type="Resource" id="fw_allow"]
 script = ExtResource("1_choice")
@@ -51,9 +52,22 @@ choice_id = "realtime_off"
 label = "Real-time protection: Off"
 hint = "การปิด Real-time protection ทำให้ Anti-Virus ไม่เฝ้าระวังไฟล์ในเครื่อง ลองเลือกวิธีที่ยังคงการป้องกันไว้"
 
+[sub_resource type="Resource" id="q_report"]
+script = ExtResource("3_question")
+question_id = "report"
+speaker = "คุณ"
+text = "จะ**รายงานผลการตรวจสอบ**ให้ครูประจำห้องคอมพิวเตอร์ว่าอย่างไรดี"
+options = PackedStringArray("อนุญาต SchoolLab ในเครือข่ายโรงเรียน ปิดกั้นโปรแกรมแปลก กักกันไฟล์แคร็กที่นักเรียนโหลดมา และฝากครูเตือนนักเรียนเรื่องโหลดโปรแกรมเถื่อนครับ", "ปิด Firewall ไว้ให้ SchoolLab ใช้งานได้ ลบไฟล์ทุกไฟล์ใน Downloads ทิ้งแล้ว ต่อไปถ้ามีข้อความเตือนขึ้นมา ปิดการแจ้งเตือนไปได้เลยครับ", "ปิดกั้นทุกโปรแกรมรวมถึง SchoolLab ไว้ก่อน Firewall สแกนและลบไวรัสให้แล้ว เครื่องใช้งานได้ตามปกติ ไม่ต้องเตือนนักเรียนเรื่องอะไรครับ", "อนุญาตทุกโปรแกรมให้เชื่อมต่อได้ และเพิ่มไฟล์แคร็กไว้ในรายการยกเว้นของ Anti-Virus นักเรียนจะได้เล่นเกมได้โดยไม่มีข้อความเตือนครับ")
+correct_index = 0
+hint = "ลองทบทวนว่าทำอะไรกับแต่ละโปรแกรมและไฟล์ไปแล้วจริง ๆ และอะไรจะช่วยไม่ให้ปัญหาเกิดซ้ำโดยไม่ลดการป้องกันของเครื่อง"
+
 [resource]
 script = ExtResource("2_data")
+school_block_hint = "โปรแกรมนี้ครูแจ้งว่าต้องใช้ส่งหน้าจอในคาบเรียน ถ้าปิดกั้นไว้ นักเรียนจะรับหน้าจอครูไม่ได้ ลองดูผู้ผลิตและตำแหน่งไฟล์อีกครั้ง"
+school_no_private_hint = "SchoolLab ต้องใช้ในเครือข่ายของโรงเรียน ลองดูว่าเครื่องนี้ต่อกับเครือข่ายประเภทใด แล้วเลือกช่องเครือข่ายให้ตรง"
+school_public_note = "ใช้ได้ครับ แต่เครื่องนี้ต่อแค่เครือข่ายของโรงเรียน (Private) การอนุญาตบน Public ไม่จำเป็น ถ้าเป็นโน้ตบุ๊กที่พกไปใช้ข้างนอก ควรติ๊กเฉพาะ Private"
 firewall_choices = Array[ExtResource("1_choice")]([SubResource("fw_allow"), SubResource("fw_block"), SubResource("fw_disable")])
-firewall_reason = "โปรแกรมไม่ทราบผู้ผลิตและกำลังขอเชื่อมต่อเข้ามาโดยไม่ได้รับการยืนยัน จึงไม่ควรอนุญาตหรือปิดระบบป้องกัน แต่ควรปิดกั้นการเชื่อมต่อไว้ก่อน — Firewall ใช้ควบคุมและปิดกั้นการเชื่อมต่อที่ไม่ได้รับอนุญาต"
+firewall_reason = "โปรแกรมไม่ทราบผู้ผลิตและกำลังขอรับการเชื่อมต่อจากเครือข่ายเข้ามาโดยไม่ได้รับการยืนยัน จึงไม่ควรอนุญาตหรือปิดระบบป้องกัน แต่ควรปิดกั้นไว้ — Firewall ใช้ควบคุมว่าโปรแกรมใดเชื่อมต่อได้: อนุญาตโปรแกรมที่จำเป็นและเชื่อถือได้ ปิดกั้นโปรแกรมที่ไม่ทราบที่มา"
 threat_choices = Array[ExtResource("1_choice")]([SubResource("av_remove"), SubResource("av_quarantine"), SubResource("av_allow"), SubResource("av_exclude"), SubResource("av_realtime_off")])
 threat_reason = "เมื่อพบไฟล์ที่มีความเสี่ยงสูงและยังไม่ทราบว่าไฟล์ปลอดภัยหรือไม่ การกักกันช่วยป้องกันไม่ให้ไฟล์ทำงานและแยกไฟล์ออกจากพื้นที่ใช้งานปกติ — Anti-Virus ใช้ตรวจหาและจัดการไฟล์อันตราย"
+questions = Array[ExtResource("3_question")]([SubResource("q_report")])
