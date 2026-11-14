@@ -42,6 +42,7 @@ static func _svg(id: String) -> String:
 		"volume": paths = '<path d="M7 25h11l15-12v38L18 39H7z" fill="#20364c"/><path d="M41 22q13 10 0 20m8-29q23 19 0 38" fill="none" stroke="#20364c" stroke-width="4" stroke-linecap="round"/>'
 		"windows_security": paths = '<path d="M32 4 56 14v18c0 14-16 24-24 29C24 56 8 46 8 32V14z" fill="#168be4"/><path d="M32 10v45c12-8 18-15 18-23V18z" fill="#0a59a9"/><path d="m21 32 8 8 16-18" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>'
 		"teamviewer": paths = '<rect x="4" y="4" width="56" height="56" rx="12" fill="#087cdb"/><circle cx="32" cy="32" r="22" fill="white"/><path d="m12 32 12-10v7h16v-7l12 10-12 10v-7H24v7z" fill="#087cdb"/>'
+		"mail": paths = '<rect x="6" y="14" width="52" height="38" rx="5" fill="#0f6cbd"/><path d="m8 18 24 18 24-18" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>'
 		"browser": paths = '<circle cx="32" cy="32" r="26" fill="#1a8ae6"/><g fill="none" stroke="white" stroke-width="3"><circle cx="32" cy="32" r="22"/><ellipse cx="32" cy="32" rx="10" ry="22"/><path d="M10 32h44M14 21h36M14 43h36"/></g>'
 		_: paths = '<circle cx="32" cy="32" r="24" fill="#237db1"/>'
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' + paths + '</svg>'

@@ -371,6 +371,7 @@ func configure_level(world: Node, level: int) -> void:
 	computers.windows_security_hosts = PackedStringArray(["PC-R3-L2"]) if level == 5 else PackedStringArray()
 	computers.teamviewer_hosts = PackedStringArray(["IT-PC-01"]) if level == 6 else PackedStringArray()
 	computers.browser_hosts = PackedStringArray(["STAFF-PC-01", "STAFF-PC-03"]) if level == 4 else PackedStringArray()
+	computers.mail_hosts = PackedStringArray(["IT-PC-01"]) if level == 6 else PackedStringArray()
 	# Installed equipment follows the story: empty in Level 1, installed but not
 	# cabled in Level 2, cabled from Level 3 on.
 	var rack := world.get_node_or_null("ComputerRoomRack")
@@ -420,6 +421,10 @@ func configure_level(world: Node, level: int) -> void:
 		mission_05.name = "Mission05"
 		world.add_child(mission_05)
 		_connect_level_end(mission_05, level)
+	if level == 6:
+		# The female teacher is in the small meeting room (not at her desk);
+		# the desk phone in the Data Center rings (Mission06Controller).
+		_connect_level_end(world.get_node("Mission06"), level)
 	if level != 6:
 		var controller := world.get_node("Mission06")
 		world.remove_child(controller)

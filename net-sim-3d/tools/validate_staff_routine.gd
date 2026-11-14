@@ -74,9 +74,13 @@ func _run() -> void:
 			_check(not m_male is NpcCharacter and m_male.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level 5: male teacher in the computer room for his mission")
 		else:
 			_check(m_male is NpcCharacter and (m_male as NpcCharacter).seated and m_male.global_position.distance_to(StaffRoomLife.seat_of("male")) < 0.01, "Level %d: male teacher at his desk" % lv)
-		var m_female := m.get_node("TeacherFemale") as NpcCharacter
-		_check(m_female != null and m_female.seated and m_female.global_position.distance_to(StaffRoomLife.seat_of("female")) < 0.01, "Level %d: female teacher at her desk" % lv)
-		_check((m_female.get_node_or_null("Talk") != null) == ("female" in free or lv == 4), "Level %d: female teacher greetable when free (Level 4: talks for her mission)" % lv)
+		var m_female := m.get_node_or_null("TeacherFemale") as NpcCharacter
+		if lv == 6:
+			# Level 6 v2 (user 2026-11-15): she is in the small meeting room.
+			_check(m_female == null, "Level 6: female teacher away in the meeting room")
+		else:
+			_check(m_female != null and m_female.seated and m_female.global_position.distance_to(StaffRoomLife.seat_of("female")) < 0.01, "Level %d: female teacher at her desk" % lv)
+			_check(m_female != null and (m_female.get_node_or_null("Talk") != null) == ("female" in free or lv == 4), "Level %d: female teacher greetable when free (Level 4: talks for her mission)" % lv)
 		if lv == 4:
 			# Alone in the teachers' room: his break is a coffee.
 			var lv_male := m_male as NpcCharacter

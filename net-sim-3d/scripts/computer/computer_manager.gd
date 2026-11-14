@@ -20,6 +20,8 @@ extends Node3D
 @export var teamviewer_hosts: PackedStringArray = ["IT-PC-01"]
 ## Mission 4: computers with the simple web browser (testing the Internet).
 @export var browser_hosts: PackedStringArray = []
+## Mission 6: computers with the Mail app (the player's desk computer).
+@export var mail_hosts: PackedStringArray = []
 ## Computers an NPC is sitting at (the supervisor at IT-HEAD-PC): the player
 ## cannot use them, and their screen collider would otherwise block the
 ## player's look/talk ray toward that NPC.
@@ -73,6 +75,8 @@ func _ready() -> void:
 			station.installed_apps.append("netplan_edu")
 		if station.hostname in teamviewer_hosts:
 			station.installed_apps.append("teamviewer")
+		if station.hostname in mail_hosts:
+			station.installed_apps.append("mail")
 		if station.hostname in browser_hosts:
 			station.installed_apps.append("browser")
 		if station.hostname in windows_security_hosts:

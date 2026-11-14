@@ -1,84 +1,45 @@
-# ภารกิจที่ 6 — TeamViewer (จำลอง) ช่วยเหลือผู้ใช้ด้วยซอฟต์แวร์ควบคุมเครื่องระยะไกล
+# ภารกิจที่ 6 — ช่วยเหลือผู้ใช้ด้วยซอฟต์แวร์ควบคุมเครื่องระยะไกล (TeamViewer จำลอง) — v2
 
-โปรแกรม TeamViewer ในเกมเป็น **ซอฟต์แวร์จำลองเพื่อการศึกษา** ไม่เรียกใช้ TeamViewer จริง ไม่เชื่อมต่อคอมพิวเตอร์จริง และไม่ส่งข้อมูลออกจากเกม
-TeamViewer ID `482 731 965` และ Password `N7q4P2` เป็นข้อมูลสมมติ
+บทภารกิจอยู่ที่ `../../../ภารกิจ/ด่าน_06/README.md` — ส่วน "ร่างด่าน 6 v2" (ตกลงกับผู้พัฒนา 15 พ.ย. 2569) สร้างใหม่ตามมาตรฐานด่าน 1–5 แทนต้นแบบเดิม (คะแนนเริ่ม 100 แล้วหัก, บันทึกไฟล์, หน้าสรุปของตัวเอง)
 
-เอกสารออกแบบภารกิจ: `D:\Project-1\ภารกิจที่6\ภารกิจที่6_ช่วยเหลือผู้ใช้ด้วยซอฟต์แวร์ควบคุมเครื่องระยะไกล.docx`
+โปรแกรม TeamViewer, แอป Mail และเครื่อง `MEETING-PC` เป็นของจำลองเพื่อการศึกษา ไม่เรียกใช้ TeamViewer จริง ไม่เชื่อมต่อคอมพิวเตอร์จริง ID `482 731 965` และ Password `N7q4P2` / `Hx5t8R` (หลังรีสตาร์ท) เป็นข้อมูลสมมติ
 
-## ขั้นตอนในเกม
+## ขั้นตอนในเกม (แท็บภารกิจ 8 ขั้น)
 
-1. **ห้อง Data Center = ห้อง IT Support** โทรศัพท์วางอยู่บนโต๊ะผู้เล่น ข้างคอมพิวเตอร์ **IT-PC-01** (ฉาก `desk_phone.tscn`)
-2. โทรศัพท์ดัง (ไฟแดงกระพริบ) มองที่โทรศัพท์แล้วกด **E** เพื่อรับสาย
-3. ครูสาวพูดตามบทในเอกสาร และบอก TeamViewer ID กับ Password กด E / Space หรือคลิกเพื่อไปต่อ จบสายแล้วขึ้น "ได้รับภารกิจ: ..."
-4. กด E ที่ IT-PC-01 เพื่อเข้า Desktop แล้วเปิดไอคอน **TeamViewer**
-5. หน้าหลักมีรายการตรวจสอบก่อนเชื่อมต่อ 5 ข้อ พิมพ์ **Partner ID** แล้วกด **Connect** (มีหรือไม่มีช่องว่างก็ได้)
-6. หน้าต่าง **Authentication** พิมพ์ **Password** (แยกตัวพิมพ์เล็ก-ใหญ่) แล้วกด **Log On** จะขึ้น "Connection established" แล้วเปิด Desktop ของครูสาว
-7. แถบด้านบนแสดง `Remote Session | Connected to: TEACHER-PC | Session status: Active | [End Session]`
-8. คลิกไอคอนลำโพงบน Taskbar ของเครื่องครูสาว กดปุ่มลำโพงเพื่อยกเลิก Mute ปรับเสียงเป็น 50–70% แล้วกด **ทดสอบเสียง** ครูสาวจะยืนยัน
-9. กด **End Session** → **Disconnect** สถานะเปลี่ยนเป็น `Session ended`
-10. ปิดโปรแกรม TeamViewer แล้วปิดคอมพิวเตอร์ (เริ่ม → ปิดเครื่อง หรือ Esc) ระบบจะแสดง **หน้าสรุปความรู้** (TeamViewer / AnyDesk / ซอฟต์แวร์ควบคุมระยะไกล) และ "ภารกิจสำเร็จ"
+1. โทรศัพท์บนโต๊ะผู้เล่นใน Data Center (ห้อง IT Support) ดัง: ครูสาวอยู่ใน**ห้องประชุมเล็ก** คลิปนำเสนอไม่มีเสียง ช่างถามอาการ เสนอ TeamViewer ขออนุญาต และขอให้ส่ง ID / Password ทาง**อีเมล** — ระหว่างสายผู้เล่น**เลือกคำพูดเอง 3 จุด** (ใช้โปรแกรมอะไร, ขออะไรจากครู, ตอบเมื่อครูขอปิดหน้าต่าง TeamViewer)
+2. ~10 วินาทีต่อมาอีเมลเข้าแอป **Mail** ของ IT-PC-01 (แจ้งเตือนมุมขวาล่าง) เปิดอ่าน — ข้อความเลือกและคัดลอกได้
+3. เปิด TeamViewer (ภาษาอังกฤษแบบโปรแกรมจริง มีไฟสถานะ "Ready to connect (secure connection)" ไม่มีรายการ ✓ ก่อนเชื่อมต่อ)
+4. Partner ID → Connect → Password (แยกตัวพิมพ์เล็กใหญ่, วางได้) → Log On
+5. บน Desktop ของ `MEETING-PC`: ไอคอนลำโพงถูก Mute ที่ 25% → ยกเลิก Mute และปรับเป็น 50–70%
+6. ครูส่งข้อความในแชทเมื่อเชื่อมต่อได้ ผู้เล่นพิมพ์ให้ครูลองเปิดคลิป ครูตอบตามที่ได้ยิน (เงียบ / เบา / ดัง / ได้ยินแล้ว) แล้วถามต่ออีก 2 ข้อ (แก้อุปกรณ์จากระยะไกลได้ไหม, ปิดโปรแกรมแล้วรหัสยังใช้ได้ไหม) ผู้เล่นตอบด้วยปุ่มตอบกลับในแชท
+7. End Session → Disconnect
+8. ปิด TeamViewer แล้วปิดคอมพิวเตอร์ของตัวเอง (ตามแบบเสนอ) → หน้าสรุปผล (มีแถวความรู้ TeamViewer / AnyDesk / ซอฟต์แวร์ควบคุมระยะไกล)
 
-- ถ้ากด Connect ก่อนรับสาย จะขึ้นว่าเครื่องปลายทางยังไม่พร้อม และไม่หักคะแนน
-- ถ้าพยายามปิดโปรแกรมหรือปิดคอมพิวเตอร์ระหว่าง Remote Session จะไม่ยอมให้ปิด และหักคะแนน
-- ถ้าปิดคอมพิวเตอร์ตอนที่ TeamViewer ยังเปิดอยู่ (แม้จบ Session แล้ว) ระบบจะเตือนให้ปิดโปรแกรมก่อน โดยไม่หักคะแนน
+สิ่งที่ผิดได้ (ไม่ทำให้ด่านล้มเหลว): เปิดไฟล์ "คะแนนสอบกลางภาค ม.2.xlsx" บน Desktop ปลายทาง, Start › Power › Restart / Shut down ของเครื่องปลายทาง (Session หลุด ครูส่งรหัสใหม่ทางอีเมล), จบ Session ก่อนครูยืนยัน, กดปิดโปรแกรมกลาง Session, สั่งปิดเครื่องตอน TeamViewer ยังเปิดอยู่
 
-## กติกาคะแนน
+ครูสาวไม่อยู่ที่โต๊ะในห้องพักครูระหว่างด่านนี้ (อยู่ในห้องประชุม) IT-PC-01 เป็นคอมประจำโต๊ะของผู้เล่นจึงใช้ได้ตลอด
 
-| กรณี | หัก |
-|---|---|
-| กรอก TeamViewer ID ผิด | 5 ต่อครั้ง |
-| กรอก Password ผิด | 5 ต่อครั้ง |
-| ปิดโปรแกรมหรือปิดเครื่องระหว่าง Remote Session (ไม่กด End Session) | 10 ต่อครั้ง |
-| ปรับเสียงผิดช่วง หรือยังไม่ได้ยกเลิก Mute | ไม่หัก (ให้คำแนะนำทุกครั้ง) |
-| ช่องว่าง หรือกด Connect ก่อนรับสาย | ไม่หัก |
+## คะแนน 30/50/20
 
-คะแนนเริ่มที่ 100 และไม่ต่ำกว่า 0
+| ส่วน | รายการ | คะแนน |
+|---|---|---|
+| ความถูกต้อง | เชื่อมต่อ MEETING-PC · ครูยืนยันว่าได้ยินเสียง · Session สุดท้ายจบด้วย End Session › Disconnect | 10 + 10 + 10 |
+| กระบวนการ (10 ข้อ ข้อละ 5) | ตัวเลือกในบทสนทนา 5 ข้อ ถูกครั้งแรก: ใช้โปรแกรมอะไร · ขออะไรจากครู · ปิดหน้าต่าง TeamViewer ได้ไหม (โทรศัพท์) · แก้อุปกรณ์จากระยะไกลได้ไหม · รหัสยังใช้ได้ไหม (แชท) | 5 × 5 |
+| | กรอก ID / Password ถูกทุกครั้ง · ไม่เปิดไฟล์ส่วนตัว · ไม่ Restart / ปิดเครื่องปลายทาง · รอครูยืนยันก่อนจบ Session · ปิดโปรแกรมถูกลำดับ | 5 × 5 |
+| เวลา | เต็มภายใน 5 นาที เป็น 0 ที่ 15 นาที (ค่าชั่วคราว, นับหลังวางสาย) | 20 |
 
 ## ไฟล์
 
 | ไฟล์ | หน้าที่ |
 |---|---|
-| `missions/mission_06/scenes/teamviewer.tscn` | **Scene หลัก** (โปรแกรม TeamViewer จำลอง) |
-| `missions/mission_06/scenes/desk_phone.tscn` | โทรศัพท์บนโต๊ะผู้เล่นในห้อง IT Support (Data Center) |
-| `missions/mission_06/scenes/mission_06_test.tscn` | ฉากทดสอบ (กด F6) ไม่ต้องโหลดแผนที่ 3D |
-| `missions/mission_06/data/mission_06_data.tres` | ID, Password, ข้อความทั้งหมด, บทโทรศัพท์, ช่วงเสียง, คะแนน, หน้าสรุป (แก้ใน Inspector) |
-| `missions/mission_06/scripts/teamviewer_sim.gd` | ตัวโปรแกรม: หน้าหลัก, Authentication, Remote Session, ลำโพง, End Session |
-| `missions/mission_06/scripts/mission_06_controller.gd` | โทรศัพท์ → บทสนทนา → "ได้รับภารกิจ" และปิดเครื่อง → หน้าสรุป → "ภารกิจสำเร็จ" |
-| `missions/mission_06/scripts/desk_phone.gd` | โทรศัพท์บนโต๊ะ (ดัง/รับสาย) |
-| `missions/mission_06/scripts/call_dialog.gd` | กล่องบทสนทนาทางโทรศัพท์ |
-| `missions/mission_06/scripts/mission_06_state.gd` | สถานะผู้เล่น |
-| `missions/mission_06/scripts/mission_06_save_store.gd` | บันทึก/โหลด JSON ใน `mission_06_save.json` (โฟลเดอร์จาก `SavePaths`: Editor = `net-sim-3d/.saves/`, เว็บ = `user://netsim3d/`) |
-| `missions/mission_06/scripts/remote_theme.gd` | สี ฟอนต์ Sarabun และไอคอนที่วาดเอง |
-| `missions/mission_06/scripts/mission_06_test_bench.gd` | ฉากทดสอบ |
-| `tools/validate_mission_06.gd` | ทดสอบอัตโนมัติทั้งภารกิจในแผนที่จริง |
+| `scripts/mission_06_controller.gd` | ตัวควบคุมด่าน (โหนด `Mission06` ใน `main.tscn` ถูกเก็บไว้เฉพาะด่าน 6): สาย → อีเมล → ติดตามโปรแกรม → ปิดเครื่อง → หน้าสรุป |
+| `scripts/mission_06_state.gd` | สิ่งที่ผู้เล่นทำและคะแนน 30/50/20 (เริ่มใหม่ทุกครั้ง) |
+| `scripts/mission_06_data.gd` + `data/mission_06_data.tres` | บทโทรศัพท์ อีเมล ID/Password ข้อความ คำตอบในแชท แถวความรู้ (แก้ใน Inspector) |
+| `scripts/mission_06_question.gd` | ตัวเลือกในบทสนทนา 1 ข้อ: คำถาม 4 คำตอบ คำตอบที่ถูก และคำตอบกลับของครูต่อแต่ละตัวเลือก (ข้อ 1–3 ถามในบทโทรศัพท์ด้วย DialogueBox แบบเรียงแถว ข้อ 4–5 เป็นปุ่มตอบกลับในแชท) |
+| `scripts/teamviewer_sim.gd` + `scenes/teamviewer.tscn` | ตัวโปรแกรม: Home, Authentication, Remote Session (Desktop ของ MEETING-PC, ลำโพง, Start › Power, ไฟล์, แชท), End Session |
+| `scripts/remote_theme.gd` | สี ฟอนต์ ไอคอนที่วาดเอง |
+| `scripts/desk_phone.gd` + `scenes/desk_phone.tscn` | โทรศัพท์บนโต๊ะผู้เล่น |
+| `../../scripts/computer/desktop_os.gd` | แอป Mail (`deliver_mail()`, `open_mail()`, สัญญาณ `mail_opened`) และหน้าต่าง TeamViewer |
+| `../../tools/validate_mission_06.gd` / `capture_mission_06.gd` | ทดสอบอัตโนมัติ / ถ่ายภาพ |
 
-ไฟล์เดิมที่แก้:
-- `scenes/main.tscn`: เพิ่ม `DeskPhone` (บนโต๊ะ IT_PlayerDesk) และ `Mission06`
-- `scripts/computer/computer_manager.gd`: `teamviewer_hosts = ["IT-PC-01"]`
-- `scripts/computer/desktop_os.gd`: ไอคอน `open_teamviewer()` และ `request_shutdown()`
-- `scripts/player_controller.gd`: กด E กับวัตถุทั่วไปที่มี meta `interactable` เช่น โทรศัพท์
-- `tools/validate_computers.gd`: จำนวนคอมเป็น 29 เครื่อง (รวมคอมห้องพักครู 5 เครื่อง)
-
-## สัญญาณ (Signals)
-
-- `Mission06Controller.call_answered`, `mission_completed(score, wrong_id, wrong_password, close_without_end)`
-- `TeamViewerSim.connect_attempted(accepted)`, `login_attempted(accepted)`, `session_started`, `sound_tested(result)`, `teacher_confirmed`, `session_ended`, `mistake_made(reason, penalty)`
-- `DesktopOS.app_opened("teamviewer", app)`
-
-## ตั้งค่า
-
-- ไม่ให้โทรศัพท์ดังตอนเริ่มเกม: node `Mission06` → `Ring On Start` = ปิด แล้วให้ระบบภารกิจหลักเรียก `start_ringing()`
-- ย้ายโทรศัพท์: node `DeskPhone` ใน `main.tscn`
-- เปลี่ยนเครื่องที่มี TeamViewer: node `Computers` → `Teamviewer Hosts` และ node `Mission06` → `Player Computer`
-- เปลี่ยน ID, Password, ข้อความ, ช่วงเสียง, คะแนน: `missions/mission_06/data/mission_06_data.tres`
-
-## ยังไม่ได้ทำ
-
-- ประวัติบทสนทนา (เปิดดู ID และ Password ซ้ำ) ตอนนี้ทำแค่รับสายตามที่ตกลงไว้
-- ตัวละครครูสาวและหัวหน้างานใน 3D
-
-## ทดสอบ
-
-- `missions/mission_06/scenes/mission_06_test.tscn` แล้วกด F6
-- หรือเล่นเกมหลัก (F5) ผู้เล่นเริ่มในห้อง IT Support ข้างโต๊ะของตัวเอง โทรศัพท์ดังอยู่บนโต๊ะ
-- อัตโนมัติ: `godot --headless --path net-sim-3d -s res://tools/validate_mission_06.gd`
+ทดสอบ: `godot --headless --path net-sim-3d -s res://tools/validate_mission_06.gd`

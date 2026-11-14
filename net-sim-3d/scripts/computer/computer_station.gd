@@ -25,6 +25,8 @@ var network_connected := true
 var link_fault := false
 ## Programs installed on this computer (desktop icons). Set by ComputerManager.
 var installed_apps := PackedStringArray()
+## E-mails in this computer's Mail app (Mission 6): from, to, subject, body, time, read.
+var mail: Array = []
 
 ## True while this computer shows a security warning (Mission 5 target):
 ## its screen shows a Windows Security warning in the room

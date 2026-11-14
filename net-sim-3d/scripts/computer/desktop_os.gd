@@ -16,6 +16,8 @@ signal command_run(line: String)
 signal ping_done(target: String, address: String, received: int)
 ## The simulated web browser loaded a page (Mission 4): ok = it opened.
 signal page_opened(url: String, ok: bool)
+## The Mail app showed a message (Mission 6): its index in station.mail.
+signal mail_opened(index: int)
 
 const BOOT_TIME := 2.0
 ## Mission 1 program (NetPlan EDU). Shown only on computers that have "netplan_edu" installed.
@@ -60,6 +62,14 @@ var _security_toast: PanelContainer
 var _teamviewer_icon: Control
 var _teamviewer: Control
 var _browser_icon: Control
+## Mission 6: the Mail app (an inbox on computers that have "mail").
+var _mail_icon: Control
+var _mail_toast: PanelContainer
+var _mail_toast_label: Label
+var _mail_toast_until := 0
+var _mail_list: VBoxContainer
+var _mail_pane: VBoxContainer
+var _mail_selected := -1
 ## Address the browser opens first.
 const HOME_URL := "www.college.ac.th"
 const COLLEGE_BROWSER := preload("res://scripts/computer/college_browser.gd")
@@ -130,6 +140,9 @@ func _show_desktop() -> void:
 	_winsec_icon.visible = station.has_app("windows_security")
 	_teamviewer_icon.visible = station.has_app("teamviewer")
 	_browser_icon.visible = station.has_app("browser")
+	_mail_icon.visible = station.has_app("mail")
+	_mail_toast.visible = false
+	_announce_unread_mail.call_deferred()
 	for app_id: String in _app_menu_buttons:
 		_app_menu_buttons[app_id].visible = station.has_app(app_id)
 	for app_id: String in _taskbar_buttons:
@@ -146,6 +159,8 @@ func _process(_delta: float) -> void:
 		_update_clock()
 		_update_taskbar()
 		_tray_network.text = "LAN ✓" if station.network_connected else "LAN ✗"
+		if _mail_toast.visible and Time.get_ticks_msec() > _mail_toast_until:
+			_mail_toast.visible = false
 
 
 func _update_clock() -> void:
@@ -250,6 +265,9 @@ func _build_desktop() -> void:
 	_browser_icon = _desktop_icon("browser", "Web Browser", open_browser)
 	_browser_icon.name = "BrowserIcon"
 	icons.add_child(_browser_icon)
+	_mail_icon = _desktop_icon("mail", "Mail", open_mail)
+	_mail_icon.name = "MailIcon"
+	icons.add_child(_mail_icon)
 	icons.add_child(_desktop_icon("bin", "Recycle Bin", _open_recycle_bin))
 
 	_window_layer = Control.new()
@@ -259,6 +277,7 @@ func _build_desktop() -> void:
 
 	_build_taskbar()
 	_build_security_toast()
+	_build_mail_toast()
 
 
 func _build_taskbar() -> void:
@@ -301,7 +320,7 @@ func _build_taskbar() -> void:
 	search.icon_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	search.add_theme_stylebox_override("normal", _flat(Color("eff7ffcf"), 18))
 	row.add_child(search)
-	for item in [["this_pc", "folder", "This PC", _open_this_pc], ["cmd", "cmd", "Command Prompt", _open_cmd], ["netplan_edu", "netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "windows_security", "Windows Security", open_windows_security], ["teamviewer", "teamviewer", "TeamViewer", open_teamviewer], ["browser", "browser", "Web Browser", open_browser]]:
+	for item in [["this_pc", "folder", "This PC", _open_this_pc], ["cmd", "cmd", "Command Prompt", _open_cmd], ["netplan_edu", "netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "windows_security", "Windows Security", open_windows_security], ["teamviewer", "teamviewer", "TeamViewer", open_teamviewer], ["browser", "browser", "Web Browser", open_browser], ["mail", "mail", "Mail", open_mail]]:
 		var id: String = item[0]
 		var button := _task_button(item[1], item[2], _taskbar_action.bind(id, item[3]))
 		button.name = "Taskbar_" + id
@@ -373,7 +392,7 @@ func _build_taskbar() -> void:
 		var entry := _menu_button(item[0], item[1])
 		_menu_entries.append(entry)
 		menu.add_child(entry)
-	for item in [["netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "Windows Security", open_windows_security], ["teamviewer", "TeamViewer", open_teamviewer], ["browser", "Web Browser", open_browser]]:
+	for item in [["netplan_edu", "NetPlan EDU", open_netplan_edu], ["windows_security", "Windows Security", open_windows_security], ["teamviewer", "TeamViewer", open_teamviewer], ["browser", "Web Browser", open_browser], ["mail", "Mail", open_mail]]:
 		var app_button := _menu_button(item[1], item[2])
 		_app_menu_buttons[item[0]] = app_button
 		app_button.set_meta("app_id", item[0])
@@ -579,6 +598,9 @@ func _close_window(id: String, quiet: bool = false) -> void:
 		_netplan = null
 	if id == "windows_security":
 		_winsec = null
+	if id == "mail":
+		_mail_list = null
+		_mail_pane = null
 	if id == "teamviewer":
 		_teamviewer = null
 	if id == "cmd":
@@ -734,6 +756,9 @@ func open_teamviewer() -> Control:
 	app.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	app.offset_bottom = -48.0 # Keep the taskbar visible.
 	_window_layer.add_child(app)
+	# Below the mission tab (top right): its close button and End Session
+	# must stay clickable (Mission 6 needs both).
+	app.offset_top = 76.0
 	_windows["teamviewer"] = app
 	_teamviewer = app
 	app.connect("close_requested", func(): _close_window("teamviewer"))
@@ -821,6 +846,182 @@ func _load_page(page: Control, url: String) -> void:
 		page.add_child(_label("ตรวจสอบสายเครือข่าย, โมเด็ม และเราเตอร์", 16, Color(0.35, 0.4, 0.48)))
 		page.add_child(_label("ERR_INTERNET_DISCONNECTED", 13, Color(0.45, 0.48, 0.55)))
 	page_opened.emit(url.strip_edges(), ok)
+
+
+## Delivers an e-mail to `target` (Mission 6). `mail`: from, to, subject, body.
+## A Windows 11 style notification pops up when that computer's desktop is
+## on screen; otherwise when it is next switched on.
+func deliver_mail(target: ComputerStation, mail: Dictionary) -> void:
+	var entry := mail.duplicate()
+	entry["read"] = false
+	var t := Time.get_time_dict_from_system()
+	entry["time"] = "%02d:%02d" % [t.hour, t.minute]
+	target.mail.append(entry)
+	if visible and _desktop.visible and station == target:
+		Sound.play("popup_open")
+		_show_mail_toast(entry)
+		_refresh_mail()
+
+
+## The Mail app: the inbox on the left, the newest message open on the right.
+## The message text can be selected and copied (Ctrl+C).
+func open_mail() -> Control:
+	if station == null or not station.has_app("mail"):
+		return null
+	_mail_toast.visible = false
+	var window := _open_window("mail", "Mail — %s" % station.hostname, Vector2(780, 440), func(body: MarginContainer):
+		var split := HBoxContainer.new()
+		split.add_theme_constant_override("separation", 14)
+		body.add_child(split)
+		var list_panel := PanelContainer.new()
+		list_panel.custom_minimum_size = Vector2(260, 0)
+		list_panel.add_theme_stylebox_override("panel", _flat(Color(0.93, 0.95, 0.98), 4))
+		split.add_child(list_panel)
+		_mail_list = VBoxContainer.new()
+		_mail_list.name = "MailList"
+		_mail_list.add_theme_constant_override("separation", 2)
+		list_panel.add_child(_mail_list)
+		_mail_pane = VBoxContainer.new()
+		_mail_pane.name = "MailPane"
+		_mail_pane.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		_mail_pane.add_theme_constant_override("separation", 6)
+		split.add_child(_mail_pane))
+	if _mail_selected < 0 or _mail_selected >= station.mail.size() or _has_unread():
+		_mail_selected = station.mail.size() - 1
+	_refresh_mail()
+	if _mail_selected >= 0:
+		_select_mail(_mail_selected)
+	app_opened.emit("mail", window)
+	return window
+
+
+func _has_unread() -> bool:
+	for m in station.mail:
+		if not m["read"]:
+			return true
+	return false
+
+
+func _select_mail(index: int) -> void:
+	if station == null or index < 0 or index >= station.mail.size():
+		return
+	_mail_selected = index
+	station.mail[index]["read"] = true
+	_refresh_mail()
+	mail_opened.emit(index)
+
+
+func _refresh_mail() -> void:
+	if _mail_list == null or not is_instance_valid(_mail_list):
+		return
+	for child in _mail_list.get_children():
+		_mail_list.remove_child(child)
+		child.queue_free()
+	for child in _mail_pane.get_children():
+		_mail_pane.remove_child(child)
+		child.queue_free()
+	if station.mail.is_empty():
+		_mail_list.add_child(_label("  Inbox is empty", 14, Color(0.4, 0.44, 0.5)))
+		return
+	for i in range(station.mail.size() - 1, -1, -1):
+		var m: Dictionary = station.mail[i]
+		var b := Button.new()
+		b.name = "Mail%d" % i
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		b.text = "%s  %s\n%s" % ["●" if not m["read"] else " ", m["from"], m["subject"]]
+		b.custom_minimum_size = Vector2(0, 56)
+		b.add_theme_font_size_override("font_size", 13)
+		b.add_theme_color_override("font_color", COLOR_TEXT)
+		b.add_theme_stylebox_override("normal", _flat(Color("cfe4ff") if i == _mail_selected else Color.TRANSPARENT, 4))
+		b.add_theme_stylebox_override("hover", _flat(Color("e3efff"), 4))
+		b.pressed.connect(_select_mail.bind(i))
+		_mail_list.add_child(b)
+	if _mail_selected < 0:
+		return
+	var sel: Dictionary = station.mail[_mail_selected]
+	_mail_pane.add_child(_label(sel["subject"], 20, COLOR_TEXT))
+	_mail_pane.add_child(_label("From: %s     %s" % [sel["from"], sel["time"]], 13, Color(0.35, 0.4, 0.48)))
+	_mail_pane.add_child(_label("To: %s" % sel["to"], 13, Color(0.35, 0.4, 0.48)))
+	_mail_pane.add_child(HSeparator.new())
+	var text := RichTextLabel.new()
+	text.name = "MailBody"
+	text.text = sel["body"]
+	text.fit_content = true
+	text.selection_enabled = true
+	text.context_menu_enabled = true
+	text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	text.add_theme_font_size_override("normal_font_size", 17)
+	text.add_theme_color_override("default_color", COLOR_TEXT)
+	text.add_theme_color_override("selection_color", Color("9cc8ff"))
+	_mail_pane.add_child(text)
+
+
+func _announce_unread_mail() -> void:
+	if station == null or not station.has_app("mail"):
+		return
+	for i in range(station.mail.size() - 1, -1, -1):
+		if not station.mail[i]["read"]:
+			_show_mail_toast(station.mail[i])
+			return
+
+
+func _build_mail_toast() -> void:
+	_mail_toast = PanelContainer.new()
+	_mail_toast.name = "MailToast"
+	_mail_toast.anchor_left = 1.0
+	_mail_toast.anchor_right = 1.0
+	_mail_toast.anchor_top = 1.0
+	_mail_toast.anchor_bottom = 1.0
+	_mail_toast.offset_left = -376.0
+	_mail_toast.offset_right = -12.0
+	_mail_toast.offset_top = -48.0 - 12.0 - 120.0
+	_mail_toast.offset_bottom = -48.0 - 12.0
+	var style := _flat(Color(0.93, 0.93, 0.93, 0.98), 8)
+	style.border_color = Color(0.78, 0.78, 0.78)
+	style.set_border_width_all(1)
+	style.shadow_color = Color(0, 0, 0, 0.22)
+	style.shadow_size = 12
+	style.content_margin_left = 16
+	style.content_margin_right = 10
+	style.content_margin_top = 10
+	style.content_margin_bottom = 12
+	_mail_toast.add_theme_stylebox_override("panel", style)
+	_mail_toast.visible = false
+	_desktop.add_child(_mail_toast)
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 4)
+	_mail_toast.add_child(column)
+	var head := HBoxContainer.new()
+	column.add_child(head)
+	var icon := _icon_view("mail", 18)
+	head.add_child(icon)
+	var title := _label("Mail", 13, Color(0.2, 0.2, 0.2))
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(title)
+	var dismiss := Button.new()
+	dismiss.text = " x "
+	dismiss.flat = true
+	dismiss.add_theme_color_override("font_color", Color(0.3, 0.3, 0.3))
+	dismiss.pressed.connect(func(): _mail_toast.visible = false)
+	head.add_child(dismiss)
+	_mail_toast_label = _label("", 14, Color(0.1, 0.1, 0.1))
+	_mail_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	column.add_child(_mail_toast_label)
+	var open := Button.new()
+	open.name = "OpenMailButton"
+	open.text = "Open"
+	open.add_theme_color_override("font_color", Color(0.1, 0.1, 0.1))
+	open.add_theme_stylebox_override("normal", _flat(Color(0.98, 0.98, 0.98), 4))
+	open.add_theme_stylebox_override("hover", _flat(Color(1, 1, 1), 4))
+	open.pressed.connect(func(): open_mail())
+	column.add_child(open)
+
+
+func _show_mail_toast(mail: Dictionary) -> void:
+	_mail_toast_label.text = "%s\n%s" % [mail["from"], mail["subject"]]
+	_mail_toast.visible = true
+	_mail_toast.move_to_front()
+	_mail_toast_until = Time.get_ticks_msec() + 10000
 
 
 ## Opens Windows Security (Mission 5) full screen above the taskbar. Returns the

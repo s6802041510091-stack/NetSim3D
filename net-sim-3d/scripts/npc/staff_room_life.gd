@@ -74,7 +74,8 @@ static func setup(world: Node, for_level: int) -> void:
 	var life := StaffRoomLife.new()
 	life.name = "StaffRoomLife"
 	life.level = for_level
-	if world.get_node_or_null("TeacherFemale") == null:
+	# Level 6: she is in a meeting in the small meeting room (not in the map).
+	if world.get_node_or_null("TeacherFemale") == null and for_level != 6:
 		var female: Node3D = (load(FEMALE_SCENE) as PackedScene).instantiate()
 		female.name = "TeacherFemale"
 		# Her model has no thighs under the knee-length skirt (like the female
