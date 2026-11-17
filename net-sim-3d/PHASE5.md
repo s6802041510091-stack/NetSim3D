@@ -114,7 +114,7 @@
 - ลด upper `School floor belt` จากจุดกึ่งกลาง -0.10 เป็น -0.27 เมตร
   ทำให้ผิวบนอยู่ -0.16 เมตรใต้แผ่นพื้น พร้อมแก้ตัวสร้างและส่งออก town.glb ใหม่
   สำรองต้นฉบับไว้ `tmp/town_before_floor_visibility_fix.blend`
-- ลด ClassroomAmbient 1.5 → 1.0 และ CorridorAmbient 1.0 → 0.7 เท่านั้น
+- ลด ClassroomAmbient 1.5 → 1.0 และ CorridorAmbient 1.0 → 0.7 เท่านั้น (ไฟชุดนี้ถูกแทนด้วยไฟใต้โคมเพดาน 18 พ.ย. 2026 ดู MENU.md "ไฟเพดาน")
   คงตำแหน่งไฟและการปรับอื่นของผู้ใช้ ไม่เปลี่ยนแสงอาทิตย์หรือแสงพื้นฐาน
 - `validate_floor_visibility.gd`: ก่อนแก้พบผิวปิด 2 จุด หลังแก้ failures=0
   และ `inspect_stair_obstruction.gd` ยังเดินลง/กลับขึ้นผ่าน failures=0

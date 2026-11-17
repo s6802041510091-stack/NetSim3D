@@ -61,8 +61,7 @@ func _ready() -> void:
 	_build_womens()
 	_build_mens()
 	_commit()
-	_light(Vector3(-15.2,2.65,-13.5))
-	_light(Vector3(-15.2,2.65,-20.5))
+	# Lighting comes from the ceiling panels (scripts/props/ceiling_lights.gd).
 
 
 # ------------------------------------------------------------------ rooms
@@ -285,12 +284,6 @@ func _gather_fixture(node:Node,parent_transform:Transform3D,pieces:Array) -> voi
 			elif mat and "Drain" in mat.resource_name:key="dark"
 			pieces.append({"mesh":mesh,"surface":surface,"key":key,"transform":transform_here})
 	for child in node.get_children():_gather_fixture(child,transform_here,pieces)
-
-func _light(at:Vector3) -> void:
-	var light:=OmniLight3D.new();light.position=at
-	light.light_color=Color(1,.97,.92);light.light_energy=.85
-	light.omni_range=8;light.shadow_enabled=false
-	light.set_meta("restroom_generated",true);add_child(light)
 
 
 # ------------------------------------------------------------------ building

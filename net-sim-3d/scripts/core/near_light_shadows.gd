@@ -1,16 +1,16 @@
 class_name NearLightShadows
 extends Node
-## "High" graphics quality: the room light nearest the camera casts shadows,
-## so desks, chairs and people stand on the floor instead of floating.
+## "High" graphics quality: the ceiling light nearest the camera casts
+## shadows, so desks, chairs and people stand on the floor instead of floating.
 ##
-## Only one light at a time, and only lights the camera can see: in the
-## Compatibility renderer an omni shadow renders everything in the light's
-## range six times (cube map). Measured 2026-11-17/18 on a Ryzen 5 3500U:
-## the IT Support room light (range 12 m) added ~6-15 ms a frame, the computer
-## room light (20 m) ~10-20 ms, the corridor light (35 m) ~60 ms.
+## Only one light at a time, and only lights the camera can see. Since
+## 2026-11-18 the ceiling lights are spot lights under each panel
+## (CeilingLights): a spot shadow is one extra render of what the cone
+## covers. Omni lights still work (cube map, six renders: measured
+## 2026-11-17 on a Ryzen 5 3500U at ~6-15 ms a frame for a 12 m room light).
 
-## Lights with a larger range light the whole floor (the corridor fill
-## light) and never get a shadow. 20 m keeps the computer room light.
+## Omni lights with a larger range light a whole floor and never get a
+## shadow (the old 35 m corridor light cost ~60 ms).
 const MAX_RANGE := 20.0
 ## A new light takes over only when it is this much closer (no flicker at
 ## the midpoint between two lights).
@@ -24,10 +24,18 @@ const SIGHT_MASK := 1
 ## the IT Support room, science lab and storeroom: at 0.15-0.2 of its energy
 ## the room's brightness matches the shadowless light (average difference
 ## under 2 %). Re-measure this after a Godot upgrade.
-const SHADOW_ENERGY := 0.17
+const OMNI_SHADOW_ENERGY := 0.17
+## Spot lights (the ceiling panels) behave the same way. Measured 2026-11-18
+## in the IT Support room, science lab and teachers' room: at 0.15 the room's
+## brightness is within 2 % of the shadowless light; the shadow added
+## 0-9 ms a frame.
+const SPOT_SHADOW_ENERGY := 0.15
+## A spot light is used for shadows while the camera is within its range
+## plus this much (its cone lights the floor around the camera).
+const SPOT_REACH := 3.0
 
-var _lights: Array[OmniLight3D] = []
-var _current: OmniLight3D
+var _lights: Array[Light3D] = []
+var _current: Light3D
 var _current_energy := 0.0
 var _clock := CHECK_EVERY
 
@@ -36,11 +44,12 @@ func _ready() -> void:
 	# Levels open paused behind the "ready" prompt and F1 pauses the game;
 	# the world is still on screen then, so keep choosing the light.
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	for node in get_parent().find_children("*", "OmniLight3D", true, false):
-		var light := node as OmniLight3D
-		if light.omni_range <= MAX_RANGE and not light.shadow_enabled:
-			light.omni_shadow_mode = OmniLight3D.SHADOW_CUBE
-			_lights.append(light)
+	for node in get_parent().find_children("*", "Light3D", true, false):
+		if node is OmniLight3D and node.omni_range <= MAX_RANGE and not node.shadow_enabled:
+			node.omni_shadow_mode = OmniLight3D.SHADOW_CUBE
+			_lights.append(node)
+		elif node is SpotLight3D and not node.shadow_enabled:
+			_lights.append(node)
 
 
 # Physics step: the line-of-sight ray needs the physics space.
@@ -62,7 +71,7 @@ func _update() -> void:
 	var eye := camera.global_position
 	var space := camera.get_world_3d().direct_space_state
 	var skip := _own_bodies(camera)
-	var best: OmniLight3D
+	var best: Light3D
 	var best_distance := INF
 	for light in _lights:
 		if not _usable(light, eye):
@@ -77,15 +86,19 @@ func _update() -> void:
 	_use(best)
 
 
-func _usable(light: OmniLight3D, eye: Vector3) -> bool:
+func _usable(light: Light3D, eye: Vector3) -> bool:
 	return is_instance_valid(light) and light.is_visible_in_tree() \
-		and eye.distance_to(light.global_position) < light.omni_range
+		and eye.distance_to(light.global_position) < _reach(light)
+
+
+func _reach(light: Light3D) -> float:
+	return light.spot_range + SPOT_REACH if light is SpotLight3D else light.omni_range
 
 
 ## A light behind a wall or a closed door lights nothing the player sees, so
 ## its shadow would only cost time (the corridor used to pick the science lab
 ## light through the wall).
-func _seen(space: PhysicsDirectSpaceState3D, eye: Vector3, light: OmniLight3D, skip: Array[RID]) -> bool:
+func _seen(space: PhysicsDirectSpaceState3D, eye: Vector3, light: Light3D, skip: Array[RID]) -> bool:
 	if space == null:
 		return true
 	var query := PhysicsRayQueryParameters3D.create(eye, light.global_position, SIGHT_MASK, skip)
@@ -103,7 +116,7 @@ func _own_bodies(camera: Node) -> Array[RID]:
 	return bodies
 
 
-func _use(light: OmniLight3D) -> void:
+func _use(light: Light3D) -> void:
 	if light == _current:
 		return
 	if is_instance_valid(_current):
@@ -112,10 +125,10 @@ func _use(light: OmniLight3D) -> void:
 	_current = light
 	if light:
 		_current_energy = light.light_energy
-		light.light_energy = _current_energy * SHADOW_ENERGY
+		light.light_energy = _current_energy * (SPOT_SHADOW_ENERGY if light is SpotLight3D else OMNI_SHADOW_ENERGY)
 		light.shadow_enabled = true
 
 
 ## For checks: the light that casts shadows now (or null).
-func current_light() -> OmniLight3D:
+func current_light() -> Light3D:
 	return _current

@@ -92,7 +92,10 @@ func _apply_sky() -> void:
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color(0.80, 0.88, 1.0)
-	environment.ambient_light_energy = 0.35
+	# 0.35 until 2026-11-18. The ceiling spot lights (ceiling_lights.gd) only
+	# light their cone, unlike the old room-sized omni lights, so walls and
+	# ceilings need more fill to keep rooms as bright as before.
+	environment.ambient_light_energy = 0.42
 	world.environment = environment
 
 
