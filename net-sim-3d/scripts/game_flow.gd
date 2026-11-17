@@ -22,7 +22,38 @@ var _background: TextureRect
 var _breeze: MenuBreeze
 var _home_hotspots: Control
 var _art_canvas: Control
+## The menu art (home, level select, settings) is one 16:9 picture with
+## hotspots on it. It keeps its proportions and sits centred; on a wider or
+## taller window (a browser tab) the space around it shows the same school
+## background, blurred and dimmed, instead of stretching the picture.
+var _art: TextureRect
+var _backdrop_blur: ShaderMaterial
+const ART_SIZE := Vector2(1672, 943)
 var _screen := "home"
+## Graphics quality (agreed with the user 2026-11-17). The value is the 3D
+## render resolution; the UI and text always stay sharp.
+##   low    = 80 %, and the exterior sun casts no shadow (see
+##            apply_world_quality: ~40 % less frame time, unseen indoors),
+##            and small far-away school pieces are not drawn
+##   medium = 100 %, the look the game has always had (default)
+##   high   = 100 % + 4x MSAA (smooth edges) + anisotropic texture filtering
+##            (floor tiles and walls stay sharp at a slant) + the nearest room
+##            light casts shadows (NearLightShadows) + soft glow on bright
+##            lights. Tonemapping was tried and left out: it paled the sky
+##            outside the windows and flattened the picture.
+const QUALITY := {"low": 0.8, "medium": 1.0, "high": 1.0}
+const QUALITY_ORDER := ["low", "medium", "high"]
+## Render layer 11, used only to let the shadowless "low" sun light the town.
+const TOWN_LIGHT_LAYER := 1 << 10
+## "low": school pieces smaller than this (metres) ...
+const SMALL_PART := 0.4
+## ... are not drawn farther away than this (metres).
+const SMALL_PART_RANGE := 8.0
+## Saved settings written before the 2026-11-17 remap used low 0.6,
+## medium 0.8, high 1.0; scheme 2 keeps each tester's picture the same.
+const QUALITY_SCHEME := 2
+const QUALITY_FROM_SCHEME_1 := {"low": "low", "medium": "low", "high": "medium"}
+var quality := "medium"
 var _card: PanelContainer
 var _positioner: MarginContainer
 var _body: VBoxContainer
@@ -77,6 +108,8 @@ func _ready() -> void:
 func _show_initial_menu() -> void:
 	if get_tree().current_scene and get_tree().current_scene.scene_file_path == MENU:
 		show_home()
+	elif get_tree().current_scene is Node3D:
+		apply_world_quality(get_tree().current_scene) # F6 launch of a level
 
 func load_preferences() -> void:
 	_config.load(save_file)
@@ -91,6 +124,114 @@ func load_preferences() -> void:
 			AudioServer.set_bus_send(index, "Master")
 		var value: Variant = _config.get_value("audio", bus, 80.0)
 		set_volume(bus, float(value) if (value is float or value is int) else 80.0, false)
+	# Default "medium" (full resolution, no extras): measured 2026-11-17 in
+	# the web build (Compatibility renderer, Ryzen 5 3500U), a 3D scale below
+	# 1.0 was no faster and in a small window slower (extra pass), and "high"
+	# costs more, so both are opt-in only.
+	var default_quality := "medium"
+	var saved_quality: Variant = _config.get_value("video", "quality", default_quality)
+	if not saved_quality is String or not QUALITY.has(saved_quality):
+		saved_quality = default_quality
+	elif _config.get_value("video", "quality_scheme", 1) != QUALITY_SCHEME:
+		saved_quality = QUALITY_FROM_SCHEME_1[saved_quality]
+	set_quality(saved_quality, false)
+
+func set_quality(level: String, persist := true) -> void:
+	if not QUALITY.has(level):
+		return
+	quality = level
+	var root := get_tree().root
+	root.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+	root.scaling_3d_scale = QUALITY[level]
+	root.msaa_3d = Viewport.MSAA_4X if level == "high" else Viewport.MSAA_DISABLED
+	var scene := get_tree().current_scene
+	if scene is Node3D:
+		apply_world_quality(scene)
+	_config.set_value("video", "quality", level)
+	_config.set_value("video", "quality_scheme", QUALITY_SCHEME)
+	if persist:
+		_save_preferences()
+
+## The quality parts that live in the loaded world rather than the viewport.
+##
+## Sun shadow: the exterior sun is the only light with a shadow, and its
+## shadow falls only on the town outside the windows (the indoor lights have
+## none). Measured 2026-11-17 (Ryzen 5 3500U, 1152x648): turning it off cut a
+## frame from ~44-48 ms to ~26-28 ms, so "low" turns it off.
+##
+## Anisotropic filtering is a material setting in Godot, so "high" switches
+## the textured materials between trilinear and anisotropic. The
+## Compatibility renderer ignores Viewport.anisotropic_filtering_level
+## (tested 2026-11-17); the strength comes from the project setting
+## rendering/textures/default_filters/anisotropic_filtering_level.
+func apply_world_quality(world: Node) -> void:
+	for sun in world.find_children("ExteriorSun", "DirectionalLight3D", true, false):
+		# Without its shadow the sun would also light the whole interior
+		# (through roof and walls), turning rooms warmer and brighter. So at
+		# "low" it lights only the town: town geometry gets an extra render
+		# layer (it stays on layer 1, which the player camera sees) and the
+		# sun's cull mask is cut to that layer.
+		var town := sun.get_parent()
+		for part in town.find_children("*", "VisualInstance3D", true, false):
+			if part != sun:
+				part.layers |= TOWN_LIGHT_LAYER
+		sun.shadow_enabled = quality != "low"
+		sun.light_cull_mask = TOWN_LIGHT_LAYER if quality == "low" else 0xFFFFFFFF # Godot's default
+	var high := quality == "high"
+	# Glow: ceiling panels, screens and light strips bloom softly. Cost
+	# measured under 1 ms. The environment is the town's own copy (see
+	# exterior_town.gd _apply_sky), so the scene file stays untouched.
+	for sky in world.find_children("*", "WorldEnvironment", true, false):
+		var environment: Environment = sky.environment
+		if environment:
+			environment.glow_enabled = high
+			environment.glow_intensity = 0.6
+			environment.glow_strength = 1.0
+			environment.glow_bloom = 0.0
+			environment.glow_hdr_threshold = 0.9
+			environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	# "low": small pieces of the school (binders, keyboard keys, mice,
+	# glassware: under SMALL_PART metres) are not drawn beyond SMALL_PART_RANGE.
+	# Measured 2026-11-18 at "low" (Ryzen 5 3500U): views down the school
+	# need up to ~3,900 draw calls; this cut 10-17 % of the frame time in
+	# the teachers' room, science lab and corridor. Only the building and
+	# corridor props: characters (shoes, eyes) and mission items keep showing.
+	for part_root in [world.get_node_or_null("MapVisual"), world.get_node_or_null("CorridorFurnishings")]:
+		if part_root == null:
+			continue
+		for part in part_root.find_children("*", "GeometryInstance3D", true, false):
+			var geometry := part as GeometryInstance3D
+			if quality == "low":
+				var box: AABB = geometry.global_transform * geometry.get_aabb()
+				if box.get_longest_axis_size() < SMALL_PART:
+					geometry.visibility_range_end = SMALL_PART_RANGE
+					geometry.visibility_range_end_margin = 0.5 # no flicker at the edge
+			else:
+				geometry.visibility_range_end = 0.0
+	var shadows := world.get_node_or_null("NearLightShadows")
+	if high and shadows == null:
+		shadows = NearLightShadows.new()
+		shadows.name = "NearLightShadows"
+		world.add_child(shadows)
+	elif not high and shadows:
+		shadows.free() # _exit_tree turns its light's shadow off
+	var wanted := BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC if quality == "high" \
+		else BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+	var done := {}
+	for node in world.find_children("*", "GeometryInstance3D", true, false):
+		var materials: Array = [node.material_override]
+		if node is MeshInstance3D and node.mesh:
+			for surface in node.mesh.get_surface_count():
+				materials.append(node.mesh.surface_get_material(surface))
+				materials.append(node.get_surface_override_material(surface))
+		for material in materials:
+			if material is BaseMaterial3D and not done.has(material):
+				done[material] = true
+				# Only the two smooth mipmapped modes; pixel-art or
+				# no-mipmap materials keep their own filter.
+				if material.texture_filter in [BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS,
+						BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC]:
+					material.texture_filter = wanted
 
 func set_volume(bus: String, value: float, persist := true) -> void:
 	if not AUDIO.has(bus) or not is_finite(value):
@@ -120,6 +261,34 @@ func _build_shell() -> void:
 	_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_layer.add_child(_background)
+	_backdrop_blur = ShaderMaterial.new()
+	_backdrop_blur.shader = Shader.new()
+	_backdrop_blur.shader.code = """
+shader_type canvas_item;
+uniform float radius = 4.0;
+uniform float dim = 0.8;
+void fragment() {
+	// 9x9 Gaussian-weighted taps: soft, without the grid a sparse box blur leaves.
+	vec2 step_uv = TEXTURE_PIXEL_SIZE * radius;
+	vec3 sum = vec3(0.0);
+	float total = 0.0;
+	for (int x = -4; x <= 4; x++) {
+		for (int y = -4; y <= 4; y++) {
+			float w = exp(-float(x * x + y * y) / 8.0);
+			sum += texture(TEXTURE, UV + vec2(float(x), float(y)) * step_uv).rgb * w;
+			total += w;
+		}
+	}
+	COLOR = vec4(sum / total * dim, 1.0);
+}
+"""
+	# Under the petals (the breeze is added after it), above the backdrop.
+	_art = TextureRect.new()
+	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_art.stretch_mode = TextureRect.STRETCH_SCALE
+	_art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_art.hide()
+	_background.add_child(_art)
 	_breeze = MenuBreeze.new()
 	_breeze.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_background.add_child(_breeze)
@@ -168,6 +337,8 @@ func _page(title: String, subtitle: String, card_width := 900, right_space := 0,
 	_card.show()
 	_background.texture = MENU_BACKGROUND
 	_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_background.material = null
+	_art.hide()
 	for child in _body.get_children():
 		_body.remove_child(child)
 		child.queue_free()
@@ -227,14 +398,17 @@ func _show_art(texture: Texture2D, screen: String) -> void:
 	_layer.show()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	_card.hide()
-	_background.texture = texture
-	_background.stretch_mode = TextureRect.STRETCH_SCALE
+	_background.texture = MENU_BACKGROUND
+	_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_background.material = _backdrop_blur
+	_art.texture = texture
+	_art.show()
 	for child in _home_hotspots.get_children():
 		_home_hotspots.remove_child(child)
 		child.queue_free()
 	_home_hotspots.show()
 	_art_canvas = Control.new()
-	_art_canvas.size = Vector2(1672, 943)
+	_art_canvas.size = ART_SIZE
 	_art_canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_home_hotspots.add_child(_art_canvas)
 	_scale_art()
@@ -242,8 +416,17 @@ func _show_art(texture: Texture2D, screen: String) -> void:
 		_home_hotspots.resized.connect(_scale_art)
 
 func _scale_art() -> void:
-	if is_instance_valid(_art_canvas):
-		_art_canvas.scale = _home_hotspots.size / Vector2(1672, 943)
+	if not is_instance_valid(_art_canvas):
+		return
+	# One scale for both axes (fit inside), centred: the art and its hotspots
+	# share the same rectangle so the buttons stay on the painted buttons.
+	var area := _home_hotspots.size
+	var s := minf(area.x / ART_SIZE.x, area.y / ART_SIZE.y)
+	var offset := ((area - ART_SIZE * s) / 2.0).round()
+	_art_canvas.scale = Vector2(s, s)
+	_art_canvas.position = offset
+	_art.position = offset
+	_art.size = ART_SIZE * s
 
 func _refresh_language() -> void:
 	match _screen:
@@ -314,30 +497,33 @@ func next_level_available(level: int) -> bool:
 
 func show_settings() -> void:
 	_show_art(SETTINGS_TH if L10n.locale == "th" else SETTINGS_EN, "settings")
-	var segment := Panel.new()
-	segment.position = Vector2(1170, 318)
-	segment.size = Vector2(308, 62)
-	segment.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	segment.add_theme_stylebox_override("panel", _panel(Color("fffaf1"), 31, Color.WHITE))
-	_art_canvas.add_child(segment)
-	var languages := ["th", "en"]
-	for index in range(2):
-		var code: String = languages[index]
-		var button := Button.new()
-		button.name = "Language_" + code
-		button.text = "ไทย" if code == "th" else "ENG"
-		button.position = Vector2(1170 + index * 154, 318)
-		button.size = Vector2(154, 62)
-		button.add_theme_font_override("font", BODY_FONT)
-		button.add_theme_font_size_override("font_size", 33)
-		var selected := L10n.locale == code
-		button.add_theme_color_override("font_color", Color.WHITE if selected else INK)
-		button.add_theme_color_override("font_hover_color", Color.WHITE if selected else INK)
-		button.add_theme_stylebox_override("normal", _panel(Color("078ee4") if selected else Color.TRANSPARENT, 31, Color.WHITE if selected else Color.TRANSPARENT))
-		button.add_theme_stylebox_override("hover", _panel(Color("168bce") if selected else Color("e9f6ff"), 31, Color.WHITE))
-		button.add_theme_stylebox_override("focus", _panel(Color.TRANSPARENT, 31, BLUE))
-		button.pressed.connect(func(): L10n.set_locale(code))
-		_art_canvas.add_child(button)
+	# One row in the artwork holds two settings: language beside its painted
+	# label, graphics quality (drawn here) on the right half.
+	var thai := L10n.locale == "th"
+	_segment("Language_", ["th", "en"], ["ไทย", "ENG"], L10n.locale, Vector2(450, 318), 154,
+		func(code: String): L10n.set_locale(code))
+	var divider := ColorRect.new()
+	divider.color = Color("20364c33")
+	divider.position = Vector2(800, 310)
+	divider.size = Vector2(2, 78)
+	divider.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_art_canvas.add_child(divider)
+	var quality_label := Label.new()
+	quality_label.name = "QualityLabel"
+	quality_label.text = "คุณภาพภาพ" if thai else "Graphics"
+	quality_label.position = Vector2(838, 318)
+	quality_label.size = Vector2(190, 62)
+	quality_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	quality_label.add_theme_font_override("font", BODY_FONT)
+	quality_label.add_theme_font_size_override("font_size", 34)
+	quality_label.add_theme_color_override("font_color", INK)
+	_art_canvas.add_child(quality_label)
+	var quality_names := ["ต่ำ", "กลาง", "สูง"] if thai else ["Low", "Med", "High"]
+	var quality_buttons := _segment("Quality_", QUALITY_ORDER, quality_names, quality, Vector2(1040, 318), 146, _pick_quality)
+	var hints := ["ลดความละเอียดภาพ 3 มิติและปิดเงาแดด สำหรับเครื่องช้า", "ภาพมาตรฐาน (ค่าเริ่มต้น)", "ขอบเนียน พื้นผิวคม มีเงาในห้องและแสงฟุ้ง สำหรับเครื่องแรง"] if thai \
+		else ["Lower 3D resolution and no sun shadows, for slower computers", "Standard picture (default)", "Smooth edges, sharper textures, room shadows and glow, for faster computers"]
+	for index in quality_buttons.size():
+		quality_buttons[index].tooltip_text = hints[index]
 	for index in range(AUDIO.size()):
 		var bus: String = AUDIO.keys()[index]
 		var y: float = [515.0, 591.0, 670.0][index]
@@ -361,6 +547,39 @@ func show_settings() -> void:
 			set_volume(bus, value)
 			percent.text = "%d%%" % value)
 	_art_button("Back", Rect2(201, 750, 1270, 78), show_pause if paused_menu else show_home)
+
+func _pick_quality(level: String) -> void:
+	set_quality(level)
+	show_settings() # redraw so the chosen level is lit
+
+## A rounded pill of equal buttons on the settings artwork; `current` is lit.
+func _segment(prefix: String, codes: Array, labels: Array, current: String, at: Vector2, width: float, pick: Callable) -> Array[Button]:
+	var back := Panel.new()
+	back.position = at
+	back.size = Vector2(width * codes.size(), 62)
+	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	back.add_theme_stylebox_override("panel", _panel(Color("fffaf1"), 31, Color.WHITE))
+	_art_canvas.add_child(back)
+	var buttons: Array[Button] = []
+	for index in codes.size():
+		var code: String = codes[index]
+		var button := Button.new()
+		button.name = prefix + code
+		button.text = labels[index]
+		button.position = at + Vector2(index * width, 0)
+		button.size = Vector2(width, 62)
+		button.add_theme_font_override("font", BODY_FONT)
+		button.add_theme_font_size_override("font_size", 33)
+		var selected := current == code
+		button.add_theme_color_override("font_color", Color.WHITE if selected else INK)
+		button.add_theme_color_override("font_hover_color", Color.WHITE if selected else INK)
+		button.add_theme_stylebox_override("normal", _panel(Color("078ee4") if selected else Color.TRANSPARENT, 31, Color.WHITE if selected else Color.TRANSPARENT))
+		button.add_theme_stylebox_override("hover", _panel(Color("168bce") if selected else Color("e9f6ff"), 31, Color.WHITE))
+		button.add_theme_stylebox_override("focus", _panel(Color.TRANSPARENT, 31, BLUE))
+		button.pressed.connect(pick.bind(code))
+		_art_canvas.add_child(button)
+		buttons.append(button)
+	return buttons
 
 func configure_level(world: Node, level: int) -> void:
 	if not loading:
@@ -521,6 +740,7 @@ func _enter_loaded_level() -> void:
 	configure_level(world, current_level)
 	var old := get_tree().current_scene
 	get_tree().root.add_child(world)
+	apply_world_quality(world)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().current_scene = world
 	if old:

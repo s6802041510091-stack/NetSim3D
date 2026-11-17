@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web-lobby",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "net-sim-3d/web/serve.ps1"],
+      "port": 8765,
+      "url": "http://localhost:8765"
+    }
+  ]
+}
