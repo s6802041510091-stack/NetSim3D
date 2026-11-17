@@ -2,19 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://j8nxcvs47csb"
-path="res://.godot/imported/teacher_female_khaki_160cm_eyebrow001.png-a27620c3314ee3596bdb46d7152d78b6.ctex"
+uid="uid://c8ckbgovyy6"
+path="res://.godot/imported/skin_young_lightskinned_female_diffuse3.png-409ffc2a7733373ec31b0c35c6bc1cf4.ctex"
 metadata={
 "vram_texture": false
-}
-generator_parameters={
-"md5": "67bd4a6045281c2f8aa7f28610223c5c"
 }
 
 [deps]
 
-source_file="res://assets/models/teacher_female_khaki_160cm_eyebrow001.png"
-dest_files=["res://.godot/imported/teacher_female_khaki_160cm_eyebrow001.png-a27620c3314ee3596bdb46d7152d78b6.ctex"]
+source_file="res://assets/models/shared_textures/skin_young_lightskinned_female_diffuse3.png"
+dest_files=["res://.godot/imported/skin_young_lightskinned_female_diffuse3.png-409ffc2a7733373ec31b0c35c6bc1cf4.ctex"]
 
 [params]
 

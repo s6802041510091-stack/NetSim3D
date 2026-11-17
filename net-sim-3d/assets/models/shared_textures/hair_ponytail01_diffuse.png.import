@@ -2,19 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjvw61knoygiv"
-path="res://.godot/imported/cleaner_female_apron_160cm_shoes04_normal.png-76b2ad17598a2c806358800c684505f3.ctex"
+uid="uid://dw0ehn772n0h5"
+path="res://.godot/imported/hair_ponytail01_diffuse.png-49a998a6ed89117f41fac7aec62960b4.ctex"
 metadata={
 "vram_texture": false
-}
-generator_parameters={
-"md5": "ddc222212a99fbf88ea2da90d83c475f"
 }
 
 [deps]
 
-source_file="res://assets/models/cleaner/cleaner_female_apron_160cm_shoes04_normal.png"
-dest_files=["res://.godot/imported/cleaner_female_apron_160cm_shoes04_normal.png-76b2ad17598a2c806358800c684505f3.ctex"]
+source_file="res://assets/models/shared_textures/hair_ponytail01_diffuse.png"
+dest_files=["res://.godot/imported/hair_ponytail01_diffuse.png-49a998a6ed89117f41fac7aec62960b4.ctex"]
 
 [params]
 

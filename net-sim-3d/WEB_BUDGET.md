@@ -20,6 +20,28 @@
 **ยังไม่ได้วัด FPS และเวลาโหลดในเบราว์เซอร์** (หน้าต่างเบราว์เซอร์ในแอปถูกซ่อนจึงไม่วาดภาพ)
 ต้องทดสอบใน Chrome บนเครื่องสเปกขั้นต่ำก่อนสรุป
 
+## วัดซ้ำหลังทำครบ 6 ด่าน (14 พฤศจิกายน 2026)
+
+Export Web release ด้วย Godot 4.7.2 (ไม่มี error) แล้วเปิดผ่าน `web/serve.ps1` ในเบราว์เซอร์ของแอป Claude:
+Lobby → เมนู → Level 1 พร้อมแล้ว → ฉากโรงเรียน เล่นได้
+
+| รายการ | 9 พ.ย. | 14 พ.ย. | 14 พ.ย. หลังรวม texture ซ้ำ (R3) |
+|---|---|---|---|
+| `index.pck` | 91.6 MB | 186 MB | 138 MB |
+| `index.wasm` | 37.7 MB | 37.7 MB | 37.7 MB |
+| ดาวน์โหลดจริง (gzip) | 96.5 MB | ~189 MB | ~140 MB |
+
+หลังรวม texture ซ้ำ ตัวตรวจ `validate_students`, `validate_cleaner`, `validate_mission_04/05/06` ผ่านทั้งหมด
+
+**ขนาดเพิ่มเกือบเท่าตัว** สาเหตุหลักคือตัวละครที่เพิ่มหลัง 9 พ.ย. (นักเรียน ครู แม่บ้าน) รวมประมาณ 80 MB:
+texture 2048×2048 จำนวนมาก นำเข้าแบบ Lossless (`compress/mode=0`, ไม่จำกัดขนาด) แต่ละไฟล์ ~4 MB
+ทางแก้ที่คาดว่าได้ผลมากที่สุด: ตั้ง texture ตัวละครเป็น VRAM Compressed และ `process/size_limit=1024`
+(ยังไม่ได้ทำ รอผู้พัฒนาตัดสิน) ส่วนแบ่งที่เหลือ: โรงเรียน 65 MB, texture อื่น 20 MB, เมือง 15 MB, เสียง 3 MB
+
+เครื่องที่ทดสอบ (โน้ตบุ๊กสำรอง ต่ำกว่าสเปกขั้นต่ำ): Ryzen 5 3500U 2.1 GHz 4 คอร์, RAM 6 GB, Radeon Vega
+ในหน้าต่างเบราว์เซอร์เล็ก (682×783) ได้ประมาณ **21 FPS** ในห้อง IT Support และโหลดนาน
+แม้ไฟล์มาจากเครื่องตัวเอง ผู้พัฒนาลองเล่นแล้ว "เล่นได้แต่โหลดนาน" ยังต้องวัดบนเครื่องสเปกขั้นต่ำ (RAM 8 GB) ใน Chrome เต็มจอ
+
 ## สิ่งที่ทำ
 
 - **R1 ตู้ Rack ห้อง Server**: ไม่ส่งออกชั้นรายละเอียด `P3 | Rack equipment details` (2.25 ล้านสามเหลี่ยม) ตัวตู้ยังอยู่
@@ -29,6 +51,11 @@
   พร้อม Edge Split 30° เพื่อคงขอบคม
 - **R3 ตัวละคร**: texture ผิว/ตา/คิ้ว/เสื้อ/รองเท้า ที่ซ้ำกันใน 8 GLB ใช้ไฟล์กลางชุดเดียวใน
   `assets/models/shared_textures/` (บีบอัด VRAM, mipmap, ผิวและเสื้อไม่เกิน 1024)
+  14 พ.ย. 2026 ขยายไปยังตัวละครที่เพิ่มทีหลัง 7 GLB (นักเรียน 5 คน, ครูสาว, แม่บ้าน) เพิ่มไฟล์กลาง
+  `skin_young_lightskinned_female_diffuse3.png` และ `hair_ponytail01_diffuse.png` (ตั้งค่านำเข้าเหมือนไฟล์เดิมของนักเรียน:
+  Lossless, mipmap, 2048) และลบ PNG ที่ Godot แยกออกมาจาก GLB เดิม 39 ไฟล์
+  นักเรียนชายใช้ผิว/เสื้อ/ตา/รองเท้าชุดกลางเดียวกับครูชาย (ผิวและเสื้อ 1024 แทน 2048 เดิม)
+  เสื้อ `short01` (mullet) และ `short02` (แม่บ้าน) ไม่ซ้ำกับใคร จึงยังเป็นไฟล์ของตัวเอง
 - **R4 ตึกในเมือง**: texture ใน `japanese_buildings.glb` ลดจาก 1024 เป็น 512
 - **R5**: ไฟล์ `hand_*.glb` และ `player_right_arm*.glb` ถูกใช้จริงทั้งหมด ไม่มีไฟล์ให้ตัด
 - ปิด `create_shadow_meshes` ของโรงเรียนและเมือง เพราะเกมไม่มีไฟที่สร้างเงา
@@ -40,7 +67,7 @@
 
 ```text
 blender -b --python 3Dmodel/scripts/optimize_school_for_web.py
-node net-sim-3d/tools/share_character_textures.cjs        # หลังส่งออกตัวละคร/มือจาก Blender ใหม่
+godot --headless --path net-sim-3d -s res://tools/share_character_textures.gd   # หลังส่งออกตัวละคร/มือจาก Blender ใหม่ แล้วลบ <glb>_<ภาพ>.png ที่ Godot แยกออกมา
 godot --headless --path net-sim-3d -s res://tools/downscale_glb_textures.gd -- res://assets/exterior/japanese_buildings.glb 512
 ```
 
