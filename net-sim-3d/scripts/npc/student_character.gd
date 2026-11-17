@@ -27,6 +27,11 @@ const FACE_RATE := 1.5 # rad/s turning on the spot
 const ACCEL := 0.8 # m/s^2, both speeding up and slowing down
 const VIA_RADIUS := 0.55
 const CHAT_WAIT := 70.0 # how long to wait for a friend who is on the way
+## A student sits only from the bench's front point (arrival is within 0.06 m).
+## The feet are planted where she stands when she starts to sit, so sitting
+## from anywhere else (pinned by a plant pot or wall) stretched her legs
+## sideways along the bench.
+const SEAT_REACH := 0.15
 
 var manager: Node
 var routine: Array[Dictionary] = []
@@ -382,6 +387,15 @@ func _arrive() -> void:
 		if step.has("door"):
 			_closing = 6.0
 	if step.has("bench"):
+		var front: Vector3 = step["point"]
+		if Vector2(global_position.x - front.x, global_position.z - front.z).length() > SEAT_REACH:
+			# Pinned on the way (see _walk_physics): give the bench up and
+			# let the director choose something else, rather than sit from here.
+			if manager and manager.has_method("plan_finished"):
+				manager.plan_finished(self)
+			else:
+				_advance()
+			return
 		_bench = manager.bench_for(step["bench"])
 		if _bench:
 			var slot: float = step.get("slot", 0.0)

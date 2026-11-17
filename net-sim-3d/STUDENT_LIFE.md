@@ -16,6 +16,7 @@ Seven students are instanced in `scenes/npc/corridor_students.tscn`, which is pa
 
 - `scripts/npc/student_life.gd` is the director: spots, reservations, walker budget, chat groups and the plan for each student's next activity. Its `random_seed` export (0 = random each run) makes runs repeatable.
 - `scripts/npc/student_character.gd` follows a plan of steps (`via` pass-through points, `anchor` long stays, `bench`/`slot`, `door`/`door_op`, `hide`). It reuses the approved rig, bench pose, foot contacts and cloth correction unchanged.
+- A student sits only from the bench's front point (within `SEAT_REACH` = 0.15 m). The feet are planted where she stands when the sit starts, so a student who was pinned on the way (by a plant pot or the wall, 15 s "settle where we are" fallback) used to sit from there with her legs stretched sideways along the bench (seen at BenchRight02 beside PlantRight03, fixed 2026-11-15). Now she gives that bench up and the director picks another activity.
 - Doors are the existing `InteractiveDoor` nodes (`set_open`), so the door swing, collision and sounds are the same as when the player opens them.
 
 ## Housekeeper (agreed with the user 2026-11-12)
