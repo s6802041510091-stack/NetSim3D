@@ -38,9 +38,8 @@ var _screen := "home"
 ##   medium = 100 %, the look the game has always had (default)
 ##   high   = 100 % + 4x MSAA (smooth edges) + anisotropic texture filtering
 ##            (floor tiles and walls stay sharp at a slant) + the nearest room
-##            light casts shadows (NearLightShadows) + soft glow on bright
-##            lights. Tonemapping was tried and left out: it paled the sky
-##            outside the windows and flattened the picture.
+##            light casts shadows (NearLightShadows) + glow + film look "B"
+##            with sunlight through the windows (CinematicLook).
 const QUALITY := {"low": 0.8, "medium": 1.0, "high": 1.0}
 const QUALITY_ORDER := ["low", "medium", "high"]
 ## Render layer 11, used only to let the shadowless "low" sun light the town.
@@ -190,6 +189,8 @@ func apply_world_quality(world: Node) -> void:
 			environment.glow_bloom = 0.0
 			environment.glow_hdr_threshold = 0.9
 			environment.glow_blend_mode = Environment.GLOW_BLEND_MODE_SOFTLIGHT
+	# "high": film look B with sunlight through the windows (cinematic_look.gd).
+	CinematicLook.apply(world, high)
 	# "low": small pieces of the school (binders, keyboard keys, mice,
 	# glassware: under SMALL_PART metres) are not drawn beyond SMALL_PART_RANGE.
 	# Measured 2026-11-18 at "low" (Ryzen 5 3500U): views down the school
@@ -520,8 +521,8 @@ func show_settings() -> void:
 	_art_canvas.add_child(quality_label)
 	var quality_names := ["ต่ำ", "กลาง", "สูง"] if thai else ["Low", "Med", "High"]
 	var quality_buttons := _segment("Quality_", QUALITY_ORDER, quality_names, quality, Vector2(1040, 318), 146, _pick_quality)
-	var hints := ["ลดความละเอียดภาพ 3 มิติและปิดเงาแดด สำหรับเครื่องช้า", "ภาพมาตรฐาน (ค่าเริ่มต้น)", "ขอบเนียน พื้นผิวคม มีเงาในห้องและแสงฟุ้ง สำหรับเครื่องแรง"] if thai \
-		else ["Lower 3D resolution and no sun shadows, for slower computers", "Standard picture (default)", "Smooth edges, sharper textures, room shadows and glow, for faster computers"]
+	var hints := ["ลดความละเอียดภาพ 3 มิติและปิดเงาแดด สำหรับเครื่องช้า", "ภาพมาตรฐาน (ค่าเริ่มต้น)", "แสงแบบภาพยนตร์ แดดส่องผ่านหน้าต่าง มีเงาในห้อง สำหรับเครื่องแรง"] if thai \
+		else ["Lower 3D resolution and no sun shadows, for slower computers", "Standard picture (default)", "Film-style light, sun through the windows, room shadows, for faster computers"]
 	for index in quality_buttons.size():
 		quality_buttons[index].tooltip_text = hints[index]
 	for index in range(AUDIO.size()):
