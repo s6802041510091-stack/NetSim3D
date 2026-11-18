@@ -22,12 +22,14 @@ var _background: TextureRect
 var _breeze: MenuBreeze
 var _home_hotspots: Control
 var _art_canvas: Control
-## The menu art (home, level select, settings) is one 16:9 picture with
-## hotspots on it. It keeps its proportions and sits centred; on a wider or
-## taller window (a browser tab) the space around it shows the same school
-## background, blurred and dimmed, instead of stretching the picture.
+## Menu screens (home, level select, settings) are two layers (agreed with
+## the user 2026-11-18): a 21:9 school background that covers the whole
+## window (cropped at the edges, never stretched), and on top the menu panel
+## cut from the original artwork (tools/cut_menu_panels.gd: a 16:9 canvas,
+## transparent outside the card) with hotspots on its painted buttons. The
+## panel keeps its proportions and sits centred, so every window shape is
+## filled and the buttons are always whole.
 var _art: TextureRect
-var _backdrop_blur: ShaderMaterial
 const ART_SIZE := Vector2(1672, 943)
 var _screen := "home"
 ## Graphics quality (agreed with the user 2026-11-17). The value is the 3D
@@ -77,13 +79,15 @@ const BLUE := Color("237db1")
 const CORAL := Color("e97775")
 const HEADING_FONT := preload("res://assets/fonts/Anuphan-Variable.ttf")
 const BODY_FONT := preload("res://assets/fonts/Sarabun-Regular.ttf")
-const MENU_BACKGROUND := preload("res://assets/ui/school_spring_background.png")
-const HOME_REFERENCE := preload("res://assets/ui/home_reference_exact.png")
-const HOME_TH := preload("res://assets/ui/home_th.png")
-const LEVELS_TH := preload("res://assets/ui/select_level_th.png")
-const LEVELS_EN := preload("res://assets/ui/select_level_en.png")
-const SETTINGS_TH := preload("res://assets/ui/settings_th_base.png")
-const SETTINGS_EN := preload("res://assets/ui/settings_en_base.png")
+## 21:9 (1916x821). The older 16:9 school_spring_background.png is still
+## used by the in-game college website (college_browser.gd).
+const MENU_BACKGROUND := preload("res://assets/ui/school_spring_background-new.png")
+const HOME_REFERENCE := preload("res://assets/ui/menu_panel_home_en.png")
+const HOME_TH := preload("res://assets/ui/menu_panel_home_th.png")
+const LEVELS_TH := preload("res://assets/ui/menu_panel_levels_th.png")
+const LEVELS_EN := preload("res://assets/ui/menu_panel_levels_en.png")
+const SETTINGS_TH := preload("res://assets/ui/menu_panel_settings_th.png")
+const SETTINGS_EN := preload("res://assets/ui/menu_panel_settings_en.png")
 
 func _panel(color: Color, radius: int, border: Color = Color.TRANSPARENT) -> StyleBoxFlat:
 	var box := StyleBoxFlat.new()
@@ -262,27 +266,6 @@ func _build_shell() -> void:
 	_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_layer.add_child(_background)
-	_backdrop_blur = ShaderMaterial.new()
-	_backdrop_blur.shader = Shader.new()
-	_backdrop_blur.shader.code = """
-shader_type canvas_item;
-uniform float radius = 4.0;
-uniform float dim = 0.8;
-void fragment() {
-	// 9x9 Gaussian-weighted taps: soft, without the grid a sparse box blur leaves.
-	vec2 step_uv = TEXTURE_PIXEL_SIZE * radius;
-	vec3 sum = vec3(0.0);
-	float total = 0.0;
-	for (int x = -4; x <= 4; x++) {
-		for (int y = -4; y <= 4; y++) {
-			float w = exp(-float(x * x + y * y) / 8.0);
-			sum += texture(TEXTURE, UV + vec2(float(x), float(y)) * step_uv).rgb * w;
-			total += w;
-		}
-	}
-	COLOR = vec4(sum / total * dim, 1.0);
-}
-"""
 	# Under the petals (the breeze is added after it), above the backdrop.
 	_art = TextureRect.new()
 	_art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -401,7 +384,7 @@ func _show_art(texture: Texture2D, screen: String) -> void:
 	_card.hide()
 	_background.texture = MENU_BACKGROUND
 	_background.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	_background.material = _backdrop_blur
+	_background.material = null # full-bleed, no blur (the panel is its own layer)
 	_art.texture = texture
 	_art.show()
 	for child in _home_hotspots.get_children():
