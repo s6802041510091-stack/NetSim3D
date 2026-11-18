@@ -22,8 +22,8 @@ const FRAMES := {
 	"settings": [Rect2i(147, 70, 1378, 799), 52.0],
 }
 const SOURCES := {
-	"menu_panel_home_th": ["home_th", "home"],
-	"menu_panel_home_en": ["home_reference_exact", "home"],
+	"menu_panel_home_th": ["home_th_five", "home"],
+	"menu_panel_home_en": ["home_en_five", "home"],
 	"menu_panel_levels_th": ["select_level_th", "levels"],
 	"menu_panel_levels_en": ["select_level_en", "levels"],
 	"menu_panel_settings_th": ["settings_th_base", "settings"],

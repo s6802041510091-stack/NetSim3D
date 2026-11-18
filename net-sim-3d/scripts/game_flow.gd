@@ -57,6 +57,16 @@ const QUALITY_FROM_SCHEME_1 := {"low": "low", "medium": "low", "high": "medium"}
 var quality := "medium"
 var _card: PanelContainer
 var _positioner: MarginContainer
+var _scroll: ScrollContainer
+var _page_area: MarginContainer
+## Settings segments (language, quality): last choice drawn, per segment.
+var _segment_shown := {}
+const SEGMENT_SLIDE := 0.32
+## Card padding above and below the page (pixels).
+const CARD_PAD_Y := 25
+## Pause and "are you sure?" pages: a short list of buttons, so a narrow card
+## (the default 900 looked too wide, user 2026-11-18).
+const SMALL_CARD_WIDTH := 600
 var _body: VBoxContainer
 var _page_title: Label
 var _progress: ProgressBar
@@ -281,13 +291,11 @@ func _build_shell() -> void:
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 20)
 	_background.add_child(margin)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
+	_page_area = margin
 	var center := CenterContainer.new()
 	center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	center.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.add_child(center)
+	margin.add_child(center)
 	_positioner = MarginContainer.new()
 	center.add_child(_positioner)
 	_card = PanelContainer.new()
@@ -301,12 +309,24 @@ func _build_shell() -> void:
 	for side in ["left", "right"]:
 		padding.add_theme_constant_override("margin_" + side, 36)
 	for side in ["top", "bottom"]:
-		padding.add_theme_constant_override("margin_" + side, 25)
+		padding.add_theme_constant_override("margin_" + side, CARD_PAD_Y)
 	_card.add_child(padding)
+	# The card always stays whole on screen (all four corners rounded); a page
+	# taller than the window scrolls inside it (agreed with the user 2026-11-18,
+	# the progress pages used to slide the whole card past the window edge).
+	_scroll = ScrollContainer.new()
+	_scroll.name = "PageScroll"
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_style_scrollbar(_scroll.get_v_scroll_bar())
+	padding.add_child(_scroll)
 	_body = VBoxContainer.new()
 	_body.custom_minimum_size.x = 280
+	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_body.add_theme_constant_override("separation", 10)
-	padding.add_child(_body)
+	_scroll.add_child(_body)
+	_body.minimum_size_changed.connect(_fit_card, CONNECT_DEFERRED)
+	# The full-window background, not `margin`: the card would grow `margin`.
+	_background.resized.connect(_fit_card)
 	_home_hotspots = Control.new()
 	_home_hotspots.name = "HomeHotspots"
 	_home_hotspots.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -314,6 +334,26 @@ func _build_shell() -> void:
 	_layer.add_child(_home_hotspots)
 	_home_hotspots.hide()
 	_layer.hide()
+
+## The card is as tall as its page, but never taller than the window: the
+## rest scrolls inside the card. (A ScrollContainer does not pass its
+## child's height on, so the height is set here.)
+func _fit_card() -> void:
+	if not is_instance_valid(_scroll):
+		return
+	var available := _background.size.y - _page_area.get_theme_constant("margin_top") - _page_area.get_theme_constant("margin_bottom") - CARD_PAD_Y * 2
+	var needed := _body.get_combined_minimum_size().y
+	_scroll.custom_minimum_size.y = maxf(minf(needed, available), 0.0)
+
+func _style_scrollbar(bar: VScrollBar) -> void:
+	var track := _panel(Color("dfe8f1aa"), 5)
+	track.content_margin_left = 4
+	track.content_margin_right = 4
+	bar.add_theme_stylebox_override("scroll", track)
+	bar.add_theme_stylebox_override("scroll_focus", track)
+	for state in ["grabber", "grabber_highlight", "grabber_pressed"]:
+		var colour := {"grabber": Color("9fb4c8"), "grabber_highlight": Color("7d97b0"), "grabber_pressed": BLUE}[state] as Color
+		bar.add_theme_stylebox_override(state, _panel(colour, 5))
 
 func _page(title: String, subtitle: String, card_width := 900, right_space := 0, home := false) -> void:
 	_screen = "generic"
@@ -327,6 +367,7 @@ func _page(title: String, subtitle: String, card_width := 900, right_space := 0,
 		_body.remove_child(child)
 		child.queue_free()
 	_card.custom_minimum_size.x = card_width
+	_scroll.scroll_vertical = 0 # a new page starts at its top
 	_positioner.add_theme_constant_override("margin_right", right_space)
 	_layer.show()
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -442,10 +483,37 @@ func _home_hotspot(label: String, y_top: float, y_bottom: float, action: Callabl
 func show_home() -> void:
 	Sound.music("menu")
 	_show_art(HOME_TH if L10n.locale == "th" else HOME_REFERENCE, "home")
-	_home_hotspot("PLAY", 383, 470, show_levels)
-	_home_hotspot("CONTINUE", 484, 570, func(): start_level(last_level), last_level == 0)
-	_home_hotspot("SETTINGS", 585, 670, show_settings)
-	_home_hotspot("EXIT TO LOBBY", 685, 771, confirm_exit)
+	# Five painted buttons (tools/relayout_home_buttons.gd, 2026-11-18).
+	_home_hotspot("PLAY", 383, 454, show_levels)
+	_home_hotspot("CONTINUE", 466, 537, func(): start_level(last_level), last_level == 0)
+	_home_hotspot("SETTINGS", 549, 620, show_settings)
+	_home_hotspot("PROGRESS", 632, 703, show_progress)
+	_home_hotspot("EXIT TO LOBBY", 715, 786, confirm_exit)
+
+## The learner's own results (this browser / computer only), per level.
+func show_progress() -> void:
+	_page("ความคืบหน้าของฉัน", "สรุปผลทุกด่านที่เล่นบนเครื่อง/เบราว์เซอร์นี้ • แสดงเฉพาะผลของคุณเอง", 980)
+	_screen = "progress"
+	ProgressDashboard.build_overview(_body, TITLES, AVAILABLE, is_level_unlocked, show_progress_level)
+	var back := _button("‹  กลับเมนูหลัก", show_home, false, false)
+	back.name = "ProgressBack"
+	back.set_meta("sound", "back")
+
+func show_progress_level(level: int) -> void:
+	_page("ด่าน %d  ·  %s" % [level, TITLES[level - 1]], "คะแนนแต่ละครั้ง ผลครั้งล่าสุด และจุดที่ผิดพลาด", 980)
+	_screen = "progress_level"
+	ProgressDashboard.build_level(_body, level)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	_body.add_child(row)
+	var back := _button("‹  กลับหน้าความคืบหน้า", show_progress, false, false, row)
+	back.name = "ProgressLevelBack"
+	back.set_meta("sound", "back")
+	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if is_level_unlocked(level):
+		var play := _button("เล่นด่านนี้", start_level.bind(level), false, true, row)
+		play.name = "ProgressPlayLevel"
+		play.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 func show_levels() -> void:
 	_show_art(LEVELS_TH if L10n.locale == "th" else LEVELS_EN, "levels")
@@ -537,6 +605,9 @@ func _pick_quality(level: String) -> void:
 	show_settings() # redraw so the chosen level is lit
 
 ## A rounded pill of equal buttons on the settings artwork; `current` is lit.
+## The lit part is its own blue "thumb" that slides to a new choice (asked by
+## the user 2026-11-18). Picking redraws the page, so the last shown choice per
+## segment is remembered and the new thumb starts there and glides over.
 func _segment(prefix: String, codes: Array, labels: Array, current: String, at: Vector2, width: float, pick: Callable) -> Array[Button]:
 	var back := Panel.new()
 	back.position = at
@@ -544,6 +615,18 @@ func _segment(prefix: String, codes: Array, labels: Array, current: String, at: 
 	back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	back.add_theme_stylebox_override("panel", _panel(Color("fffaf1"), 31, Color.WHITE))
 	_art_canvas.add_child(back)
+	var to_index := maxi(codes.find(current), 0)
+	var from_index: int = codes.find(_segment_shown.get(prefix, current))
+	if from_index < 0:
+		from_index = to_index
+	_segment_shown[prefix] = current
+	var thumb := Panel.new()
+	thumb.name = prefix + "Thumb"
+	thumb.position = at + Vector2(from_index * width, 0)
+	thumb.size = Vector2(width, 62)
+	thumb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	thumb.add_theme_stylebox_override("panel", _panel(Color("078ee4"), 31, Color.WHITE))
+	_art_canvas.add_child(thumb)
 	var buttons: Array[Button] = []
 	for index in codes.size():
 		var code: String = codes[index]
@@ -554,16 +637,59 @@ func _segment(prefix: String, codes: Array, labels: Array, current: String, at: 
 		button.size = Vector2(width, 62)
 		button.add_theme_font_override("font", BODY_FONT)
 		button.add_theme_font_size_override("font_size", 33)
-		var selected := current == code
-		button.add_theme_color_override("font_color", Color.WHITE if selected else INK)
-		button.add_theme_color_override("font_hover_color", Color.WHITE if selected else INK)
-		button.add_theme_stylebox_override("normal", _panel(Color("078ee4") if selected else Color.TRANSPARENT, 31, Color.WHITE if selected else Color.TRANSPARENT))
-		button.add_theme_stylebox_override("hover", _panel(Color("168bce") if selected else Color("e9f6ff"), 31, Color.WHITE))
+		var selected := index == to_index
+		_segment_ink(Color.WHITE if index == from_index else INK, button)
+		button.add_theme_stylebox_override("normal", _panel(Color.TRANSPARENT, 31))
+		button.add_theme_stylebox_override("pressed", _panel(Color.TRANSPARENT, 31))
+		# The thumb shows through the chosen one; the others light up softly.
+		button.add_theme_stylebox_override("hover", _panel(Color("ffffff22") if selected else Color("e9f6ff"), 31))
 		button.add_theme_stylebox_override("focus", _panel(Color.TRANSPARENT, 31, BLUE))
 		button.pressed.connect(pick.bind(code))
 		_art_canvas.add_child(button)
 		buttons.append(button)
+	if from_index != to_index:
+		# Each label turns white as much as the thumb lies under it, so the
+		# words stay readable all the way (a plain cross-fade went grey on blue).
+		var tween := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tween.tween_method(_slide_thumb.bind(thumb, buttons), thumb.position.x, at.x + to_index * width, SEGMENT_SLIDE).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		# A slight stretch while it travels, so it feels like it glides.
+		thumb.pivot_offset = thumb.size / 2.0
+		var squash := create_tween().set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		squash.tween_property(thumb, "scale", Vector2(1.06, 0.9), SEGMENT_SLIDE * 0.4).set_trans(Tween.TRANS_SINE)
+		squash.tween_property(thumb, "scale", Vector2.ONE, SEGMENT_SLIDE * 0.6).set_trans(Tween.TRANS_SINE)
+		# Changing quality or language makes this frame slow; started now, the
+		# slide would spend most of its time in that one frame and look like a jump.
+		_play_after_hitch([tween, squash])
+	_slide_thumb(thumb.position.x, thumb, buttons)
 	return buttons
+
+## Moves the thumb to `x` and colours each label by how much of it is covered.
+func _slide_thumb(x: float, thumb: Panel, buttons: Array[Button]) -> void:
+	if not is_instance_valid(thumb):
+		return
+	thumb.position.x = x
+	for button in buttons:
+		var covered := clampf(1.0 - absf(button.position.x - x) / button.size.x, 0.0, 1.0)
+		# Short switch around half-covered: mixed shades are grey on both backgrounds.
+		_segment_ink(INK.lerp(Color.WHITE, smoothstep(0.35, 0.65, covered)), button)
+
+## Holds `tweens` for two frames (the slow one and the next, whose time step
+## still includes it), then plays them.
+func _play_after_hitch(tweens: Array) -> void:
+	for tween: Tween in tweens:
+		tween.pause()
+	for i in 2:
+		await get_tree().process_frame
+	for tween: Tween in tweens:
+		if tween.is_valid():
+			tween.play()
+
+## Text colour of a segment button in every state (tweened when the thumb moves).
+func _segment_ink(colour: Color, button: Button) -> void:
+	if not is_instance_valid(button):
+		return
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		button.add_theme_color_override(state, colour)
 
 func configure_level(world: Node, level: int) -> void:
 	if not loading:
@@ -776,11 +902,22 @@ func pause_game() -> void:
 	show_pause()
 
 func show_pause() -> void:
-	_page("พักเกม / ด่าน %d" % current_level, "พักเกม • ภารกิจจะหยุดระหว่างเปิดเมนู")
+	_page("พักเกม / ด่าน %d" % current_level, "พักเกม • ภารกิจจะหยุดระหว่างเปิดเมนู", SMALL_CARD_WIDTH)
+	# Only "play on" is blue; the rest are grey-white (user 2026-11-18). The
+	# lobby is reached from the main menu, so it is not offered here.
 	_button("เล่นต่อ", resume_game).grab_focus()
-	_button("ตั้งค่า", show_settings)
-	_button("กลับเมนูหลัก", confirm_menu)
-	_button("กลับล็อบบี้", confirm_exit)
+	_quiet_button(_button("ตั้งค่า", show_settings, false, false))
+	_quiet_button(_button("กลับเมนูหลัก", confirm_menu, false, false))
+
+## Grey-white look for a secondary menu button.
+func _quiet_button(button: Button) -> void:
+	var normal := _panel(Color("f1f4f8"), 15, Color("d3dce6"))
+	normal.shadow_color = Color("193a6122")
+	normal.shadow_size = 4
+	button.add_theme_stylebox_override("normal", normal)
+	button.add_theme_stylebox_override("hover", _panel(Color("e4ebf2"), 15, Color("b9c7d6")))
+	button.add_theme_stylebox_override("pressed", _panel(Color("d6e0ea"), 15, Color("a9b9ca")))
+	button.add_theme_color_override("font_pressed_color", INK)
 
 func resume_game() -> void:
 	if _awaiting_start:
@@ -793,7 +930,7 @@ func resume_game() -> void:
 	Input.mouse_mode = mode
 
 func confirm_menu() -> void:
-	_page("กลับเมนูหลัก?", "เก็บเฉพาะความคืบหน้าที่ระบบภารกิจบันทึกไว้\nตำแหน่งยืนและหน้าต่างที่เปิดจะไม่ถูกเก็บ")
+	_page("กลับเมนูหลัก?", "เก็บเฉพาะความคืบหน้าที่ระบบภารกิจบันทึกไว้\nตำแหน่งยืนและหน้าต่างที่เปิดจะไม่ถูกเก็บ", SMALL_CARD_WIDTH)
 	_button("กลับเมนูหลัก", return_to_menu)
 	_button("ยกเลิก", show_pause)
 
@@ -807,7 +944,7 @@ func return_to_menu() -> void:
 	show_home()
 
 func confirm_exit() -> void:
-	_page("กลับหน้า Lobby?", "ออกจากเกม • เก็บเฉพาะความคืบหน้าที่ภารกิจบันทึกไว้")
+	_page("กลับหน้า Lobby?", "ออกจากเกม • เก็บเฉพาะความคืบหน้าที่ภารกิจบันทึกไว้", SMALL_CARD_WIDTH)
 	_button("Exit to Lobby", exit_to_lobby)
 	_button("ยกเลิก", show_pause if paused_menu else show_home)
 

@@ -12,6 +12,9 @@ extends RefCounted
 
 const LEVEL_COUNT := 6
 const FILE_NAME := "progress.json"
+## Attempts kept per level for the progress dashboard (oldest dropped first).
+const HISTORY_LIMIT := 30
+const HISTORY_KEYS := ["total", "stars", "passed", "correctness", "process", "time", "elapsed_sec", "decisions_correct", "decisions_total", "mistakes", "finished_at"]
 
 ## Tests point this somewhere else so they never touch real progress.
 static var save_path: String = SavePaths.file(FILE_NAME)
@@ -31,6 +34,17 @@ static func level_record(level: int) -> Dictionary:
 
 static func best_score(level: int) -> int:
 	return int(level_record(level).get("best_total", -1))
+
+
+## Finished attempts of `level`, oldest first. Saves from before the log was
+## added (2026-11-18) only have their last attempt.
+static func history(level: int) -> Array:
+	var record := level_record(level)
+	var attempt_log: Variant = record.get("history")
+	if attempt_log is Array and not attempt_log.is_empty():
+		return attempt_log
+	var last: Variant = record.get("last")
+	return [last] if last is Dictionary else []
 
 
 static func is_passed(level: int) -> bool:
@@ -55,6 +69,13 @@ static func record_attempt(level: int, score: MissionScore, extra: Dictionary = 
 	result["finished_at"] = Time.get_datetime_string_from_system()
 	record["attempts"] = int(record.get("attempts", 0)) + 1
 	record["last"] = result
+	# Short per-attempt log for the progress dashboard (newest last).
+	var attempt_log: Array = record.get("history", []) if record.get("history", []) is Array else []
+	var entry := {}
+	for key in HISTORY_KEYS:
+		entry[key] = result.get(key)
+	attempt_log.append(entry)
+	record["history"] = attempt_log.slice(maxi(attempt_log.size() - HISTORY_LIMIT, 0))
 	if score.total() > int(record.get("best_total", -1)):
 		record["best_total"] = score.total()
 		record["best_stars"] = score.stars()
