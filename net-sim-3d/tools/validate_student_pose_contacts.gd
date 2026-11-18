@@ -1,7 +1,9 @@
 extends SceneTree
 
 const Audit=preload("res://tools/audit_student_animation.gd")
-const BENCHES=["BenchLeft03","BenchRight01","BenchLeft01","BenchRight03","BenchRight04"]
+## One bench per student: seven students since 2026-11-12 (two extra students
+## reuse the mullet and bob-cut models), eight corridor benches.
+const BENCHES=["BenchLeft03","BenchRight01","BenchLeft01","BenchRight03","BenchRight04","BenchLeft02","BenchLeft04"]
 var failures:=0
 var measurements:Array=[]
 
@@ -115,9 +117,10 @@ func _run() -> void:
 	for j in 90:
 		if s.phase=="stand":s._seat_transition(1.0/60)
 	check(s._seat_blend<.01 and s.global_position.distance_to(s._approach)<.01,"stand-up did not resume after player left")
-	var out:="D:/NetSim3D/Preview/โถงทางเดิน/students/audit-after"
+	# In the repository (was a fixed D:/ path on the first workstation).
+	var out:=ProjectSettings.globalize_path("res://").path_join("../Preview/โถงทางเดิน/students/audit-after").simplify_path()
 	DirAccess.make_dir_recursive_absolute(out)
 	var file:=FileAccess.open(out.path_join("dense-contacts.json"),FileAccess.WRITE)
 	file.store_string(JSON.stringify(measurements,"  "))
-	print("STUDENT_POSE_CONTACTS_VALID samples=210 walking_samples=120 swept_player_block=pass" if failures==0 else "STUDENT_POSE_CONTACTS_INVALID failures="+str(failures))
+	print("STUDENT_POSE_CONTACTS_VALID samples=%d walking_samples=%d swept_player_block=pass" % [42*life.students.size(),24*life.students.size()] if failures==0 else "STUDENT_POSE_CONTACTS_INVALID failures="+str(failures))
 	quit(1 if failures else 0)

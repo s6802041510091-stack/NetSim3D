@@ -1,5 +1,8 @@
 extends SceneTree
-const OUTPUT := "D:/NetSim3D/Preview/UI_Desktop_Windows11/actual/"
+## Screenshots go to the repository's Preview folder (was a fixed D:/ path on
+## the first workstation). Without a window (--headless) nothing is drawn, so
+## the checks still run but no pictures are saved.
+var OUTPUT := ProjectSettings.globalize_path("res://").path_join("../Preview/UI_Desktop_Windows11/actual/").simplify_path() + "/"
 
 func _initialize() -> void:
 	call_deferred("_check")
@@ -7,7 +10,9 @@ func _initialize() -> void:
 func _settle() -> void:
 	await process_frame
 	await process_frame
-	await RenderingServer.frame_post_draw
+	# Without a window frame_post_draw never fires: the run would hang here.
+	if DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
 
 func _click(button: Button) -> void:
 	await _settle()
@@ -31,6 +36,8 @@ func _click(button: Button) -> void:
 
 func _shot(name: String) -> void:
 	await _settle()
+	if DisplayServer.get_name() == "headless":
+		return
 	assert(root.get_texture().get_image().save_png(OUTPUT + name + ".png") == OK)
 
 func _check() -> void:

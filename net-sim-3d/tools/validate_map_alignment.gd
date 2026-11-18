@@ -33,6 +33,7 @@ func _run() -> void:
 	var visual: Node3D = main.get_node("MapVisual")
 	var collision: StaticBody3D = main.get_node("MapCollision")
 	var records: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/map_collisions_phase5.json"))
+	var moved_plants: Dictionary = load("res://scripts/school_visual_fixes.gd").MOVED_PLANTS
 	var checked := 0
 	for entry: Dictionary in records:
 		if entry.kind == "door":
@@ -47,6 +48,19 @@ func _run() -> void:
 			bounds = bounds.merge(part.global_transform * part.get_aabb())
 		var center := Vector3(entry.center[0], entry.center[1], entry.center[2])
 		var size := Vector3(entry.size[0], entry.size[1], entry.size[2])
+		if moved_plants.has(entry.name):
+			# school_visual_fixes.gd moves these plants (and their colliders) out
+			# of the walkway at start-up: compare with the moved collider, not
+			# with the exported position in the JSON.
+			var moved := collision.get_node_or_null(String(entry.name)) as Node3D
+			_check(moved != null, "moved plant collider missing: " + entry.name)
+			if moved:
+				center = moved.global_position
+			var target: Vector2 = moved_plants[entry.name]
+			# Same centre the mover uses: the plant mesh's own box.
+			var own := (mesh.global_transform * mesh.get_aabb()).get_center()
+			_check(Vector2(own.x, own.z).distance_to(target) < 0.01,
+				entry.name + " was not moved beside the teacher's desk")
 		if entry.name == "StairShell_Lower_EastWall":
 			# The visible wall ends underneath the entrance slab to avoid duplicate
 			# surfaces. Its existing solid collider may extend inside that slab.

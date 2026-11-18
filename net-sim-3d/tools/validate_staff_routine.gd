@@ -68,10 +68,10 @@ func _run() -> void:
 		var free: Array = free_by_level[lv]
 		_check(lv_life.idle.keys() == free, "Level %d: free teachers %s" % [lv, lv_life.idle.keys()])
 		var m_male: Node3D = m.get_node("TeacherMale")
-		if lv == 3:
-			_check(m_male is NpcCharacter and (m_male as NpcCharacter).seated and m_male.global_position.distance_to(Vector3(6.78, 0.02, -8.88)) < 0.05, "Level 3: male teacher works at TEACHER-PC (Mission03Controller)")
-		elif lv == 5:
-			_check(not m_male is NpcCharacter and m_male.global_position.distance_to(Vector3(5.15, 0.02, -8.0)) < 0.01, "Level 5: male teacher in the computer room for his mission")
+		if lv == 3 or lv == 5:
+			# Level 3 (Mission03Controller) and, since Level 5 v2.1, Level 5: he
+			# works seated at TEACHER-PC in the computer room.
+			_check(m_male is NpcCharacter and (m_male as NpcCharacter).seated and m_male.global_position.distance_to(Vector3(6.78, 0.02, -8.88)) < 0.05, "Level %d: male teacher works at TEACHER-PC in the computer room" % lv)
 		else:
 			_check(m_male is NpcCharacter and (m_male as NpcCharacter).seated and m_male.global_position.distance_to(StaffRoomLife.seat_of("male")) < 0.01, "Level %d: male teacher at his desk" % lv)
 		var m_female := m.get_node_or_null("TeacherFemale") as NpcCharacter

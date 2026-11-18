@@ -27,13 +27,17 @@ func _check_closed(door: InteractiveDoor, visual: Node3D, leaf: MeshInstance3D) 
 	var latch_gap := rear.position.z - panel.end.z
 	var top_gap := header.position.y - panel.end.y
 	var depth_offset := panel.get_center().x - header.get_center().x
-	_check(absf(hinge_gap - 0.004) < 0.001, "hinge gap is %.4f m, expected 0.004" % hinge_gap)
-	_check(absf(latch_gap - 0.004) < 0.001, "latch gap is %.4f m, expected 0.004" % latch_gap)
+	# school_visual_fixes.gd moves each jamb JAMB_NUDGE (2 mm) into the opening
+	# against z-fighting with the wall edge: the side gaps are 4 - 2 = 2 mm and
+	# the hinge line stays 2 mm behind the front jamb's face.
+	var nudge: float = load("res://scripts/school_visual_fixes.gd").JAMB_NUDGE
+	_check(absf(hinge_gap - (0.004 - nudge)) < 0.001, "hinge gap is %.4f m, expected %.3f" % [hinge_gap, 0.004 - nudge])
+	_check(absf(latch_gap - (0.004 - nudge)) < 0.001, "latch gap is %.4f m, expected %.3f" % [latch_gap, 0.004 - nudge])
 	_check(absf(top_gap - 0.004) < 0.001, "header gap is %.4f m, expected 0.004" % top_gap)
 	_check(absf(panel.position.y - 0.008) < 0.001, "floor gap is %.4f m, expected 0.008" % panel.position.y)
 	_check(absf(depth_offset) < 0.001, "leaf is %.4f m out of the frame plane" % depth_offset)
 	_check(absf(door.global_position.x - header.get_center().x) < 0.001 and
-		absf(door.global_position.z - front.end.z) < 0.001, "hinge is not on the frame's inner edge")
+		absf(door.global_position.z - (front.end.z - nudge)) < 0.001, "hinge is not on the frame's inner edge")
 	var collider_bounds: AABB = door._shape.global_transform * door._shape.shape.get_debug_mesh().get_aabb()
 	_check(collider_bounds.get_center().distance_to(panel.get_center()) < 0.001 and
 		collider_bounds.size.distance_to(panel.size) < 0.001, "moving collider does not fit the corrected leaf")

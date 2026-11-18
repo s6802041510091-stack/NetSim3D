@@ -20,9 +20,15 @@ func _run() -> void:
 	var player: CharacterBody3D = map.get_node("ITSupportPlayer")
 	# This checks permanent furniture clearance. Dynamic student collision,
 	# yielding and looping are exercised separately by validate_students.gd.
-	for student: StudentCharacter in map.get_node("CorridorStudents").students:
-		student.process_mode = Node.PROCESS_MODE_DISABLED
-		student.collision_layer = 0
+	# The housekeeper (added 2026-11-12, mopping the corridor) is a moving
+	# person too: validate_cleaner.gd covers her.
+	var people: Array = map.get_node("CorridorStudents").students.duplicate()
+	var cleaner := map.get_node_or_null("CorridorStudents/Cleaner")
+	if cleaner:
+		people.append(cleaner)
+	for person: CharacterBody3D in people:
+		person.process_mode = Node.PROCESS_MODE_DISABLED
+		person.collision_layer = 0
 	player.require_mouse_capture = false
 	player.set_physics_process(false)
 	player.velocity = Vector3.ZERO

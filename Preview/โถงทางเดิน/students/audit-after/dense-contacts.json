@@ -10,140 +10,140 @@
     "fraction": 0.05,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0031969437841326,
+    "sole_min_y": 0.00321186566725373,
     "way": "sit"
   },
   {
     "fraction": 0.1,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00312497047707438,
+    "sole_min_y": 0.00318021303974092,
     "way": "sit"
   },
   {
     "fraction": 0.15,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00353371747769415,
+    "sole_min_y": 0.00313038052991033,
     "way": "sit"
   },
   {
     "fraction": 0.2,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030004798900336,
+    "sole_min_y": 0.00306212226860225,
     "way": "sit"
   },
   {
     "fraction": 0.25,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030006158631295,
+    "sole_min_y": 0.00300034019164741,
     "way": "sit"
   },
   {
     "fraction": 0.3,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036207772791,
+    "sole_min_y": 0.00300036510452628,
     "way": "sit"
   },
   {
     "fraction": 0.35,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000533208251,
+    "sole_min_y": 0.00300032761879265,
     "way": "sit"
   },
   {
     "fraction": 0.4,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300037045963109,
+    "sole_min_y": 0.00300040328875184,
     "way": "sit"
   },
   {
     "fraction": 0.45,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300042470917106,
+    "sole_min_y": 0.00300042401067913,
     "way": "sit"
   },
   {
     "fraction": 0.5,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025544129312,
+    "sole_min_y": 0.0030004361178726,
     "way": "sit"
   },
   {
     "fraction": 0.55,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300019909627736,
+    "sole_min_y": 0.00300043704919517,
     "way": "sit"
   },
   {
     "fraction": 0.6,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299992901273072,
+    "sole_min_y": 0.00300025823526084,
     "way": "sit"
   },
   {
     "fraction": 0.65,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299997651018202,
+    "sole_min_y": 0.00300030410289764,
     "way": "sit"
   },
   {
     "fraction": 0.7,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299987313337624,
+    "sole_min_y": 0.00300045195035636,
     "way": "sit"
   },
   {
     "fraction": 0.75,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299981841817498,
+    "sole_min_y": 0.00300002354197204,
     "way": "sit"
   },
   {
     "fraction": 0.8,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299950945191085,
+    "sole_min_y": 0.00300012086518109,
     "way": "sit"
   },
   {
     "fraction": 0.85,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299969292245805,
+    "sole_min_y": 0.00300019909627736,
     "way": "sit"
   },
   {
     "fraction": 0.9,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299956579692662,
+    "sole_min_y": 0.00300007686018944,
     "way": "sit"
   },
   {
     "fraction": 0.95,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299973972141743,
+    "sole_min_y": 0.00299986358731985,
     "way": "sit"
   },
   {
     "fraction": 1.0,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299956253729761,
+    "sole_min_y": 0.00300010526552796,
     "way": "sit"
   },
   {
@@ -157,1316 +157,1904 @@
     "fraction": 0.05,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299973972141743,
+    "sole_min_y": 0.00299977813847363,
     "way": "stand"
   },
   {
     "fraction": 0.1,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299956579692662,
+    "sole_min_y": 0.00299967569299042,
     "way": "stand"
   },
   {
     "fraction": 0.15,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299969292245805,
+    "sole_min_y": 0.00299968919716775,
     "way": "stand"
   },
   {
     "fraction": 0.2,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299950945191085,
+    "sole_min_y": 0.00299984007142484,
     "way": "stand"
   },
   {
     "fraction": 0.25,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299981841817498,
+    "sole_min_y": 0.00299983471632004,
     "way": "stand"
   },
   {
     "fraction": 0.3,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299987313337624,
+    "sole_min_y": 0.00299984565936029,
     "way": "stand"
   },
   {
     "fraction": 0.35,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299997651018202,
+    "sole_min_y": 0.00299990153871477,
     "way": "stand"
   },
   {
     "fraction": 0.4,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299992901273072,
+    "sole_min_y": 0.00299974018707871,
     "way": "stand"
   },
   {
     "fraction": 0.45,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300019909627736,
+    "sole_min_y": 0.00299982517026365,
     "way": "stand"
   },
   {
     "fraction": 0.5,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025544129312,
+    "sole_min_y": 0.00299992947839201,
     "way": "stand"
   },
   {
     "fraction": 0.55,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300042470917106,
+    "sole_min_y": 0.00299979979172349,
     "way": "stand"
   },
   {
     "fraction": 0.6,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300037045963109,
+    "sole_min_y": 0.0030000451952219,
     "way": "stand"
   },
   {
     "fraction": 0.65,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000533208251,
+    "sole_min_y": 0.00299999886192381,
     "way": "stand"
   },
   {
     "fraction": 0.7,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036207772791,
+    "sole_min_y": 0.00300008663907647,
     "way": "stand"
   },
   {
     "fraction": 0.75,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030006158631295,
+    "sole_min_y": 0.00300030061043799,
     "way": "stand"
   },
   {
     "fraction": 0.8,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030004798900336,
+    "sole_min_y": 0.00300027383491397,
     "way": "stand"
   },
   {
     "fraction": 0.85,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00353371747769415,
+    "sole_min_y": 0.00300042470917106,
     "way": "stand"
   },
   {
     "fraction": 0.9,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00312497047707438,
+    "sole_min_y": 0.00300037697888911,
     "way": "stand"
   },
   {
     "fraction": 0.95,
     "id": "mullet",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0031969437841326,
+    "sole_min_y": 0.00300059304572642,
     "way": "stand"
   },
   {
     "fraction": 1.0,
     "id": "mullet",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300020491704345,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.0,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300025683827698,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.05,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00321146356873214,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.1,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00317917414940894,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.15,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00312769273295999,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.2,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00305749662220478,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.25,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300035579130054,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.3,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030002526473254,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.35,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300023518502712,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.4,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300040584988892,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.45,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041236914694,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.5,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300049129873514,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.55,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030004985164851,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.6,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300032622180879,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.65,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300060189329088,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.7,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300045544281602,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.75,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300029804930091,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.8,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300022703595459,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.85,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300031760707498,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.9,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300002377480268,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.95,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300014042295516,
+    "way": "sit"
+  },
+  {
+    "fraction": 1.0,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299993786029518,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.0,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299982377327979,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.05,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0029997038654983,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.1,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299979257397354,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.15,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299981189891696,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.2,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0029997699894011,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.25,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299974274821579,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.3,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299981725402176,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.35,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299988128244877,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.4,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299993203952909,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.45,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299978838302195,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.5,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299983331933618,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.55,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299997557885945,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.6,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300007406622171,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.65,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300008803606033,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.7,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300016067922115,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.75,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300013506785035,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.8,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300036417320371,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.85,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300046778284013,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.9,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300038629211485,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.95,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300045567564666,
+    "way": "stand"
+  },
+  {
+    "fraction": 1.0,
+    "id": "two_block",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041865557432,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.0,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300025450997055,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.05,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00321055809035897,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.1,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00317336805164814,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.15,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00311420485377312,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.2,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00534352427348495,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.25,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041446462274,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.3,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300033995881677,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.35,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300052529200912,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.4,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300034508109093,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.45,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300051411613822,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.5,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300057744607329,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.55,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300049339421093,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.6,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300045032054186,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.65,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300039770081639,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.7,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300056091509759,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.75,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300046033225954,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.8,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300022680312395,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.85,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.003000283613801,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.9,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030000435654074,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.95,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300009129568934,
+    "way": "sit"
+  },
+  {
+    "fraction": 1.0,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299988174811006,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.0,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300006661564112,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.05,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299993786029518,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.1,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299989804625511,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.15,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299966777674854,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.2,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0029998142272234,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.25,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299975601956248,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.3,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300007895566523,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.35,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300016487017274,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.4,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300014833919704,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.45,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299981608986855,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.5,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300005124881864,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.55,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300004240125418,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.6,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300015765242279,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.65,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300000002607703,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.7,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300038256682456,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.75,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300028803758323,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.8,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300042680464685,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.85,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300051062367857,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.9,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030003753490746,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.95,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300044822506607,
+    "way": "stand"
+  },
+  {
+    "fraction": 1.0,
+    "id": "bob",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300039770081639,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.0,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300025660544634,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.05,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00321028428152204,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.1,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00317208468914032,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.15,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00311112566851079,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.2,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0049108574166894,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.25,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300018000416458,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.3,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300046289339662,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.35,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030003774445504,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.4,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300051737576723,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.45,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030005204025656,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.5,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300055788829923,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.55,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041143782437,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.6,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300042727030814,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.65,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300030596554279,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.7,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300046498887241,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.75,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041073933244,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.8,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300027430057526,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.85,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300035439431667,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.9,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300020491704345,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.95,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300022400915623,
+    "way": "sit"
+  },
+  {
+    "fraction": 1.0,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300015253014863,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.0,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299977860413492,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.05,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299993599765003,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.1,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299979280680418,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.15,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299966661259532,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.2,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299987150356174,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.25,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299984123557806,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.3,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299992738291621,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.35,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299990247003734,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.4,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300016510300338,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.45,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299996929243207,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.5,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300011574290693,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.55,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300033483654261,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.6,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300036324188113,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.65,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299994647502899,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.7,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300026312470436,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.75,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300042959861457,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.8,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300040259025991,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.85,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300039537250996,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.9,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300041516311467,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.95,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300049409270287,
+    "way": "stand"
+  },
+  {
+    "fraction": 1.0,
+    "id": "wendy",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300043728202581,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.0,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300025660544634,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.05,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00321031361818314,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.1,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0031722029671073,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.15,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00311102019622922,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.2,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00491053843870759,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.25,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300024007447064,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.3,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300039956346154,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.35,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300031690858305,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.4,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300047523342073,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.45,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300045032054186,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.5,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300059607252479,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.55,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300060189329088,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.6,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300040049478412,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.65,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300038140267134,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.7,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300040887668729,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.75,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300053111277521,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.8,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300029176287353,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.85,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300036231055856,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.9,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300032878294587,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.95,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300028175115585,
+    "way": "sit"
+  },
+  {
+    "fraction": 1.0,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300021027214825,
+    "way": "sit"
+  },
+  {
+    "fraction": 0.0,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.002999969990924,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.05,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299996393732727,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.1,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300003937445581,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.15,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299987639300525,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.2,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299991550855339,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.25,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299981306307018,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.3,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00299995904788375,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.35,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300001632422209,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.4,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300014670938253,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.45,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300017581321299,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.5,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300011551007628,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.55,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300032366067171,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.6,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300029991194606,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.65,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300026009790599,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.7,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030002542771399,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.75,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300040934234858,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.8,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.0030004633590579,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.85,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300051923841238,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.9,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300042401067913,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.95,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300059467554092,
+    "way": "stand"
+  },
+  {
+    "fraction": 1.0,
+    "id": "layer",
+    "seat_triangle_crossings": 0,
+    "sole_min_y": 0.00300047220662236,
+    "way": "stand"
+  },
+  {
+    "fraction": 0.0,
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
     "sole_min_y": 0.0030002505518496,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.0,
-    "id": "two_block",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025683827698,
     "way": "sit"
   },
   {
     "fraction": 0.05,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319608976133168,
+    "sole_min_y": 0.00321167730726302,
     "way": "sit"
   },
   {
     "fraction": 0.1,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00312214251607656,
+    "sole_min_y": 0.00318023329600692,
     "way": "sit"
   },
   {
     "fraction": 0.15,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00308757647871971,
+    "sole_min_y": 0.00313019985333085,
     "way": "sit"
   },
   {
     "fraction": 0.2,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300043099559844,
+    "sole_min_y": 0.00306230131536722,
     "way": "sit"
   },
   {
     "fraction": 0.25,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300044030882418,
+    "sole_min_y": 0.00300022074952722,
     "way": "sit"
   },
   {
     "fraction": 0.3,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300041539594531,
+    "sole_min_y": 0.00300024799071252,
     "way": "sit"
   },
   {
     "fraction": 0.35,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300043867900968,
+    "sole_min_y": 0.00300020142458379,
     "way": "sit"
   },
   {
     "fraction": 0.4,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030004158616066,
+    "sole_min_y": 0.00300027197226882,
     "way": "sit"
   },
   {
     "fraction": 0.45,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300046778284013,
+    "sole_min_y": 0.00300051318481565,
     "way": "sit"
   },
   {
     "fraction": 0.5,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300015229731798,
+    "sole_min_y": 0.0030005166772753,
     "way": "sit"
   },
   {
     "fraction": 0.55,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300031760707498,
+    "sole_min_y": 0.00300035113468766,
     "way": "sit"
   },
   {
     "fraction": 0.6,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300004822202027,
+    "sole_min_y": 0.00300022680312395,
     "way": "sit"
   },
   {
     "fraction": 0.65,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300017511472106,
+    "sole_min_y": 0.00300033646635711,
     "way": "sit"
   },
   {
     "fraction": 0.7,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299983355216682,
+    "sole_min_y": 0.00300042657181621,
     "way": "sit"
   },
   {
     "fraction": 0.75,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299985776655376,
+    "sole_min_y": 0.00300004100427032,
     "way": "sit"
   },
   {
     "fraction": 0.8,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299967522732913,
+    "sole_min_y": 0.00300004216842353,
     "way": "sit"
   },
   {
     "fraction": 0.85,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299969408661127,
+    "sole_min_y": 0.00299999653361738,
     "way": "sit"
   },
   {
     "fraction": 0.9,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299967010505497,
+    "sole_min_y": 0.002999969990924,
     "way": "sit"
   },
   {
     "fraction": 0.95,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299971154890954,
+    "sole_min_y": 0.00299998163245618,
     "way": "sit"
   },
   {
     "fraction": 1.0,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299982377327979,
+    "sole_min_y": 0.00300016184337437,
     "way": "sit"
   },
   {
     "fraction": 0.0,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299982377327979,
+    "sole_min_y": 0.00299953925423324,
     "way": "stand"
   },
   {
     "fraction": 0.05,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299971154890954,
+    "sole_min_y": 0.00299984822049737,
     "way": "stand"
   },
   {
     "fraction": 0.1,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299967010505497,
+    "sole_min_y": 0.00299973506480455,
     "way": "stand"
   },
   {
     "fraction": 0.15,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299969408661127,
+    "sole_min_y": 0.00299962167628109,
     "way": "stand"
   },
   {
     "fraction": 0.2,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299967522732913,
+    "sole_min_y": 0.00299986521713436,
     "way": "stand"
   },
   {
     "fraction": 0.25,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299985776655376,
+    "sole_min_y": 0.00299979303963482,
     "way": "stand"
   },
   {
     "fraction": 0.3,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299983355216682,
+    "sole_min_y": 0.00299996393732727,
     "way": "stand"
   },
   {
     "fraction": 0.35,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300017511472106,
+    "sole_min_y": 0.00299979979172349,
     "way": "stand"
   },
   {
     "fraction": 0.4,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300004822202027,
+    "sole_min_y": 0.00299971201457083,
     "way": "stand"
   },
   {
     "fraction": 0.45,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300031760707498,
+    "sole_min_y": 0.00299972901120782,
     "way": "stand"
   },
   {
     "fraction": 0.5,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300015229731798,
+    "sole_min_y": 0.00299995485693216,
     "way": "stand"
   },
   {
     "fraction": 0.55,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300046778284013,
+    "sole_min_y": 0.0029998105019331,
     "way": "stand"
   },
   {
     "fraction": 0.6,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030004158616066,
+    "sole_min_y": 0.00300007802434266,
     "way": "stand"
   },
   {
     "fraction": 0.65,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300043867900968,
+    "sole_min_y": 0.00300014135427773,
     "way": "stand"
   },
   {
     "fraction": 0.7,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300041539594531,
+    "sole_min_y": 0.00300015090033412,
     "way": "stand"
   },
   {
     "fraction": 0.75,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300044030882418,
+    "sole_min_y": 0.00300022168084979,
     "way": "stand"
   },
   {
     "fraction": 0.8,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300043099559844,
+    "sole_min_y": 0.00299999956041574,
     "way": "stand"
   },
   {
     "fraction": 0.85,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00308757647871971,
+    "sole_min_y": 0.00300046359188855,
     "way": "stand"
   },
   {
     "fraction": 0.9,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00312214251607656,
+    "sole_min_y": 0.00300025846809149,
     "way": "stand"
   },
   {
     "fraction": 0.95,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319608976133168,
+    "sole_min_y": 0.00300039653666317,
     "way": "stand"
   },
   {
     "fraction": 1.0,
-    "id": "two_block",
+    "id": "mullet_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025683827698,
+    "sole_min_y": 0.00300030154176056,
     "way": "stand"
   },
   {
     "fraction": 0.0,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
     "sole_min_y": 0.00300025450997055,
     "way": "sit"
   },
   {
     "fraction": 0.05,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319319497793913,
+    "sole_min_y": 0.0032104083802551,
     "way": "sit"
   },
   {
     "fraction": 0.1,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003107616212219,
+    "sole_min_y": 0.00317351892590523,
     "way": "sit"
   },
   {
     "fraction": 0.15,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300027569755912,
+    "sole_min_y": 0.00311429728753865,
     "way": "sit"
   },
   {
     "fraction": 0.2,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300028966739774,
+    "sole_min_y": 0.00534360343590379,
     "way": "sit"
   },
   {
     "fraction": 0.25,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040352158248,
+    "sole_min_y": 0.00300041190348566,
     "way": "sit"
   },
   {
     "fraction": 0.3,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051271915436,
+    "sole_min_y": 0.00300036859698594,
     "way": "sit"
   },
   {
     "fraction": 0.35,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036137923598,
+    "sole_min_y": 0.00300044915638864,
     "way": "sit"
   },
   {
     "fraction": 0.4,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045870244503,
+    "sole_min_y": 0.00300042331218719,
     "way": "sit"
   },
   {
     "fraction": 0.45,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051062367857,
+    "sole_min_y": 0.00300043215975165,
     "way": "sit"
   },
   {
     "fraction": 0.5,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300032831728458,
+    "sole_min_y": 0.0030004505533725,
     "way": "sit"
   },
   {
     "fraction": 0.55,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000283613801,
+    "sole_min_y": 0.00300046266056597,
     "way": "sit"
   },
   {
     "fraction": 0.6,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300009828060865,
+    "sole_min_y": 0.00300045614130795,
     "way": "sit"
   },
   {
     "fraction": 0.65,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300009315833449,
+    "sole_min_y": 0.00300047686323524,
     "way": "sit"
   },
   {
     "fraction": 0.7,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299988361075521,
+    "sole_min_y": 0.0030003150459379,
     "way": "sit"
   },
   {
     "fraction": 0.75,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030000030528754,
+    "sole_min_y": 0.00300036487169564,
     "way": "sit"
   },
   {
     "fraction": 0.8,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299982773140073,
+    "sole_min_y": 0.00300013041123748,
     "way": "sit"
   },
   {
     "fraction": 0.85,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299992854706943,
+    "sole_min_y": 0.00300035672262311,
     "way": "sit"
   },
   {
     "fraction": 0.9,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0029996067751199,
+    "sole_min_y": 0.00300020701251924,
     "way": "sit"
   },
   {
     "fraction": 0.95,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299985473975539,
+    "sole_min_y": 0.003000074531883,
     "way": "sit"
   },
   {
     "fraction": 1.0,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300006661564112,
+    "sole_min_y": 0.0030000398401171,
     "way": "sit"
   },
   {
     "fraction": 0.0,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300006661564112,
+    "sole_min_y": 0.00299993646331131,
     "way": "stand"
   },
   {
     "fraction": 0.05,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299985473975539,
+    "sole_min_y": 0.00299986894242466,
     "way": "stand"
   },
   {
     "fraction": 0.1,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0029996067751199,
+    "sole_min_y": 0.00299989432096481,
     "way": "stand"
   },
   {
     "fraction": 0.15,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299992854706943,
+    "sole_min_y": 0.00299983285367489,
     "way": "stand"
   },
   {
     "fraction": 0.2,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299982773140073,
+    "sole_min_y": 0.00299978558905423,
     "way": "stand"
   },
   {
     "fraction": 0.25,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030000030528754,
+    "sole_min_y": 0.00299988128244877,
     "way": "stand"
   },
   {
     "fraction": 0.3,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299988361075521,
+    "sole_min_y": 0.00299989152699709,
     "way": "stand"
   },
   {
     "fraction": 0.35,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300009315833449,
+    "sole_min_y": 0.00299998349510133,
     "way": "stand"
   },
   {
     "fraction": 0.4,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300009828060865,
+    "sole_min_y": 0.00300003658048809,
     "way": "stand"
   },
   {
     "fraction": 0.45,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000283613801,
+    "sole_min_y": 0.00299978256225586,
     "way": "stand"
   },
   {
     "fraction": 0.5,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300032831728458,
+    "sole_min_y": 0.00300000282004476,
     "way": "stand"
   },
   {
     "fraction": 0.55,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051062367857,
+    "sole_min_y": 0.00300020375289023,
     "way": "stand"
   },
   {
     "fraction": 0.6,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045870244503,
+    "sole_min_y": 0.00300010130740702,
     "way": "stand"
   },
   {
     "fraction": 0.65,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036137923598,
+    "sole_min_y": 0.00300018768757582,
     "way": "stand"
   },
   {
     "fraction": 0.7,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051271915436,
+    "sole_min_y": 0.00300016324035823,
     "way": "stand"
   },
   {
     "fraction": 0.75,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040352158248,
+    "sole_min_y": 0.00300020561553538,
     "way": "stand"
   },
   {
     "fraction": 0.8,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300028966739774,
+    "sole_min_y": 0.0030005075968802,
     "way": "stand"
   },
   {
     "fraction": 0.85,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300027569755912,
+    "sole_min_y": 0.00300065032206476,
     "way": "stand"
   },
   {
     "fraction": 0.9,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003107616212219,
+    "sole_min_y": 0.00300047337077558,
     "way": "stand"
   },
   {
     "fraction": 0.95,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319319497793913,
+    "sole_min_y": 0.0030005790758878,
     "way": "stand"
   },
   {
     "fraction": 1.0,
-    "id": "bob",
+    "id": "bob_b",
     "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025450997055,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.0,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025660544634,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.05,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319247343577445,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.1,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00310419546440244,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.15,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035299733281,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.2,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300037791021168,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.25,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300061423331499,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.3,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300053553655744,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.35,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300044286996126,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.4,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300053996033967,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.45,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300039537250996,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.5,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040491856635,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.55,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035439431667,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.6,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030001571867615,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.65,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300021632574499,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.7,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299996323883533,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.75,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000115044415,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.8,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300003308802843,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.85,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299993669614196,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.9,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0029998526442796,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.95,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299991643987596,
-    "way": "sit"
-  },
-  {
-    "fraction": 1.0,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299977860413492,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.0,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299977860413492,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.05,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299991643987596,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.1,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0029998526442796,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.15,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299993669614196,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.2,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300003308802843,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.25,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.003000115044415,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.3,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299996323883533,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.35,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300021632574499,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.4,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030001571867615,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.45,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035439431667,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.5,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040491856635,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.55,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300039537250996,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.6,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300053996033967,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.65,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300044286996126,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.7,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300053553655744,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.75,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300061423331499,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.8,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300037791021168,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.85,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035299733281,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.9,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00310419546440244,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.95,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319247343577445,
-    "way": "stand"
-  },
-  {
-    "fraction": 1.0,
-    "id": "wendy",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025660544634,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.0,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025660544634,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.05,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319245411083102,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.1,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00310432002879679,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.15,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025753676891,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.2,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030005571898073,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.25,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300050526857376,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.3,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045404583216,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.35,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045916810632,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.4,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300047127529979,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.45,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051923841238,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.5,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040747970343,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.55,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036231055856,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.6,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035485997796,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.65,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300026475451887,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.7,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300016859546304,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.75,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300007243640721,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.8,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299990968778729,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.85,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299991271458566,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.9,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299971038475633,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.95,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299989525228739,
-    "way": "sit"
-  },
-  {
-    "fraction": 1.0,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.002999969990924,
-    "way": "sit"
-  },
-  {
-    "fraction": 0.0,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.002999969990924,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.05,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299989525228739,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.1,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299971038475633,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.15,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299991271458566,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.2,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00299990968778729,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.25,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300007243640721,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.3,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300016859546304,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.35,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300026475451887,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.4,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300035485997796,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.45,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300036231055856,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.5,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300040747970343,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.55,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300051923841238,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.6,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300047127529979,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.65,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045916810632,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.7,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300045404583216,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.75,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300050526857376,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.8,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.0030005571898073,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.85,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025753676891,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.9,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00310432002879679,
-    "way": "stand"
-  },
-  {
-    "fraction": 0.95,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00319245411083102,
-    "way": "stand"
-  },
-  {
-    "fraction": 1.0,
-    "id": "layer",
-    "seat_triangle_crossings": 0,
-    "sole_min_y": 0.00300025660544634,
+    "sole_min_y": 0.00300038047134876,
     "way": "stand"
   }
 ]

@@ -88,7 +88,7 @@ godot --headless --path net-sim-3d -s res://tools/downscale_glb_textures.gd -- r
 ```
 
 ตรวจภาพเทียบก่อน/หลังด้วย `tools/capture_school_views.gd` (ต้องเปิดหน้าต่าง ไม่ใช้ `--headless`)
-และรันตัวตรวจ `tools/validate_*.gd` ทั้ง 14 ชุด ซึ่งผ่านทั้งหมดในรอบนี้
+และรันตัวตรวจ `tools/validate_*.gd` ทั้งหมด (27 ชุด ณ 18 พ.ย. 2026)
 `validate_phase5.gd` เปลี่ยนเงื่อนไขจำนวน node จาก "อย่างน้อย 8,900" เป็น "1,500–3,000"
 
 ## ถ้าต้องลดต่อ
