@@ -62,10 +62,21 @@ texture 2048×2048 จำนวนมาก นำเข้าแบบ Lossless
 
 ## วิธีสร้างใหม่
 
-ต้นฉบับ Blender `Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend` **ไม่ถูกแก้**
-การลดทำในหน่วยความจำตอนส่งออกเท่านั้น
+ต้นฉบับ Blender `Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend` **ไม่ถูกแก้โดยขั้นตอนลดขนาด**
+การลดทำในหน่วยความจำตอนส่งออกเท่านั้น (การแก้เนื้อหาโรงเรียนทำด้วยสคริปต์แยกที่บันทึกไฟล์ เช่นด้านล่าง)
+
+**แป้นพิมพ์และเมาส์โต๊ะครู (18 พ.ย. 2026):** คอมโต๊ะครู 5 ชุดในห้องพักครู (`TR_Computer_1–5`) เดิมเป็นกล่องเรียบ
+แป้นพิมพ์ไม่มีปุ่ม `3Dmodel/scripts/replace_teacher_keyboards.py` ลบกล่องแป้นพิมพ์/เมาส์ (คงจอ เคส แผ่นรองเมาส์)
+แล้ววางสำเนาแป้นพิมพ์ 104 ปุ่ม (`TeacherComputerSet_Root/03_Keyboard`) และเมาส์ไร้สาย (`TeacherComputerSet_Root.001/04_Mouse`)
+ในคอลเลกชัน `19.1 | Teacher workstation N | Computer N` ชื่อ `TR_Computer_N__Key_*` เพื่อให้ขั้นตอนลดขนาดรวมปุ่มเป็นชิ้นเดียว
+ผล: +30 ชิ้น (6 ต่อโต๊ะ), สามเหลี่ยม 1,529,599 → 1,574,954, ไฟล์ 87.95 → 88.14 MB
+ตรวจโครงสร้าง GLB: ไม่มีชื่อชิ้นส่วนเดิมหายหรือเปลี่ยน มีแต่ชิ้นใหม่ของโต๊ะครู
+
+**gltfpack:** เครื่องปัจจุบันใช้ v1.3 (ดาวน์โหลดจาก github.com/zeux/meshoptimizer releases ไว้ที่ `tmp/godot-4.7.1/gltfpack/`)
+ไม่ทราบรุ่นที่ใช้ครั้งก่อน ทดสอบส่งออกต้นฉบับเดิมด้วย v1.3 แล้ว: ชื่อชิ้นส่วนตรงกันทุกชิ้น ส่วนวาด 2,107 → 2,111 ไฟล์ +58 KB
 
 ```text
+blender -b "Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend" --python 3Dmodel/scripts/replace_teacher_keyboards.py   # ทำครั้งเดียว รันซ้ำจะข้ามโต๊ะที่ทำแล้ว
 blender -b --python 3Dmodel/scripts/optimize_school_for_web.py
 godot --headless --path net-sim-3d -s res://tools/share_character_textures.gd   # หลังส่งออกตัวละคร/มือจาก Blender ใหม่ แล้วลบ <glb>_<ภาพ>.png ที่ Godot แยกออกมา
 godot --headless --path net-sim-3d -s res://tools/downscale_glb_textures.gd -- res://assets/exterior/japanese_buildings.glb 512
