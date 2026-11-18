@@ -456,10 +456,14 @@ func _open_search() -> void:
 	_search.grab_focus()
 
 func _filter_menu(query: String) -> void:
+	var wanted := query.strip_edges().to_lower()
 	for entry in _menu_entries:
 		var id := str(entry.get_meta("app_id", ""))
 		var installed := id == "" or (station != null and station.has_app(id))
-		entry.visible = installed and GameLocale.text(entry.text).to_lower().contains(query.strip_edges().to_lower())
+		# An empty search shows everything: in Godot 4.7 "abc".contains("") is
+		# false, which left the Start menu empty until something was typed
+		# (found by validate_desktop_apps.gd, 2026-11-18).
+		entry.visible = installed and (wanted == "" or GameLocale.text(entry.text).to_lower().contains(wanted))
 	call_deferred("_fit_start_menu")
 
 func _fit_start_menu() -> void:
