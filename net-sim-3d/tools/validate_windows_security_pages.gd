@@ -9,8 +9,8 @@ extends SceneTree
 ## godot --headless --path net-sim-3d -s res://tools/validate_windows_security_pages.gd
 ## With a window and `-- <out_dir>` it also saves pictures of the new pages.
 const SCENE := "res://missions/mission_05/scenes/windows_security.tscn"
-## Links this round did not wire up (the user chose the pages to add).
-const STILL_PLAIN := ["Link_Protectionupdates", "Link_NetworkandInternettroubleshooter", "Link_Firewallnotificationsettings", "Link_Advancedsettings", "Link_Restorefirewallstodefault"]
+## Links that may still do nothing (none since 2026-11-20).
+const STILL_PLAIN := []
 
 var failures := 0
 var out_dir := ""
@@ -35,6 +35,10 @@ func _frames(n: int) -> void:
 func _shot(name: String) -> void:
 	if out_dir == "":
 		return
+	# The game's main menu (GameFlow's layers) comes up after a while: keep
+	# it out of the pictures of the program.
+	for layer in root.get_node("GameFlow").find_children("*", "CanvasLayer", true, false):
+		(layer as CanvasLayer).visible = false
 	await _frames(3)
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(out_dir.path_join(name + ".png"))
@@ -83,7 +87,8 @@ func _run() -> void:
 		WindowsSecurity.Page.ACCOUNT_INFO, WindowsSecurity.Page.SIGN_IN, WindowsSecurity.Page.DYNAMIC_LOCK,
 		WindowsSecurity.Page.SMART_APP, WindowsSecurity.Page.REPUTATION, WindowsSecurity.Page.EXPLOIT,
 		WindowsSecurity.Page.CORE_ISOLATION, WindowsSecurity.Page.SECURITY_PROCESSOR, WindowsSecurity.Page.FAMILY_GROUP,
-		WindowsSecurity.Page.NOTIFICATIONS, WindowsSecurity.Page.PROVIDERS]
+		WindowsSecurity.Page.NOTIFICATIONS, WindowsSecurity.Page.PROVIDERS, WindowsSecurity.Page.PROTECTION_UPDATES,
+		WindowsSecurity.Page.FW_TROUBLESHOOT, WindowsSecurity.Page.FW_NOTIFICATIONS, WindowsSecurity.Page.FW_ADVANCED, WindowsSecurity.Page.FW_RESTORE]
 	for p in new_pages:
 		app.open_page(p)
 		await _frames(1)
@@ -98,7 +103,7 @@ func _run() -> void:
 
 	# No dead links left on the pages this round covers.
 	var dead := PackedStringArray()
-	for p in [WindowsSecurity.Page.VIRUS, WindowsSecurity.Page.ACCOUNT, WindowsSecurity.Page.APP, WindowsSecurity.Page.DEVICE,
+	for p in [WindowsSecurity.Page.VIRUS, WindowsSecurity.Page.FIREWALL, WindowsSecurity.Page.ACCOUNT, WindowsSecurity.Page.APP, WindowsSecurity.Page.DEVICE,
 			WindowsSecurity.Page.FAMILY, WindowsSecurity.Page.SETTINGS, WindowsSecurity.Page.AV_SETTINGS] + new_pages:
 		app.open_page(p)
 		await _frames(1)
@@ -212,6 +217,42 @@ func _run() -> void:
 	await _press_switch("Pref_notify_firewall")
 	check(not app._prefs["notify_firewall"] and app.state.wrong_count() == before, "notification settings change freely")
 	await _shot("notifications")
+
+	# The last five links (2026-11-20): they work and change nothing in the
+	# mission (no wrong pick, no section decision, no rules check).
+	var sections := [app.state.conn_tool_first, app.state.file_tool_first, app.state.rules_checked, app.state.wrong_count()]
+	app.open_page(WindowsSecurity.Page.PROTECTION_UPDATES)
+	await _frames(1)
+	(app.find_child("CheckUpdatesButton", true, false) as Button).pressed.emit()
+	await _frames(1)
+	check(_text(app).contains("Checking for updates"), "Check for updates: checking")
+	await create_timer(2.4).timeout
+	check(_text(app).contains("Protection definitions are up to date."), "Check for updates: up to date")
+	await _shot("protection_updates")
+	app.open_page(WindowsSecurity.Page.FW_TROUBLESHOOT)
+	await _frames(1)
+	(app.find_child("RunTroubleshooterButton", true, false) as Button).pressed.emit()
+	await create_timer(2.9).timeout
+	check(_text(app).contains("No problems found.") and _text(app).contains("Private network"), "troubleshooter: no problems, Private network")
+	app.open_page(WindowsSecurity.Page.FW_ADVANCED)
+	await _frames(1)
+	var rules := _text(app.find_child("InboundRules", true, false))
+	check(rules.contains(app.data.school_app) and rules.contains(app.data.firewall_app) and rules.contains("Block"), "Advanced settings: SchoolLab allowed, Unknown_Update.exe blocked")
+	await _shot("fw_advanced")
+	app.open_page(WindowsSecurity.Page.FW_RESTORE)
+	await _frames(1)
+	(app.find_child("RestoreDefaultsButton", true, false) as Button).pressed.emit()
+	await _frames(1)
+	check(app.dialog_visible() and _text(app).contains("Are you sure"), "Restore defaults asks first")
+	(app.find_child("Dialog_Yes", true, false) as Button).pressed.emit()
+	await _frames(2)
+	check(_text(app).contains("managed by your organization"), "the school's policy keeps the rules")
+	(app.find_child("Dialog_OK", true, false) as Button).pressed.emit()
+	await _frames(2)
+	app.open_page(WindowsSecurity.Page.FW_NOTIFICATIONS)
+	await _frames(1)
+	check(app.find_child("Pref_notify_firewall", true, false) != null, "firewall notification settings")
+	check([app.state.conn_tool_first, app.state.file_tool_first, app.state.rules_checked, app.state.wrong_count()] == sections, "the five pages change nothing in the mission")
 
 	app.queue_free()
 	WindowsSecurity.shared_state = null

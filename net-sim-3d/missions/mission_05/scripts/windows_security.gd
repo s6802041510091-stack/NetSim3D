@@ -61,7 +61,9 @@ enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY
 	# Pages to look around in (2026-11-19); only their protection switches
 	# count in the mission (see Mission05State.PROTECTION_SETTINGS).
 	SCAN_OPTIONS, ALLOWED_THREATS, RANSOMWARE, ACCOUNT_INFO, SIGN_IN, DYNAMIC_LOCK, SMART_APP, REPUTATION,
-	EXPLOIT, CORE_ISOLATION, SECURITY_PROCESSOR, FAMILY_GROUP, NOTIFICATIONS, PROVIDERS }
+	EXPLOIT, CORE_ISOLATION, SECURITY_PROCESSOR, FAMILY_GROUP, NOTIFICATIONS, PROVIDERS,
+	# The last five links (2026-11-20).
+	PROTECTION_UPDATES, FW_TROUBLESHOOT, FW_NOTIFICATIONS, FW_ADVANCED, FW_RESTORE }
 
 ## Sidebar: page, glyph, title.
 const NAV := [
@@ -87,6 +89,10 @@ const SECTION := {
 	Page.SMART_APP: "app", Page.REPUTATION: "app", Page.EXPLOIT: "app",
 	Page.CORE_ISOLATION: "device", Page.SECURITY_PROCESSOR: "device", Page.FAMILY_GROUP: "family",
 	Page.NOTIFICATIONS: "settings", Page.PROVIDERS: "settings",
+	# The Firewall pages stay in the Firewall section (the mission's first-
+	# section decisions are unchanged); they do not count as checking the rules.
+	Page.PROTECTION_UPDATES: "virus", Page.FW_TROUBLESHOOT: "firewall", Page.FW_NOTIFICATIONS: "firewall",
+	Page.FW_ADVANCED: "firewall", Page.FW_RESTORE: "firewall",
 }
 ## The page each sub-page goes back to (the sidebar lights the top one).
 const PARENT := {
@@ -97,6 +103,8 @@ const PARENT := {
 	Page.SMART_APP: Page.APP, Page.REPUTATION: Page.APP, Page.EXPLOIT: Page.APP,
 	Page.CORE_ISOLATION: Page.DEVICE, Page.SECURITY_PROCESSOR: Page.DEVICE,
 	Page.FAMILY_GROUP: Page.FAMILY, Page.NOTIFICATIONS: Page.SETTINGS, Page.PROVIDERS: Page.SETTINGS,
+	Page.PROTECTION_UPDATES: Page.VIRUS, Page.FW_TROUBLESHOOT: Page.FIREWALL, Page.FW_NOTIFICATIONS: Page.FIREWALL,
+	Page.FW_ADVANCED: Page.FIREWALL, Page.FW_RESTORE: Page.FIREWALL,
 }
 ## Scan options: name, description (as in the real program).
 const SCAN_KINDS := {
@@ -687,6 +695,16 @@ func _refresh() -> void:
 			_page_family_group()
 		Page.NOTIFICATIONS:
 			_page_notifications()
+		Page.PROTECTION_UPDATES:
+			_page_protection_updates()
+		Page.FW_TROUBLESHOOT:
+			_page_fw_troubleshoot()
+		Page.FW_NOTIFICATIONS:
+			_page_fw_notifications()
+		Page.FW_ADVANCED:
+			_page_fw_advanced()
+		Page.FW_RESTORE:
+			_page_fw_restore()
 		Page.PROVIDERS:
 			_page_providers()
 	for b in _nav.values():
@@ -758,7 +776,7 @@ func _page_virus() -> void:
 	_section("history", "Virus & threat protection updates")
 	var updates := _block()
 	updates.add_child(_label("Security intelligence is up to date.\nLast update: %s 7:42 AM" % _today(), 14, SecurityTheme.INK_SOFT))
-	_links(updates, ["Protection updates"])
+	_links(updates, ["Protection updates"], [func(): open_page(Page.PROTECTION_UPDATES)])
 	_section("folder", "Ransomware protection")
 	var ransom := _block()
 	ransom.add_child(_label("No action needed.", 14, SecurityTheme.INK_SOFT))
@@ -960,7 +978,9 @@ func _page_firewall() -> void:
 	for p: String in ["Domain", "Private", "Public"]:
 		_content.add_child(_profile_row(p))
 	_content.add_child(_spacer(10))
-	_links(_content, ["Allow an app through firewall", "Network and Internet troubleshooter", "Firewall notification settings", "Advanced settings", "Restore firewalls to default"], [func(): open_page(Page.ALLOWED_APPS)])
+	_links(_content, ["Allow an app through firewall", "Network and Internet troubleshooter", "Firewall notification settings", "Advanced settings", "Restore firewalls to default"], [
+		func(): open_page(Page.ALLOWED_APPS), func(): open_page(Page.FW_TROUBLESHOOT), func(): open_page(Page.FW_NOTIFICATIONS),
+		func(): open_page(Page.FW_ADVANCED), func(): open_page(Page.FW_RESTORE)])
 
 
 ## "Allow an app through firewall": the rules list, like the real "Allowed
@@ -1417,6 +1437,149 @@ func _page_providers() -> void:
 	for item in [["virus", "Antivirus", "Microsoft Defender Antivirus"], ["firewall", "Firewall", "Microsoft Defender Firewall"], ["app", "Web protection", "Microsoft Defender SmartScreen"]]:
 		_section(item[0], item[1])
 		_block().add_child(_status_row("ok", item[2], "Turned on"))
+
+
+var _update_state := "" # "", "checking", "done"
+var _update_checked_at := ""
+var _troubleshoot_state := "" # "", "running", "done"
+
+
+func _page_protection_updates() -> void:
+	_title("Protection updates", "View info about your security intelligence version, and check for\nupdates.", "history")
+	_section("history", "Security intelligence")
+	var b := _block()
+	b.add_child(_wrapped("Microsoft Defender Antivirus uses security intelligence to detect threats. We try to automatically download the most recent intelligence to protect your device against the newest threats. You can also manually check for updates."))
+	b.add_child(_details({"Security intelligence version": "1.421.112.0", "Version created on": "%s 5:12 AM" % _today(),
+		"Last update": ("%s %s" % [_today(), _update_checked_at]) if _update_state == "done" else "%s 7:42 AM" % _today()}))
+	var check := Button.new()
+	check.name = "CheckUpdatesButton"
+	check.text = "Check for updates"
+	check.custom_minimum_size = Vector2(150, 32)
+	check.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	SecurityTheme.style_accent(check)
+	check.disabled = _update_state == "checking"
+	check.pressed.connect(_check_updates)
+	b.add_child(check)
+	match _update_state:
+		"checking":
+			b.add_child(_label("Checking for updates...", 14, SecurityTheme.INK_SOFT))
+		"done":
+			b.add_child(_status_row("ok", "Protection definitions are up to date.", "Last checked: %s %s" % [_today(), _update_checked_at]))
+
+
+## "Check for updates": a short check that finds nothing new.
+func _check_updates() -> void:
+	_update_state = "checking"
+	_refresh()
+	await get_tree().create_timer(2.0).timeout
+	var t := Time.get_time_dict_from_system()
+	_update_checked_at = "%d:%02d %s" % [12 if t.hour % 12 == 0 else t.hour % 12, t.minute, "PM" if t.hour >= 12 else "AM"]
+	_update_state = "done"
+	if page == Page.PROTECTION_UPDATES:
+		_refresh()
+
+
+## The network troubleshooter (in Windows it is in Settings): runs a few
+## checks; the school network and the firewall are fine.
+func _page_fw_troubleshoot() -> void:
+	_title("Network and Internet troubleshooter", "Find and fix problems with connecting to the internet or to websites.", "firewall")
+	var b := _block()
+	var run := Button.new()
+	run.name = "RunTroubleshooterButton"
+	run.text = "Run"
+	run.custom_minimum_size = Vector2(100, 32)
+	run.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	SecurityTheme.style_accent(run)
+	run.disabled = _troubleshoot_state == "running"
+	run.pressed.connect(_run_troubleshooter)
+	b.add_child(run)
+	match _troubleshoot_state:
+		"running":
+			b.add_child(_label("Detecting problems...", 14, SecurityTheme.INK_SOFT))
+		"done":
+			b.add_child(_status_row("ok", "Troubleshooting has completed. No problems found.", ""))
+			for row in [["Ethernet", "Connected"], ["Internet access", "Available"], ["Network profile", "%s network" % ACTIVE_PROFILE],
+					["Microsoft Defender Firewall", "On for Domain, Private and Public networks"]]:
+				b.add_child(_status_row("ok", row[0], row[1]))
+
+
+func _run_troubleshooter() -> void:
+	_troubleshoot_state = "running"
+	_refresh()
+	await get_tree().create_timer(2.5).timeout
+	_troubleshoot_state = "done"
+	if page == Page.FW_TROUBLESHOOT:
+		_refresh()
+
+
+## "Firewall notification settings": the firewall part of Notifications
+## (kept in the Firewall section, so it changes no mission decision).
+func _page_fw_notifications() -> void:
+	_title("Firewall & network protection notifications", "Choose when Microsoft Defender Firewall lets you know it blocked an app.", "firewall")
+	var f := _block()
+	f.add_child(_wrapped("Notify me when Microsoft Defender Firewall blocks a new app."))
+	f.add_child(_pref_toggle("notify_firewall"))
+	for item in [["notify_domain", "Domain firewall"], ["notify_private", "Private firewall"], ["notify_public", "Public firewall"]]:
+		f.add_child(_pref_check(item[0], item[1]))
+
+
+## "Advanced settings": a read-only look at Windows Defender Firewall with
+## Advanced Security, its profiles and inbound rules (the alerts' answers
+## included once they are given).
+func _page_fw_advanced() -> void:
+	_title("Windows Defender Firewall with Advanced Security", "Local Computer · read only in this lab", "firewall")
+	_section("firewall", "Overview")
+	var o := _block()
+	for p in ["Domain", "Private", "Public"]:
+		o.add_child(_status_row("ok", "%s Profile%s" % [p, " is Active" if p == ACTIVE_PROFILE else ""],
+			"Windows Defender Firewall is on.\nInbound connections that do not match a rule are blocked. Outbound connections are allowed."))
+	_section("firewall", "Inbound Rules")
+	var grid := GridContainer.new()
+	grid.name = "InboundRules"
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 22)
+	grid.add_theme_constant_override("v_separation", 4)
+	var m := MarginContainer.new()
+	m.add_theme_constant_override("margin_left", 32)
+	m.add_child(grid)
+	_content.add_child(m)
+	for head in ["Name", "Profile", "Enabled", "Action"]:
+		grid.add_child(_label(head, 13, SecurityTheme.INK, true))
+	var rules := []
+	if state.alert_done(Mission05State.ALERT_SCHOOL):
+		var both: bool = "allow_both" in state.alert_answers[Mission05State.ALERT_SCHOOL]
+		rules.append([data.school_app, "Private, Public" if both else "Private", "Yes", "Allow"])
+	if state.alert_done(Mission05State.ALERT_UNKNOWN):
+		rules.append([data.firewall_app, "All", "Yes", "Block"])
+	for r: Array in BUILTIN_RULES:
+		var profiles := PackedStringArray()
+		if r[1]:
+			profiles.append("Private")
+		if r[2]:
+			profiles.append("Public")
+		rules.append([r[0], ", ".join(profiles) if not profiles.is_empty() else "Private, Public", "Yes" if (r[1] or r[2]) else "No", "Allow"])
+	for r: Array in rules:
+		for cell in r:
+			grid.add_child(_label(str(cell), 13, SecurityTheme.WARNING_INK if cell == "Block" else SecurityTheme.INK_SOFT))
+
+
+## "Restore firewalls to default": asks first, then the school's policy
+## stops it (the SchoolLab and Unknown_Update.exe rules stay as they are).
+func _page_fw_restore() -> void:
+	_title("Restore default settings", "Restoring the defaults removes all the Windows Defender Firewall settings\nthat you have configured for all network locations.", "firewall")
+	var b := _block()
+	b.add_child(_wrapped("This might cause some apps to stop working."))
+	var restore := Button.new()
+	restore.name = "RestoreDefaultsButton"
+	restore.text = "Restore defaults"
+	restore.custom_minimum_size = Vector2(150, 32)
+	restore.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	restore.pressed.connect(func(): _show_dialog("Restore Default Settings",
+		"Are you sure you want to restore your default settings? This removes every rule you added, including the ones for the apps you just answered.",
+		[["Yes", func(): _show_dialog("Restore Default Settings",
+			"Some settings are managed by your organization. This PC belongs to the school, so its firewall can't be restored to the defaults here.", [["OK", _close_dialog]])],
+		["No", _close_dialog]]))
+	b.add_child(restore)
 
 
 # ---------------------------------------------------------------- their widgets
