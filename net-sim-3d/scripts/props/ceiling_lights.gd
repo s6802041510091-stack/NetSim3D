@@ -19,13 +19,17 @@ extends Node3D
 const PANEL_MATERIAL := "MAP | Light diffuser"
 ## Room panel copied to places that have a ceiling but no fixture.
 const TEMPLATE_PANEL := "Light_Panel_ITSupport"
-## Centre (x, z) of each added panel. IT return area between the IT Support
-## room and the storeroom, and the stairwell landing: no light in either.
+## Centre (x, z) of each added panel, at the template's height; or
+## Vector3(x, ceiling y, z) for a ceiling at another height. IT return area
+## between the IT Support room and the storeroom, and the stairwell
+## landings: no light in any of them.
 const EXTRA_PANELS := {
 	"Light_Panel_ITReturn": Vector2(-10.8, -33.75),
 	# Stairwell main landing, under the upper floor (added 2026-11-19 with
 	# the stairwell finishes, StairwellDecor): it was the darkest place.
 	"Light_Panel_StairLanding": Vector2(-10.3, -27.3),
+	# Foot of the flight down, seen from the landing above (2026-11-19).
+	"Light_Panel_StairLower": Vector3(-19.3, -0.15, -25.8),
 }
 
 const ROOM_ENERGY := 3.3
@@ -68,7 +72,8 @@ func _ready() -> void:
 		_add_light(panel)
 
 
-func _copy_panel(template: MeshInstance3D, panel_name: String, at: Vector2) -> MeshInstance3D:
+func _copy_panel(template: MeshInstance3D, panel_name: String, where: Variant) -> MeshInstance3D:
+	var at := Vector2(where.x, where.z if where is Vector3 else where.y)
 	var panel := MeshInstance3D.new()
 	panel.name = panel_name
 	panel.mesh = template.mesh
@@ -78,7 +83,8 @@ func _copy_panel(template: MeshInstance3D, panel_name: String, at: Vector2) -> M
 	add_child(panel)
 	var box := _box(template)
 	var place := template.global_transform
-	place.origin += Vector3(at.x - box.get_center().x, 0.0, at.y - box.get_center().z)
+	var lift: float = (where.y - box.end.y) if where is Vector3 else 0.0
+	place.origin += Vector3(at.x - box.get_center().x, lift, at.y - box.get_center().z)
 	panel.global_transform = place
 	return panel
 

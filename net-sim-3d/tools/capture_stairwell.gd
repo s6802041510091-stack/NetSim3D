@@ -10,6 +10,7 @@ const VIEWS := {
 	"4_lower_floor": [Vector3(-19.6, -1.9, -25.5), Vector3(-12.0, -2.6, -28.5)],
 	"5_upper_floor": [Vector3(-12.0, 4.85, -28.9), Vector3(-19.5, 4.2, -28.4)],
 	"6_landing_wall": [Vector3(-13.5, 1.6, -27.3), Vector3(-9.2, 1.5, -30.5)],
+	"7_landing_close": [Vector3(-8.6, 1.6, -25.4), Vector3(-12.2, 0.7, -28.6)],
 }
 
 func _initialize() -> void:

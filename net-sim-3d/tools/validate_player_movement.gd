@@ -67,6 +67,24 @@ func _run() -> void:
 	var map: Node3D = map_scene.instantiate()
 	root.add_child(map)
 	var map_player: CharacterBody3D = map.get_node("ITSupportPlayer")
+	map_player.require_mouse_capture = false # Headless tests have no captured window.
+	# The stairs are closed (only the corridor floor is built): walking at
+	# the flight up or down from the landing stops short of the first step.
+	await physics_frame
+	for target_z in [-28.7875, -25.8, -27.3]:
+		map_player.global_position = Vector3(-10.4, 0, target_z)
+		map_player.rotation.y = PI / 2.0
+		map_player.velocity = Vector3.ZERO
+		Input.action_press("move_forward")
+		for i in range(40):
+			await physics_frame
+		Input.action_release("move_forward")
+		if map_player.global_position.x < -11.15 or absf(map_player.global_position.y) > 0.03:
+			push_error("The closed stairs let the player through at z=%f: %s" % [target_z, map_player.global_position])
+			quit(1)
+			return
+	# The step-up itself is still checked on the map's real stairs.
+	map.get_node("StairwellDecor/StairsClosed").free()
 	map_player.global_position = Vector3(-10.98, 0, -28.7875)
 	await physics_frame
 	map_player._try_step_up(Vector3(-0.12, 0, 0))

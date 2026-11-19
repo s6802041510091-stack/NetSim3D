@@ -2,7 +2,8 @@ class_name StairwellDecor
 extends Node3D
 
 ## Finishes for the stairwell (the map model gives plain grey stone steps,
-## bare aluminium rails and blank walls). Visual only: nothing here collides.
+## bare aluminium rails and blank walls). The finishes are visual only; the
+## one collider is the invisible wall closing the stairs (see _closure).
 ## Design "A, classic terrazzo", chosen by the user on 2026-11-19 from three
 ## in-game previews:
 ##  * Steps, landings and stairwell floors: polished terrazzo (หินขัด).
@@ -11,7 +12,9 @@ extends Node3D
 ##    reflected the sky blue on some rails and the walls green on others).
 ##  * Two-tone walls: a blue-grey band up to dado height with a navy rail.
 ##  * Floor number and safety signs on the main landing.
-## The landing's ceiling light is in CeilingLights (EXTRA_PANELS).
+##  * The floor below: its open west end walled off, a pair of closed wooden
+##    doors in the frame and a "ชั้น 1" sign.
+## The ceiling lights over both landings are in CeilingLights (EXTRA_PANELS).
 
 ## Inner wall faces beside the flights and the stairwell's two ends (x).
 const NORTH_FACE := -30.44
@@ -47,7 +50,86 @@ func _ready() -> void:
 	for floor_y: float in FLOORS:
 		_wall_band(floor_y)
 	_signs()
+	_closure()
+	_lower_end()
 	_commit()
+
+
+# --- Closing the stairs ------------------------------------------------------
+# Only the corridor floor is built, so the flights up and down are closed off
+# on the main landing, wall to wall, just before the first steps. Invisible,
+# as the user asked on 2026-11-19 (after seeing a steel gate, belt posts and
+# site barriers): the stairs still look open, they just cannot be used.
+
+const CLOSE_X := -11.15 # on the landing, 14 cm before the first riser
+const CLOSE_HEIGHT := 2.4 # higher than anyone can step over (no jumping)
+
+func _closure() -> void:
+	var body := StaticBody3D.new()
+	body.name = "StairsClosed"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	add_child(body)
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(0.12, CLOSE_HEIGHT, NORTH_FACE - SOUTH_FACE).abs()
+	shape.shape = box
+	shape.position = Vector3(CLOSE_X, CLOSE_HEIGHT * 0.5, (NORTH_FACE + SOUTH_FACE) * 0.5)
+	body.add_child(shape)
+
+
+# --- The floor below ---------------------------------------------------------
+# Seen from the landing above, the foot of the flight down ended in an empty
+# door frame with bare wall behind it. The west end is closed with a wall and
+# the frame holds a closed pair of wooden doors, the way into floor 1 (the
+# user chose these on 2026-11-19 over glass exit doors and a notice board).
+
+const LOWER_FLOOR := -3.35
+const LOWER_CEILING := -0.15
+const PORTAL_X := -20.14 # middle of the door frame's thickness
+const PORTAL_Z := Vector2(-26.81, -24.85) # the frame's opening
+const PORTAL_POSTS := Vector2(-26.93, -24.73) # outer faces of its posts
+const PORTAL_TOP := -0.8 # underside of its header
+
+func _lower_end() -> void:
+	var wall_material: Material = (get_parent().get_node("MapVisual/StairShell_Lower_WestWall") as MeshInstance3D).get_active_material(0)
+	_materials["lower_wall"] = wall_material
+	var height := LOWER_CEILING - LOWER_FLOOR
+	var east_face := PORTAL_X + 0.08
+	# Wall either side of the frame, closing off the strip behind it.
+	for span: Vector2 in [Vector2(NORTH_FACE, PORTAL_POSTS.x), Vector2(PORTAL_POSTS.y, SOUTH_FACE)]:
+		_box("lower_wall", Vector3(0.16, height, absf(span.y - span.x)), Vector3(PORTAL_X, LOWER_FLOOR + height * 0.5, (span.x + span.y) * 0.5))
+		_box("wall_low", Vector3(0.004, DADO, absf(span.y - span.x)), Vector3(east_face + 0.006, LOWER_FLOOR + DADO * 0.5, (span.x + span.y) * 0.5))
+		_box("wall_rail", Vector3(0.02, RAIL_H, absf(span.y - span.x)), Vector3(east_face + 0.014, LOWER_FLOOR + DADO + RAIL_H * 0.5, (span.x + span.y) * 0.5))
+	var mid_z := (PORTAL_Z.x + PORTAL_Z.y) * 0.5
+	_door_pair()
+	_plate("ชั้น 1", Vector3(east_face + 0.02, (PORTAL_TOP + LOWER_CEILING) * 0.5, mid_z), PI * 0.5, Vector2(0.62, 0.3), 96, "sign_navy", Color.WHITE)
+
+
+## Two leaves copied from the classroom door (leaf, handles, levers, kick
+## plates), hinged on either post and narrowed to fit the frame.
+func _door_pair() -> void:
+	var door := get_parent().get_node_or_null("Doors/BackgroundClassDoor") as Node3D
+	if door == null:
+		return
+	var parts: Array[MeshInstance3D] = []
+	for node in door.find_children("*", "MeshInstance3D", true, false):
+		if String(node.name).begins_with("BackgroundClass_"):
+			parts.append(node)
+	var leaf_width := 1.04
+	var squeeze := (PORTAL_Z.y - PORTAL_Z.x) * 0.5 / leaf_width
+	var to_door := door.global_transform.affine_inverse()
+	# Closed classroom door: hinge at the origin, leaf along +Z, floor at y 0.
+	for hinge in [[PORTAL_Z.y, Basis(Vector3.UP, PI)], [PORTAL_Z.x, Basis.IDENTITY]]:
+		var place := Transform3D(hinge[1], Vector3(PORTAL_X, LOWER_FLOOR, hinge[0])) * Transform3D(Basis.from_scale(Vector3(1, 1, squeeze)), Vector3.ZERO)
+		for part in parts:
+			var copy := MeshInstance3D.new()
+			copy.mesh = part.mesh
+			copy.material_override = part.get_active_material(0)
+			add_child(copy)
+			copy.global_transform = place * (to_door * part.global_transform)
+	var above := PORTAL_TOP - (LOWER_FLOOR + 2.135)
+	_box("lower_wall", Vector3(0.16, above, PORTAL_Z.y - PORTAL_Z.x), Vector3(PORTAL_X, PORTAL_TOP - above * 0.5, (PORTAL_Z.x + PORTAL_Z.y) * 0.5))
 
 
 ## This design's material for a stairwell piece, or null to keep the map's.
