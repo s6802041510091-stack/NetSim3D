@@ -84,6 +84,7 @@ func _ready() -> void:
 
 	is_open = start_open
 	_swing.rotation.y = _open_angle if is_open else 0.0
+	_hinge_levers()
 	if borrow_hardware_from != "":
 		# The other door may not be set up yet; wait until every door is.
 		_borrow_hardware.call_deferred(leaf)
@@ -104,9 +105,8 @@ func _borrow_hardware(leaf: MeshInstance3D) -> void:
 		return
 	var from_leaf: MeshInstance3D = null
 	var hardware: Array[MeshInstance3D] = []
-	for part in source._swing.get_children():
-		if not part is MeshInstance3D:
-			continue
+	# Recursive: that door's levers hang from their own pivots (_hinge_levers).
+	for part in source._swing.find_children("*", "MeshInstance3D", true, false):
 		if String(part.name).begins_with(borrow_hardware_from + "Leaf"):
 			from_leaf = part
 		else:
@@ -128,6 +128,67 @@ func _borrow_hardware(leaf: MeshInstance3D) -> void:
 		copy.name = part_prefix + String(part.name).trim_prefix(borrow_hardware_from)
 		_swing.add_child(copy)
 		copy.transform = mapping * (source._swing.global_transform.affine_inverse() * part.global_transform)
+	_hinge_levers()
+
+
+# --- Lever handles -------------------------------------------------------------
+# Opening a door, the hand presses the lever down, the latch lets go and the
+# lever springs back while the leaf swings (asked for on 2026-11-19).
+
+const LEVER_PRESS := 0.66 # radians the lever's free end turns down (~38°)
+const LEVER_DOWN_TIME := 0.12
+const LEVER_HOLD_TIME := 0.16
+const LEVER_UP_TIME := 0.24
+
+var _lever_pivots: Array[Node3D] = []
+var _lever_tween: Tween
+
+
+## Hangs each lever (both faces) from a pivot at its handle base, so it can
+## turn about the axis through the door (X in the closed frame).
+func _hinge_levers() -> void:
+	var bases: Array[Vector3] = []
+	for part in _swing.get_children():
+		if part is MeshInstance3D and String(part.name).begins_with(part_prefix + "Handle_Base"):
+			bases.append(part.transform * (part as MeshInstance3D).get_aabb().get_center())
+	if bases.is_empty():
+		return
+	for part in _swing.get_children():
+		if not (part is MeshInstance3D and String(part.name).begins_with(part_prefix + "Lever")):
+			continue
+		var centre: Vector3 = part.transform * (part as MeshInstance3D).get_aabb().get_center()
+		var base := bases[0]
+		for b in bases:
+			if b.distance_to(centre) < base.distance_to(centre):
+				base = b
+		var pivot := Node3D.new()
+		pivot.name = String(part.name) + "_Pivot"
+		_swing.add_child(pivot)
+		pivot.position = Vector3(centre.x, centre.y, base.z)
+		part.reparent(pivot, true)
+		# A positive turn about +X lowers a free end lying toward +Z, a
+		# negative one a free end toward -Z.
+		pivot.set_meta(&"press", signf(centre.z - base.z) * LEVER_PRESS)
+		_lever_pivots.append(pivot)
+
+
+## Press the levers down and let them spring back.
+func _press_levers() -> void:
+	if _lever_pivots.is_empty():
+		return
+	if _lever_tween:
+		_lever_tween.kill()
+	_lever_tween = create_tween().set_parallel(true)
+	_lever_tween.set_process_mode(Tween.TWEEN_PROCESS_PHYSICS)
+	for pivot in _lever_pivots:
+		_lever_tween.tween_property(pivot, "rotation:x", pivot.get_meta(&"press"), LEVER_DOWN_TIME) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_lever_tween.chain().tween_interval(LEVER_HOLD_TIME)
+	for i in _lever_pivots.size():
+		# chain() once: every lever springs back together.
+		var step := _lever_tween.chain() if i == 0 else _lever_tween
+		step.tween_property(_lever_pivots[i], "rotation:x", 0.0, LEVER_UP_TIME) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 ## The leaf's extent across the doorway (Z) in `frame` (the closed-door space).
@@ -195,6 +256,7 @@ func set_open(value: bool, animate: bool = true) -> bool:
 	is_open = value
 	if animate and value:
 		Sound.play("door_open", _swing)
+		_press_levers()
 	if _tween:
 		_tween.kill()
 	if not animate:
