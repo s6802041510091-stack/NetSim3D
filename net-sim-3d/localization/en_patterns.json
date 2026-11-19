@@ -1,0 +1,36 @@
+{
+  "%d. %s": "%d. %s",
+  "•  %s": "•  %s",
+  "%s\n×%d": "%s\n×%d",
+
+  "[เสร็จ] ": "[Done] ",
+  "[กำลังทำ] ": "[Working] ",
+  "เส้น %s ปลาย %s": "Cable %s end %s",
+  "เข้าหัวครบทั้ง 2 เส้นแล้ว": "Both cables are crimped",
+  "สายเส้นที่ %d: %s  ·  ปลายที่ %d จาก 2": "Cable %d: %s  ·  end %d of 2",
+  "ขั้นที่ %d จาก %d:  %s": "Step %d of %d:  %s",
+  "ยังเข้าหัวสายไม่ได้ ยังขาด: %s": "You can't crimp yet. Still missing: %s",
+  "มุมนี้ใช้ดูอย่างเดียว ลากหัวสายไม่ได้ — กด Q / E ไปที่มุม \"%s\"": "This view is for looking only; you cannot drag the plug here — press Q / E to switch to the \"%s\" view",
+  "ช่อง MAIN (ตัวแม่)": "MAIN port (main unit)",
+  "ช่อง REMOTE (ตัวลูก)": "REMOTE port (remote unit)",
+  "ลากหัว RJ45 ไปเสียบที่พอร์ตของ Router": "Drag the RJ45 plug into the correct router port",
+  "ลากหัว RJ45 ไปเสียบที่พอร์ต %d ของ Switched Hub": "Drag the RJ45 plug into port %d of the switched hub",
+
+  "ผมตรวจสอบเครื่องตัวอย่างครบทั้งสามเครื่องแล้วครับ ทุกเครื่องทำงานปกติครับ": "I've checked all three sample computers. All of them work normally.",
+  "ผมตรวจสอบเครื่องตัวอย่างครบทั้งสามเครื่องแล้วครับ ทุกเครื่องไม่สามารถติดต่อ Default Gateway ได้ครับ": "I've checked all three sample computers. None of them can reach the Default Gateway.",
+  "ผมตรวจสอบเครื่องตัวอย่างครบทั้งสามเครื่องแล้วครับ %sทำงานปกติ แต่%sไม่สามารถติดต่อ Default Gateway ได้ครับ": "I've checked all three sample computers. Working normally: %s. Cannot reach the Default Gateway: %s.",
+  "เครื่องครู": "teacher PC",
+  "เครื่องนักเรียนหน้าห้อง": "front student PC",
+  "เครื่องนักเรียนหลังห้อง": "back student PC",
+
+  "คำใบ้: %s": "Hint: %s",
+  "ดาวที่ได้  (สีรุ้ง %d ด่าน)": "Stars earned  (rainbow on %d)",
+  "จุดที่ %d: เลือก %s — อุปกรณ์นี้ไม่เหมาะกับจุดนี้ (เข้าใจผิดว่า: %s)": "Point %d: selected %s — This device is unsuitable for this point (Misconception: %s)",
+  "จุดที่ %d: เลือก %s — อุปกรณ์นี้ไม่เหมาะกับจุดนี้": "Point %d: selected %s — This device is unsuitable for this point",
+  "จุดที่ %d: เลือก %s — อุปกรณ์ถูก แต่เหตุผลไม่ถูก (เข้าใจผิดว่า: %s)": "Point %d: selected %s — Correct device, incorrect reason (Misconception: %s)",
+  "จุดที่ %d: เลือก %s — อุปกรณ์ถูก แต่เหตุผลไม่ถูก": "Point %d: selected %s — Correct device, incorrect reason",
+  "ผมเข้าหัว ตรวจสอบ และติดตั้งสาย LAN ทั้ง 2 เส้นตามใบงานแล้วครับ ไฟสถานะพอร์ตติดทั้งสองจุดครับ": "I have crimped, tested and installed both LAN cables according to the work order. Both port lights are on.",
+  "ผมเข้าหัว ตรวจสอบ และติดตั้งสาย LAN ทั้ง 2 เส้นตามใบงานแล้วครับ แต่ไฟสถานะพอร์ตบางจุดไม่ติดครับ": "I have crimped, tested and installed both LAN cables according to the work order, but some port lights are off.",
+  "รบกวนด้วยนะคะ\n\nYour ID: %s\nPassword: %s": "Thank you for your help.\n\nYour ID: %s\nPassword: %s",
+  "เครื่องดับไปแล้วเปิดขึ้นมาใหม่ค่ะ ครูเปิด TeamViewer ใหม่แล้ว รหัสเปลี่ยนแล้วนะคะ\n\nYour ID: %s\nPassword: %s": "The computer turned off and started up again. I've reopened TeamViewer, so the codes have changed.\n\nYour ID: %s\nPassword: %s"
+}

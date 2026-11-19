@@ -375,8 +375,9 @@ func _refresh() -> void:
 	_subtitle.text = "สายเส้นที่ %d: %s  ·  ปลายที่ %d จาก 2" % [cable, CABLES[cable][0], 1 if key.ends_with("A") else 2]
 	var marks := []
 	for i in ENDS.size():
-		var label := "เส้น %s ปลาย %s" % [ENDS[i].substr(0, 1), "1" if ENDS[i].ends_with("A") else "2"]
-		marks.append(("[เสร็จ] " if i < end_index else ("[กำลังทำ] " if i == end_index else "")) + label)
+		# Each piece is translated on its own (the joined text has no catalog entry).
+		var label := GameLocale.text("เส้น %s ปลาย %s" % [ENDS[i].substr(0, 1), "1" if ENDS[i].ends_with("A") else "2"])
+		marks.append(GameLocale.text("[เสร็จ] " if i < end_index else ("[กำลังทำ] " if i == end_index else "")) + label)
 	_progress.text = "   ".join(PackedStringArray(marks.slice(0, 2))) + "\n" + "   ".join(PackedStringArray(marks.slice(2, 4)))
 	var steps := _steps_for(key)
 	var step := current_step()
@@ -444,7 +445,7 @@ func _draw_strip_bar(bar: Control) -> void:
 	for cm in 6:
 		var x := left + width * cm / 5.0
 		bar.draw_line(Vector2(x, top + h), Vector2(x, top + h + 6), GameUI.INK_SOFT, 1.0)
-		bar.draw_string(font, Vector2(x - 22, top + h + 22), "%d ซม." % cm, HORIZONTAL_ALIGNMENT_CENTER, 44, 12, GameUI.INK_SOFT)
+		bar.draw_string(font, Vector2(x - 22, top + h + 22), GameLocale.text("%d ซม." % cm), HORIZONTAL_ALIGNMENT_CENTER, 44, 12, GameUI.INK_SOFT)
 	var mx := left + width * strip_pos / 5.0
 	var paused := Time.get_ticks_msec() / 1000.0 < _strip_paused_until
 	bar.draw_rect(Rect2(mx - 2.5, top - 5, 5, h + 10), GameUI.BAD if paused else GameUI.INK)

@@ -510,7 +510,7 @@ func report_lines() -> PackedStringArray:
 	var abnormal := PackedStringArray()
 	for host: String in Mission03State.TARGETS:
 		var r: Dictionary = state.records.get(host, {})
-		var name := String(Mission03State.TITLES[host]).replace("คอมพิวเตอร์", "เครื่อง")
+		var name := GameLocale.text(String(Mission03State.TITLES[host]).replace("คอมพิวเตอร์", "เครื่อง"))
 		if r.get("status", "") == Mission03State.ABNORMAL:
 			abnormal.append(name)
 		else:
@@ -521,7 +521,9 @@ func report_lines() -> PackedStringArray:
 	elif normal.is_empty():
 		said += "ทุกเครื่องไม่สามารถติดต่อ Default Gateway ได้ครับ"
 	else:
-		said += "%sทำงานปกติ แต่%sไม่สามารถติดต่อ Default Gateway ได้ครับ" % [" และ".join(normal), " และ".join(abnormal)]
+		# Names are translated one by one; the joined list has no catalog entry.
+		var joiner := GameLocale.text(" และ")
+		said += "%sทำงานปกติ แต่%sไม่สามารถติดต่อ Default Gateway ได้ครับ" % [joiner.join(normal), joiner.join(abnormal)]
 	var lines := PackedStringArray(["คุณ|" + said])
 	var all_right := true
 	for host: String in Mission03State.TARGETS:

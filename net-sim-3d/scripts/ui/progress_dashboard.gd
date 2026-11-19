@@ -16,6 +16,7 @@ const IDLE := Color("8c9bab")
 const HEADING_FONT := preload("res://assets/fonts/Anuphan-Variable.ttf")
 const BODY_FONT := preload("res://assets/fonts/Sarabun-Regular.ttf")
 const MONTHS := ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
+const MONTHS_EN := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 ## Attempts drawn in the score chart of a level (newest on the right).
 const CHART_ATTEMPTS := 12
 
@@ -220,7 +221,10 @@ static func thai_date(iso: String) -> String:
 	if iso.length() < 16:
 		return "–"
 	var month := clampi(iso.substr(5, 2).to_int(), 1, 12)
-	return "%d %s %d  %s" % [iso.substr(8, 2).to_int(), MONTHS[month - 1], iso.substr(0, 4).to_int() + 543, iso.substr(11, 5)]
+	var year := iso.substr(0, 4).to_int()
+	if L10n.locale == "en":
+		return "%d %s %d  %s" % [iso.substr(8, 2).to_int(), MONTHS_EN[month - 1], year, iso.substr(11, 5)]
+	return "%d %s %d  %s" % [iso.substr(8, 2).to_int(), MONTHS[month - 1], year + 543, iso.substr(11, 5)]
 
 
 static func clock(seconds: float) -> String:

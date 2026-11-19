@@ -480,7 +480,10 @@ func sit_at_desk(player: Node) -> void:
 		var missing := missing_for_desk()
 		if not missing.is_empty():
 			Sound.play("wrong")
-			hud.show_toast("ยังเข้าหัวสายไม่ได้ ยังขาด: " + ", ".join(missing), 5.0)
+			var names := PackedStringArray()
+			for item in missing:
+				names.append(GameLocale.text(item)) # translated one by one before joining
+			hud.show_toast("ยังเข้าหัวสายไม่ได้ ยังขาด: " + ", ".join(names), 5.0)
 			return
 		tools_gathered.emit()
 		_enter(Stage.CRIMP)

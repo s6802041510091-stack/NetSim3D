@@ -16,12 +16,22 @@ var _cache: Dictionary = {}
 var _watched: Array[Dictionary] = []
 var _config := ConfigFile.new()
 var _thai := RegEx.create_from_string("[ก-๙]")
+var _audit_path := ""
+var _audit := {}
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	process_priority = 10000
-	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://localization/en.json"))
-	if data is Dictionary:
+	# en.json plus en_*.json (one file per area: menu, each level).
+	var files := ["res://localization/en.json"]
+	for name in DirAccess.get_files_at("res://localization"):
+		if name.begins_with("en_") and name.ends_with(".json"):
+			files.append("res://localization/" + name)
+	for path: String in files:
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if not data is Dictionary:
+			push_warning("Localization file could not be read: " + path)
+			continue
 		for key: String in data:
 			_add(key, str(data[key]))
 			if key.contains("|"):
@@ -36,6 +46,11 @@ func _ready() -> void:
 	_config.load(preferences_path)
 	var saved := str(_config.get_value("interface", "language", "th"))
 	locale = saved if saved in ["th", "en"] else "th"
+	# English audit (tools): NETSIM_L10N_AUDIT=<file> runs in English without
+	# saving the choice and writes every shown text still containing Thai.
+	_audit_path = OS.get_environment("NETSIM_L10N_AUDIT")
+	if _audit_path != "":
+		locale = "en"
 	TranslationServer.set_locale(locale)
 	get_tree().node_added.connect(_watch)
 
@@ -91,6 +106,13 @@ func t(source: String) -> String:
 	if _cache.size() > 4000:
 		_cache.clear()
 	_cache[source] = output
+	if _audit_path != "" and _thai.search(output) != null and not _audit.has(source):
+		_audit[source] = true
+		var file := FileAccess.open(_audit_path, FileAccess.READ_WRITE if FileAccess.file_exists(_audit_path) else FileAccess.WRITE)
+		if file:
+			file.seek_end()
+			file.store_line(JSON.stringify(source))
+			file.close()
 	return output
 
 func _translate_plain(key: String) -> String:
@@ -105,7 +127,9 @@ func _translate_plain(key: String) -> String:
 			return output
 	var result := key
 	for phrase in _phrases:
-		if not phrase.contains("%") and result.contains(phrase):
+		# Very short words (e.g. "ไป" = Go) only translate as a whole text;
+		# patched into a longer sentence they would break other words.
+		if phrase.length() >= 3 and not phrase.contains("%") and result.contains(phrase):
 			result = result.replace(phrase, _catalog[phrase])
 	return result
 
