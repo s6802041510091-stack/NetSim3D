@@ -1,11 +1,11 @@
-# Third-party buildings in the school district
+# Exterior town
 
-**Stylized Little Japanese Town Street** by Michał Solarek (@misiek13):
-https://sketchfab.com/3d-models/stylized-little-japanese-town-street-200fc33b8a2b4da98e71590feeb255a8
+The streets around the school (houses, apartment blocks, convenience
+stores, utility poles, the elevated railway, cars and the train) are built
+in code by `scripts/exterior_suburb.gd` for this project (2026-11-20). No
+third-party model is used. It replaced 72 copies of "Stylized Little
+Japanese Town Street" by Michał Solarek (CC BY 4.0), which is no longer
+part of the game.
 
-Licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).
-This project uses seven building/shop variants from the original model, omits its terrain,
-rescales and rotates the buildings, and repeats 72 instances around the school.
-The original author's endorsement is not implied. Keep this credit with distributed builds.
-
-The painted far background was generated for this project; it is not part of the CC BY model.
+The ground, roads, campus and trees (`town.glb`) and the painted far
+background (`town_panorama_v1.png`) were made for this project.

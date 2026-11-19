@@ -4,9 +4,10 @@ extends Node3D
 ## playable school's colliders, mission objects, camera, or input handling.
 const GROUND_Y := -7.2
 const TOWN_SCENE := "res://assets/exterior/town.glb"
-const BUILDING_SCENE := "res://assets/exterior/japanese_buildings.glb"
-const LAYOUT := "res://assets/exterior/japanese_layout.json"
 const PANORAMA := "res://assets/exterior/town_panorama_v1.png"
+## The streets around the school, built in code (2026-11-20; it replaced
+## 72 copies of a CC-BY building model: 2.24 M triangles, a 16 MB file).
+const SUBURB := preload("res://scripts/exterior_suburb.gd")
 
 var people: Array[Dictionary] = []
 var _box_mesh := BoxMesh.new()
@@ -16,17 +17,17 @@ var _wheel_mesh := TorusMesh.new()
 
 func _ready() -> void:
 	var town_resource := load(TOWN_SCENE) as PackedScene
-	var building_resource := load(BUILDING_SCENE) as PackedScene
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(LAYOUT))
-	if town_resource == null or building_resource == null or not parsed is Dictionary:
+	if town_resource == null:
 		push_error("Exterior town assets could not be loaded")
 		return
-	var layout: Dictionary = parsed
 	var town := town_resource.instantiate() as Node3D
 	town.name = "CampusAndGround"
 	add_child(town)
 	_apply_horizon(town)
-	_add_buildings(building_resource, layout)
+	var suburb: Node3D = SUBURB.new()
+	suburb.name = "JapaneseSuburb"
+	add_child(suburb)
+	set_meta("building_count", suburb.building_count)
 	_apply_sky()
 	_add_sun()
 	_head_mesh.radial_segments = 8
@@ -53,28 +54,6 @@ func _apply_horizon(town: Node3D) -> void:
 	horizon.set_shader_parameter("grass", original.albedo_texture)
 	horizon.set_shader_parameter("panorama", load(PANORAMA))
 	ground.material_override = horizon
-
-
-func _add_buildings(building_resource: PackedScene, layout: Dictionary) -> void:
-	var library := building_resource.instantiate() as Node3D
-	var district := Node3D.new()
-	district.name = "JapaneseStreets_CC_BY_4_0"
-	add_child(district)
-	var count := 0
-	for placement in layout.get("placements", []):
-		var prototype := library.find_child(placement.prototype, true, false) as Node3D
-		if prototype == null:
-			push_error("Missing Japanese building prototype: " + str(placement.prototype))
-			continue
-		var building := prototype.duplicate() as Node3D
-		district.add_child(building)
-		building.position = Vector3(placement.position[0], placement.position[2], -placement.position[1])
-		building.rotation.y = placement.rotation
-		count += 1
-	library.free()
-	if count != int(layout.get("instance_count", -1)):
-		push_error("Exterior building count mismatch: %d" % count)
-	set_meta("building_count", count)
 
 
 func _apply_sky() -> void:
@@ -106,7 +85,8 @@ func _add_sun() -> void:
 	sun.light_color = Color(1.0, 0.94, 0.83)
 	sun.light_energy = 0.65
 	sun.shadow_enabled = true
-	sun.directional_shadow_max_distance = 230.0
+	# 230 m until 2026-11-20; the new streets end at about 110 m.
+	sun.directional_shadow_max_distance = 140.0
 	add_child(sun)
 
 

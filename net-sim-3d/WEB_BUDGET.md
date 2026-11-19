@@ -61,7 +61,9 @@ texture 2048×2048 จำนวนมาก นำเข้าแบบ Lossless
   Lossless, mipmap, 2048) และลบ PNG ที่ Godot แยกออกมาจาก GLB เดิม 39 ไฟล์
   นักเรียนชายใช้ผิว/เสื้อ/ตา/รองเท้าชุดกลางเดียวกับครูชาย (ผิวและเสื้อ 1024 แทน 2048 เดิม)
   เสื้อ `short01` (mullet) และ `short02` (แม่บ้าน) ไม่ซ้ำกับใคร จึงยังเป็นไฟล์ของตัวเอง
-- **R4 ตึกในเมือง**: texture ใน `japanese_buildings.glb` ลดจาก 1024 เป็น 512
+- **R4 ตึกในเมือง**: (เดิม) texture ใน `japanese_buildings.glb` ลดจาก 1024 เป็น 512
+  20 พ.ย. 2026 เลิกใช้ไฟล์นี้ (16 MB, บ้าน 72 หลัง 2.24 ล้านสามเหลี่ยม) เมืองรอบโรงเรียนสร้างในโค้ดแทน
+  (`scripts/exterior_suburb.gd`: บ้าน/อาคาร 315 หลัง เสาไฟ ทางรถไฟ รถ รวมทั้งเมือง 69k สามเหลี่ยม ไม่มี texture)
 - **R5**: ไฟล์ `hand_*.glb` และ `player_right_arm*.glb` ถูกใช้จริงทั้งหมด ไม่มีไฟล์ให้ตัด
 - ปิด `create_shadow_meshes` ของโรงเรียนและเมือง เพราะเกมไม่มีไฟที่สร้างเงา
 
@@ -84,7 +86,7 @@ texture 2048×2048 จำนวนมาก นำเข้าแบบ Lossless
 blender -b "Preview/โรงเรียนและเมือง/working/classroom_shell_lookdev.blend" --python 3Dmodel/scripts/replace_teacher_keyboards.py   # ทำครั้งเดียว รันซ้ำจะข้ามโต๊ะที่ทำแล้ว
 blender -b --python 3Dmodel/scripts/optimize_school_for_web.py
 godot --headless --path net-sim-3d -s res://tools/share_character_textures.gd   # หลังส่งออกตัวละคร/มือจาก Blender ใหม่ แล้วลบ <glb>_<ภาพ>.png ที่ Godot แยกออกมา
-godot --headless --path net-sim-3d -s res://tools/downscale_glb_textures.gd -- res://assets/exterior/japanese_buildings.glb 512
+# (japanese_buildings.glb เลิกใช้แล้ว 20 พ.ย. 2026: เมืองสร้างใน scripts/exterior_suburb.gd)
 ```
 
 ตรวจภาพเทียบก่อน/หลังด้วย `tools/capture_school_views.gd` (ต้องเปิดหน้าต่าง ไม่ใช้ `--headless`)

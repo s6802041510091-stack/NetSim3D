@@ -50,7 +50,7 @@ func _run() -> void:
 		and computers.stations.size() == 29 and screen_works \
 		and colliders.get_child_count() == 396 \
 		and glass_collision_count == 62 and glass_visual_count == 62 \
-		and int(exterior.get_meta("building_count", -1)) == 72
+		and int(exterior.get_meta("building_count", -1)) >= 250 # the code-built suburb (315 on 2026-11-20)
 	print("PHASE5_VALIDATION visual=", visual.get_child_count(),
 		" doors=", moving_door_count, " door_toggle=", door_works,
 		" computers=", computers.stations.size(), " screen=", screen_works,
