@@ -101,6 +101,10 @@ func run() -> void:
 	await _shot("level_1_bottom", true)
 	check(flow._scroll.scroll_vertical > 0, "the level page scrolls inside the card")
 	var window := Rect2(Vector2.ZERO, root.get_visible_rect().size)
+	var back := flow._top_bar.find_child("ProgressLevelBack", false, false) as Button
+	check(back != null and back.is_visible_in_tree() and not flow._scroll.is_ancestor_of(back), "the back button sits above the scrolling page")
+	if back:
+		check(window.encloses(back.get_global_rect()) and back.get_global_rect().end.y <= flow._scroll.get_global_rect().position.y, "the back button stays in view, above the page, scrolled to the bottom: %s" % back.get_global_rect())
 	check(window.encloses(flow._card.get_global_rect()), "the card stays whole on screen while scrolled (rounded corners visible): card %s window %s" % [flow._card.get_global_rect(), window])
 
 	flow.show_progress_level(4)
@@ -113,9 +117,9 @@ func run() -> void:
 	check(flow._body.find_children("Mistake", "Label", true, false).size() == 2, "level 2 lists both mistakes")
 	await _shot("level_2_bottom", true)
 
-	(flow._body.find_child("ProgressLevelBack", true, false) as Button).pressed.emit()
+	(flow._top_bar.find_child("ProgressLevelBack", false, false) as Button).pressed.emit()
 	check(flow._screen == "progress", "back returns to the overview")
-	(flow._body.find_child("ProgressBack", true, false) as Button).pressed.emit()
+	(flow._top_bar.find_child("ProgressBack", false, false) as Button).pressed.emit()
 	check(flow._screen == "home", "back returns to the main menu")
 
 	GameProgress.clear()

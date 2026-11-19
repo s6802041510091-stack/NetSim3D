@@ -58,6 +58,9 @@ var quality := "medium"
 var _card: PanelContainer
 var _positioner: MarginContainer
 var _scroll: ScrollContainer
+var _top_bar: HBoxContainer # buttons above the scrolling page (_top_button)
+const TOP_BAR_GAP := 12
+const TOP_BUTTON_PAD := 22 # space left and right of a top-bar button's text
 var _page_area: MarginContainer
 ## Settings segments (language, quality): last choice drawn, per segment.
 var _segment_shown := {}
@@ -318,7 +321,19 @@ func _build_shell() -> void:
 	_scroll.name = "PageScroll"
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_style_scrollbar(_scroll.get_v_scroll_bar())
-	padding.add_child(_scroll)
+	# A bar above the scrolling page for buttons that must stay in view (the
+	# progress pages' back button, asked for on 2026-11-19); hidden if empty.
+	var frame := VBoxContainer.new()
+	frame.name = "PageFrame"
+	frame.add_theme_constant_override("separation", TOP_BAR_GAP)
+	padding.add_child(frame)
+	_top_bar = HBoxContainer.new()
+	_top_bar.name = "PageTopBar"
+	_top_bar.add_theme_constant_override("separation", 12)
+	_top_bar.hide()
+	_top_bar.visibility_changed.connect(_fit_card, CONNECT_DEFERRED)
+	frame.add_child(_top_bar)
+	frame.add_child(_scroll)
 	_body = VBoxContainer.new()
 	_body.custom_minimum_size.x = 280
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -342,6 +357,8 @@ func _fit_card() -> void:
 	if not is_instance_valid(_scroll):
 		return
 	var available := _background.size.y - _page_area.get_theme_constant("margin_top") - _page_area.get_theme_constant("margin_bottom") - CARD_PAD_Y * 2
+	if _top_bar.visible:
+		available -= _top_bar.get_combined_minimum_size().y + TOP_BAR_GAP
 	var needed := _body.get_combined_minimum_size().y
 	_scroll.custom_minimum_size.y = maxf(minf(needed, available), 0.0)
 
@@ -366,6 +383,10 @@ func _page(title: String, subtitle: String, card_width := 900, right_space := 0,
 	for child in _body.get_children():
 		_body.remove_child(child)
 		child.queue_free()
+	for child in _top_bar.get_children():
+		_top_bar.remove_child(child)
+		child.queue_free()
+	_top_bar.hide()
 	_card.custom_minimum_size.x = card_width
 	_scroll.scroll_vertical = 0 # a new page starts at its top
 	_positioner.add_theme_constant_override("margin_right", right_space)
@@ -495,25 +516,32 @@ func show_progress() -> void:
 	_page("ความคืบหน้าของฉัน", "สรุปผลทุกด่านที่เล่นบนเครื่อง/เบราว์เซอร์นี้ • แสดงเฉพาะผลของคุณเอง", 980)
 	_screen = "progress"
 	ProgressDashboard.build_overview(_body, TITLES, AVAILABLE, is_level_unlocked, show_progress_level)
-	var back := _button("‹  กลับเมนูหลัก", show_home, false, false)
-	back.name = "ProgressBack"
-	back.set_meta("sound", "back")
+	_top_button("‹  กลับเมนูหลัก", show_home).name = "ProgressBack"
 
 func show_progress_level(level: int) -> void:
 	_page("ด่าน %d  ·  %s" % [level, TITLES[level - 1]], "คะแนนแต่ละครั้ง ผลครั้งล่าสุด และจุดที่ผิดพลาด", 980)
 	_screen = "progress_level"
 	ProgressDashboard.build_level(_body, level)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 12)
-	_body.add_child(row)
-	var back := _button("‹  กลับหน้าความคืบหน้า", show_progress, false, false, row)
-	back.name = "ProgressLevelBack"
-	back.set_meta("sound", "back")
-	back.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_top_button("‹  กลับหน้าความคืบหน้า", show_progress).name = "ProgressLevelBack"
 	if is_level_unlocked(level):
-		var play := _button("เล่นด่านนี้", start_level.bind(level), false, true, row)
+		var play := _button("เล่นด่านนี้", start_level.bind(level), false, true)
 		play.name = "ProgressPlayLevel"
-		play.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+## A back button in the bar above the page: it stays in view while the page
+## scrolls.
+func _top_button(text: String, action: Callable) -> Button:
+	var button := _button(text, action, false, false, _top_bar)
+	button.custom_minimum_size.y = 46
+	button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	# Room around the words: sized to its text, it looked cramped (2026-11-19).
+	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var box := button.get_theme_stylebox(state).duplicate() as StyleBox
+		box.content_margin_left = TOP_BUTTON_PAD
+		box.content_margin_right = TOP_BUTTON_PAD + 4
+		button.add_theme_stylebox_override(state, box)
+	button.set_meta("sound", "back")
+	_top_bar.show()
+	return button
 
 func show_levels() -> void:
 	_show_art(LEVELS_TH if L10n.locale == "th" else LEVELS_EN, "levels")
