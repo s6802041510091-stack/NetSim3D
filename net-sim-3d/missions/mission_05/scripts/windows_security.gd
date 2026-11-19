@@ -57,7 +57,11 @@ signal minimize_requested
 
 const DATA_PATH := "res://missions/mission_05/data/mission_05_data.tres"
 
-enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY, SETTINGS, FW_PROFILE, AV_SETTINGS, EXCLUSIONS, ALLOWED_APPS }
+enum Page { HOME, VIRUS, ACCOUNT, FIREWALL, APP, DEVICE, HEALTH, FAMILY, HISTORY, SETTINGS, FW_PROFILE, AV_SETTINGS, EXCLUSIONS, ALLOWED_APPS,
+	# Pages to look around in (2026-11-19); only their protection switches
+	# count in the mission (see Mission05State.PROTECTION_SETTINGS).
+	SCAN_OPTIONS, ALLOWED_THREATS, RANSOMWARE, ACCOUNT_INFO, SIGN_IN, DYNAMIC_LOCK, SMART_APP, REPUTATION,
+	EXPLOIT, CORE_ISOLATION, SECURITY_PROCESSOR, FAMILY_GROUP, NOTIFICATIONS, PROVIDERS }
 
 ## Sidebar: page, glyph, title.
 const NAV := [
@@ -78,7 +82,41 @@ const SECTION := {
 	Page.HISTORY: "history", Page.SETTINGS: "settings", Page.FW_PROFILE: "firewall",
 	Page.AV_SETTINGS: "virus", Page.EXCLUSIONS: "virus",
 	Page.ALLOWED_APPS: Mission05State.TOOL_RULES,
+	Page.SCAN_OPTIONS: "virus", Page.ALLOWED_THREATS: "virus", Page.RANSOMWARE: "virus",
+	Page.ACCOUNT_INFO: "account", Page.SIGN_IN: "account", Page.DYNAMIC_LOCK: "account",
+	Page.SMART_APP: "app", Page.REPUTATION: "app", Page.EXPLOIT: "app",
+	Page.CORE_ISOLATION: "device", Page.SECURITY_PROCESSOR: "device", Page.FAMILY_GROUP: "family",
+	Page.NOTIFICATIONS: "settings", Page.PROVIDERS: "settings",
 }
+## The page each sub-page goes back to (the sidebar lights the top one).
+const PARENT := {
+	Page.FW_PROFILE: Page.FIREWALL, Page.ALLOWED_APPS: Page.FIREWALL,
+	Page.AV_SETTINGS: Page.VIRUS, Page.EXCLUSIONS: Page.AV_SETTINGS,
+	Page.SCAN_OPTIONS: Page.VIRUS, Page.ALLOWED_THREATS: Page.VIRUS, Page.RANSOMWARE: Page.VIRUS,
+	Page.ACCOUNT_INFO: Page.ACCOUNT, Page.SIGN_IN: Page.ACCOUNT, Page.DYNAMIC_LOCK: Page.ACCOUNT,
+	Page.SMART_APP: Page.APP, Page.REPUTATION: Page.APP, Page.EXPLOIT: Page.APP,
+	Page.CORE_ISOLATION: Page.DEVICE, Page.SECURITY_PROCESSOR: Page.DEVICE,
+	Page.FAMILY_GROUP: Page.FAMILY, Page.NOTIFICATIONS: Page.SETTINGS, Page.PROVIDERS: Page.SETTINGS,
+}
+## Scan options: name, description (as in the real program).
+const SCAN_KINDS := {
+	"quick": ["Quick scan", "Checks folders in your system where threats are commonly found."],
+	"full": ["Full scan", "Checks all files and running programs on your hard disk. This scan could take longer than one hour."],
+	"custom": ["Custom scan", "Choose which files and locations you want to check."],
+	"offline": ["Microsoft Defender Antivirus (offline scan)", "Some malicious software can be particularly difficult to remove from your device. Microsoft Defender Antivirus (offline scan) can help find and remove them using up-to-date threat definitions. This will restart your device and will take about 15 minutes."],
+}
+const FULL_SCAN_FILES := 412388
+## How much longer a full scan runs than a quick one (a game's minutes, not an hour).
+const FULL_SCAN_FACTOR := 2.5
+## Custom scan folders: path, files in it. The threat is in Downloads.
+const CUSTOM_FOLDERS := {
+	"Desktop": ["C:\\Users\\Student\\Desktop", 214],
+	"Documents": ["C:\\Users\\Student\\Documents", 1832],
+	"Downloads": ["C:\\Users\\Student\\Downloads", 37],
+	"Pictures": ["C:\\Users\\Student\\Pictures", 966],
+	"Local Disk (C:)": ["C:\\", 412388],
+}
+const THREAT_FOLDERS := ["Downloads", "Local Disk (C:)"]
 ## Built-in rules shown on "Allow an app through firewall" (name, private, public).
 const BUILTIN_RULES := [
 	["Core Networking", true, true],
@@ -99,7 +137,7 @@ const SCAN_PATHS := [
 	"C:\\Users\\Public\\Pictures",
 ]
 const SCAN_FILES := 48213
-const DOWNLOADS := ["Student_Game_Crack.exe", "Unknown_Update.exe", "Homework_Week3.docx", "Typing_Practice.pdf"]
+const DOWNLOADS := ["GTA7 real.exe", "Unknown_Update.exe", "Homework_Week3.docx", "Typing_Practice.pdf"]
 ## v2: the crack dropped Unknown_Update.exe, so one detection has both files.
 const AFFECTED_FILES := 2
 const PROFILES := {
@@ -128,6 +166,30 @@ var page: Page = Page.HOME
 var profile := ACTIVE_PROFILE
 var scanning: bool = false
 var scan_progress: float = 0.0
+## The scan running (or last run): "quick" / "full" / "custom".
+var scan_kind := "quick"
+## The kind of scan that found the threat (its result says so).
+var mission_scan_kind := "quick"
+## Picked on Scan options (also "offline").
+var scan_choice := "quick"
+## A scan that finds the threat for the first time moves the mission on;
+## any other (a custom scan of another folder, a scan after the quarantine)
+## is only shown.
+var _scan_for_mission := true
+var _scan_seconds := 4.0
+var _scan_files := SCAN_FILES
+var _scan_folder := ""
+## The last scan that did not find anything: kind, files (shown on the pages).
+var _extra_scan := {}
+## Settings on the look-around pages that may be changed freely (they do not
+## lower the protection): name -> value.
+var _prefs := {
+	"controlled_folder": false, "dynamic_lock": false, "smart_app": "Evaluation",
+	"mandatory_aslr": "Use default (Off)",
+	"notify_info": true, "notify_recent": true, "notify_threats": true, "notify_blocked": true,
+	"notify_account": true, "notify_firewall": true, "notify_domain": true, "notify_private": true, "notify_public": true,
+}
+var _dialog: Control
 ## The threat's details are open, and the action picked in them.
 var threat_expanded := false
 var threat_pick := ""
@@ -144,6 +206,7 @@ var _scan_left: Label
 var _alerts: FirewallAlerts
 var _picker: Control
 var _picker_pick := ""
+var _picker_mode := "file"
 var _add_menu_open := false
 var _hint_panel: PanelContainer
 var _hint_label: Label
@@ -174,12 +237,16 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if not scanning:
 		return
-	scan_progress = minf(1.0, scan_progress + delta / maxf(0.1, data.scan_seconds))
+	scan_progress = minf(1.0, scan_progress + delta / maxf(0.1, _scan_seconds))
 	if is_instance_valid(_scan_bar):
 		_scan_bar.value = scan_progress * 100.0
-		_scan_count.text = "%s files scanned" % _thousands(int(scan_progress * SCAN_FILES))
-		_scan_path.text = SCAN_PATHS[int(scan_progress * 23) % SCAN_PATHS.size()]
-		_scan_left.text = "Estimated time remaining: 00:00:%02d" % ceili((1.0 - scan_progress) * data.scan_seconds)
+		_scan_count.text = "%s files scanned" % _thousands(int(scan_progress * _scan_files))
+		var path: String = SCAN_PATHS[int(scan_progress * 23) % SCAN_PATHS.size()]
+		if _scan_folder != "":
+			var root: String = CUSTOM_FOLDERS[_scan_folder][0]
+			path = root if not path.begins_with(root) else path
+		_scan_path.text = path
+		_scan_left.text = "Estimated time remaining: 00:00:%02d" % ceili((1.0 - scan_progress) * _scan_seconds)
 	if scan_progress >= 1.0:
 		_finish_scan()
 
@@ -196,6 +263,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func handle_escape() -> bool:
 	if not visible:
 		return false
+	if dialog_visible():
+		_close_dialog()
+		return true
 	if _picker.visible:
 		_picker.visible = false
 		return true
@@ -288,15 +358,38 @@ func choose_firewall(choice_id: String) -> bool:
 	return false
 
 
-## Quick scan. Only once the alerts and the teacher's question are done (v2).
-func start_scan() -> bool:
-	if scanning or state.scan_status == Mission05State.ScanStatus.SCANNED or not state.can_scan():
+## A scan: "quick" (the Virus page's button), "full", or "custom" of one of
+## CUSTOM_FOLDERS. Not before the alerts are answered (v2), and not while a
+## found threat waits for its action. The first scan that reaches the threat
+## (quick, full, custom of Downloads or C:) moves the mission on; a custom scan
+## of another folder, or any scan after the quarantine, finds nothing.
+func start_scan(kind := "quick", folder := "") -> bool:
+	var scanned := state.scan_status == Mission05State.ScanStatus.SCANNED
+	if scanning or not SCAN_KINDS.has(kind) or kind == "offline" or (kind == "custom" and not CUSTOM_FOLDERS.has(folder)):
 		return false
-	if page != Page.VIRUS:
+	if (not scanned and not state.can_scan()) or (scanned and not state.threat_quarantined):
+		return false
+	var reaches_threat := kind != "custom" or folder in THREAT_FOLDERS
+	_scan_for_mission = reaches_threat and not scanned
+	scan_kind = kind
+	_scan_folder = folder if kind == "custom" else ""
+	match kind:
+		"full":
+			_scan_seconds = data.scan_seconds * FULL_SCAN_FACTOR
+			_scan_files = FULL_SCAN_FILES
+		"custom":
+			_scan_files = CUSTOM_FOLDERS[folder][1]
+			_scan_seconds = data.scan_seconds * (FULL_SCAN_FACTOR if folder == "Local Disk (C:)" else 0.75)
+		_:
+			_scan_seconds = data.scan_seconds
+			_scan_files = SCAN_FILES
+	if page != Page.VIRUS and page != Page.SCAN_OPTIONS:
 		open_page(Page.VIRUS)
 	scanning = true
 	scan_progress = 0.0
-	scan_started.emit()
+	if _scan_for_mission:
+		mission_scan_kind = kind
+		scan_started.emit()
 	_refresh()
 	return true
 
@@ -366,6 +459,11 @@ func _after_fix() -> void:
 
 func _finish_scan() -> void:
 	scanning = false
+	if not _scan_for_mission:
+		_extra_scan = {"kind": scan_kind, "files": _scan_files}
+		_refresh()
+		return
+	_extra_scan = {}
 	state.scan_status = Mission05State.ScanStatus.SCANNED
 	threat_expanded = false
 	scan_finished.emit(1)
@@ -489,17 +587,10 @@ func _sidebar() -> Control:
 
 
 func _go_back() -> void:
-	match page:
-		Page.FW_PROFILE, Page.ALLOWED_APPS:
-			open_page(Page.FIREWALL)
-		Page.AV_SETTINGS:
-			open_page(Page.VIRUS)
-		Page.EXCLUSIONS:
-			open_page(Page.AV_SETTINGS)
-		Page.HOME:
-			pass
-		_:
-			open_page(Page.HOME)
+	if PARENT.has(page):
+		open_page(PARENT[page])
+	elif page != Page.HOME:
+		open_page(Page.HOME)
 
 
 func _nav_item(target: Page, kind: String, text: String) -> Button:
@@ -526,12 +617,10 @@ func _nav_item(target: Page, kind: String, text: String) -> Button:
 
 ## The sidebar item lit for the current page (sub-pages light their section).
 func _nav_selected() -> Page:
-	match page:
-		Page.FW_PROFILE, Page.ALLOWED_APPS:
-			return Page.FIREWALL
-		Page.AV_SETTINGS, Page.EXCLUSIONS:
-			return Page.VIRUS
-	return page
+	var top := page
+	while PARENT.has(top):
+		top = PARENT[top]
+	return top
 
 
 # ================================================================ pages
@@ -572,6 +661,34 @@ func _refresh() -> void:
 			_page_exclusions()
 		Page.ALLOWED_APPS:
 			_page_allowed_apps()
+		Page.SCAN_OPTIONS:
+			_page_scan_options()
+		Page.ALLOWED_THREATS:
+			_page_allowed_threats()
+		Page.RANSOMWARE:
+			_page_ransomware()
+		Page.ACCOUNT_INFO:
+			_page_account_info()
+		Page.SIGN_IN:
+			_page_sign_in()
+		Page.DYNAMIC_LOCK:
+			_page_dynamic_lock()
+		Page.SMART_APP:
+			_page_smart_app()
+		Page.REPUTATION:
+			_page_reputation()
+		Page.EXPLOIT:
+			_page_exploit()
+		Page.CORE_ISOLATION:
+			_page_core_isolation()
+		Page.SECURITY_PROCESSOR:
+			_page_security_processor()
+		Page.FAMILY_GROUP:
+			_page_family_group()
+		Page.NOTIFICATIONS:
+			_page_notifications()
+		Page.PROVIDERS:
+			_page_providers()
 	for b in _nav.values():
 		b.queue_redraw()
 	if _alerts:
@@ -633,9 +750,27 @@ func _tile(node_name: String, kind: String, title: String, status: String, badge
 func _page_virus() -> void:
 	_title("Virus & threat protection", "Protection for your device against threats.", "virus")
 	_section("history", "Current threats")
-	var box := _block()
+	_current_threats(_block())
+	_section("settings", "Virus & threat protection settings")
+	var settings := _block()
+	settings.add_child(_label("No action needed.", 14, SecurityTheme.INK_SOFT))
+	_links(settings, ["Manage settings"], [func(): open_page(Page.AV_SETTINGS)])
+	_section("history", "Virus & threat protection updates")
+	var updates := _block()
+	updates.add_child(_label("Security intelligence is up to date.\nLast update: %s 7:42 AM" % _today(), 14, SecurityTheme.INK_SOFT))
+	_links(updates, ["Protection updates"])
+	_section("folder", "Ransomware protection")
+	var ransom := _block()
+	ransom.add_child(_label("No action needed.", 14, SecurityTheme.INK_SOFT))
+	_links(ransom, ["Manage ransomware protection"], [func(): open_page(Page.RANSOMWARE)])
+
+
+## "Current threats": the scan running, its result, or the state before it
+## (the Virus page and Scan options both show it). `full`: with the Quick scan
+## button and the links under it (the Virus page).
+func _current_threats(box: VBoxContainer, full := true) -> void:
 	if scanning:
-		box.add_child(_label("Quick scan running...", 15, SecurityTheme.INK, true))
+		box.add_child(_label("%s running..." % SCAN_KINDS[scan_kind][0], 15, SecurityTheme.INK, true))
 		_scan_left = _label("", 14, SecurityTheme.INK_SOFT)
 		box.add_child(_scan_left)
 		_scan_bar = ProgressBar.new()
@@ -649,14 +784,24 @@ func _page_virus() -> void:
 		box.add_child(_scan_count)
 		_scan_path = _label("", 13, SecurityTheme.INK_SOFT)
 		box.add_child(_scan_path)
+		# The scan that looks for the mission's threat cannot be stopped.
 		var cancel := Button.new()
+		cancel.name = "CancelScanButton"
 		cancel.text = "Cancel"
-		cancel.disabled = true
+		cancel.disabled = _scan_for_mission
 		cancel.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		cancel.pressed.connect(func():
+			scanning = false
+			_refresh())
 		box.add_child(cancel)
 	elif state.scan_status == Mission05State.ScanStatus.NOT_SCANNED:
-		box.add_child(_status_row("warn", "Your device hasn't been scanned in 7 days.", "No scan results available. Run a quick scan to check for threats."))
-		box.add_child(_label("Last scan: 7 days ago (quick scan)", 14, SecurityTheme.INK_SOFT))
+		if _extra_scan.is_empty():
+			box.add_child(_status_row("warn", "Your device hasn't been scanned in 7 days.", "No scan results available. Run a quick scan to check for threats."))
+			box.add_child(_label("Last scan: 7 days ago (quick scan)", 14, SecurityTheme.INK_SOFT))
+		else:
+			box.add_child(_status_row("ok", "No current threats.", _last_extra_scan()))
+		if not full:
+			return
 		var scan := Button.new()
 		scan.name = "QuickScanButton"
 		scan.text = "Quick scan"
@@ -664,14 +809,14 @@ func _page_virus() -> void:
 		scan.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		SecurityTheme.style_accent(scan)
 		scan.disabled = not state.can_scan()
-		scan.pressed.connect(start_scan)
+		scan.pressed.connect(func(): start_scan())
 		box.add_child(scan)
 		if not state.alerts_done():
 			box.add_child(_label("Another security action is waiting: Firewall & network protection.", 13, SecurityTheme.WARNING_INK))
-		_links(box, ["Scan options", "Allowed threats", "Protection history"])
+		_scan_links(box)
 	elif not state.threat_quarantined:
 		box.add_child(_status_row("bad", "Threats found.", "Start the recommended actions."))
-		box.add_child(_label("Threats found: 1   ·   Last scan: %s (quick scan)   ·   %s files scanned" % [_today(), _thousands(SCAN_FILES)], 14, SecurityTheme.INK_SOFT))
+		box.add_child(_label("Threats found: 1   ·   Last scan: %s (%s)   ·   %s files scanned" % [_today(), SCAN_KINDS[mission_scan_kind][0].to_lower(), _thousands(FULL_SCAN_FILES if mission_scan_kind == "full" else SCAN_FILES)], 14, SecurityTheme.INK_SOFT))
 		_threat_list(box)
 		var start := Button.new()
 		start.name = "StartActionsButton"
@@ -682,26 +827,36 @@ func _page_virus() -> void:
 		start.disabled = threat_pick == ""
 		start.pressed.connect(func(): choose_threat(threat_pick))
 		box.add_child(start)
-		_links(box, ["Scan options", "Allowed threats", "Protection history"])
+		if full:
+			_scan_links(box)
 	else:
-		box.add_child(_status_row("ok", "No current threats.", "Last scan: %s (quick scan)\n1 threat found and quarantined (%d affected items).\n%s files scanned." % [_today(), AFFECTED_FILES, _thousands(SCAN_FILES)]))
+		var last := "Last scan: %s (%s)\n1 threat found and quarantined (%d affected items).\n%s files scanned." % [_today(), SCAN_KINDS[mission_scan_kind][0].to_lower(), AFFECTED_FILES, _thousands(FULL_SCAN_FILES if mission_scan_kind == "full" else SCAN_FILES)]
+		box.add_child(_status_row("ok", "No current threats.", last if _extra_scan.is_empty() else _last_extra_scan()))
 		var done := _label("%s, %s — Threat quarantined" % [data.threat_file, data.firewall_app], 14, SecurityTheme.OK, true)
 		done.name = "QuarantinedNote"
 		box.add_child(done)
+		if not full:
+			return
 		var quick := Button.new()
+		quick.name = "QuickScanButton"
 		quick.text = "Quick scan"
+		quick.custom_minimum_size = Vector2(120, 32)
 		quick.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		SecurityTheme.style_accent(quick)
+		quick.pressed.connect(func(): start_scan())
 		box.add_child(quick)
-		_links(box, ["Scan options", "Allowed threats", "Protection history"])
-	_section("settings", "Virus & threat protection settings")
-	var settings := _block()
-	settings.add_child(_label("No action needed.", 14, SecurityTheme.INK_SOFT))
-	_links(settings, ["Manage settings"], [func(): open_page(Page.AV_SETTINGS)])
-	_section("history", "Virus & threat protection updates")
-	var updates := _block()
-	updates.add_child(_label("Security intelligence is up to date.\nLast update: %s 7:42 AM" % _today(), 14, SecurityTheme.INK_SOFT))
-	_links(updates, ["Protection updates"])
+		_scan_links(box)
+
+
+func _scan_links(box: Control) -> void:
+	_links(box, ["Scan options", "Allowed threats", "Protection history"], [
+		func(): open_page(Page.SCAN_OPTIONS), func(): open_page(Page.ALLOWED_THREATS), func(): open_page(Page.HISTORY)])
+
+
+## The result line of the last scan that found nothing.
+func _last_extra_scan() -> String:
+	var kind: String = SCAN_KINDS[_extra_scan["kind"]][0].to_lower()
+	return "Last scan: %s (%s)\n0 threats found.\n%s files scanned." % [_today(), kind, _thousands(int(_extra_scan["files"]))]
 
 
 ## The threat found by the scan: a row that opens its details and actions.
@@ -921,17 +1076,13 @@ func _page_av_settings() -> void:
 			_refresh())
 	t.name = "RealtimeToggle"
 	rt.add_child(t)
-	for item in [["Cloud-delivered protection", "Provides increased and faster protection with access to the latest protection data in the cloud."], ["Automatic sample submission", "Send sample files to Microsoft to help protect you and others from potential threats."], ["Tamper Protection", "Prevents others from tampering with important security features."]]:
-		var blk := _block()
-		blk.add_child(_label(item[0], 15, SecurityTheme.INK, true))
-		blk.add_child(_label("This setting is managed by your administrator.", 13, SecurityTheme.INK_SOFT))
-		var d := _label(item[1], 14, SecurityTheme.INK_SOFT)
-		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		blk.add_child(d)
-		var locked := SecurityTheme.toggle(true, func(_on: bool): pass)
-		(locked.get_node("Switch") as Button).disabled = true
-		locked.modulate = Color(1, 1, 1, 0.5)
-		blk.add_child(locked)
+	_protect_toggle("cloud", "Provides increased and faster protection with access to the latest protection data in the cloud. Works best with Automatic sample submission turned on.")
+	_protect_toggle("samples", "Send sample files to Microsoft to help protect you and others from potential threats. We'll prompt you if the file we need is likely to contain personal information.")
+	_protect_toggle("tamper", "Prevents others from tampering with important security features.")
+	var cfa := _block()
+	cfa.add_child(_label("Controlled folder access", 15, SecurityTheme.INK, true))
+	cfa.add_child(_wrapped("Protect files, folders, and memory areas on your device from unauthorized changes by unfriendly applications."))
+	_links(cfa, ["Manage Controlled folder access"], [func(): open_page(Page.RANSOMWARE)])
 	var ex := _block()
 	ex.add_child(_label("Exclusions", 15, SecurityTheme.INK, true))
 	var ed := _label("Microsoft Defender Antivirus won't scan items that have been excluded. Excluded items could contain threats that make your device vulnerable.", 14, SecurityTheme.INK_SOFT)
@@ -976,22 +1127,22 @@ func _page_exclusions() -> void:
 
 func _page_account() -> void:
 	_title("Account protection", "Security for your account and sign-in.", "account")
-	_status_block("account", "Microsoft account", "ok", "Signed in with a local school account.", ["Account info"])
-	_status_block("account", "Windows Hello", "ok", "No action needed.", ["Sign-in options"])
-	_status_block("account", "Dynamic lock", "", "Windows can lock when devices paired to your PC go out of range.", ["Dynamic lock settings"])
+	_status_block("account", "Microsoft account", "ok", "Signed in with a local school account.", ["Account info"], [func(): open_page(Page.ACCOUNT_INFO)])
+	_status_block("account", "Windows Hello", "ok", "No action needed.", ["Sign-in options"], [func(): open_page(Page.SIGN_IN)])
+	_status_block("account", "Dynamic lock", "", "Windows can lock when devices paired to your PC go out of range.", ["Dynamic lock settings"], [func(): open_page(Page.DYNAMIC_LOCK)])
 
 
 func _page_app() -> void:
 	_title("App & browser control", "App protection and online security.", "app")
-	_status_block("app", "Smart App Control", "", "Smart App Control adds significant protection from new and emerging threats by blocking apps that are malicious or untrusted.", ["Smart App Control settings"])
-	_status_block("app", "Reputation-based protection", "ok", "No action needed.", ["Reputation-based protection settings"])
-	_status_block("app", "Exploit protection", "ok", "No action needed.", ["Exploit protection settings"])
+	_status_block("app", "Smart App Control", "", "Smart App Control adds significant protection from new and emerging threats by blocking apps that are malicious or untrusted.", ["Smart App Control settings"], [func(): open_page(Page.SMART_APP)])
+	_status_block("app", "Reputation-based protection", "ok", "No action needed.", ["Reputation-based protection settings"], [func(): open_page(Page.REPUTATION)])
+	_status_block("app", "Exploit protection", "ok", "No action needed.", ["Exploit protection settings"], [func(): open_page(Page.EXPLOIT)])
 
 
 func _page_device() -> void:
 	_title("Device security", "Security that comes built into your device.", "device")
-	_status_block("device", "Core isolation", "ok", "Virtualization-based security is running to protect the core parts of your device.", ["Core isolation details"])
-	_status_block("device", "Security processor", "ok", "Your security processor, called the trusted platform module (TPM), is providing additional encryption for your device.", ["Security processor details"])
+	_status_block("device", "Core isolation", "ok", "Virtualization-based security is running to protect the core parts of your device.", ["Core isolation details"], [func(): open_page(Page.CORE_ISOLATION)])
+	_status_block("device", "Security processor", "ok", "Your security processor, called the trusted platform module (TPM), is providing additional encryption for your device.", ["Security processor details"], [func(): open_page(Page.SECURITY_PROCESSOR)])
 	_status_block("device", "Secure boot", "ok", "Secure boot is on. This helps prevent malicious software from loading when your device starts.", [])
 
 
@@ -1005,8 +1156,8 @@ func _page_health() -> void:
 
 func _page_family() -> void:
 	_title("Family options", "Get what you need to simplify your family's digital life.", "family")
-	_status_block("family", "Parental controls", "", "Help protect your kids online. Choose which websites your kids can visit as they explore the web.", ["View family settings"])
-	_status_block("family", "See your family's devices at a glance", "", "View the health and safety status of your family's devices.", ["View devices"])
+	_status_block("family", "Parental controls", "", "Help protect your kids online. Choose which websites your kids can visit as they explore the web.", ["View family settings"], [func(): open_page(Page.FAMILY_GROUP)])
+	_status_block("family", "See your family's devices at a glance", "", "View the health and safety status of your family's devices.", ["View devices"], [func(): open_page(Page.FAMILY_GROUP)])
 
 
 func _page_history() -> void:
@@ -1027,13 +1178,357 @@ func _page_history() -> void:
 
 func _page_settings() -> void:
 	_title("Settings", "", "settings")
-	_status_block("settings", "Notifications", "", "Windows Security will send notifications with critical information about the health and security of your device.", ["Manage notifications"])
-	_status_block("settings", "About", "", "Windows Security (simulated for education)\nNot affiliated with Microsoft. Nothing on your real computer is scanned.", [])
+	_status_block("settings", "Security providers", "", "Manage the apps and services that protect your device.", ["Manage providers"], [func(): open_page(Page.PROVIDERS)])
+	_status_block("settings", "Notifications", "", "Windows Security will send notifications with critical information about the health and security of your device.", ["Manage notifications"], [func(): open_page(Page.NOTIFICATIONS)])
+	_status_block("settings", "About", "", "Windows Security (simulated for education)\nNot affiliated with Microsoft. Nothing on your real computer is scanned.\nAntimalware Client Version: 4.18.24090.11\nEngine Version: 1.1.24090.11\nSecurity intelligence version: 1.421.112.0", [])
+
+
+# ================================================================ pages to look around in
+# Added 2026-11-19 so the program works more like the real one. They do not
+# move the mission on; their protection switches are the only part that
+# counts (turning one off is wrong, like Real-time protection).
+
+func _page_scan_options() -> void:
+	_title("Scan options", "Run a scan from the available options on this page.", "virus")
+	_current_threats(_block(), false)
+	var list := _block()
+	var group := ButtonGroup.new()
+	for kind: String in SCAN_KINDS:
+		var radio := CheckBox.new()
+		radio.name = "ScanKind_" + kind
+		radio.text = SCAN_KINDS[kind][0]
+		radio.button_group = group
+		radio.button_pressed = scan_choice == kind
+		radio.focus_mode = Control.FOCUS_NONE
+		radio.add_theme_font_override("font", SecurityTheme.FONT_BOLD)
+		radio.toggled.connect(func(on: bool):
+			if on:
+				scan_choice = kind)
+		list.add_child(radio)
+		var about := _wrapped(SCAN_KINDS[kind][1])
+		about.custom_minimum_size.x = 520
+		var indent := MarginContainer.new()
+		indent.add_theme_constant_override("margin_left", 30)
+		indent.add_child(about)
+		list.add_child(indent)
+	var now := Button.new()
+	now.name = "ScanNowButton"
+	now.text = "Scan now"
+	now.custom_minimum_size = Vector2(120, 32)
+	now.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	SecurityTheme.style_accent(now)
+	var scanned := state.scan_status == Mission05State.ScanStatus.SCANNED
+	now.disabled = scanning or (not scanned and not state.can_scan()) or (scanned and not state.threat_quarantined)
+	now.pressed.connect(_scan_now)
+	list.add_child(_spacer(4))
+	list.add_child(now)
+	if not scanned and not state.can_scan():
+		list.add_child(_label("Another security action is waiting: Firewall & network protection.", 13, SecurityTheme.WARNING_INK))
+	elif scanned and not state.threat_quarantined:
+		list.add_child(_label("Take action on the current threat first.", 13, SecurityTheme.WARNING_INK))
+
+
+func _scan_now() -> void:
+	match scan_choice:
+		"custom":
+			open_picker("folder")
+		"offline":
+			_offline_dialog()
+		_:
+			start_scan(scan_choice)
+
+
+## Offline scan needs a restart, which the school lab does not allow.
+func _offline_dialog() -> void:
+	_show_dialog("Microsoft Defender Antivirus (offline scan)",
+		"You'll need to restart your device.\nYour device will restart, and the scan will take about 15 minutes. Save your work before you continue.",
+		[["Scan", func(): _show_dialog("Microsoft Defender Antivirus (offline scan)",
+			"This PC is managed by your school. Restarting it isn't allowed during the lab, so the offline scan can't start.\nRun a quick, full or custom scan instead.", [["OK", _close_dialog]])],
+		["Cancel", _close_dialog]])
+
+
+func _page_allowed_threats() -> void:
+	_title("Allowed threats", "Allowed threats are items that have been identified as threats, but which you've\nallowed to run on your device.", "virus")
+	_content.add_child(_wrapped("Microsoft Defender Antivirus won't take action on threats you've allowed. Allowing threats could put your device at risk."))
+	_content.add_child(_spacer(6))
+	_content.add_child(_label("There are no allowed threats.", 14, SecurityTheme.INK))
+
+
+func _page_ransomware() -> void:
+	_title("Ransomware protection", "Protect your files against threats like ransomware, and see how to\nrestore files in case of an attack.", "folder")
+	_section("folder", "Controlled folder access")
+	var cfa := _block()
+	cfa.add_child(_wrapped("Protect files, folders, and memory areas on your device from unauthorized changes by unfriendly applications."))
+	cfa.add_child(_pref_toggle("controlled_folder"))
+	if _prefs["controlled_folder"]:
+		cfa.add_child(_label("Protected folders", 14, SecurityTheme.INK, true))
+		for folder in ["C:\\Users\\Student\\Documents", "C:\\Users\\Student\\Pictures", "C:\\Users\\Student\\Videos", "C:\\Users\\Student\\Music", "C:\\Users\\Student\\Desktop", "C:\\Users\\Student\\Favorites"]:
+			cfa.add_child(_label(folder, 13, SecurityTheme.INK_SOFT))
+	_section("history", "Ransomware data recovery")
+	var rec := _block()
+	rec.add_child(_wrapped("You may be able to recover files in these accounts in case of a ransomware attack."))
+	rec.add_child(_label("No cloud storage account is set up on this school PC.", 14, SecurityTheme.INK_SOFT))
+
+
+func _page_account_info() -> void:
+	_title("Your info", "The account you're signed in with on this device.", "account")
+	_content.add_child(_details({"Name": "Student", "Account": "STUDENT-PC\\Student", "Account type": "Local account · Standard user", "Managed by": "School IT Support"}))
+	_content.add_child(_spacer(8))
+	_content.add_child(_wrapped("Settings for this account are managed by the school. Ask IT Support to change them."))
+
+
+func _page_sign_in() -> void:
+	_title("Sign-in options", "Ways to sign in to this device.", "account")
+	for item in [["Facial recognition (Windows Hello)", "This option is currently unavailable."], ["Fingerprint recognition (Windows Hello)", "This option is currently unavailable."],
+			["PIN (Windows Hello)", "Not set up."], ["Security key", "Not set up."], ["Password", "You're signed in with your password."]]:
+		var row := _block()
+		row.add_child(_label(item[0], 15, SecurityTheme.INK, true))
+		row.add_child(_label(item[1], 14, SecurityTheme.INK_SOFT))
+
+
+func _page_dynamic_lock() -> void:
+	_title("Dynamic lock", "Windows can use devices that are paired to your PC to know when\nyou're away.", "account")
+	var b := _block()
+	b.add_child(_label("Allow Windows to automatically lock your device when you're away", 15, SecurityTheme.INK, true))
+	b.add_child(_pref_toggle("dynamic_lock"))
+	if _prefs["dynamic_lock"]:
+		b.add_child(_label("We couldn't find a paired phone. Pair a phone in Bluetooth & devices.", 13, SecurityTheme.WARNING_INK))
+
+
+func _page_smart_app() -> void:
+	_title("Smart App Control", "Smart App Control adds significant protection from new and emerging\nthreats by blocking apps that are malicious or untrusted.", "app")
+	var b := _block()
+	var group := ButtonGroup.new()
+	for item in [["On", "Smart App Control blocks apps that are malicious or untrusted."],
+			["Evaluation", "Smart App Control checks whether it can help protect you without getting in your way too often. If it can, it turns itself on."],
+			["Off", "Smart App Control won't block apps. If you turn it off, you can't turn it back on without reinstalling Windows."]]:
+		var radio := CheckBox.new()
+		radio.name = "SmartApp_" + item[0]
+		radio.text = item[0]
+		radio.button_group = group
+		radio.button_pressed = _prefs["smart_app"] == item[0]
+		radio.focus_mode = Control.FOCUS_NONE
+		radio.add_theme_font_override("font", SecurityTheme.FONT_BOLD)
+		radio.pressed.connect(func():
+			if item[0] == "Off":
+				_lower_protection("smart_app")
+			else:
+				_prefs["smart_app"] = item[0]
+				_refresh())
+		b.add_child(radio)
+		var about := _wrapped(item[1])
+		var indent := MarginContainer.new()
+		indent.add_theme_constant_override("margin_left", 30)
+		indent.add_child(about)
+		b.add_child(indent)
+
+
+func _page_reputation() -> void:
+	_title("Reputation-based protection", "These settings protect your device from malicious or potentially\nunwanted apps, files, and websites.", "app")
+	_protect_toggle("check_apps", "Microsoft Defender SmartScreen helps protect your device by checking for unrecognized apps and files from the web.")
+	_protect_toggle("smartscreen_edge", "Microsoft Defender SmartScreen helps protect your device from malicious sites and downloads.")
+	_protect_toggle("phishing", "Protects your passwords from being typed on malicious sites and from being saved in unsafe places.")
+	_protect_toggle("pua", "Protect your device from low-reputation apps that might cause unexpected behaviors.")
+	_protect_toggle("smartscreen_store", "Microsoft Defender SmartScreen protects your device by checking web content that Microsoft Store apps use.")
+
+
+## System settings of Exploit protection: name, what it does, on by default.
+const EXPLOIT_SETTINGS := [
+	["Control flow guard (CFG)", "Ensures control flow integrity for indirect calls.", true],
+	["Data Execution Prevention (DEP)", "Prevents code from being run from data-only memory pages.", true],
+	["Force randomization for images (Mandatory ASLR)", "Force relocation of images not compiled with /DYNAMICBASE.", false],
+	["Randomize memory allocations (Bottom-up ASLR)", "Randomize locations for virtual memory allocations.", true],
+	["High-entropy ASLR", "Increase variability when using Randomize memory allocations (Bottom-up ASLR).", true],
+	["Validate exception chains (SEHOP)", "Ensures the integrity of an exception chain during dispatch.", true],
+	["Validate heap integrity", "Terminates a process when heap corruption is detected.", true],
+]
+
+
+func _page_exploit() -> void:
+	_title("Exploit protection", "See the Exploit protection settings for your system and programs.\nYou can customize the settings you want.", "app")
+	_section("settings", "System settings")
+	for item: Array in EXPLOIT_SETTINGS:
+		var b := _block()
+		b.add_child(_label(item[0], 15, SecurityTheme.INK, true))
+		b.add_child(_wrapped(item[1]))
+		var pick := OptionButton.new()
+		pick.name = "Exploit_" + String(item[0]).get_slice(" (", 0).replace(" ", "")
+		pick.focus_mode = Control.FOCUS_NONE
+		pick.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		pick.custom_minimum_size = Vector2(220, 30)
+		var default_on: bool = item[2]
+		var options := ["Use default (%s)" % ("On" if default_on else "Off"), "On by default", "Off by default"]
+		for o in options:
+			pick.add_item(o)
+		var current: String = options[0] if default_on else _prefs["mandatory_aslr"]
+		pick.select(options.find(current))
+		pick.item_selected.connect(func(i: int):
+			if default_on and options[i] == "Off by default":
+				_lower_protection("exploit") # not applied: the list is drawn again
+			elif not default_on:
+				_prefs["mandatory_aslr"] = options[i])
+		b.add_child(pick)
+
+
+func _page_core_isolation() -> void:
+	_title("Core isolation", "Security features available on your device that use virtualization-based\nsecurity.", "device")
+	_protect_toggle("memory_integrity", "Prevents attacks from inserting malicious code into high-security processes.")
+	_protect_toggle("lsa", "Protects user credentials by helping prevent unsigned drivers and plugins from loading into the Local Security Authority.")
+	_protect_toggle("driver_blocklist", "Microsoft blocks drivers with known security vulnerabilities from running on your device.")
+
+
+func _page_security_processor() -> void:
+	_title("Security processor details", "Information about the trusted platform module (TPM).", "device")
+	_section("device", "Specifications")
+	_block().add_child(_details({"Manufacturer": "Infineon (IFX)", "Manufacturer version": "7.85.4555.0", "Specification version": "2.0", "PPI specification version": "1.3", "TPM specification sub-version": "1.59", "PC client spec version": "1.05"}))
+	_section("device", "Status")
+	var status := _block()
+	status.add_child(_status_row("ok", "Attestation: Ready", ""))
+	status.add_child(_status_row("ok", "Storage: Ready", ""))
+
+
+func _page_family_group() -> void:
+	_title("Family options", "Family settings are managed online with a Microsoft account.", "family")
+	_content.add_child(_wrapped("This school PC isn't part of a family group. Family settings and devices are managed at family.microsoft.com, which isn't available on the school lab network."))
+
+
+func _page_notifications() -> void:
+	_title("Notifications", "Windows Security will send notifications with critical information about\nthe health and security of your device.", "settings")
+	_section("virus", "Virus & threat protection notifications")
+	var v := _block()
+	v.add_child(_wrapped("Get informational notifications about the protection of your device."))
+	v.add_child(_pref_toggle("notify_info"))
+	for item in [["notify_recent", "Recent activity and scan results"], ["notify_threats", "Threats found, but no immediate action is needed"], ["notify_blocked", "Files or activities are blocked"]]:
+		v.add_child(_pref_check(item[0], item[1]))
+	_section("account", "Account protection notifications")
+	var a := _block()
+	a.add_child(_wrapped("Get account protection notifications."))
+	a.add_child(_pref_toggle("notify_account"))
+	_section("firewall", "Firewall & network protection notifications")
+	var f := _block()
+	f.add_child(_wrapped("Notify me when Microsoft Defender Firewall blocks a new app."))
+	f.add_child(_pref_toggle("notify_firewall"))
+	for item in [["notify_domain", "Domain firewall"], ["notify_private", "Private firewall"], ["notify_public", "Public firewall"]]:
+		f.add_child(_pref_check(item[0], item[1]))
+
+
+func _page_providers() -> void:
+	_title("Security providers", "Manage the apps and services that protect your device.", "settings")
+	for item in [["virus", "Antivirus", "Microsoft Defender Antivirus"], ["firewall", "Firewall", "Microsoft Defender Firewall"], ["app", "Web protection", "Microsoft Defender SmartScreen"]]:
+		_section(item[0], item[1])
+		_block().add_child(_status_row("ok", item[2], "Turned on"))
+
+
+# ---------------------------------------------------------------- their widgets
+
+## A protection switch (Mission05State.PROTECTION_SETTINGS): always on;
+## turning it off is a wrong decision with a hint, and it stays on.
+func _protect_toggle(id: String, text: String) -> void:
+	var b := _block()
+	b.add_child(_label(Mission05State.PROTECTION_SETTINGS[id][0], 15, SecurityTheme.INK, true))
+	b.add_child(_wrapped(text))
+	var t := SecurityTheme.toggle(true, func(on: bool):
+		if not on:
+			_lower_protection(id))
+	t.name = "Protect_" + id
+	b.add_child(t)
+
+
+func _lower_protection(id: String) -> void:
+	state.note_protection_off(id)
+	_wrong(Mission05State.protection_hint(id))
+	_refresh()
+
+
+## A switch that may be changed freely (stored in _prefs).
+func _pref_toggle(key: String) -> HBoxContainer:
+	var t := SecurityTheme.toggle(bool(_prefs[key]), func(on: bool):
+		_prefs[key] = on
+		_refresh())
+	t.name = "Pref_" + key
+	return t
+
+
+func _pref_check(key: String, text: String) -> CheckBox:
+	var cb := CheckBox.new()
+	cb.name = "Pref_" + key
+	cb.text = text
+	cb.focus_mode = Control.FOCUS_NONE
+	cb.button_pressed = bool(_prefs[key])
+	cb.toggled.connect(func(on: bool): _prefs[key] = on)
+	return cb
+
+
+func _wrapped(text: String) -> Label:
+	var l := _label(text, 14, SecurityTheme.INK_SOFT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.custom_minimum_size = Vector2(560, 0)
+	return l
+
+
+## A Windows-style message box over the program: title, text, buttons
+## ([[text, action], ...]; the first is the default, in the accent colour).
+func _show_dialog(title: String, text: String, buttons: Array) -> void:
+	_close_dialog()
+	_dialog = Control.new()
+	_dialog.name = "SecurityDialog"
+	_dialog.mouse_filter = Control.MOUSE_FILTER_STOP
+	_dialog.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(_dialog)
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.12)
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_dialog.add_child(dim)
+	var win := PanelContainer.new()
+	win.set_anchors_preset(Control.PRESET_CENTER)
+	win.custom_minimum_size = Vector2(520, 0)
+	win.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	win.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var sb := SecurityTheme.box(SecurityTheme.CARD, Color(0.6, 0.6, 0.6), 8, 22, 18)
+	sb.shadow_color = Color(0, 0, 0, 0.25)
+	sb.shadow_size = 18
+	win.add_theme_stylebox_override("panel", sb)
+	_dialog.add_child(win)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 12)
+	win.add_child(col)
+	col.add_child(_label("Windows Security", 12, SecurityTheme.INK_SOFT))
+	col.add_child(_label(title, 18, SecurityTheme.INK, true))
+	var body := _label(text, 14, SecurityTheme.INK)
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.custom_minimum_size = Vector2(476, 0)
+	col.add_child(body)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_END
+	row.add_theme_constant_override("separation", 8)
+	col.add_child(row)
+	for i in buttons.size():
+		var b := Button.new()
+		b.name = "Dialog_" + String(buttons[i][0])
+		b.text = buttons[i][0]
+		b.custom_minimum_size = Vector2(100, 32)
+		if i == 0:
+			SecurityTheme.style_accent(b)
+		b.pressed.connect(buttons[i][1])
+		row.add_child(b)
+
+
+func _close_dialog() -> void:
+	if is_instance_valid(_dialog):
+		_dialog.queue_free()
+	_dialog = null
+
+
+func dialog_visible() -> bool:
+	return is_instance_valid(_dialog)
 
 
 # ================================================================ file picker (Add an exclusion)
 
-func open_picker() -> void:
+## "file": Add an exclusion -> File (Downloads). "folder": Custom scan's
+## "Select Folder" (CUSTOM_FOLDERS).
+func open_picker(mode := "file") -> void:
+	_picker_mode = mode
 	_picker_pick = ""
 	_picker.visible = true
 	_refresh_picker()
@@ -1078,20 +1573,21 @@ func _refresh_picker() -> void:
 	var bar := HBoxContainer.new()
 	bar.custom_minimum_size = Vector2(0, 34)
 	col.add_child(bar)
-	var title := _label("Open", 13, SecurityTheme.INK)
+	var folders := _picker_mode == "folder"
+	var title := _label("Select Folder" if folders else "Open", 13, SecurityTheme.INK)
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	bar.add_child(title)
 	bar.add_child(_window_button("PickerClose", "close", func(): _picker.visible = false))
-	var path := _label("This PC  ›  Local Disk (C:)  ›  Users  ›  Student  ›  Downloads", 14, SecurityTheme.INK)
+	var path := _label("This PC" if folders else "This PC  ›  Local Disk (C:)  ›  Users  ›  Student  ›  Downloads", 14, SecurityTheme.INK)
 	col.add_child(path)
 	var list := VBoxContainer.new()
 	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 0)
 	col.add_child(list)
-	for f: String in DOWNLOADS:
+	for f: String in (CUSTOM_FOLDERS.keys() if folders else DOWNLOADS):
 		var b := Button.new()
-		b.name = "File_" + f.get_basename()
+		b.name = ("Folder_" + f.replace(" ", "").replace("(", "").replace(":)", "")) if folders else ("File_" + f.get_basename())
 		b.text = "          " + f
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.custom_minimum_size = Vector2(0, 32)
@@ -1099,7 +1595,7 @@ func _refresh_picker() -> void:
 		var picked := _picker_pick == f
 		b.add_theme_stylebox_override("normal", SecurityTheme.box(SecurityTheme.INFO_BG if picked else Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0, 12, 4))
 		b.add_theme_stylebox_override("hover", SecurityTheme.box(SecurityTheme.INFO_BG, Color(0, 0, 0, 0), 0, 12, 4))
-		b.draw.connect(func(): SecurityTheme.draw_glyph(b, "file", Vector2(30, b.size.y * 0.5), 16.0, SecurityTheme.INK_SOFT))
+		b.draw.connect(func(): SecurityTheme.draw_glyph(b, "folder" if folders else "file", Vector2(30, b.size.y * 0.5), 16.0, SecurityTheme.INK_SOFT))
 		b.pressed.connect(func():
 			_picker_pick = f
 			_refresh_picker())
@@ -1108,16 +1604,21 @@ func _refresh_picker() -> void:
 	foot.alignment = BoxContainer.ALIGNMENT_END
 	foot.add_theme_constant_override("separation", 8)
 	col.add_child(foot)
-	var name_box := _label("File name:  " + _picker_pick, 14, SecurityTheme.INK)
+	var name_box := _label(("Folder:  " if folders else "File name:  ") + _picker_pick, 14, SecurityTheme.INK)
 	name_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	foot.add_child(name_box)
 	var open := Button.new()
 	open.name = "PickerOpen"
-	open.text = "Open"
+	open.text = "Select Folder" if folders else "Open"
 	open.custom_minimum_size = Vector2(100, 32)
 	SecurityTheme.style_accent(open)
 	open.disabled = _picker_pick == ""
-	open.pressed.connect(func(): choose_threat("exclude"))
+	if folders:
+		open.pressed.connect(func():
+			_picker.visible = false
+			start_scan("custom", _picker_pick))
+	else:
+		open.pressed.connect(func(): choose_threat("exclude"))
 	foot.add_child(open)
 	var cancel := Button.new()
 	cancel.text = "Cancel"
@@ -1252,7 +1753,7 @@ func _block() -> VBoxContainer:
 
 
 ## A section with a status badge, a line of text and links (static pages).
-func _status_block(kind: String, title: String, badge: String, text: String, links: Array) -> void:
+func _status_block(kind: String, title: String, badge: String, text: String, links: Array, actions: Array = []) -> void:
 	_section(kind, title)
 	var b := _block()
 	if badge != "":
@@ -1263,7 +1764,7 @@ func _status_block(kind: String, title: String, badge: String, text: String, lin
 		l.custom_minimum_size = Vector2(560, 0)
 		b.add_child(l)
 	if not links.is_empty():
-		_links(b, links)
+		_links(b, links, actions)
 
 
 func _status_row(badge: String, text: String, sub: String) -> HBoxContainer:

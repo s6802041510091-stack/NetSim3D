@@ -22,7 +22,8 @@ extends RefCounted
 ##        section opened is Virus & threat protection (a firewall does not
 ##        remove files)                                                    10
 ##     4. never lowered the protection: Firewall off, Real-time protection
-##        off, Add an exclusion, Allow on device                           10
+##        off, Add an exclusion, Allow on device, or any switch in
+##        PROTECTION_SETTINGS (Cloud-delivered protection, SmartScreen ...) 10
 ##     5. opened Protection history before submitting AND everything was
 ##        green when "ส่งผลการตรวจสอบ" was first pressed                      5
 ##     6. what the player tells the teacher (the report, a choice: what was
@@ -57,6 +58,25 @@ const FIREWALL_OFF := "disable"
 ## (Add an exclusion) / realtime_off (Real-time protection switched off).
 const THREAT_RIGHT := "quarantine"
 const LOWERING_THREAT := ["allow", "exclude", "realtime_off"]
+## Protection switches on the program's other pages (added 2026-11-19, the
+## user wanted Windows Security to work more like the real one). Turning one
+## off is always wrong, never applied, and loses "kept_protection" like the
+## Real-time switch: id -> [setting name, what turning it off does (Thai)].
+const PROTECTION_SETTINGS := {
+	"cloud": ["Cloud-delivered protection", "โปรแกรม Anti-Virus ไม่ได้รับข้อมูลภัยคุกคามล่าสุดจากระบบคลาวด์"],
+	"samples": ["Automatic sample submission", "ไฟล์น่าสงสัยไม่ถูกส่งไปตรวจสอบเพิ่มเติม"],
+	"tamper": ["Tamper Protection", "โปรแกรมอันตรายแก้ไขการตั้งค่าความปลอดภัยได้"],
+	"check_apps": ["Check apps and files", "เครื่องไม่ตรวจแอปและไฟล์ที่ไม่รู้จักจากอินเทอร์เน็ต"],
+	"smartscreen_edge": ["SmartScreen for Microsoft Edge", "เบราว์เซอร์ Microsoft Edge ไม่เตือนเว็บไซต์และไฟล์ดาวน์โหลดที่อันตราย"],
+	"phishing": ["Phishing protection", "ไม่มีคำเตือนเมื่อกรอกรหัสผ่านในเว็บไซต์หลอกลวง"],
+	"pua": ["Potentially unwanted app blocking", "โปรแกรมไม่พึงประสงค์ที่มักแฝงมากับโปรแกรมเถื่อนติดตั้งได้"],
+	"smartscreen_store": ["SmartScreen for Microsoft Store apps", "แอปจาก Microsoft Store เปิดเว็บที่อันตรายได้โดยไม่มีคำเตือน"],
+	"smart_app": ["Smart App Control", "แอปที่ไม่น่าเชื่อถือทำงานได้ และเปิดกลับคืนได้ยาก"],
+	"exploit": ["Exploit protection", "โปรแกรมที่มีช่องโหว่ถูกโจมตีได้ง่ายขึ้น"],
+	"memory_integrity": ["Memory integrity", "โค้ดอันตรายเข้าถึงส่วนสำคัญของระบบได้ง่ายขึ้น"],
+	"lsa": ["Local Security Authority protection", "รหัสผ่านและข้อมูลการเข้าสู่ระบบถูกขโมยได้ง่ายขึ้น"],
+	"driver_blocklist": ["Microsoft Vulnerable Driver Blocklist", "ไดรเวอร์ที่มีช่องโหว่ทำงานบนเครื่องได้"],
+}
 ## The one choice left: how to report to the teacher, in the room (user
 ## 2026-11-15; not on the desktop).
 const QUESTION_ORDER := ["report"]
@@ -73,6 +93,8 @@ var app_opened := false
 var alert_answers := {ALERT_SCHOOL: [], ALERT_UNKNOWN: []}
 ## How many times the firewall switch was turned off.
 var firewall_off_count := 0
+## Every PROTECTION_SETTINGS switch turned off, in order (repeats included).
+var protection_off := PackedStringArray()
 ## The player has opened the right section for each problem.
 var conn_matched := false
 var file_matched := false
@@ -149,6 +171,24 @@ func note_alert(key: String, answer: String) -> bool:
 
 func note_firewall_off() -> void:
 	firewall_off_count += 1
+
+
+## A PROTECTION_SETTINGS switch was turned off (always wrong, not applied).
+func note_protection_off(id: String) -> void:
+	if PROTECTION_SETTINGS.has(id):
+		protection_off.append(id)
+
+
+## The Thai hint for turning `id` off (never gives the answer away).
+static func protection_hint(id: String) -> String:
+	var s: Array = PROTECTION_SETTINGS[id]
+	return "การปิด %s ทำให้%s ลองเลือกวิธีที่ยังคงการป้องกันไว้" % [s[0], s[1]]
+
+
+## The summary's line for having turned `id` off.
+static func protection_mistake(id: String) -> String:
+	var s: Array = PROTECTION_SETTINGS[id]
+	return "ปิด %s — ทำให้%s" % [s[0], s[1]]
 
 
 ## A section or page of the program was opened (Home does not count). Before
@@ -259,7 +299,7 @@ func kept_protection() -> bool:
 	for id in LOWERING_THREAT:
 		if id in threat_choices:
 			return false
-	return threat_quarantined and firewall_off_count == 0
+	return threat_quarantined and firewall_off_count == 0 and protection_off.is_empty()
 
 
 ## Which process decisions were right: id -> bool (PROCESS_ORDER).
@@ -308,6 +348,7 @@ func wrong_count() -> int:
 	n += int(conn_tool_first != "" and conn_tool_first != TOOL_FIREWALL)
 	n += int(file_tool_first != "" and file_tool_first != TOOL_VIRUS)
 	n += firewall_off_count
+	n += protection_off.size()
 	n += threat_choices.size() - int(THREAT_RIGHT in threat_choices)
 	n += int(submit_first == "early")
 	n += question_answers["report"].size() - int(question_done["report"])
@@ -342,6 +383,11 @@ func mistakes() -> PackedStringArray:
 		out.append("เพิ่มไฟล์เป็น Exclusion — ข้อยกเว้นใช้กับไฟล์ที่ยืนยันแล้วว่าปลอดภัยเท่านั้น")
 	if "realtime_off" in threat_choices:
 		out.append("ปิด Real-time protection — ทำให้ Anti-Virus ไม่เฝ้าระวังไฟล์ในเครื่อง")
+	var listed := {}
+	for id: String in protection_off:
+		if not listed.has(id):
+			listed[id] = true
+			out.append(protection_mistake(id))
 	if submit_first == "early":
 		out.append("กดส่งผลการตรวจสอบก่อนทุกส่วนเป็นสีเขียว — ควรตรวจสถานะหลังแก้ไขก่อนส่งผล")
 	if report_submitted and not history_checked:

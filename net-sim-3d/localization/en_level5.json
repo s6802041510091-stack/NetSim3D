@@ -74,5 +74,20 @@
   "ไม่ได้เปิด Protection history ยืนยันว่ากักกันไฟล์แล้วก่อนส่งผล": "Did not open Protection history to confirm the file was quarantined before submitting",
   "รายงานผลให้ครูไม่ตรงกับสิ่งที่ทำ — ควรบอกสิ่งที่ทำจริง (อนุญาต SchoolLab, ปิดกั้นโปรแกรมแปลก, กักกันไฟล์) และฝากครูเตือนนักเรียนเรื่องโปรแกรมเถื่อน": "The report to the teacher didn't match what you did — say what you actually did (allowed SchoolLab, blocked the unknown program, quarantined the file) and ask the teacher to warn students about pirated software",
   "ยังมีส่วนที่ต้องดำเนินการอยู่ ตรวจสอบสถานะในหน้า Home ให้ทุกส่วนเป็นสีเขียวก่อนส่งผล": "Some sections still need action. Check the Home page and make every section green before submitting.",
-  "เมื่อทุกส่วนเป็นสีเขียวแล้ว": "When every section is green"
+  "เมื่อทุกส่วนเป็นสีเขียวแล้ว": "When every section is green",
+  "การปิด %s ทำให้%s ลองเลือกวิธีที่ยังคงการป้องกันไว้": "Turning off %s means %s. Choose a way that keeps protection on.",
+  "ปิด %s — ทำให้%s": "Turned off %s — %s",
+  "โปรแกรม Anti-Virus ไม่ได้รับข้อมูลภัยคุกคามล่าสุดจากระบบคลาวด์": "the antivirus no longer gets the latest threat data from the cloud",
+  "ไฟล์น่าสงสัยไม่ถูกส่งไปตรวจสอบเพิ่มเติม": "suspicious files are no longer sent for further checks",
+  "โปรแกรมอันตรายแก้ไขการตั้งค่าความปลอดภัยได้": "harmful programs can change the security settings",
+  "เครื่องไม่ตรวจแอปและไฟล์ที่ไม่รู้จักจากอินเทอร์เน็ต": "unrecognized apps and files from the web are no longer checked",
+  "เบราว์เซอร์ Microsoft Edge ไม่เตือนเว็บไซต์และไฟล์ดาวน์โหลดที่อันตราย": "Microsoft Edge no longer warns about harmful websites and downloads",
+  "ไม่มีคำเตือนเมื่อกรอกรหัสผ่านในเว็บไซต์หลอกลวง": "there is no warning when a password is typed on a fake website",
+  "โปรแกรมไม่พึงประสงค์ที่มักแฝงมากับโปรแกรมเถื่อนติดตั้งได้": "unwanted programs that often come with cracked software can install",
+  "แอปจาก Microsoft Store เปิดเว็บที่อันตรายได้โดยไม่มีคำเตือน": "Microsoft Store apps can open harmful web content without a warning",
+  "แอปที่ไม่น่าเชื่อถือทำงานได้ และเปิดกลับคืนได้ยาก": "untrusted apps can run, and it is hard to turn back on",
+  "โปรแกรมที่มีช่องโหว่ถูกโจมตีได้ง่ายขึ้น": "programs with security holes are easier to attack",
+  "โค้ดอันตรายเข้าถึงส่วนสำคัญของระบบได้ง่ายขึ้น": "harmful code can reach the core of the system more easily",
+  "รหัสผ่านและข้อมูลการเข้าสู่ระบบถูกขโมยได้ง่ายขึ้น": "passwords and sign-in data are easier to steal",
+  "ไดรเวอร์ที่มีช่องโหว่ทำงานบนเครื่องได้": "drivers with known security holes can run on the computer"
 }
