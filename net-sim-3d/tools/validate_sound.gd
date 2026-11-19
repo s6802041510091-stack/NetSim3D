@@ -94,6 +94,15 @@ func _run() -> void:
 	await create_timer(door.swing_time + 0.1).timeout
 	_check(await _played_after("door_close", func(): door.set_open(false), door.swing_time + 0.2), "door closes with a sound")
 
+	# The desk phone (Levels 4-6): answering it lifts the handset audibly;
+	# a phone that is not ringing does nothing.
+	var phone: DeskPhone = map.get_node("DeskPhone")
+	phone.ringing = false
+	_check(not await _played_after("phone_pickup", func(): phone.use(player)), "a silent phone makes no pick-up sound")
+	phone.ringing = true
+	_check(await _played_after("phone_pickup", func(): phone.use(player)), "answering the phone: the handset is picked up")
+	phone.ringing = false
+
 	# Talking: the line types out with ticks; advancing clicks.
 	var dialogue: DialogueBox = mission.dialogue
 	_check(await _played_after("type_tick", func(): dialogue.show_lines(PackedStringArray(["ทดสอบ|ข้อความทดสอบเสียงพิมพ์ตามตัวอักษร"])), 0.3), "dialogue typing ticks")

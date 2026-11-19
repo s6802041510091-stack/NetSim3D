@@ -53,6 +53,11 @@ const BANK := {
 	"jingle_pass": {"files": ["@jingle_pass.wav"], "bus": "SoundEffect", "db": -3.0},
 	"jingle_fail": {"files": ["@jingle_fail.wav"], "bus": "SoundEffect", "db": -4.0},
 	"star": {"files": ["@star.wav"], "bus": "SoundEffect", "db": -6.0},
+	# Answering the desk phone: the handset grabbed and lifted off the cradle
+	# (mixed from Kenney recordings by tools/audio/record_phone_pickup.gd,
+	# chosen by the user 2026-11-20). Played 2D: the handset is at the
+	# player's ear, a little louder than the ring it cuts off.
+	"phone_pickup": {"files": ["@phone_pickup.wav"], "bus": "SoundEffect", "db": 4.0},
 }
 ## Background music (put the files in assets/audio/music/, see README there).
 const MUSIC := {

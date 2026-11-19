@@ -7,7 +7,8 @@ credits are given anyway.
 | Folder | What | Source | License |
 |---|---|---|---|
 | `kenney/` | Footsteps, doors, chair (cloth), interface clicks, confirm/error, windows | Kenney — Impact Sounds, Interface Sounds, RPG Audio (www.kenney.nl) | CC0 1.0 (`kenney/LICENSE_kenney.txt`) |
-| `generated/` | Room ambience (outside, air conditioner, computer fans), computer boot/shutdown, keyboard and mouse clicks, dialogue typing, result jingles and star | Made for this game by `tools/audio/generate_sounds.cjs` | Part of this project |
+| `generated/` | Room ambience (outside, air conditioner, computer fans), computer boot/shutdown, keyboard and mouse clicks, dialogue typing, result jingles and star, phone ring | Made for this game by `tools/audio/generate_sounds.cjs` | Part of this project |
+| `generated/phone_pickup.wav` | The desk phone's handset picked up | Mixed for this game from the Kenney sounds above (`cloth1`, `metalLatch`, `switch_002`) by `tools/audio/record_phone_pickup.gd` | CC0 1.0 (from Kenney) |
 | `music/LofiLoop.ogg` | Menu music | "Lofi Hip Hop Loop" by omfgdude (OMF-Games), https://opengameart.org/content/lofi-hip-hop-loop | CC0 |
 | `music/calm_track-loop.ogg` | Level music | "Calm Track" by pmiller, https://opengameart.org/content/calm-track | CC0 / public domain |
 

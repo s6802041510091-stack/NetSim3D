@@ -77,6 +77,8 @@ func get_prompt_text() -> String:
 
 func use(player: Node) -> void:
 	if ringing:
+		# The handset comes off the cradle (Levels 4, 5 and 6 share this phone).
+		Sound.play("phone_pickup") # at the player's ear, not from the desk
 		answered.emit(player)
 
 
