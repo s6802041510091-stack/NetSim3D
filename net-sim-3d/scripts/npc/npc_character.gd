@@ -459,6 +459,10 @@ const TURN_SPEED := 4.5
 ## shoulder, the arm almost straight, palms facing the legs.
 const HANG_DIRECTION := Vector3(0.12, -1.0, 0.06) # +X = out to the side
 const HANG_REACH := 0.97 # share of the arm's length
+## Standing and walking: ankle distance from the middle as a share of the hip
+## joint's. The imported A-pose spreads each straight leg ~6° out (ankles
+## 38 cm apart, hips 22 cm), which made everyone walk with their legs apart.
+const FEET_UNDER_HIPS := 0.7
 ## Walk cycle swing (radians): thighs, knees on the forward swing, arms, feet.
 const THIGH_SWING := 0.4
 const KNEE_BEND := 0.6
@@ -640,9 +644,24 @@ func _standing_pose() -> Dictionary:
 			var hang := Vector3(HANG_DIRECTION.x * out, HANG_DIRECTION.y, HANG_DIRECTION.z).normalized()
 			# Elbow toward the back, hand pointing down, thumb forward.
 			_place_hand(side, shoulder + hang * length * HANG_REACH, Vector3(0.2 * out, 0.0, -1.0), Vector3(0.05 * out, -1.0, 0.02), Vector3(0.0, 0.0, 1.0))
+			_feet_under_hips(side)
 		_stand_pose = _current_pose()
 		_apply_pose(now)
 	return _stand_pose
+
+
+## Swings the straight leg in at the hip so the ankle comes under the hip
+## joint (FEET_UNDER_HIPS). The foot turns with the leg (its sole tilts ~8°):
+## the socks are skinned to the foot, so keeping the foot level while the
+## shin leans in left the sock cuff standing off the leg.
+func _feet_under_hips(side: String) -> void:
+	var thigh := skeleton.find_bone("upperleg01." + side)
+	var foot := skeleton.find_bone("foot." + side)
+	if thigh < 0 or foot < 0:
+		return
+	var hip := _bone_pos(thigh)
+	var ankle := _bone_pos(foot)
+	_aim(thigh, ankle - hip, Vector3(hip.x * FEET_UNDER_HIPS, ankle.y, ankle.z) - hip)
 
 
 ## Blends every bone from `from` to `to` over STAND_TIME; `extra(t)` moves the body.
