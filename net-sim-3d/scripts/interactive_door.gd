@@ -28,6 +28,12 @@ const GROUP := &"interactive_doors"
 ## The Blender presentation pose may be only 65 degrees. Open at least square
 ## to the wall so a player capsule can enter AND leave without snagging the tip.
 @export_range(90.0, 120.0, 1.0) var minimum_open_degrees: float = 90.0
+## For a leaf modelled without hardware: copy the handles, levers and kick
+## plates of the door with this part prefix (e.g. "BackgroundClass_").
+@export var borrow_hardware_from: String = ""
+## Some models are posed open past square (the computer room door at 117°),
+## which turns the leaf's hinge edge back into its own jamb. Cap the swing.
+@export_range(90.0, 180.0, 1.0) var maximum_open_degrees: float = 180.0
 
 var is_open := false
 var is_moving := false
@@ -60,7 +66,7 @@ func _ready() -> void:
 	# How far the model's leaf is swung from this node's closed pose.
 	var relative := (global_basis.inverse() * leaf.global_basis).orthonormalized()
 	var authored_angle := relative.get_euler().y
-	_open_angle = signf(authored_angle) * maxf(absf(authored_angle), deg_to_rad(minimum_open_degrees))
+	_open_angle = signf(authored_angle) * clampf(absf(authored_angle), deg_to_rad(minimum_open_degrees), deg_to_rad(maxf(maximum_open_degrees, minimum_open_degrees)))
 
 	_swing = Node3D.new()
 	_swing.name = "Swing"
@@ -78,6 +84,63 @@ func _ready() -> void:
 
 	is_open = start_open
 	_swing.rotation.y = _open_angle if is_open else 0.0
+	if borrow_hardware_from != "":
+		# The other door may not be set up yet; wait until every door is.
+		_borrow_hardware.call_deferred(leaf)
+
+
+## Copies the handles, levers and kick plates of the door whose parts start
+## with `borrow_hardware_from` onto this leaf. Every door is described in its
+## closed pose with the hinge at 0 (see _ready), so the parts are mapped from
+## that door's leaf span across the width (Z) onto this one: flipped when this
+## leaf hangs the other way, scaled to its width, Y (height) unchanged.
+func _borrow_hardware(leaf: MeshInstance3D) -> void:
+	var source: InteractiveDoor = null
+	for door in get_tree().get_nodes_in_group(GROUP):
+		if door != self and door.part_prefix == borrow_hardware_from and door._swing != null:
+			source = door
+	if source == null:
+		push_warning("%s: no door with parts '%s' to copy the handles from" % [name, borrow_hardware_from])
+		return
+	var from_leaf: MeshInstance3D = null
+	var hardware: Array[MeshInstance3D] = []
+	for part in source._swing.get_children():
+		if not part is MeshInstance3D:
+			continue
+		if String(part.name).begins_with(borrow_hardware_from + "Leaf"):
+			from_leaf = part
+		else:
+			hardware.append(part)
+	if from_leaf == null or hardware.is_empty():
+		return
+	var from_span := _span_z(from_leaf, source._swing)
+	var to_span := _span_z(leaf, _swing)
+	# Hinge-side and free-side ends of each leaf (nearest / farthest from 0).
+	var from_hinge := from_span.x if absf(from_span.x) < absf(from_span.y) else from_span.y
+	var from_free := from_span.y if from_hinge == from_span.x else from_span.x
+	var to_hinge := to_span.x if absf(to_span.x) < absf(to_span.y) else to_span.y
+	var to_free := to_span.y if to_hinge == to_span.x else to_span.x
+	var z_scale := (to_free - to_hinge) / (from_free - from_hinge)
+	# A negative Z scale also flips X, which keeps it a turn (no mirrored parts).
+	var mapping := Transform3D(Basis.from_scale(Vector3(signf(z_scale), 1.0, z_scale)), Vector3(0, 0, to_hinge - from_hinge * z_scale))
+	for part in hardware:
+		var copy := part.duplicate() as MeshInstance3D
+		copy.name = part_prefix + String(part.name).trim_prefix(borrow_hardware_from)
+		_swing.add_child(copy)
+		copy.transform = mapping * (source._swing.global_transform.affine_inverse() * part.global_transform)
+
+
+## The leaf's extent across the doorway (Z) in `frame` (the closed-door space).
+func _span_z(mesh: MeshInstance3D, frame: Node3D) -> Vector2:
+	var to_frame := frame.global_transform.affine_inverse() * mesh.global_transform
+	var box := mesh.get_aabb()
+	var low := INF
+	var high := -INF
+	for i in 8:
+		var z: float = (to_frame * box.get_endpoint(i)).z
+		low = minf(low, z)
+		high = maxf(high, z)
+	return Vector2(low, high)
 
 
 func _is_door_part(mesh_name: String) -> bool:

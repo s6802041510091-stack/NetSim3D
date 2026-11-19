@@ -105,7 +105,11 @@ func _run() -> void:
 	_check(player.global_position.x > -4.5, "old invisible wall blocks widened corridor: " + str(player.global_position))
 	# Follow a continuous L-shaped approach to the classroom, without teleporting
 	# across the stale wall as the old short doorway ray test did.
-	await _walk(player, PI, 38)
+	# 42 frames ends near the middle of the doorway (z ≈ -8.45). The door now
+	# opens 90° like the others (2026-11-19, it used to swing 117° back into
+	# its own jamb), so its leaf stands on the hinge edge at z = -8.95 and a
+	# path hugging that side (38 frames, z -8.64) brushed the leaf.
+	await _walk(player, PI, 42)
 	var door: InteractiveDoor = main.get_node("Doors/ClassroomDoor")
 	_check(door.set_open(true, false), "classroom could not open")
 	await physics_frame
