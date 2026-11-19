@@ -20,8 +20,13 @@ const PANEL_MATERIAL := "MAP | Light diffuser"
 ## Room panel copied to places that have a ceiling but no fixture.
 const TEMPLATE_PANEL := "Light_Panel_ITSupport"
 ## Centre (x, z) of each added panel. IT return area between the IT Support
-## room and the storeroom: its ceiling had no light.
-const EXTRA_PANELS := {"Light_Panel_ITReturn": Vector2(-10.8, -33.75)}
+## room and the storeroom, and the stairwell landing: no light in either.
+const EXTRA_PANELS := {
+	"Light_Panel_ITReturn": Vector2(-10.8, -33.75),
+	# Stairwell main landing, under the upper floor (added 2026-11-19 with
+	# the stairwell finishes, StairwellDecor): it was the darkest place.
+	"Light_Panel_StairLanding": Vector2(-10.3, -27.3),
+}
 
 const ROOM_ENERGY := 3.3
 ## Panels in small rooms or close together (and the long corridor) made those

@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://scenes/props/corridor_furnishings.tscn" id="21_corridor"]
 [ext_resource type="PackedScene" path="res://scenes/npc/corridor_students.tscn" id="22_students"]
 [ext_resource type="Script" path="res://scripts/props/ceiling_lights.gd" id="23_ceiling_lights"]
+[ext_resource type="Script" path="res://scripts/props/stairwell_decor.gd" id="24_stairwell"]
 
 [sub_resource type="Environment" id="Environment"]
 background_mode = 1
@@ -155,6 +156,9 @@ transform = Transform3D(-3.6199901e-06, 0, -1, 0, 1, 0, 1, 0, -3.6199901e-06, 5.
 
 [node name="CeilingLights" type="Node3D" parent="."]
 script = ExtResource("23_ceiling_lights")
+
+[node name="StairwellDecor" type="Node3D" parent="."]
+script = ExtResource("24_stairwell")
 
 [node name="Ambience" type="Node" parent="." unique_id=1774100001]
 
