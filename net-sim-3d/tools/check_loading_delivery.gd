@@ -1,5 +1,6 @@
 extends SceneTree
-const OUTPUT := "D:/NetSim3D/Preview/UI_หน้าโหลด/"
+## Screenshots go to $NETSIM_SHOTS (a folder ending in /) or user://.
+var OUTPUT: String = OS.get_environment("NETSIM_SHOTS") if OS.get_environment("NETSIM_SHOTS") != "" else "user://"
 
 func _initialize() -> void:
 	call_deferred("_check")
@@ -47,18 +48,23 @@ func _check() -> void:
 		assert(flow.loading)
 		var last_percent := 0.0
 		var saw_in_between := false
+		var shot_loading := false
 		var deadline := Time.get_ticks_msec() + 30000
 		while flow.loading and Time.get_ticks_msec() < deadline:
 			await process_frame
-			var percent: float = flow._progress.value
+			var percent: float = flow._load_percent
 			assert(percent >= last_percent)
 			assert(is_equal_approx(flow._loading_visual.mail_progress, percent / 100.0))
 			assert(Input.mouse_mode == Input.MOUSE_MODE_VISIBLE)
+			if not shot_loading and percent > 30 and percent < 100:
+				shot_loading = true
+				await _shot("loading-" + code)
 			saw_in_between = saw_in_between or (percent > 0 and percent < 100)
 			last_percent = percent
 		assert(saw_in_between)
 		assert(not flow.loading)
-		assert(flow._progress.value == 100.0)
+		assert(flow._load_percent == 100)
+		assert(flow._body.find_children("*", "ProgressBar", true, false).is_empty())
 		assert(flow._loading_visual.mail_progress == 1.0)
 		assert(not flow._status.visible)
 		assert(sound.history.count("load_complete") == 1)

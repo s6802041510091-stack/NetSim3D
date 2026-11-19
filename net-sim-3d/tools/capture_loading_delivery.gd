@@ -16,13 +16,6 @@ func _capture() -> void:
 	var visual := LoadingDelivery.new()
 	flow._body.add_child(visual)
 	visual.set_percent(68)
-	var bar := ProgressBar.new()
-	bar.custom_minimum_size.y = 12
-	bar.show_percentage = false
-	bar.add_theme_stylebox_override("background", flow._panel(Color("d7e8ee"), 9))
-	bar.add_theme_stylebox_override("fill", flow._panel(flow.CORAL, 9))
-	bar.value = 68
-	flow._body.add_child(bar)
 	flow._label("กำลังโหลด . . . 68%", 32, flow.INK, true).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	await create_timer(0.4).timeout
 	var image := root.get_texture().get_image()

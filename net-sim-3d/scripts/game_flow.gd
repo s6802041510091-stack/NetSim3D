@@ -69,7 +69,7 @@ const CARD_PAD_Y := 25
 const SMALL_CARD_WIDTH := 600
 var _body: VBoxContainer
 var _page_title: Label
-var _progress: ProgressBar
+var _load_percent := 0 # shown on the loading screen
 var _status: Label
 var _loading_visual: LoadingDelivery
 var _config := ConfigFile.new()
@@ -785,12 +785,9 @@ func start_level(level: int) -> void:
 	_page("Level %d  /  กำลังโหลด" % level, TITLES[level - 1])
 	_loading_visual = LoadingDelivery.new()
 	_body.add_child(_loading_visual)
-	_progress = ProgressBar.new()
-	_progress.custom_minimum_size.y = 12
-	_progress.show_percentage = false
-	_progress.add_theme_stylebox_override("background", _panel(Color("d7e8ee"), 9))
-	_progress.add_theme_stylebox_override("fill", _panel(CORAL, 9))
-	_body.add_child(_progress)
+	# No progress bar (removed 2026-11-19 at the user's request): the mail
+	# travelling between the computers and the percentage show the progress.
+	_load_percent = 0
 	_status = _label("กำลังโหลด . . . 0%", 32, INK, true)
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	loading = true
@@ -830,7 +827,7 @@ func _process(delta: float) -> void:
 		_show_start_prompt(_load_saved)
 
 func _set_load_progress(percent: int) -> void:
-	_progress.value = percent
+	_load_percent = percent
 	_loading_visual.set_percent(percent)
 	_status.text = "กำลังโหลด . . . %d%%" % percent
 
