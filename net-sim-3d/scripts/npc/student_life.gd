@@ -12,6 +12,7 @@ const WEST_LANE := -7.35 # walking toward -Z (the IT/server end)
 const EAST_LANE := -4.95 # walking toward +Z (the computer-room end)
 const Z_MIN := -43.4
 const Z_MAX := 9.2
+const SpeechBubble := preload("res://scripts/npc/speech_bubble.gd")
 const SEAT_SLOT := .36 # two people per bench, either side of its middle
 const MAX_WALKERS := 3
 const STAY := Vector2(60, 90) # seconds at a bench/wall/window
@@ -39,6 +40,28 @@ var chat_spots := {
 	"chat_end": [Vector3(-3.9, .02, -42.6), Vector3(-4.8, .02, -43.4)],
 	"chat_w1": [Vector3(-8.5, .02, 5.7), Vector3(-8.45, .02, 4.75)],
 }
+## What two friends say to each other, in turns (0 = whoever starts, 1 = the
+## other). Friends' talk: no polite endings, and no "I/you" words that tell
+## a boy from a girl, so any pair can say any of these. One conversation,
+## a short quiet pause, then the next from a shuffled deck.
+const CHAT_LINES := [
+	[[0, "งานวิชาเครือข่ายต้องส่งวันไหนนะ"], [1, "วันศุกร์นี้ ยังไม่ได้เริ่มเลย"], [0, "เหมือนกันเลย คืนนี้ทำด้วยกันไหม"], [1, "ได้ เจอกันที่ห้องสมุดหลังเลิกเรียน"]],
+	[[0, "ห้องคอมใหม่เสร็จหรือยังอะ"], [1, "ได้ยินว่าพี่ฝ่าย IT กำลังเดินสายแลนอยู่"], [0, "อยากใช้เครื่องใหม่แล้ว"], [1, "เสร็จเมื่อไหร่ไปจองที่ริมหน้าต่างกัน"]],
+	[[0, "เที่ยงนี้กินอะไรดี"], [1, "ข้าวมันไก่ที่โรงอาหารไหม"], [0, "คิวยาวทุกวันเลยอะ"], [1, "งั้นพักเที่ยงปุ๊บรีบลงไปเลย"]],
+	[[0, "สอบกลางภาคอาทิตย์หน้าแล้วนะ"], [1, "เร็วมาก ยังอ่านไม่ทันเลย"], [0, "กลัววิชาคณิตที่สุด"], [1, "เดี๋ยวติวให้ พอทำได้อยู่"], [0, "ขอบคุณมาก เลี้ยงชานมเลย"]],
+	[[0, "Wi-Fi ตึกนี้หลุดบ่อยจัง"], [1, "เห็นว่ากำลังติด Access Point ตัวใหม่"], [0, "หวังว่าจะเร็วขึ้นนะ"], [1, "ส่งงานออนไลน์ทีไรเน็ตหลุดทุกที"]],
+	[[0, "กีฬาสีปีนี้ได้สีอะไร"], [1, "สีฟ้า"], [0, "สีเดียวกันเลย เย้"], [1, "เย็นนี้ซ้อมเชียร์นะ อย่าลืม"]],
+	[[0, "เมื่อคืนเล่นเกมจนตีสอง"], [1, "มิน่าหาวทั้งเช้า"], [0, "ง่วงมากจริง ๆ"], [1, "คาบหน้าอย่าหลับนะ ครูเช็กชื่อ"]],
+	[[0, "คาบบ่ายเข้าแล็บเข้าหัวสายแลนนะ"], [1, "ต้องเรียงสีสายตาม T568B ใช่ไหม"], [0, "ใช่ ขาวส้ม ส้ม ขาวเขียว ฟ้า"], [1, "แล้วก็ขาวฟ้า เขียว ขาวน้ำตาล น้ำตาล"], [0, "จำแม่นมาก"]],
+	[[0, "ปิดเทอมนี้ไปไหนไหม"], [1, "กลับบ้านต่างจังหวัด ช่วยที่บ้านขายของ"], [0, "ดีจัง ได้พักด้วย"], [1, "แล้วจะซื้อของฝากมาให้นะ"]],
+	[[0, "ฝึกงานปีหน้าอยากไปที่ไหน"], [1, "อยากไปฝ่าย IT ของบริษัทใหญ่ ๆ"], [0, "อยากไปด้วย จะได้ดูแลเซิร์ฟเวอร์จริง"], [1, "งั้นตั้งใจเรียนวิชาเครือข่ายเยอะ ๆ"]],
+]
+## How close the player must be to see the corridor chat (m).
+const CHAT_HEAR_RANGE := 8.0
+const CHAT_PAUSE := Vector2(4.0, 8.0) # quiet seconds between two conversations
+## Larger than the staff-room bubbles: read from across the corridor.
+const CHAT_TEXT_SCALE := 1.35
+
 const BENCHES := ["BenchLeft01", "BenchLeft02", "BenchLeft03", "BenchLeft04",
 	"BenchRight01", "BenchRight02", "BenchRight03", "BenchRight04"]
 
@@ -48,7 +71,11 @@ var students: Array[StudentCharacter] = []
 var player: CharacterBody3D
 var furnishings: Node3D
 var reserved := {} # spot key -> student
-var groups := {} # chat key -> {"members": [a, b], "speaker": s, "next": seconds}
+## chat key -> {"members": [a, b], "speaker": s or null, "next": seconds,
+## "talk": CHAT_LINES index, "line": line index (-1 before the first),
+## "bubble": the Label3D shown over the speaker, or null}
+var groups := {}
+var _talk_deck: Array[int] = [] # shuffled CHAT_LINES indices still to use
 var history := {} # student id -> recent plan kinds, newest last
 var _serial := 0
 var cleaner: CleanerCharacter
@@ -193,11 +220,72 @@ func _physics_process(delta: float) -> void:
 		var g: Dictionary = groups[key]
 		var a: StudentCharacter = g["members"][0]
 		if not a._chat_started:
+			# Still on the way, or one of them is leaving: nobody speaks.
+			_drop_bubble(g)
+			g["speaker"] = null
 			continue
 		g["next"] -= delta
 		if g["next"] <= 0:
-			g["speaker"] = g["members"][1] if g["speaker"] == g["members"][0] else g["members"][0]
-			g["next"] = rng.randf_range(3.5, 7.5)
+			_next_line(g)
+	_tidy_bubbles()
+
+## The next line of the group's conversation over the speaker's head; after
+## the last line both are quiet a while, then a new conversation starts.
+func _next_line(g: Dictionary) -> void:
+	_drop_bubble(g)
+	var talk: Array = CHAT_LINES[g["talk"]]
+	g["line"] += 1
+	if g["line"] >= talk.size():
+		g["speaker"] = null
+		g["line"] = -1
+		g["talk"] = _deal_talk()
+		g["next"] = rng.randf_range(CHAT_PAUSE.x, CHAT_PAUSE.y)
+		return
+	var entry: Array = talk[g["line"]]
+	var who: StudentCharacter = g["members"][entry[0]]
+	var text: String = entry[1]
+	g["speaker"] = who
+	var bubble := SpeechBubble.create(self, who, text, CHAT_TEXT_SCALE)
+	bubble.visible = _can_overhear(bubble)
+	g["bubble"] = bubble
+	# Long enough to read: about 2.8 s for a short line, up to 5.5 s.
+	g["next"] = clampf(1.4 + text.length() * 0.07, 2.8, 5.5)
+
+func _deal_talk() -> int:
+	if _talk_deck.is_empty():
+		for i in CHAT_LINES.size():
+			_talk_deck.append(i)
+		for i in range(_talk_deck.size() - 1, 0, -1):
+			var j := rng.randi_range(0, i)
+			var t := _talk_deck[i]
+			_talk_deck[i] = _talk_deck[j]
+			_talk_deck[j] = t
+	return _talk_deck.pop_back()
+
+func _drop_bubble(g: Dictionary) -> void:
+	var bubble: Label3D = g.get("bubble")
+	if bubble != null and is_instance_valid(bubble):
+		bubble.queue_free()
+	g["bubble"] = null
+
+## Bubbles of chats that ended (a friend left) go; the rest show only to a
+## player close enough to overhear them.
+func _tidy_bubbles() -> void:
+	for bubble: Node in get_children():
+		if not bubble is Label3D:
+			continue
+		var owned := false
+		for g: Dictionary in groups.values():
+			if g.get("bubble") == bubble:
+				owned = true
+				break
+		if not owned:
+			bubble.queue_free()
+		else:
+			(bubble as Label3D).visible = _can_overhear(bubble)
+
+func _can_overhear(bubble: Node3D) -> bool:
+	return player != null and player.global_position.distance_to(bubble.global_position) < CHAT_HEAR_RANGE
 
 func is_speaking(student: StudentCharacter) -> bool:
 	var g: Dictionary = groups.get(student.chat_group, {})
@@ -497,7 +585,10 @@ func _release(s: StudentCharacter) -> void:
 func _new_group(a: StudentCharacter, b: StudentCharacter) -> String:
 	_serial += 1
 	var key := "chat%d" % _serial
-	groups[key] = {"members": [a, b], "speaker": a, "next": rng.randf_range(3.5, 6.5)}
+	# Either friend may open the conversation; the first line comes soon.
+	var members := [a, b] if rng.randf() < .5 else [b, a]
+	groups[key] = {"members": members, "speaker": null, "next": rng.randf_range(1.0, 3.0),
+		"talk": _deal_talk(), "line": -1, "bubble": null}
 	return key
 
 func _near_weight(s: StudentCharacter, at: Vector3) -> float:

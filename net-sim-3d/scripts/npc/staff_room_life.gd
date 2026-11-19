@@ -15,6 +15,7 @@ extends Node
 ## GameFlow.configure_level calls setup() before the world enters the tree.
 
 const NPC_SCRIPT := "res://scripts/npc/npc_character.gd"
+const SpeechBubble := preload("res://scripts/npc/speech_bubble.gd")
 const FEMALE_SCENE := "res://scenes/teacher_female.tscn"
 
 ## Seated pose and hand targets per teacher. Desk layout (both desks the same):
@@ -356,34 +357,13 @@ func _walk_home(teacher: NpcCharacter, route: Array) -> void:
 
 ## A speech bubble over `who`'s head for `seconds`.
 func say(who: NpcCharacter, text: String, seconds: float) -> void:
-	var bubble := Label3D.new()
-	bubble.name = "SpeechBubble"
-	bubble.text = text
-	bubble.font = GameUI.FONT_BOLD
-	bubble.font_size = 40
-	bubble.pixel_size = 0.0016
-	bubble.outline_size = 12
-	bubble.outline_modulate = Color(0.05, 0.08, 0.14, 0.9)
-	bubble.modulate = Color(1.0, 1.0, 1.0)
-	bubble.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	bubble.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	bubble.width = 560.0
-	bubble.visible = false
-	get_parent().add_child(bubble)
-	bubble.global_position = _head_of(who) + Vector3.UP * 0.32
+	var bubble := SpeechBubble.create(get_parent(), who, text)
 	_bubbles.append(bubble)
 	Sound.play("type_tick", who, -6.0)
 	await get_tree().create_timer(seconds, false).timeout
 	_bubbles.erase(bubble)
 	if is_instance_valid(bubble):
 		bubble.queue_free()
-
-
-func _head_of(who: NpcCharacter) -> Vector3:
-	var head := who.skeleton.find_bone("head") if who.skeleton else -1
-	if head < 0:
-		return who.global_position + Vector3.UP * 1.6
-	return who.skeleton.global_transform * who.skeleton.get_bone_global_pose(head).origin
 
 
 func _set_greeting(teacher: NpcCharacter, on: bool) -> void:
