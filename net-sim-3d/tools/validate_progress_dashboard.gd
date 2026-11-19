@@ -3,7 +3,10 @@ extends SceneTree
 ## Progress dashboard of the main menu (added 2026-11-18): the fifth home
 ## button, the overview of every level and the per-level page with the
 ## attempt history. Uses a scratch progress file, so real results are untouched.
-## Screenshots go to Preview/ความคืบหน้า/ (run WITHOUT --headless for them):
+## Run it WITH a window (not --headless): the checks that the level page
+## scrolls inside the card and that the back button stays in view need a
+## real screen (headless they fail), and the screenshots go to
+## Preview/ความคืบหน้า/:
 ##   godot --path net-sim-3d -s res://tools/validate_progress_dashboard.gd
 
 const SHOTS := "res://../Preview/ความคืบหน้า"

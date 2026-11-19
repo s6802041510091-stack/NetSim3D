@@ -322,7 +322,10 @@ class SummaryStars:
 			_star(center, radius, EMPTY_FILL, EMPTY_EDGE, false)
 			if i < mini(earned, 3) or is_rainbow():
 				var s := shown[i]
-				if s > 0.0:
+				# The pop-in starts from nothing: a star a pixel wide has all
+				# its points on top of each other and cannot be filled
+				# ("Invalid polygon data, triangulation failed").
+				if radius * s >= 1.5:
 					_star(center, radius * s, GameUI.GOLD, GOLD_EDGE, is_rainbow(), i)
 
 	func _star(center: Vector2, radius: float, fill: Color, edge: Color, rainbow: bool, index: int = 0) -> void:
