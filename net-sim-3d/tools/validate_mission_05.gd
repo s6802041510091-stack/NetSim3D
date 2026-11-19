@@ -240,6 +240,40 @@ func _run() -> void:
 	await _boot(manager, target, player)
 	_check(desktop.visible and desktop._winsec_icon.visible and desktop._security_toast.visible, "desktop with the icon and the warning pop-up")
 	_check(mission.stage == Mission05Controller.Stage.OPEN and not mission.dialogue.is_open(), "step 3: open Windows Security (nothing asked on the desktop)")
+	# The cracked game's shortcut: SmartScreen stops it; nothing counts.
+	var crack := desktop.find_child("GameCrackIcon", true, false) as Button
+	_check(crack != null and crack.visible, "the game's shortcut is on the desktop")
+	var wrong_before := mission.state.wrong_count()
+	crack.pressed.emit()
+	await _frames(1)
+	var smartscreen := desktop.find_child("SmartScreenPanel", true, false)
+	_check(smartscreen != null and _text_of(smartscreen).contains("Windows protected your PC") and _text_of(smartscreen).contains(data.threat_file), "opening it: SmartScreen blocks the unknown app")
+	(desktop.find_child("DontRunButton", true, false) as Button).pressed.emit()
+	await _frames(2)
+	_check(desktop.find_child("SmartScreenPanel", true, false) == null and mission.state.wrong_count() == wrong_before and mission.stage == Mission05Controller.Stage.OPEN, "Don't run closes it; the mission is unchanged")
+	# The mouse wheel at the computer scrolls the objective list only over it.
+	var hud := mission.hud
+	if hud.collapsed:
+		hud.toggle()
+	await _frames(2)
+	if hud.steps_scrollable():
+		var steps: ScrollContainer = hud._steps_scroll
+		steps.scroll_vertical = 0
+		var turn := func(at: Vector2):
+			var wheel := InputEventMouseButton.new()
+			wheel.button_index = MOUSE_BUTTON_WHEEL_DOWN
+			wheel.pressed = true
+			wheel.position = at
+			wheel.global_position = at
+			root.push_input(wheel)
+		turn.call(Vector2(400, 300)) # on the computer's desktop
+		await _frames(2)
+		_check(steps.scroll_vertical == 0, "wheel on the computer screen leaves the objective list alone")
+		turn.call(hud._objective_panel.get_global_rect().get_center())
+		await _frames(2)
+		_check(steps.scroll_vertical > 0, "wheel over the objective list scrolls it")
+	else:
+		_check(false, "the objective list should be long enough to scroll here")
 
 	# 3. The program (Windows 11 look, English).
 	var app := desktop.open_windows_security() as WindowsSecurity
@@ -350,7 +384,7 @@ func _run() -> void:
 	await _frames(1)
 	(app.find_child("Exclude_File", true, false) as Button).pressed.emit()
 	await _frames(1)
-	(app.find_child("File_Student_Game_Crack", true, false) as Button).pressed.emit()
+	(app.find_child("File_GTA7 real", true, false) as Button).pressed.emit()
 	await _frames(1)
 	(app.find_child("PickerOpen", true, false) as Button).pressed.emit()
 	await _frames(2)
@@ -366,6 +400,8 @@ func _run() -> void:
 	(app.find_child("StartActionsButton", true, false) as Button).pressed.emit()
 	await _frames(2)
 	_check(mission.state.threat_quarantined and _text_of(app).contains("No current threats.") and not target.screen_alert, "quarantined, warning screen gone")
+	await _frames(1)
+	_check(not crack.visible, "the game's shortcut is gone from the desktop")
 	_check(mission.stage == Mission05Controller.Stage.SUBMIT and not mission.dialogue.is_open(), "step 7, nothing asked on the computer")
 
 	# 7. Protection history (process 5), Home all green, submit.

@@ -44,5 +44,9 @@ static func _svg(id: String) -> String:
 		"teamviewer": paths = '<rect x="4" y="4" width="56" height="56" rx="12" fill="#087cdb"/><circle cx="32" cy="32" r="22" fill="white"/><path d="m12 32 12-10v7h16v-7l12 10-12 10v-7H24v7z" fill="#087cdb"/>'
 		"mail": paths = '<rect x="6" y="14" width="52" height="38" rx="5" fill="#0f6cbd"/><path d="m8 18 24 18 24-18" fill="none" stroke="white" stroke-width="4" stroke-linejoin="round"/>'
 		"browser": paths = '<circle cx="32" cy="32" r="26" fill="#1a8ae6"/><g fill="none" stroke="white" stroke-width="3"><circle cx="32" cy="32" r="22"/><ellipse cx="32" cy="32" rx="10" ry="22"/><path d="M10 32h44M14 21h36M14 43h36"/></g>'
+		# Mission 5's cracked game (made up, no real game's art) and the
+		# shortcut arrow drawn over a desktop shortcut.
+		"game_crack": paths = '<rect x="4" y="4" width="56" height="56" rx="12" fill="#5b2a86"/><path d="M15 26c0-5 4-8 8-8h18c4 0 8 3 8 8l3 13c1 5-5 8-8 4l-5-6H25l-5 6c-3 4-9 1-8-4z" fill="white"/><path d="M23 25v9m-4.5-4.5h9" stroke="#5b2a86" stroke-width="3.2" stroke-linecap="round"/><circle cx="40" cy="27" r="2.6" fill="#e0457b"/><circle cx="45" cy="32" r="2.6" fill="#e0457b"/>'
+		"shortcut": paths = '<rect x="3" y="3" width="58" height="58" rx="6" fill="white" stroke="#6b7480" stroke-width="4"/><path d="M16 48c0-15 10-24 26-24v-9l13 14-13 14v-9c-12 0-20 4-26 14z" fill="#1a73e8"/>'
 		_: paths = '<circle cx="32" cy="32" r="24" fill="#237db1"/>'
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' + paths + '</svg>'

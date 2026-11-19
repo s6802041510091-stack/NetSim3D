@@ -37,8 +37,10 @@ extends Resource
 @export_group("Anti-Virus")
 ## Seconds the simulated scan takes (the design asks for 3–5 s).
 @export_range(1.0, 10.0, 0.5) var scan_seconds: float = 4.0
-@export var threat_file: String = "Student_Game_Crack.exe"
-@export var threat_path: String = "C:\\Users\\Student\\Downloads\\Student_Game_Crack.exe"
+## The cracked game the student downloaded (name chosen by the user,
+## 2026-11-19: no such game exists; the scan finds no real file).
+@export var threat_file: String = "GTA7 real.exe"
+@export var threat_path: String = "C:\\Users\\Student\\Downloads\\GTA7 real.exe"
 ## Detection name in the style Windows uses (made up).
 @export var threat_name: String = "HackTool:Win32/GameCrack.A"
 @export var threat_risk: String = "High"

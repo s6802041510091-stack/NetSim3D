@@ -113,6 +113,10 @@ func _run() -> void:
 	manager.open_computer(target, player)
 	await create_timer(manager.zoom_time + DesktopOS.BOOT_TIME + 0.6).timeout
 	await _shot("m5_04_desktop_warning")
+	# The cracked game's shortcut, opened: SmartScreen stops it.
+	(desktop.find_child("GameCrackIcon", true, false) as Button).pressed.emit()
+	await _shot("m5_04b_smartscreen")
+	(desktop.find_child("DontRunButton", true, false) as Button).pressed.emit()
 	var app := desktop.open_windows_security() as WindowsSecurity
 	await create_timer(0.3).timeout
 	await _shot("m5_05_home")

@@ -64,6 +64,9 @@ var _teamviewer: Control
 var _browser_icon: Control
 ## Mission 6: the Mail app (an inbox on computers that have "mail").
 var _mail_icon: Control
+## Mission 5: the shortcut to the cracked game the student downloaded (the
+## file is in Downloads); gone once Windows Security quarantines it.
+var _crack_icon: Control
 var _mail_toast: PanelContainer
 var _mail_toast_label: Label
 var _mail_toast_until := 0
@@ -141,6 +144,7 @@ func _show_desktop() -> void:
 	_teamviewer_icon.visible = station.has_app("teamviewer")
 	_browser_icon.visible = station.has_app("browser")
 	_mail_icon.visible = station.has_app("mail")
+	_crack_icon.visible = _crack_on_disk()
 	_mail_toast.visible = false
 	_announce_unread_mail.call_deferred()
 	for app_id: String in _app_menu_buttons:
@@ -158,6 +162,7 @@ func _process(_delta: float) -> void:
 	if visible and _desktop.visible:
 		_update_clock()
 		_update_taskbar()
+		_crack_icon.visible = _crack_on_disk() # it goes the moment it is quarantined
 		_tray_network.text = "LAN ✓" if station.network_connected else "LAN ✗"
 		if _mail_toast.visible and Time.get_ticks_msec() > _mail_toast_until:
 			_mail_toast.visible = false
@@ -269,6 +274,15 @@ func _build_desktop() -> void:
 	_mail_icon.name = "MailIcon"
 	icons.add_child(_mail_icon)
 	icons.add_child(_desktop_icon("bin", "Recycle Bin", _open_recycle_bin))
+	# Windows hides known file extensions: the shortcut shows the name only,
+	# with the shortcut arrow over its picture.
+	_crack_icon = _desktop_icon("game_crack", "GTA7 real", _open_game_crack)
+	_crack_icon.name = "GameCrackIcon"
+	var arrow := _icon_view("shortcut", 16)
+	arrow.position = Vector2(0, 30)
+	(_crack_icon.get_child(0).get_child(0) as Control).add_child(arrow)
+	_crack_icon.visible = false
+	icons.add_child(_crack_icon)
 
 	_window_layer = Control.new()
 	_window_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -1084,6 +1098,52 @@ func open_netplan_edu() -> Control:
 	app.connect("computer_exit_requested", func(): shutdown_requested.emit())
 	app_opened.emit("netplan_edu", app)
 	return app
+
+
+## The cracked game is still on this (Mission 5) computer: not quarantined yet.
+func _crack_on_disk() -> bool:
+	var progress := WindowsSecurity.shared_state
+	return station != null and station.has_app("windows_security") and progress != null and not progress.threat_quarantined
+
+
+## Opening the game: Microsoft Defender SmartScreen stops it (no "Run anyway"
+## on the school's managed PC). Nothing here counts in the mission.
+func _open_game_crack() -> void:
+	if not _crack_on_disk():
+		return
+	var data := load(WindowsSecurity.DATA_PATH) as Mission05Data
+	var window := _open_window("smartscreen", "Microsoft Defender SmartScreen", Vector2(560, 300), func(body):
+		var panel := PanelContainer.new()
+		panel.name = "SmartScreenPanel"
+		var blue := _flat(Color("0063b1"))
+		blue.content_margin_left = 28
+		blue.content_margin_right = 28
+		blue.content_margin_top = 22
+		blue.content_margin_bottom = 20
+		panel.add_theme_stylebox_override("panel", blue)
+		panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		body.add_child(panel)
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override("separation", 12)
+		panel.add_child(col)
+		col.add_child(_label("Windows protected your PC", 26, Color.WHITE))
+		var text := _label("Microsoft Defender SmartScreen prevented an unrecognized app from starting. Running this app might put your PC at risk.", 15, Color.WHITE)
+		text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		text.custom_minimum_size = Vector2(500, 0)
+		col.add_child(text)
+		col.add_child(_label("App:          %s\nPublisher:  Unknown publisher" % data.threat_file, 15, Color.WHITE))
+		var row := HBoxContainer.new()
+		row.alignment = BoxContainer.ALIGNMENT_END
+		row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		col.add_child(row)
+		var dont := Button.new()
+		dont.name = "DontRunButton"
+		dont.text = "Don't run"
+		dont.custom_minimum_size = Vector2(120, 34)
+		dont.size_flags_vertical = Control.SIZE_SHRINK_END
+		dont.pressed.connect(func(): _close_window("smartscreen"))
+		row.add_child(dont))
+	window.move_to_front()
 
 
 func _open_recycle_bin() -> void:

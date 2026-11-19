@@ -162,7 +162,7 @@ Status: Waiting for permission
 
 ```text
 Threats found: 1
-File: Student_Game_Crack.exe
+File: GTA7 real.exe
 Risk level: High
 Status: Action required
 ```
@@ -360,7 +360,7 @@ Security status: Protected
 
 ## เนื้อเรื่อง v2 (ไอเดีย 4)
 
-เมื่อวานนักเรียนคนหนึ่งดาวน์โหลด `Student_Game_Crack.exe` (โปรแกรมแคร็กเกม) มาไว้ในโฟลเดอร์ Downloads ของเครื่อง `PC-R3-L2` และเปิดใช้งาน โปรแกรมนี้แอบสร้าง `Unknown_Update.exe` ซึ่งพยายามเปิดรับการเชื่อมต่อจากเครือข่ายเข้ามาที่เครื่อง
+เมื่อวานนักเรียนคนหนึ่งดาวน์โหลด `GTA7 real.exe` (โปรแกรมแคร็กเกม) มาไว้ในโฟลเดอร์ Downloads ของเครื่อง `PC-R3-L2` และเปิดใช้งาน โปรแกรมนี้แอบสร้าง `Unknown_Update.exe` ซึ่งพยายามเปิดรับการเชื่อมต่อจากเครือข่ายเข้ามาที่เครื่อง
 
 ในเวลาเดียวกัน ครูประจำห้องเพิ่งติดตั้งโปรแกรมของโรงเรียน `SchoolLab Classroom` สำหรับส่งหน้าจอครูไปยังเครื่องนักเรียนในคาบเรียนวันนี้ ทำให้ Windows แสดงหน้าต่างแจ้งเตือน Firewall ของทั้งสองโปรแกรม
 
@@ -447,7 +447,7 @@ Path:      C:\Users\Student\Downloads\Unknown_Update.exe
 
 ```text
 Affected items:
-  file: C:\Users\Student\Downloads\Student_Game_Crack.exe
+  file: C:\Users\Student\Downloads\GTA7 real.exe
   file: C:\Users\Student\Downloads\Unknown_Update.exe
 ```
 
