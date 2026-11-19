@@ -313,11 +313,20 @@ func _refresh() -> void:
 func _input(event: InputEvent) -> void:
 	if not _objective_panel.visible:
 		return
-	# Mouse wheel: scroll a long step list (works with the mouse captured).
+	# Mouse wheel: scroll a long step list. With the mouse captured (walking
+	# about) any wheel turn does it; with a visible cursor (at a computer,
+	# in a dialog) only over the panel, and then the page under the cursor
+	# does not scroll as well (user 2026-11-19: the wheel on the computer
+	# screen also scrolled this list).
 	if event is InputEventMouseButton and event.pressed and not collapsed and steps_scrollable():
 		var wheel := (event as InputEventMouseButton).button_index
 		if wheel == MOUSE_BUTTON_WHEEL_UP or wheel == MOUSE_BUTTON_WHEEL_DOWN:
+			var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+			if not captured and not _objective_panel.get_global_rect().has_point((event as InputEventMouseButton).position):
+				return
 			_steps_scroll.scroll_vertical += int(WHEEL_STEP * (-1.0 if wheel == MOUSE_BUTTON_WHEEL_UP else 1.0))
+			if not captured:
+				get_viewport().set_input_as_handled()
 			return
 	if not event is InputEventKey:
 		return
