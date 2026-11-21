@@ -740,6 +740,8 @@ func configure_level(world: Node, level: int) -> void:
 	# The teachers work in the teachers' room when the level's mission does not
 	# need them (the male teacher stands in the computer room in Levels 3, 5).
 	StaffRoomLife.setup(world, level)
+	# ครูแสตมป์ at the laptop in the science room, in every level.
+	load("res://scripts/npc/science_teacher.gd").call("setup", world, level)
 	if level == 1:
 		var mission: Node = load("res://missions/mission_01/scripts/mission_01_controller.gd").new()
 		mission.name = "Mission01"
