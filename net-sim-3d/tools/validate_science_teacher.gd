@@ -85,8 +85,33 @@ func _test_level_1(map: Node3D, teacher: NpcCharacter) -> void:
 	var chair := map.get_node("MapVisual/" + TEACHER.CHAIR) as MeshInstance3D
 	var chair_center: Vector3 = chair.global_transform * chair.get_aabb().get_center()
 	_check(Vector2(chair_center.x - TEACHER.SEAT.x, chair_center.z - TEACHER.SEAT.z).length() < 0.12, "chair under him: %s" % chair_center)
+	# The chair's backrest is behind him, not between him and the bench.
+	var back_z := -INF
+	for v: Vector3 in chair.mesh.get_faces():
+		var w := chair.global_transform * v
+		if w.y > 0.85:
+			back_z = maxf(back_z, w.z)
+	_check(back_z < TEACHER.SEAT.z, "backrest behind him: z %.2f" % back_z)
+	# Shoes stop at the bench cabinet (front face z -7.875); knees under the top's edge.
+	var skeleton := teacher.find_children("*", "Skeleton3D", true, false)[0] as Skeleton3D
+	var foremost := -INF
+	for bone in skeleton.get_bone_count():
+		var bone_name := skeleton.get_bone_name(bone)
+		if bone_name.begins_with("toe") or bone_name.begins_with("lowerleg"):
+			foremost = maxf(foremost, (skeleton.global_transform * skeleton.get_bone_global_pose(bone).origin).z)
+	_check(foremost < -7.88, "legs clear of the bench cabinet: z %.3f" % foremost)
+	# One laptop: the bench's baked one is gone, his own stands at the edge.
+	var bench := map.get_node("MapVisual/" + TEACHER.BENCH) as MeshInstance3D
+	var screens := 0
+	for surface in bench.mesh.get_surface_count():
+		var material := bench.mesh.surface_get_material(surface)
+		if material and material.resource_name.begins_with("DC | screen"):
+			screens += 1
+	_check(screens == 0 and map.get_node_or_null("StampLaptop") != null, "laptop moved to the bench edge")
+	var credit := map.get_node_or_null("WhiteboardCredit") as Label3D
+	_check(credit != null and credit.text == TEACHER.CREDIT and credit.global_position.x > -13.3 and credit.global_position.y < 1.1, "credit in the whiteboard's corner")
 	var hands := teacher.get_node("KeyboardHand") as Node3D
-	_check(absf(hands.global_position.y - 0.92) < 0.03 and hands.global_position.z > -7.62 and hands.global_position.z < -7.4, "left hand on the laptop: %s" % hands.global_position)
+	_check(absf(hands.global_position.y - 0.92) < 0.03 and hands.global_position.z > -7.89 and hands.global_position.z < -7.70, "left hand on the laptop: %s" % hands.global_position)
 
 	var player := map.get_node("ITSupportPlayer") as CharacterBody3D
 	player.require_mouse_capture = false

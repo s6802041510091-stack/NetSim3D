@@ -17,20 +17,30 @@ const LINES := [
 	"ครูหวังว่าเธอจะชอบ รร. นี้นะ เพราะครูตั้งใจพัฒนาจริงๆ",
 ]
 
-## The laptop sits on the demo bench (top 0.90 m, front edge z -7.91) with its
-## keyboard around (-14.30, -7.52); the screen faces the chair (-Z). He sits
-## facing +Z (model forward), so his left (+X local) is world +X.
-const SEAT := Vector3(-14.30, 0.02, -8.17)
+## The demo bench (top 0.90 m, edge z -7.91) is a closed cabinet with no knee
+## space, so he sits back where the map's chair stands: knees 5 cm short of the
+## top's edge, shoes at the cabinet's kick. He faces +Z (model forward), so his
+## left (+X local) is world +X.
+const SEAT := Vector3(-14.30, 0.02, -8.56)
+const BENCH := "SCI_TeacherDemoBench"
 const CHAIR := "SCI_TeacherChair"
-## The map's chair stands 1.1 m from the laptop: it moves this far toward the bench.
-const CHAIR_FORWARD := 0.38
-## ...and its gas lift goes up as far as he sits higher.
+## The map's chair faces away from the bench: it turns round under him and its
+## gas lift goes up as far as he sits higher.
 const CHAIR_RAISE := 0.12
 const DROP := 0.34 # 12 cm higher than in the teachers' room: the lab bench is 0.90 m
-const LEAN := 12.0
+const LEAN := 18.0
+## The laptop the map bakes into the bench (0.40 m in from the edge, out of his
+## reach from here) comes off the bench mesh; his own stands at the edge, the
+## screen towards him. Base centre, on the bench top:
+const LAPTOP := Vector3(-14.30, 0.91, -7.77)
 ## Left hand / right hand on the touchpad / right hand typing (teacher space).
-const HANDS := [Vector3(0.11, 0.90, 0.60), Vector3(-0.02, 0.895, 0.52), Vector3(-0.09, 0.90, 0.61)]
+const HANDS := [Vector3(0.11, 0.90, 0.73), Vector3(-0.02, 0.895, 0.67), Vector3(-0.09, 0.90, 0.74)]
 const HAND_MARKERS := ["KeyboardHand", "MouseHand", "KeyboardRightHand"]
+
+## The developer's credit, small in marker ink in the bottom-right corner of
+## the science-room whiteboard (board face z -9.705, x -17.3..-13.1, y 0.93..2.18).
+const CREDIT := "Develop by Weeraphat Krunitiwat\nTCT KMUTNB"
+const CREDIT_POS := Vector3(-13.22, 1.02, -9.70)
 
 ## Clothes: shirt, trousers and stitching colours, and whether the khaki
 ## uniform's epaulets stay. Picked by the user from in-game previews.
@@ -68,8 +78,9 @@ static func setup(world: Node, _level: int) -> void:
 	body.set("right_typing_target", NodePath(HAND_MARKERS[2]))
 	body.set("seated", true)
 	world.add_child(body)
-	_move_chair(world)
-	StaffRoomLife.align_chair(world, CHAIR, SEAT, 0.0)
+	_place_chair(world)
+	_move_laptop(world)
+	_write_credit(world)
 	var life: Node = (load(SELF) as GDScript).new()
 	life.name = "ScienceTeacher"
 	life.set("teacher", body)
@@ -105,12 +116,92 @@ static func dress(body: Node, id: String) -> void:
 				mesh.set_surface_override_material(surface, copy)
 
 
-## Slides the map's chair toward the bench so it sits under him.
-static func _move_chair(world: Node) -> void:
+## Turns the map's chair round (backrest behind him, not between him and the
+## bench), centres it under the seat and raises it.
+static func _place_chair(world: Node) -> void:
 	var visual := world.get_node_or_null("MapVisual") as Node3D
-	var chair := visual.get_node_or_null(CHAIR) as Node3D if visual else null
-	if chair:
-		chair.position += visual.basis.inverse() * Vector3(0, CHAIR_RAISE, CHAIR_FORWARD)
+	var chair := visual.get_node_or_null(CHAIR) as MeshInstance3D if visual else null
+	if chair == null:
+		return
+	# World space = the level root's space: setup() runs before it enters the tree.
+	var to_world := visual.transform * chair.transform
+	var center := to_world * chair.get_aabb().get_center()
+	var turned := Transform3D(Basis(Vector3.UP, PI), Vector3.ZERO) * Transform3D(to_world.basis, to_world.origin - center)
+	turned.origin += Vector3(SEAT.x, center.y + CHAIR_RAISE, SEAT.z)
+	chair.transform = visual.transform.affine_inverse() * turned
+
+
+## Takes the baked laptop off the bench mesh (its keys share the polymer
+## surface with the sink basin at the other end; its screen has a surface of
+## its own) and builds the same laptop at the bench edge.
+static func _move_laptop(world: Node) -> void:
+	var visual := world.get_node_or_null("MapVisual") as Node3D
+	var bench := visual.get_node_or_null(BENCH) as MeshInstance3D if visual else null
+	if bench == null or bench.mesh == null:
+		return
+	var old := bench.mesh
+	var mesh := ArrayMesh.new()
+	var polymer: Material = null
+	var screen: Material = null
+	for surface in old.get_surface_count():
+		var material := old.surface_get_material(surface)
+		var arrays := old.surface_get_arrays(surface)
+		var verts: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		if material and material.resource_name.begins_with("DC | screen"):
+			screen = material
+			continue
+		if material and material.resource_name.ends_with("Polymer"):
+			polymer = material
+			# Laptop: local x -1.07..-0.73; sink basin: x 0.96..1.34.
+			var kept := PackedInt32Array()
+			var indices: PackedInt32Array = arrays[Mesh.ARRAY_INDEX]
+			for i in range(0, indices.size(), 3):
+				if verts[indices[i]].x < 0.0 and verts[indices[i + 1]].x < 0.0 and verts[indices[i + 2]].x < 0.0:
+					continue
+				kept.append_array([indices[i], indices[i + 1], indices[i + 2]])
+			arrays[Mesh.ARRAY_INDEX] = kept
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+	bench.mesh = mesh
+
+	var laptop := Node3D.new()
+	laptop.name = "StampLaptop"
+	laptop.position = LAPTOP
+	# Same parts as the baked one: base, lid tilted back 0.25 rad, screen on the lid.
+	_box(laptop, Vector3(0.34, 0.02, 0.24), Vector3.ZERO, 0.0, polymer)
+	_box(laptop, Vector3(0.34, 0.23, 0.015), Vector3(0, 0.12, 0.12), 0.25, polymer)
+	_box(laptop, Vector3(0.30, 0.19, 0.004), Vector3(0, 0.12, 0.11), 0.25, screen)
+	world.add_child(laptop)
+
+
+## Small, faded marker writing tucked in the board's corner (reads from the class).
+static func _write_credit(world: Node) -> void:
+	var label := Label3D.new()
+	label.name = "WhiteboardCredit"
+	label.text = CREDIT
+	label.font = GameUI.FONT_BOLD
+	label.font_size = 32
+	label.pixel_size = 0.0011
+	label.outline_size = 0
+	label.modulate = Color(0.10, 0.20, 0.55, 0.7)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	label.line_spacing = -6.0
+	label.shaded = false
+	label.double_sided = false
+	label.position = CREDIT_POS
+	world.add_child(label)
+
+
+static func _box(parent: Node3D, size: Vector3, pos: Vector3, tilt: float, material: Material) -> void:
+	var box := BoxMesh.new()
+	box.size = size
+	var part := MeshInstance3D.new()
+	part.mesh = box
+	part.material_override = material
+	part.position = pos
+	part.rotation.x = tilt
+	parent.add_child(part)
 
 
 func _ready() -> void:
