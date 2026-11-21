@@ -349,18 +349,18 @@ func _enter(next: Stage) -> void:
 	if teacher_talk:
 		teacher_talk.prompt = ""
 	if talk:
-		talk.prompt = "กด F เพื่อคุยกับหัวหน้างาน" if stage != Stage.REPORT else "กด F เพื่อรายงานผลกับหัวหน้างาน"
+		talk.prompt = "กด E เพื่อคุยกับหัวหน้างาน" if stage != Stage.REPORT else "กด E เพื่อรายงานผลกับหัวหน้างาน"
 	match stage:
 		Stage.MEET:
-			teacher_talk.prompt = "กด F เพื่อคุยกับ" + TEACHER
+			teacher_talk.prompt = "กด E เพื่อคุยกับ" + TEACHER
 		Stage.TELL:
-			teacher_talk.prompt = "กด F เพื่อแจ้งผลให้" + TEACHER
+			teacher_talk.prompt = "กด E เพื่อแจ้งผลให้" + TEACHER
 		Stage.DONE:
 			if talk:
 				talk.prompt = ""
 		_:
 			if teacher_talk and stage > Stage.MEET and stage < Stage.TELL:
-				teacher_talk.prompt = "กด F เพื่อคุยกับ" + TEACHER
+				teacher_talk.prompt = "กด E เพื่อคุยกับ" + TEACHER
 	_refresh_spots()
 	_show_steps()
 	_refresh_marker()
@@ -371,16 +371,16 @@ func _refresh_spots() -> void:
 	match stage:
 		Stage.INSPECT:
 			if not saw_port:
-				tower_prompt = "กด F เพื่อดูพอร์ตการ์ดเครือข่ายด้านหลังเครื่อง"
+				tower_prompt = "กด E เพื่อดูพอร์ตการ์ดเครือข่ายด้านหลังเครื่อง"
 		Stage.TEST:
-			tower_prompt = "กด F เพื่อตรวจสาย LAN (เลือกเครื่องมือ)"
+			tower_prompt = "กด E เพื่อตรวจสาย LAN (เลือกเครื่องมือ)"
 		Stage.REPLACE:
-			tower_prompt = "กด F เพื่อเปลี่ยนการ์ดเครือข่าย (NIC)" if has_spare else ""
+			tower_prompt = "กด E เพื่อเปลี่ยนการ์ดเครือข่าย (NIC)" if has_spare else ""
 	tower_spot.set_prompt(tower_prompt)
 	if stage == Stage.SWAP and cable_home_pending:
-		tower_spot.set_prompt("กด F เพื่อเสียบสาย LAN กลับเข้าเครื่องครูสาว")
-	swap_spot.set_prompt("กด F เพื่อเสียบสาย LAN เส้นเดิมเข้าคอมพิวเตอร์เครื่องนี้" if stage == Stage.SWAP and not cable_home_pending else "")
-	parts_spot.set_prompt("กด F เพื่อเปิดกล่องอะไหล่คอมพิวเตอร์" if stage == Stage.FETCH else "")
+		tower_spot.set_prompt("กด E เพื่อเสียบสาย LAN กลับเข้าเครื่องครูสาว")
+	swap_spot.set_prompt("กด E เพื่อเสียบสาย LAN เส้นเดิมเข้าคอมพิวเตอร์เครื่องนี้" if stage == Stage.SWAP and not cable_home_pending else "")
+	parts_spot.set_prompt("กด E เพื่อเปิดกล่องอะไหล่คอมพิวเตอร์" if stage == Stage.FETCH else "")
 
 
 func _show_steps() -> void:
@@ -391,26 +391,26 @@ func _show_steps() -> void:
 	var hint := ""
 	match stage:
 		Stage.CALL:
-			hint = "โทรศัพท์บนโต๊ะทำงานของคุณในห้อง IT Support กำลังดัง มองที่โทรศัพท์แล้วกด F"
+			hint = "โทรศัพท์บนโต๊ะทำงานของคุณในห้อง IT Support กำลังดัง มองที่โทรศัพท์แล้วกด E"
 		Stage.MEET:
-			hint = "ห้องพักครู โต๊ะของครูสาวอยู่หลังฉากกั้นยาว กด F ที่ครูสาว"
+			hint = "ห้องพักครู โต๊ะของครูสาวอยู่หลังฉากกั้นยาว กด E ที่ครูสาว"
 		Stage.INSPECT:
 			var left := PackedStringArray()
 			if not saw_screen:
-				left.append("นั่งที่คอมพิวเตอร์ (F) ดูสัญลักษณ์เครือข่าย")
+				left.append("นั่งที่คอมพิวเตอร์ (E) ดูสัญลักษณ์เครือข่าย")
 			if not saw_port:
-				left.append("ดูไฟพอร์ตการ์ดเครือข่ายด้านหลังเครื่อง (F ที่ตัวเครื่อง)")
+				left.append("ดูไฟพอร์ตการ์ดเครือข่ายด้านหลังเครื่อง (E ที่ตัวเครื่อง)")
 			hint = " • ".join(left)
 		Stage.TEST:
-			hint = "กด F ที่ตัวเครื่อง แล้วเลือกเครื่องมือตรวจสาย"
+			hint = "กด E ที่ตัวเครื่อง แล้วเลือกเครื่องมือตรวจสาย"
 		Stage.SWAP:
-			hint = "นำสาย LAN กลับไปเสียบที่เครื่องครูสาว (F ที่ตัวเครื่อง)" if cable_home_pending else "คอมพิวเตอร์ STAFF-PC-03 โต๊ะว่างแถวเดียวกัน กด F ที่ตัวเครื่อง"
+			hint = "นำสาย LAN กลับไปเสียบที่เครื่องครูสาว (E ที่ตัวเครื่อง)" if cable_home_pending else "คอมพิวเตอร์ STAFF-PC-03 โต๊ะว่างแถวเดียวกัน กด E ที่ตัวเครื่อง"
 		Stage.ANALYZE:
 			hint = "อ่านหลักฐาน แล้วเลือกวิธีแก้ไข"
 		Stage.FETCH:
 			hint = "ห้องเก็บอุปกรณ์ข้างห้อง IT Support กล่องอะไหล่บนโต๊ะกลางห้อง"
 		Stage.REPLACE:
-			hint = "กลับไปที่เครื่องของครูสาว กด F ที่ตัวเครื่อง"
+			hint = "กลับไปที่เครื่องของครูสาว กด E ที่ตัวเครื่อง"
 		Stage.VERIFY:
 			var todo := PackedStringArray()
 			if not state.verified_ping:
@@ -419,9 +419,9 @@ func _show_steps() -> void:
 				todo.append("เปิด Web Browser")
 			hint = "นั่งที่คอมพิวเตอร์ของครูสาว • " + " • ".join(todo)
 		Stage.TELL:
-			hint = "กด F ที่ครูสาว"
+			hint = "กด E ที่ครูสาว"
 		Stage.REPORT:
-			hint = "กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด F"
+			hint = "กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด E"
 	hud.set_steps(ObjectiveHUD.sequence(STEPS, current), hint, HEADING, "ภารกิจที่ 4")
 
 
@@ -549,7 +549,7 @@ func _check_verified() -> void:
 
 # ---------------------------------------------------------------- the PC
 
-## F at the PC case: look at the port (symptoms), test the cable or replace
+## E at the PC case: look at the port (symptoms), test the cable or replace
 ## the card, depending on the stage.
 func use_tower(player: Node) -> void:
 	if _busy:
@@ -690,7 +690,6 @@ func ask_verdict() -> void:
 			_rebuild_tester_loop()
 	tester.visible = false
 	_rig_clear()
-	_give(_player, "lan_cable_teacher", "สาย LAN ของเครื่องครูสาว")
 	await _camera_back(_player)
 	_busy = false
 	_enter(Stage.SWAP)
@@ -740,7 +739,7 @@ func _rebuild_tester_loop() -> void:
 
 # ---------------------------------------------------------------- swap test
 
-## F at STAFF-PC-03: the player plugs the same cable in by hand; its LED
+## E at STAFF-PC-03: the player plugs the same cable in by hand; its LED
 ## lights and the computer is online; then the conclusion.
 func use_swap_pc(player: Node) -> void:
 	if stage != Stage.SWAP or _busy or cable_home_pending:
@@ -749,7 +748,6 @@ func use_swap_pc(player: Node) -> void:
 	_player = player
 	_hold(player, true)
 	await _plug_by_hand(player, swap_tower, "ด้านหลังคอมพิวเตอร์ STAFF-PC-03")
-	_take(player, "lan_cable_teacher")
 	_swap_cable = _draw_cable(swap_tower, "Desk3Cable")
 	await get_tree().create_timer(0.8, false).timeout
 	swap_tower.port.set_link(true)
@@ -773,7 +771,6 @@ func _finish_swap() -> void:
 	if _swap_cable:
 		_swap_cable.queue_free()
 		_swap_cable = null
-	_give(_player, "lan_cable_teacher", "สาย LAN ของเครื่องครูสาว")
 	cable_home_pending = true
 	await _camera_back(_player)
 	_busy = false
@@ -788,7 +785,6 @@ func plug_back(player: Node) -> void:
 	_player = player
 	_hold(player, true)
 	await _plug_by_hand(player, tower, "ด้านหลังคอมพิวเตอร์ครูสาว")
-	_take(player, "lan_cable_teacher")
 	if _cable:
 		_cable.visible = true
 	hud.show_toast("เสียบสายกลับแล้ว — ไฟสถานะของการ์ดเครือข่ายยังไม่ติด", 3.5)
@@ -984,7 +980,6 @@ func _on_picked(id: String) -> void:
 			asking = ""
 			choice.close()
 			has_spare = true
-			_give(_player, "spare_nic", "การ์ดเครือข่าย (NIC) สำรอง")
 			hud.show_toast("หยิบ NIC สำรองแล้ว — นำไปเปลี่ยนที่เครื่องของครูสาว", 3.5)
 			_release(_player)
 			_enter(Stage.REPLACE)
@@ -1078,7 +1073,6 @@ func replace_nic(player: Node) -> void:
 		"ต้องดึงการ์ดตรงๆ ออกจากช่อง ห้ามงัดเอียง")
 	await t.card_away()
 	var tray_at := t.spare_start()
-	_take(player, "spare_nic")
 	has_spare = false
 	t.show_spare()
 	await _wait_drag(tray_at, t.rest_position("PCIe_Slot_Target"), func(k: float): t.set_card_in(k), "ลากการ์ดเครือข่ายตัวใหม่ลงช่อง PCIe ให้ตรงช่อง",
@@ -1353,7 +1347,6 @@ func _replace_auto(player: Node) -> void:
 	var eye := center + side * 0.55 + Vector3.UP * 0.25 + Vector3(-0.25, 0, 0)
 	await _camera_to(player, Transform3D(Basis.looking_at(center - eye, Vector3.UP), eye))
 	await tower.replace_nic(func(_i: int, text: String): hud.show_toast(text, Mission04Tower.STEP_TIME * 2.2))
-	_take(player, "spare_nic")
 	has_spare = false
 	station.network_connected = true
 	await _camera_to(player, _port_view(tower))
@@ -1443,18 +1436,6 @@ func _camera_back(player: Node) -> void:
 		await player.return_camera(VIEW_TIME)
 	_view_away = false
 	_release(player)
-
-
-func _give(player: Node, id: String, title: String) -> void:
-	var presentation: Node = player.get_node_or_null("Presentation") if player else null
-	if presentation and presentation.has_method("add_item"):
-		presentation.call("add_item", id, title)
-
-
-func _take(player: Node, id: String) -> void:
-	var presentation: Node = player.get_node_or_null("Presentation") if player else null
-	if presentation and presentation.has_method("remove_item"):
-		presentation.call("remove_item", id)
 
 
 ## The LAN cable from a case's NIC port, back over the desk edge and down

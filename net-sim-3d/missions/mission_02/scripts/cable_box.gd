@@ -3,7 +3,7 @@ extends StaticBody3D
 
 ## A 305 m pull box of UTP Cat6 cable in the storage room, labelled with the
 ## cable it is meant for (Straight-Through B-B or Crossover A-B). Look at it
-## and press F to take a cable from it for one of the connection points
+## and press E to take a cable from it for one of the connection points
 ## (Mission02CableBoxPanel). Interaction layer 8, like the other props.
 
 signal used(player: Node, type: String)

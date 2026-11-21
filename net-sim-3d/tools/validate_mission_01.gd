@@ -521,10 +521,10 @@ func _test_in_game() -> void:
 	for i in 2:
 		await physics_frame
 	await _look_at(player, screen_center)
-	_check(3, player.focused_computer == pc and player._prompt.text.contains("กด F เพื่อใช้งานคอมพิวเตอร์"), "prompt: " + player._prompt.text)
+	_check(3, player.focused_computer == pc and player._prompt.text.contains("กด E เพื่อใช้งานคอมพิวเตอร์"), "prompt: " + player._prompt.text)
 	var start_pos := player.global_position
 	await _press_interact()
-	_check(3, player.controls_locked, "F did not lock the player")
+	_check(3, player.controls_locked, "E did not lock the player")
 	await create_timer(manager.zoom_time + 1.0).timeout
 	_check(3, desktop.visible and desktop.is_booting and desktop._boot.visible, "Set-up screen not showing")
 	await create_timer(1.35).timeout

@@ -72,7 +72,7 @@ func _process(delta: float) -> void:
 
 
 func get_prompt_text() -> String:
-	return "กด F เพื่อรับสาย (โทรศัพท์ดัง)" if ringing else ""
+	return "กด E เพื่อรับสาย (โทรศัพท์ดัง)" if ringing else ""
 
 
 func use(player: Node) -> void:

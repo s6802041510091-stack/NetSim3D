@@ -1,7 +1,7 @@
 class_name CrimpStation
 extends StaticBody3D
 
-## The work spot on the spare desk: look at it and press F to sit and crimp.
+## The work spot on the spare desk: look at it and press E to sit and crimp.
 ## Holds the CrimpBench (the 3x cable end, shown only while seated) and the
 ## DeskLayout (work mat, the two cables, the kit). A mission sets `prompt`
 ## when the player may use it and listens to `used`.

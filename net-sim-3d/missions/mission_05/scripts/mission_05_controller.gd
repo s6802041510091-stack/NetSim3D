@@ -210,9 +210,9 @@ func _enter(next: Stage) -> void:
 			Stage.CALL, Stage.DONE:
 				teacher_talk.prompt = ""
 			Stage.TELL:
-				teacher_talk.prompt = "กด F เพื่อแจ้งผลให้" + TEACHER
+				teacher_talk.prompt = "กด E เพื่อแจ้งผลให้" + TEACHER
 			_:
-				teacher_talk.prompt = "กด F เพื่อคุยกับ" + TEACHER
+				teacher_talk.prompt = "กด E เพื่อคุยกับ" + TEACHER
 	_show_steps()
 	_refresh_marker()
 
@@ -245,9 +245,9 @@ func _show_steps() -> void:
 	var hint := ""
 	match stage:
 		Stage.CALL:
-			hint = "โทรศัพท์บนโต๊ะทำงานของคุณในห้อง IT Support กำลังดัง มองที่โทรศัพท์แล้วกด F"
+			hint = "โทรศัพท์บนโต๊ะทำงานของคุณในห้อง IT Support กำลังดัง มองที่โทรศัพท์แล้วกด E"
 		Stage.GO:
-			hint = "ห้องคอมพิวเตอร์ แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2 (หน้าจอขึ้นกล่องเตือน Threats found) กด F ที่คอมพิวเตอร์"
+			hint = "ห้องคอมพิวเตอร์ แถวที่ 3 ฝั่งซ้าย เครื่องที่ 2 (หน้าจอขึ้นกล่องเตือน Threats found) กด E ที่คอมพิวเตอร์"
 		Stage.OPEN:
 			hint = "เปิดโปรแกรม Windows Security จากไอคอนบน Desktop"
 		Stage.FIREWALL:
@@ -262,9 +262,9 @@ func _show_steps() -> void:
 		Stage.SUBMIT:
 			hint = "ตรวจสถานะความปลอดภัยของเครื่อง แล้วกด \"ส่งผลการตรวจสอบ\" (มุมขวาล่าง)"
 		Stage.TELL:
-			hint = "ครูนั่งที่โต๊ะครูหน้าห้องคอมพิวเตอร์ กด F ที่ครู"
+			hint = "ครูนั่งที่โต๊ะครูหน้าห้องคอมพิวเตอร์ กด E ที่ครู"
 	if _away_from_computer() and stage >= Stage.OPEN and stage <= Stage.SUBMIT:
-		hint = "กลับไปที่ PC-R3-L2 (กด F ที่คอมพิวเตอร์) • " + hint
+		hint = "กลับไปที่ PC-R3-L2 (กด E ที่คอมพิวเตอร์) • " + hint
 	hud.set_steps(ObjectiveHUD.sequence(STEPS, int(stage)), hint, HEADING, "ภารกิจที่ 5")
 
 

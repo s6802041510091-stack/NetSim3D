@@ -181,12 +181,11 @@ func _run() -> void:
 	mission.drawer.close()
 	await _frames(1)
 
-	var presentation: Node = player.get_node("Presentation")
 	var owned := []
-	for slot: Dictionary in presentation.items:
-		if not slot.is_empty():
-			owned.append(slot.id)
-	_check(owned.size() == 7 and "lan_cable_1" in owned and "lan_cable_2" in owned and "cable_tester" in owned and "screwdriver" in owned, "tool case: %s" % [owned])
+	for point in mission.state.cable_types:
+		owned.append("lan_cable_%d" % point)
+	owned.append_array(mission.drawer_taken.keys())
+	_check(owned.size() == 7 and "lan_cable_1" in owned and "lan_cable_2" in owned and "cable_tester" in owned and "screwdriver" in owned, "items taken: %s" % [owned])
 	await _test_crimping(mission, props, player)
 	map.queue_free()
 	await _frames(2)
@@ -387,7 +386,7 @@ func _test_tester(mission: Mission02Controller, props: Mission02Props, player: C
 	_check(box.visible and box.choosing and c0 != null and c1 != null and c0.text.begins_with("ผ่าน") and c1.text.begins_with("ไม่ผ่าน"), "after one scan: the question at the bottom, pass on the left, discard on the right")
 	_check(box._panel.get_global_rect().end.x <= panel.side_panel.get_global_rect().position.x, "the question stays clear of the step panel")
 	box.advance()
-	_check(box.visible and box.choosing, "F / click does not skip the question")
+	_check(box.visible and box.choosing, "E / click does not skip the question")
 	c1.pressed.emit()
 	_check(mission.state.tester_verdicts.get(1) == false and mission.state.spare_cables.is_empty() and panel.message.contains("ใช้งานได้"), "good cable discarded: told it works, kept: " + panel.message)
 	_check(panel.cable == 2 and not tester.is_on, "next cable, tester off")
@@ -472,7 +471,7 @@ func _test_plugging(station: CrimpStation, player: CharacterBody3D) -> void:
 
 
 ## Levels 1-2: both teachers sit working at their desks in the teachers' room
-## (STAFF-PC-02 / STAFF-PC-01), idle (greeting on F), their computers in use.
+## (STAFF-PC-02 / STAFF-PC-01), idle (greeting on E), their computers in use.
 func _check_teacher_seated(map: Node3D, level_name: String) -> void:
 	var computers := map.get_node("Computers") as ComputerManager
 	for id in ["male", "female"]:

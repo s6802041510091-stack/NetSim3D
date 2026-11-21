@@ -34,7 +34,7 @@ func _ready() -> void:
 	col.add_child(GameUI.label("วิธีควบคุม", 28, GameUI.INK, true))
 	col.add_child(GameUI.label("พร้อมสำรวจโรงเรียนแล้ว", 17, GameUI.INK_SOFT))
 	col.add_child(HSeparator.new())
-	var keys := [["W A S D", "เดิน"], ["Mouse", "มองรอบตัว"], ["Shift", "วิ่ง"], ["F", "โต้ตอบ / ใช้อุปกรณ์ / เปิดประตู"], ["E", "เปิด–ปิดกระเป๋า"], ["F1", "เปิดเมนูพัก / ตั้งค่า"], ["Esc", "แสดงเมาส์"]]
+	var keys := [["W A S D", "เดิน"], ["Mouse", "มองรอบตัว"], ["Shift", "วิ่ง"], ["E", "โต้ตอบ / ใช้อุปกรณ์ / เปิดประตู"], ["F1", "เปิดเมนูพัก / ตั้งค่า"], ["Esc", "แสดงเมาส์"]]
 	for pair in keys:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 18)

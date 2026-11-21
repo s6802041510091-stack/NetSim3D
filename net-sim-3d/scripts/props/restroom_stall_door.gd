@@ -2,7 +2,7 @@
 class_name RestroomStallDoor
 extends Node3D
 
-## A cubicle door using the player's existing generic F interaction.
+## A cubicle door using the player's existing generic E interaction.
 signal state_changed(opened:bool)
 var number:=1
 var width:=.78
@@ -53,7 +53,7 @@ func _ready() -> void:
 
 func get_prompt_text() -> String:
 	if is_moving:return ""
-	var pattern:=GameLocale.text("[F] ปิดประตู%s" if is_open else "[F] เปิดประตู%s")
+	var pattern:=GameLocale.text("[E] ปิดประตู%s" if is_open else "[E] เปิดประตู%s")
 	return pattern% (" "+GameLocale.text("คอก %d"%number))
 
 func use(_player:Node) -> void:

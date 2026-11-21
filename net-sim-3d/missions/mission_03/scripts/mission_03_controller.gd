@@ -188,7 +188,7 @@ func _ready() -> void:
 		teacher_talk = Talkable.new()
 		teacher_talk.name = "Talk"
 		teacher_talk.display_name = TEACHER
-		teacher_talk.prompt = "กด F เพื่อคุยกับ" + TEACHER
+		teacher_talk.prompt = "กด E เพื่อคุยกับ" + TEACHER
 		teacher.add_child(teacher_talk)
 		teacher_talk.talked.connect(_on_teacher_talked)
 	_enter(Stage.BRIEFING)
@@ -222,15 +222,15 @@ func _enter(next: Stage) -> void:
 	stage = next
 	match stage:
 		Stage.BRIEFING:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน Data Center")
 			unplug_spot.set_prompt("")
 			_point_at_supervisor()
 		Stage.INSPECT:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
-			unplug_spot.set_prompt("กด F เพื่อถอดสาย LAN ของเครื่องนี้")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
+			unplug_spot.set_prompt("กด E เพื่อถอดสาย LAN ของเครื่องนี้")
 			_refresh_inspect()
 		Stage.RETURN:
-			_set_prompt("กด F เพื่อส่งรายงานให้หัวหน้างาน")
+			_set_prompt("กด E เพื่อส่งรายงานให้หัวหน้างาน")
 			unplug_spot.set_prompt("")
 			_point_at_supervisor()
 		Stage.DONE:
@@ -244,13 +244,13 @@ func _enter(next: Stage) -> void:
 ## The teacher may be met before the briefing, so steps are marked by what
 ## is finished (the first unfinished one is current).
 const STEP_HINTS := [
-	"ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด F",
-	"ครูประจำห้องกำลังใช้เครื่องครูอยู่ ไปที่ห้องคอมพิวเตอร์ มองที่ครูแล้วกด F",
-	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด F เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
-	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด F เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
-	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด F เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
+	"ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด E",
+	"ครูประจำห้องกำลังใช้เครื่องครูอยู่ ไปที่ห้องคอมพิวเตอร์ มองที่ครูแล้วกด E",
+	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด E เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
+	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด E เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
+	"ไปที่เครื่องในห้องคอมพิวเตอร์ กด E เพื่อนั่ง ใช้ ipconfig และ ping แล้วกรอกใบตรวจ",
 	"ตรวจความครบถ้วนของรายงาน แล้วกดยืนยันรายงาน",
-	"กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด F",
+	"กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด E",
 ]
 
 
@@ -451,7 +451,7 @@ func _on_teacher_talked(player: Node) -> void:
 
 ## After the first talk: he stands up (TEACHER-PC is free from then on),
 ## walks out through the corridor to the teachers' room and sits at his own
-## desk (STAFF-PC-02), where F gives a short line again.
+## desk (STAFF-PC-02), where E gives a short line again.
 func teacher_leave() -> void:
 	if teacher_place != "desk" or not teacher is NpcCharacter:
 		return
@@ -479,7 +479,7 @@ func teacher_leave() -> void:
 		if staff_pc:
 			staff_pc.collision_layer = 0
 	teacher_place = "staff_room"
-	teacher_talk.prompt = "กด F เพื่อทักทาย" + TEACHER
+	teacher_talk.prompt = "กด E เพื่อทักทาย" + TEACHER
 
 
 ## Opens `door_name`, walks `path` through it, closes it behind him.

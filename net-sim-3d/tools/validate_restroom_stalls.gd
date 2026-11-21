@@ -58,16 +58,16 @@ func _run() -> void:
 		await wait_frames(20)
 		Input.action_release("move_forward")
 		check((player.global_position-centre).dot(inward)<-.20,door.name+" closed door is solid")
-		check(player.focused_interactable==door,door.name+" F focus outside")
+		check(player.focused_interactable==door,door.name+" E focus outside")
 		player.interact()
 		await wait_frames(20)
-		check(door.is_open and not door.is_moving,door.name+" F opens from outside")
+		check(door.is_open and not door.is_moving,door.name+" E opens from outside")
 		check(await walk(player,inside),door.name+" can walk inside")
 		# Aim at the actual open leaf, on the side wall, from inside the cubicle.
 		var handle:=door.swing.global_transform*Vector3(door.width*.8,1.05,-.02)
 		look(player,handle)
 		await wait_frames(5)
-		check(player.focused_interactable==door,door.name+" F focus inside")
+		check(player.focused_interactable==door,door.name+" E focus inside")
 		player.interact()
 		await wait_frames(20)
 		check(not door.is_open and not door.is_moving,door.name+" can close while inside")
@@ -76,7 +76,7 @@ func _run() -> void:
 		check(player.focused_interactable==door,door.name+" closed door focus inside")
 		player.interact()
 		await wait_frames(20)
-		check(door.is_open and not door.is_moving,door.name+" F opens from inside")
+		check(door.is_open and not door.is_moving,door.name+" E opens from inside")
 		check(await walk(player,outside),door.name+" can walk back out")
 		player.global_position=centre+inward*.40+Vector3(0,.02,0)
 		player.velocity=Vector3.ZERO
@@ -95,5 +95,5 @@ func _run() -> void:
 	check(rooms.stall_doors[0].get_prompt_text().contains("Cubicle"),"English cubicle prompt")
 	locale.locale=saved
 	Engine.time_scale=1;Engine.physics_ticks_per_second=60
-	print("RESTROOM_STALLS_VALID doors=12 walks=24 interaction=F language=th/en" if failures==0 else "RESTROOM_STALLS_INVALID failures="+str(failures))
+	print("RESTROOM_STALLS_VALID doors=12 walks=24 interaction=E language=th/en" if failures==0 else "RESTROOM_STALLS_INVALID failures="+str(failures))
 	quit(1 if failures else 0)

@@ -97,16 +97,16 @@ func _enter(next: Stage) -> void:
 	stage = next
 	match stage:
 		Stage.BRIEFING:
-			_show_steps(0, "ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด F")
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
+			_show_steps(0, "ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด E")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
 		Stage.DESIGN:
-			_show_steps(1, "นั่งที่คอมพิวเตอร์ของคุณ (F) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ทั้ง 3 จุด")
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_show_steps(1, "นั่งที่คอมพิวเตอร์ของคุณ (E) เปิด NetPlan EDU แล้วเลือกอุปกรณ์ทั้ง 3 จุด")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
 			_point_at_computer()
 		Stage.REPORT:
-			_show_steps(2, "ออกจากคอมพิวเตอร์ (Esc) แล้วมองที่หัวหน้างานแล้วกด F")
-			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
+			_show_steps(2, "ออกจากคอมพิวเตอร์ (Esc) แล้วมองที่หัวหน้างานแล้วกด E")
+			_set_prompt("กด E เพื่อรายงานผลกับหัวหน้างาน")
 			_point_at_supervisor()
 		Stage.DONE:
 			hud.set_objective("")

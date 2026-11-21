@@ -1,8 +1,7 @@
 class_name PickupItem
 extends StaticBody3D
 
-## Something on a desk the player can pick up with F into the tool case
-## (PlayerPresentation inventory). It sits on the interaction layer, so it
+## Something on a desk the player can pick up with E. It sits on the interaction layer, so it
 ## never blocks walking. A mission turns it on with `available` and listens to
 ## `picked_up`. Its collision box is fitted to the visual when it is ready.
 
@@ -34,16 +33,12 @@ func _ready() -> void:
 func get_prompt_text() -> String:
 	if taken or not available:
 		return ""
-	return "กด F เพื่อหยิบ " + title
+	return "กด E เพื่อหยิบ " + title
 
 
-func use(player: Node) -> void:
+func use(_player: Node) -> void:
 	if taken or not available:
 		return
-	var presentation: Node = player.get_node_or_null("Presentation") if player else null
-	if presentation and presentation.has_method("add_item"):
-		if not presentation.call("add_item", item_id, title):
-			return
 	take()
 
 

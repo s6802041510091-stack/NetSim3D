@@ -54,7 +54,7 @@ func _ready() -> void:
 	col.add_theme_constant_override("separation", 8)
 	card.add_child(col)
 	col.add_child(GameUI.label("ลิ้นชัก  ·  ชุดเข้าหัวสาย", 22, GameUI.INK, true))
-	col.add_child(GameUI.label("เลือกหยิบของที่ต้องใช้ใส่กระเป๋าช่าง (กด E เพื่อดูของในกระเป๋า)", 16, GameUI.INK_SOFT))
+	col.add_child(GameUI.label("เลือกหยิบของที่ต้องใช้ไปทำงาน", 16, GameUI.INK_SOFT))
 	var grid := GridContainer.new()
 	grid.columns = 4
 	grid.add_theme_constant_override("h_separation", 10)
@@ -113,7 +113,7 @@ func _refresh() -> void:
 	for id: String in _buttons:
 		var button: Button = _buttons[id]
 		button.disabled = taken.has(id)
-		button.text = "อยู่ในกระเป๋าแล้ว" if taken.has(id) else "หยิบ"
+		button.text = "หยิบแล้ว" if taken.has(id) else "หยิบ"
 
 
 func _item_card(entry: Array) -> Control:

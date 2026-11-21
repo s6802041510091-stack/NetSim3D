@@ -2,7 +2,7 @@ class_name DialogueBox
 extends CanvasLayer
 
 ## Subtitles for talking with an NPC: one line at a time at the bottom of the
-## screen. Each line is "ผู้พูด|ข้อความ". Click, F, Space or Enter goes to the
+## screen. Each line is "ผู้พูด|ข้อความ". Click, E, Space or Enter goes to the
 ## next line; `finished` fires after the last one.
 ## ask() shows one line with answer buttons side by side instead (a decision
 ## in the player's own words); `chosen` fires with the button's index.
@@ -27,7 +27,7 @@ var _text: RichTextLabel
 var _hint: Label
 var _header: Label
 var _reveal := -1.0 # characters shown so far while typing, -1 = whole line shown
-## True while ask() waits for an answer (clicks and F do not skip it).
+## True while ask() waits for an answer (clicks and E do not skip it).
 var choosing := false
 ## A plain BoxContainer so ask(stacked = true) can turn it vertical.
 var _choices: BoxContainer
@@ -122,7 +122,7 @@ func advance(force: bool = false) -> void:
 	var parts := lines[index].split("|", true, 1)
 	_speaker.text = parts[0] if parts.size() > 1 else ""
 	_text.text = highlight(keep_together(parts[1] if parts.size() > 1 else parts[0]))
-	_hint.text = "คลิก หรือกด F / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
+	_hint.text = "คลิก หรือกด E / Space เพื่อ" + ("จบบทสนทนา" if index == lines.size() - 1 else "ไปต่อ")
 	_reveal = 0.0
 	_text.visible_characters = 0
 

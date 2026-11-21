@@ -152,7 +152,7 @@ func _show_steps() -> void:
 	var hint := ""
 	match stage:
 		Stage.CALL:
-			hint = "โทรศัพท์บนโต๊ะทำงานของคุณใน Data Center กำลังดัง มองที่โทรศัพท์แล้วกด F"
+			hint = "โทรศัพท์บนโต๊ะทำงานของคุณใน Data Center กำลังดัง มองที่โทรศัพท์แล้วกด E"
 		Stage.MAIL:
 			hint = "รออีเมลจากครูสาว แล้วเปิดอ่านในแอป Mail ของคอม IT-PC-01" if state.mails_delivered == 0 or _away_from_computer() else "เปิดแอป Mail แล้วอ่านอีเมลจากครูสาว"
 		Stage.OPEN:
@@ -168,7 +168,7 @@ func _show_steps() -> void:
 		Stage.CLOSE:
 			hint = "ปิดโปรแกรม TeamViewer แล้วปิดคอมพิวเตอร์ของคุณ (เริ่ม › ปิดเครื่อง)"
 	if _away_from_computer() and stage >= Stage.MAIL and stage <= Stage.CLOSE:
-		hint = "กลับไปที่ IT-PC-01 (กด F ที่คอมพิวเตอร์) • " + hint
+		hint = "กลับไปที่ IT-PC-01 (กด E ที่คอมพิวเตอร์) • " + hint
 	hud.set_steps(ObjectiveHUD.sequence(STEPS, int(stage)), hint, HEADING, "ภารกิจที่ 6")
 
 

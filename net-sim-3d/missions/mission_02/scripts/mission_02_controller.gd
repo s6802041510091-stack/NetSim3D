@@ -194,35 +194,35 @@ func _enter(next: Stage) -> void:
 	match stage:
 		Stage.BRIEFING:
 			_show_steps()
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน Data Center")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน Data Center")
 			_point_at_supervisor()
 		Stage.GATHER:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
 			if props:
 				for box: Mission02CableBox in props.cable_boxes.values():
-					box.set_prompt("กด F เพื่อดูกล่องสาย " + box.title())
-				props.drawer_spot.set_prompt("กด F เพื่อเปิดลิ้นชักชุดเข้าหัวสาย")
-				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
+					box.set_prompt("กด E เพื่อดูกล่องสาย " + box.title())
+				props.drawer_spot.set_prompt("กด E เพื่อเปิดลิ้นชักชุดเข้าหัวสาย")
+				props.crimp_station.set_prompt("กด E เพื่อนั่งเข้าหัวสาย LAN")
 			_refresh_gather()
 		Stage.CRIMP:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
 			if props:
 				for box: Mission02CableBox in props.cable_boxes.values():
 					box.set_prompt("")
 				props.drawer_spot.set_prompt("")
 				# The player puts the cables and the kit out on the desk.
 				props.crimp_station.layout.lay_out(state.cable_types)
-				props.crimp_station.set_prompt("กด F เพื่อนั่งเข้าหัวสาย LAN")
+				props.crimp_station.set_prompt("กด E เพื่อนั่งเข้าหัวสาย LAN")
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_crimp_objective()
 		Stage.TEST:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
 			if props:
-				props.crimp_station.set_prompt("กด F เพื่อตรวจสายด้วย LAN Cable Tester")
+				props.crimp_station.set_prompt("กด E เพื่อตรวจสายด้วย LAN Cable Tester")
 				marker.point_at_position(props.crimp_station.global_position, 0.45)
 			_refresh_test_objective()
 		Stage.INSTALL:
-			_set_prompt("กด F เพื่อคุยกับหัวหน้างาน")
+			_set_prompt("กด E เพื่อคุยกับหัวหน้างาน")
 			if props:
 				props.crimp_station.set_prompt("")
 				# The two cables go to the computer room.
@@ -230,7 +230,7 @@ func _enter(next: Stage) -> void:
 			_set_install_step("rack")
 		Stage.REPORT:
 			_show_steps()
-			_set_prompt("กด F เพื่อรายงานผลกับหัวหน้างาน")
+			_set_prompt("กด E เพื่อรายงานผลกับหัวหน้างาน")
 			rack_spot.set_prompt("")
 			pc_spot.set_prompt("")
 			_point_at_supervisor()
@@ -301,23 +301,14 @@ func _release_player() -> void:
 func _on_cable_taken(point: int, type: String) -> void:
 	if not state.set_cable_type(point, type):
 		return
-	_give(_player, "lan_cable_%d" % point, "สาย LAN จุดที่ %d (%s)" % [point, Mission02CableBox.TYPES[type][0]])
 	hud.show_toast("หยิบสาย %s สำหรับจุดเชื่อมต่อที่ %d แล้ว" % [Mission02CableBox.TYPES[type][0], point], 3.0)
 	if state.cable_types_done():
 		cable_types_chosen.emit()
 
 
-func _on_drawer_item_taken(id: String, title: String) -> void:
+func _on_drawer_item_taken(id: String, _title: String) -> void:
 	drawer_seen = true
 	drawer_taken[id] = true
-	_give(_player, id, title)
-
-
-## Puts an item in the player's tool case (PlayerPresentation), if there is one.
-func _give(player: Node, id: String, title: String) -> void:
-	var presentation: Node = player.get_node_or_null("Presentation") if player else null
-	if presentation and presentation.has_method("add_item"):
-		presentation.call("add_item", id, title)
 
 
 func _point_at_supervisor() -> void:
@@ -425,7 +416,7 @@ func _refresh_test_objective() -> void:
 ## the objective panel: it reads the mission's progress and changes nothing.
 const STEP_HEADING := "เข้าหัวและเชื่อมต่อสาย LAN"
 const STEP_HINTS := [
-	"ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด F",
+	"ไปที่ห้อง IT Support มองที่หัวหน้างานแล้วกด E",
 	"กล่องสายอยู่บนโต๊ะกลางห้องเก็บอุปกรณ์ (มุมห้อง IT Support)",
 	"ลิ้นชัก \"ชุดเข้าหัวสาย\" อยู่ในห้องเก็บอุปกรณ์",
 	"สายเส้นละ 2 ปลาย มาตรฐาน T568B ทั้งสองปลาย",
@@ -433,7 +424,7 @@ const STEP_HINTS := [
 	"Wall Rack อยู่หลังโต๊ะครูในห้องคอมพิวเตอร์",
 	"เสียบเข้าการ์ดเครือข่ายด้านหลังคอมพิวเตอร์ครู",
 	"กลับไปที่ Wall Rack แล้วดูไฟสถานะพอร์ตของ Switched Hub",
-	"กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด F",
+	"กลับไปห้อง IT Support มองที่หัวหน้างานแล้วกด E",
 ]
 
 
@@ -468,7 +459,7 @@ func _show_steps() -> void:
 			hint = STEP_HINTS[i]
 	# Everything gathered: carry it to the desk.
 	if stage == Stage.GATHER and done[1] and done[2]:
-		hint = "นำสายและเครื่องมือไปที่โต๊ะว่างในห้อง IT Support แล้วกด F เพื่อนั่ง"
+		hint = "นำสายและเครื่องมือไปที่โต๊ะว่างในห้อง IT Support แล้วกด E เพื่อนั่ง"
 	hud.set_steps(step_list, hint, STEP_HEADING, "ภารกิจที่ 2")
 
 
@@ -560,17 +551,17 @@ func _set_install_step(step: String) -> void:
 	match step:
 		"rack":
 			_show_steps()
-			rack_spot.set_prompt("กด F เพื่อเปิดตู้ Wall Rack และติดตั้งสาย")
+			rack_spot.set_prompt("กด E เพื่อเปิดตู้ Wall Rack และติดตั้งสาย")
 			if rack:
 				marker.point_at_position(rack.global_position, 0.45)
 		"pc":
 			_show_steps()
-			pc_spot.set_prompt("กด F เพื่อเสียบสายเข้าการ์ดเครือข่าย")
+			pc_spot.set_prompt("กด E เพื่อเสียบสายเข้าการ์ดเครือข่าย")
 			if pc_port:
 				marker.point_at_position(pc_port.global_position, 0.35)
 		"leds":
 			_show_steps()
-			rack_spot.set_prompt("กด F เพื่อดูไฟสถานะพอร์ตที่ Wall Rack")
+			rack_spot.set_prompt("กด E เพื่อดูไฟสถานะพอร์ตที่ Wall Rack")
 			if rack:
 				marker.point_at_position(rack.global_position, 0.45)
 

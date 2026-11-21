@@ -1,7 +1,7 @@
 class_name Talkable
 extends StaticBody3D
 
-## Makes an NPC something the player can look at and press F to talk to.
+## Makes an NPC something the player can look at and press E to talk to.
 ## Add it as a child of the NPC (it builds its own capsule on the interaction
 ## layer, so it never blocks walking). A mission sets `prompt` when the NPC has
 ## something to say and listens to `talked`. An empty prompt = not talkable now.

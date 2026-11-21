@@ -1,7 +1,7 @@
 class_name InteractSpot
 extends StaticBody3D
 
-## An invisible box the player can look at and press F to use (e.g. the wall
+## An invisible box the player can look at and press E to use (e.g. the wall
 ## rack or the back of a PC during a mission). Hit by the interact ray only
 ## while it has a prompt, so it never gets in the way otherwise.
 

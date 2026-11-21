@@ -6,7 +6,7 @@ extends Node
 ## and 5, the female teacher "ครูสาว" in Missions 4 and 6).
 ##   - Each one works at his/her own computer: seated, typing and using the
 ##     mouse (NpcCharacter, the same as the Data Center supervisor).
-##   - F on an idle teacher: he/she stops, turns, says one short greeting and
+##   - E on an idle teacher: he/she stops, turns, says one short greeting and
 ##     goes back to work (no effect on the score).
 ##   - Routine: work a while, then a break: when both are free the male
 ##     teacher walks to the female teacher's office and they chat (speech
@@ -189,7 +189,7 @@ func _ready() -> void:
 		var talk := Talkable.new()
 		talk.name = "Talk"
 		talk.display_name = TEACHERS[id]["name"]
-		talk.prompt = "กด F เพื่อทักทาย" + String(TEACHERS[id]["name"])
+		talk.prompt = "กด E เพื่อทักทาย" + String(TEACHERS[id]["name"])
 		(idle[id] as Node).add_child(talk)
 		talk.talked.connect(greet.bind(id))
 		activity[id] = "desk"
@@ -202,7 +202,7 @@ static func seat_of(id: String) -> Vector3:
 	return TEACHERS[id]["seat"]
 
 
-## F on an idle teacher: stop working, turn, one line, back to work.
+## E on an idle teacher: stop working, turn, one line, back to work.
 func greet(player: Node, id: String) -> void:
 	if _busy or not idle.has(id) or activity.get(id, "desk") != "desk":
 		return
@@ -370,4 +370,4 @@ func _set_greeting(teacher: NpcCharacter, on: bool) -> void:
 	var talk := teacher.get_node_or_null("Talk") as Talkable
 	if talk:
 		var id := "male" if teacher == idle.get("male") else "female"
-		talk.prompt = ("กด F เพื่อทักทาย" + String(TEACHERS[id]["name"])) if on else ""
+		talk.prompt = ("กด E เพื่อทักทาย" + String(TEACHERS[id]["name"])) if on else ""

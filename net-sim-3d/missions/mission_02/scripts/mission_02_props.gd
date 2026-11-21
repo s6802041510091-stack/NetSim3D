@@ -29,9 +29,9 @@ const ISLAND_DECOR := "ST_Island_Items"
 const DRAWER_FRONT := Vector3(-14.66, 0.0, -31.11)
 
 var cable_boxes := {} # type -> Mission02CableBox
-## Look at the drawer cabinet and press F (prompt set by the controller).
+## Look at the drawer cabinet and press E (prompt set by the controller).
 var drawer_spot: InteractSpot
-## Where the player sits to crimp (F at the desk; the camera zooms to its bench).
+## Where the player sits to crimp (E at the desk; the camera zooms to its bench).
 var crimp_station: CrimpStation
 
 
