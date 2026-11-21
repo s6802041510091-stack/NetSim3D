@@ -38,14 +38,16 @@ func _check() -> void:
 		TeamViewerSim.new(),
 	]
 	for app: Control in apps:
-		app.use_save_file = false
+		if "use_save_file" in app:
+			app.set("use_save_file", false) # only NetPlan EDU saves; never touch the real save
 		parent.add_child(app)
 		app.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		await process_frame
 		await process_frame
 		if DisplayServer.get_name() != "headless":
 			await RenderingServer.frame_post_draw
-			var directory := "D:/NetSim3D/Preview/UI_เลือกด่าน_สองภาษา/actual/"
+			var directory := OS.get_environment("NETSIM_SHOTS") if OS.has_environment("NETSIM_SHOTS") else OS.get_user_data_dir()
+			directory = directory.path_join("")
 			root.get_texture().get_image().save_png(directory + app.get_class() + "-" + str(apps.find(app)) + "-english.png")
 		_inspect(app)
 		if app is WindowsSecurity:

@@ -87,6 +87,8 @@ func _section(path: String) -> String:
 		return "staffroom"
 	if path.contains("/npc/student_life"):
 		return "students"
+	if path.contains("/npc/science_teacher"):
+		return "science"
 	if path.contains("/computer/"):
 		return "computer"
 	if path.contains("game_flow") or path.contains("/ui/") or path.contains("/core/"):
@@ -104,7 +106,7 @@ func _file_order(a: String, b: String) -> bool:
 
 func _rank(path: String) -> String:
 	var section := _section(path)
-	var group: String = {"level1": "1", "level2": "2", "level3": "3", "level4": "4", "level5": "5", "level6": "6", "menu": "7", "computer": "8", "staffroom": "9", "students": "9"}.get(section, "z")
+	var group: String = {"level1": "1", "level2": "2", "level3": "3", "level4": "4", "level5": "5", "level6": "6", "menu": "7", "computer": "8", "staffroom": "9", "students": "9", "science": "9"}.get(section, "z")
 	var kind := "1" if path.contains("controller") else ("2" if path.contains("/data/") or path.ends_with("_data.gd") else "3")
 	return group + kind
 
