@@ -99,6 +99,23 @@ func run() -> void:
 		flow._controls_help.dismiss()
 		await process_frame
 		check(not paused and not flow._layer.visible, "closing the help starts the level")
+		# P pauses and resumes (F1 belongs to the browser on the web)...
+		flow._input(_key(KEY_P))
+		check(paused and flow.paused_menu, "P opens the pause menu")
+		flow._input(_key(KEY_P))
+		check(not paused and not flow.paused_menu, "P again resumes")
+		# ...but not while typing in a text box.
+		var box := LineEdit.new()
+		root.add_child(box)
+		box.grab_focus()
+		flow._input(_key(KEY_P))
+		check(not paused, "P in a text box is just a letter")
+		box.queue_free()
+		await process_frame
+		# Web: the browser releasing the pointer lock (Esc) opens the pause menu.
+		flow._pause_after_unlock()
+		check(paused and flow.paused_menu, "browser Esc (pointer lock lost) opens the pause menu")
+		flow.resume_game()
 		flow.pause_game()
 		check(paused and flow.paused_menu, "pause stops world")
 		flow.show_settings()
@@ -112,3 +129,10 @@ func run() -> void:
 	flow.save_file = real_settings
 	print("MENU_VALIDATION_FINISHED failures=", failures)
 	quit(1 if failures else 0)
+
+
+func _key(code: Key) -> InputEventKey:
+	var event := InputEventKey.new()
+	event.keycode = code
+	event.pressed = true
+	return event

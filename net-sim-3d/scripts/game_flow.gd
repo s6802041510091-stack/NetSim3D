@@ -118,6 +118,7 @@ func _ready() -> void:
 	add_child(_controls_help)
 	_controls_help.dismissed.connect(resume_game)
 	L10n.language_changed.connect(_refresh_language)
+	_hook_browser_unlock()
 	# Direct F6/test scene launches must retain their original behavior.
 	call_deferred("_show_initial_menu")
 
@@ -915,12 +916,56 @@ func _input(event: InputEvent) -> void:
 	if loading or _awaiting_start or _controls_help.visible or current_level == 0:
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_F1:
+		# F1, or P for the web (browsers keep F1 for their help page). P is a
+		# letter: not while the player types in a text box (e.g. ping in Level 3).
+		if event.keycode == KEY_F1 or (event.keycode == KEY_P and not _typing()):
 			get_viewport().set_input_as_handled()
 			if paused_menu:
 				resume_game()
 			elif not get_tree().paused:
 				pause_game()
+
+func _typing() -> bool:
+	var focus := get_viewport().gui_get_focus_owner()
+	return focus is LineEdit or focus is TextEdit
+
+## Web: while the mouse is captured the browser keeps Esc for itself — it only
+## releases the pointer lock and the game never sees the key. So a release the
+## game did not ask for (Esc, Alt+Tab) opens the pause menu. Godot's own
+## releases go through document.exitPointerLock, which is marked as intended.
+var _browser_unlock_callback: JavaScriptObject
+
+func _hook_browser_unlock() -> void:
+	if not OS.has_feature("web"):
+		return
+	_browser_unlock_callback = JavaScriptBridge.create_callback(_on_browser_unlock)
+	JavaScriptBridge.get_interface("window").netsimOnBrowserUnlock = _browser_unlock_callback
+	JavaScriptBridge.eval("""
+(function () {
+	if (window.netsimUnlockHooked) return;
+	window.netsimUnlockHooked = true;
+	var intended = false;
+	var exitLock = document.exitPointerLock.bind(document);
+	document.exitPointerLock = function () { intended = true; return exitLock(); };
+	document.addEventListener('pointerlockchange', function () {
+		if (document.pointerLockElement) { intended = false; return; }
+		var byBrowser = !intended;
+		intended = false;
+		if (byBrowser && window.netsimOnBrowserUnlock) window.netsimOnBrowserUnlock();
+	});
+})();
+""", true)
+
+func _on_browser_unlock(_args: Array) -> void:
+	call_deferred("_pause_after_unlock")
+
+func _pause_after_unlock() -> void:
+	if loading or _awaiting_start or _controls_help.visible or current_level == 0:
+		return
+	if paused_menu or get_tree().paused:
+		return
+	pause_game()
+	_previous_mouse = Input.MOUSE_MODE_CAPTURED # "เล่นต่อ" captures the mouse again
 
 func pause_game() -> void:
 	_previous_mouse = Input.mouse_mode
