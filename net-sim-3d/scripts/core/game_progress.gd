@@ -3,8 +3,10 @@ extends RefCounted
 
 ## Per-level results on this device: best score, attempts and the last result.
 ## Stored as progress.json in the SavePaths folder (project .saves/ in the
-## editor, browser storage on the Web). Accounts and the teacher report will come
-## from Supabase later; this file only drives the menu (stars, unlocking).
+## editor, browser storage on the Web). This file drives the menu (stars,
+## unlocking) and the progress page. On the NetSim website, ServerSync also sends
+## every attempt to the class and, at start, replaces this file with the
+## logged-in student's results from the server (replace_all).
 ##
 ## Unlocking: level 1 is always open; a level opens when the previous BUILT level
 ## was passed (best score >= MissionScore.PASS_SCORE). Levels still under
@@ -87,7 +89,23 @@ static func record_attempt(level: int, score: MissionScore, extra: Dictionary = 
 	else:
 		file.store_string(JSON.stringify(all, "\t"))
 		file.close()
+	# On the NetSim website: send the attempt to the student's class (server_sync.gd).
+	var tree := Engine.get_main_loop() as SceneTree
+	var sync := tree.root.get_node_or_null("ServerSync") if tree else null
+	if sync:
+		sync.submit_attempt(level, result)
 	return record
+
+
+## Replaces every level's record (the logged-in student's results from the website).
+static func replace_all(all: Dictionary) -> void:
+	DirAccess.make_dir_recursive_absolute(save_path.get_base_dir())
+	var file := FileAccess.open(save_path, FileAccess.WRITE)
+	if file == null:
+		push_warning("Progress could not be saved: " + error_string(FileAccess.get_open_error()))
+		return
+	file.store_string(JSON.stringify(all, "\t"))
+	file.close()
 
 
 static func clear() -> void:

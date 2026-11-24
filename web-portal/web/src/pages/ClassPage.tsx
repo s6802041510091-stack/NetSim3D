@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { api, type Member, type TeacherClass } from '../api';
 import { ConfirmDialog, Notice, Shell, useAction } from '../components';
 import { formatDate, useI18n } from '../i18n';
+import GameResultsTab from './GameResults';
 
 export default function ClassPage() {
   const { id = '' } = useParams();
   const { t, lang, errorText } = useI18n();
   const navigate = useNavigate();
+  const [search, setSearch] = useSearchParams();
+  const tab = search.get('tab') === 'game' ? 'game' : 'students';
   const [cls, setCls] = useState<TeacherClass | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -89,6 +92,16 @@ export default function ClassPage() {
             </div>
           </section>
 
+          <div className="page-tabs glass" role="tablist">
+            <button type="button" role="tab" aria-selected={tab === 'students'} className={tab === 'students' ? 'tab on' : 'tab'} onClick={() => setSearch({}, { replace: true })}>
+              {t('class.tabStudents')}
+            </button>
+            <button type="button" role="tab" aria-selected={tab === 'game'} className={tab === 'game' ? 'tab on' : 'tab'} onClick={() => setSearch({ tab: 'game' }, { replace: true })}>
+              {t('class.tabGame')}
+            </button>
+          </div>
+
+          {tab === 'game' ? <GameResultsTab classId={cls.id} /> : (
           <div className="split">
             <section className="glass panel">
               <h2>{t('class.members', { n: members.length })}</h2>
@@ -181,6 +194,7 @@ export default function ClassPage() {
               </fieldset>
             </section>
           </div>
+          )}
 
           <ConfirmDialog
             open={removing !== null}

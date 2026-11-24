@@ -521,9 +521,11 @@ func show_home() -> void:
 	_home_hotspot("PROGRESS", 632, 703, show_progress)
 	_home_hotspot("EXIT TO LOBBY", 715, 786, confirm_exit)
 
-## The learner's own results (this browser / computer only), per level.
+## The learner's own results per level: from the class system when logged in on
+## the NetSim website (ServerSync), otherwise this browser / computer only.
 func show_progress() -> void:
-	_page("ความคืบหน้าของฉัน", "สรุปผลทุกด่านที่เล่นบนเครื่อง/เบราว์เซอร์นี้ • แสดงเฉพาะผลของคุณเอง", 980)
+	var synced := ServerSync.is_student_synced()
+	_page("ความคืบหน้าของฉัน", "สรุปผลทุกด่านของคุณจากระบบของห้องเรียน • เห็นเหมือนกันทุกเครื่องที่เข้าสู่ระบบ" if synced else "สรุปผลทุกด่านที่เล่นบนเครื่อง/เบราว์เซอร์นี้ • แสดงเฉพาะผลของคุณเอง", 980)
 	_screen = "progress"
 	ProgressDashboard.build_overview(_body, TITLES, AVAILABLE, is_level_unlocked, show_progress_level)
 	_top_button("‹  กลับเมนูหลัก", show_home).name = "ProgressBack"
@@ -1161,6 +1163,25 @@ func return_to_menu() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file(MENU)
 	show_home()
+
+## The logged-in student's results arrived from the website (ServerSync). Redraw the
+## menu page on screen so stars, unlocking and Continue match them. After a change
+## of student on a shared computer, Continue no longer points at the previous
+## student's level.
+func on_progress_synced(account_changed: bool) -> void:
+	if account_changed:
+		last_level = 0
+		_config.set_value("session", "last_level", 0)
+		_save_preferences()
+	if current_level != 0 or loading:
+		return
+	match _screen:
+		"home":
+			show_home()
+		"levels":
+			show_levels()
+		"progress":
+			show_progress()
 
 func confirm_exit() -> void:
 	_page("กลับหน้า Lobby?", "ออกจากเกม • เก็บเฉพาะความคืบหน้าที่ภารกิจบันทึกไว้", SMALL_CARD_WIDTH)

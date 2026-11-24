@@ -2,6 +2,7 @@ import express, { type NextFunction, type Request, type Response } from 'express
 import { loadUser } from './auth.ts';
 import { HttpError } from './errors.ts';
 import { classRoutes, JoinLimiter } from './routes/classes.ts';
+import { gameRoutes } from './routes/game.ts';
 import { authRoutes, type AppOptions } from './routes/me.ts';
 
 export type { AppOptions };
@@ -35,6 +36,7 @@ export function createApp(options: AppOptions, limiter = new JoinLimiter()) {
   app.use('/api', loadUser(options.pool));
   app.use('/api', authRoutes(options));
   app.use('/api', classRoutes(options, limiter));
+  app.use('/api', gameRoutes(options));
 
   app.use('/api', (_req, _res, next) => next(new HttpError(404, 'not_found')));
 

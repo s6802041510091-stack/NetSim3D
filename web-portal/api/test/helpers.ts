@@ -23,7 +23,7 @@ export async function freshDb(): Promise<Pool> {
     pool = createPool(url);
     await migrate(pool);
   }
-  await pool.query('TRUNCATE users, teacher_allowlist, sessions, classes, enrollments CASCADE');
+  await pool.query('TRUNCATE users, teacher_allowlist, sessions, classes, enrollments, game_attempts CASCADE');
   await syncAllowlist(pool, [TEACHER, TEACHER2]);
   return pool;
 }

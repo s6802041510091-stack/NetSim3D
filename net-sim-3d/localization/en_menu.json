@@ -147,5 +147,15 @@
   "ห้องคอมใหม่จะใช้ได้เมื่อไหร่ครับ": "When will the new computer room be ready?",
   "ฝ่าย IT บอกว่ากำลังติดตั้งเครือข่ายอยู่ค่ะ": "IT says they're installing the network.",
   "จะได้พานักเรียนไปเรียนเสียที": "Then I can finally take my students there.",
-  "นักเรียนรอกันหลายคนเลยค่ะ": "Lots of students are waiting for it."
+  "นักเรียนรอกันหลายคนเลยค่ะ": "Lots of students are waiting for it.",
+  "ยังไม่ได้เลือกคลาส • เลือกคลาสที่หน้าเว็บก่อน": "No class chosen • pick one on the website first",
+  "กรอกข้อมูลนักเรียนที่หน้าเว็บก่อน": "Fill in your student details on the website first",
+  "ครู • ทดลองเล่น ไม่ส่งคะแนน": "Teacher • trial play, scores are not sent",
+  "ยังไม่ได้เข้าสู่ระบบ • คะแนนจะไม่ถูกส่งให้ครู": "Not logged in • scores will not reach your teacher",
+  "เชื่อมต่อระบบไม่ได้ • คะแนนเก็บไว้ในเครื่องก่อน": "Cannot reach the server • scores are kept on this device for now",
+  "รอส่งคะแนน %d ครั้ง": "%d results waiting to send",
+  "ยังส่งคะแนนไม่ได้ จะลองส่งอีกครั้งอัตโนมัติ": "Could not send the score yet. It will retry automatically.",
+  "ส่งคะแนนให้ครูแล้ว": "Score sent to your teacher",
+  "สรุปผลทุกด่านของคุณจากระบบของห้องเรียน • เห็นเหมือนกันทุกเครื่องที่เข้าสู่ระบบ": "All your results from the class system • the same on every device you log in from",
+  "เข้าสู่ระบบ": "Log in"
 }

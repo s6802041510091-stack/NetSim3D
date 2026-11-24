@@ -13,7 +13,9 @@ if (applied.length) console.log(`Database migrations applied: ${applied.join(', 
 await syncAllowlist(pool, teacherEmails);
 await pool.query('DELETE FROM sessions WHERE expires_at < now()');
 
-const server = createApp({ pool, devLogin, cookieSecure }).listen(port, () => {
+const timeZone = process.env.APP_TIMEZONE || 'Asia/Bangkok';
+
+const server = createApp({ pool, devLogin, cookieSecure, timeZone }).listen(port, () => {
   console.log(`NetSim API listening on port ${port}`);
   if (devLogin) console.warn('DEV_LOGIN is on: anyone can log in as any email. Never use this on the real server.');
 });

@@ -6,7 +6,8 @@ import {
 import type { Pool } from '../db.ts';
 import { HttpError, isUniqueViolation, parse } from '../errors.ts';
 
-export type AppOptions = { pool: Pool; devLogin: boolean; cookieSecure: boolean };
+/** timeZone: local time used in CSV files and the game's progress (default Asia/Bangkok). */
+export type AppOptions = { pool: Pool; devLogin: boolean; cookieSecure: boolean; timeZone?: string };
 
 /** What the website (and later the game) needs to know about the logged-in user. */
 export async function meView(pool: Pool, user: User) {

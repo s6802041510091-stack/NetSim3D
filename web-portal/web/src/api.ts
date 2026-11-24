@@ -69,6 +69,49 @@ export type Member = {
   joinedAt: string;
 };
 
+export type Brief = { total: number; stars: number; passed: boolean; finishedAt: string };
+export type LevelSummary = { attempts: number; first: Brief; best: Brief; last: Brief };
+export type StudentResults = {
+  id: string;
+  studentId: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+  former: boolean;
+  levels: Record<string, LevelSummary>;
+};
+export type GameResults = { levels: number[]; passScore: number; students: StudentResults[] };
+
+export type GameAttempt = {
+  id: string;
+  level: number;
+  attemptNo: number;
+  total: number;
+  correctness: number;
+  process: number;
+  timeScore: number;
+  stars: number;
+  passed: boolean;
+  elapsedSec: number;
+  decisionsCorrect: number;
+  decisionsTotal: number;
+  checkCount: number | null;
+  mistakes: string[];
+  stepTimes: { step: number; name: string; sec: number }[];
+  mistakeLog: { what?: string; why?: string; text?: string; step?: number; at_sec?: number; at_end?: boolean }[];
+  finishedAt: string;
+};
+
+export type CsvType = 'summary' | 'attempts' | 'steps';
+
+export function csvUrl(classId: string, q: { type: CsvType; level?: number; from?: string; to?: string; lang: string }): string {
+  const p = new URLSearchParams({ type: q.type, lang: q.lang });
+  if (q.level) p.set('level', String(q.level));
+  if (q.from) p.set('from', q.from);
+  if (q.to) p.set('to', q.to);
+  return `/api/classes/${classId}/export.csv?${p}`;
+}
+
 type MeResponse = { me: Me };
 
 export const api = {
@@ -89,6 +132,9 @@ export const api = {
   deleteClass: (id: string) => call<{ ok: true }>('DELETE', `/classes/${id}`),
   restoreClass: (id: string) => call<{ class: TeacherClass }>('POST', `/classes/${id}/restore`),
   removeMember: (id: string, studentId: string) => call<{ ok: true }>('DELETE', `/classes/${id}/members/${studentId}`),
+  gameResults: (id: string) => call<GameResults>('GET', `/classes/${id}/game-results`),
+  gameAttempts: (id: string, studentId: string) =>
+    call<{ attempts: GameAttempt[] }>('GET', `/classes/${id}/game-attempts?studentId=${encodeURIComponent(studentId)}`),
   joinClass: (code: string, password: string) =>
     call<{ class: { id: string; code: string; name: string }; alreadyMember: boolean }>('POST', '/classes/join', { code, password }),
 };

@@ -5,6 +5,10 @@ import { GameIcon, Notice, Shell, SimIcon, useAction } from '../components';
 import { useI18n } from '../i18n';
 import { useSession } from '../session';
 
+function ChartIcon() {
+  return <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V22h7v18zm12 0V10h7v30zm12 0V28h7v12z" fill="currentColor" /></svg>;
+}
+
 export default function TeacherLobby() {
   const { t, errorText } = useI18n();
   const { me } = useSession();
@@ -126,12 +130,17 @@ export default function TeacherLobby() {
             <span className="launch-icon launch-game"><GameIcon /></span>
             <span><strong>{t('teacher.tryGame')}</strong><span className="muted small">{t('teacher.tryGameText')}</span></span>
           </a>
-          <div className="tool disabled" aria-disabled="true">
-            <span className="launch-icon launch-soon">
-              <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40V22h7v18zm12 0V10h7v30zm12 0V28h7v12z" fill="currentColor" /></svg>
-            </span>
-            <span><strong>{t('teacher.gameDash')}</strong><span className="badge badge-amber">{t('teacher.soon')}</span></span>
-          </div>
+          {live.length > 0 ? (
+            <Link className="tool" to={`/classes/${live[0].id}?tab=game`}>
+              <span className="launch-icon launch-soon"><ChartIcon /></span>
+              <span><strong>{t('teacher.gameDash')}</strong><span className="muted small">{t('teacher.gameDashText')}</span></span>
+            </Link>
+          ) : (
+            <div className="tool disabled" aria-disabled="true">
+              <span className="launch-icon launch-soon"><ChartIcon /></span>
+              <span><strong>{t('teacher.gameDash')}</strong><span className="muted small">{t('teacher.gameDashText')}</span></span>
+            </div>
+          )}
         </div>
       </section>
     </Shell>
