@@ -131,6 +131,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return state.mistakes()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -325,6 +327,10 @@ func _greet() -> void:
 
 ## At the start: the owner of PC-R3-L2 gets up and stands beside it.
 func _watcher_step_aside() -> void:
+	# A resumed game after the fix: he stays at his seat.
+	if stage >= Stage.TELL:
+		watcher_state = "seated"
+		return
 	watcher_state = "moving"
 	await get_tree().process_frame
 	if not is_instance_valid(watcher):
@@ -460,11 +466,39 @@ func _on_chosen(pick: int) -> void:
 
 # ---------------------------------------------------------------- end
 
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	return {"stage": int(stage), "elapsed_sec": elapsed_sec, "state": LevelSave.pack(state), "greeted": greeted}
+
+
+## Windows Security reads its progress from `state` (shared_state), so the
+## program opens where it was. The phone is answered; the owner of the PC
+## stays seated if the fix was done (_watcher_step_aside).
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	LevelSave.unpack(state, d.get("state", {}))
+	greeted = bool(d.get("greeted", false))
+	var next := clampi(int(d.get("stage", 0)), Stage.CALL, Stage.TELL) as Stage
+	if next > Stage.CALL and phone:
+		phone.ringing = false
+	_timing = next > Stage.CALL
+	stage = next
+	if next == Stage.TELL:
+		# _enter(TELL) would walk him back; he has not left his seat.
+		watcher_state = "seated"
+	_enter(next)
+
+
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
 	_busy = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
-	var record := GameProgress.record_attempt(LEVEL, score, {
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes),
 		"alert_answers": state.alert_answers.duplicate(true),
 		"conn_tool_first": state.conn_tool_first, "file_tool_first": state.file_tool_first,
 		"rules_checked": state.rules_checked,

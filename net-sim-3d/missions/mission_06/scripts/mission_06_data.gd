@@ -76,7 +76,14 @@ extends Resource
 
 @export_group("Chat")
 @export var teacher_name: String = "ครูสาว"
-@export var chat_placeholder: String = "Type a message..."
+## The player cannot type freely (playtest 2026-11-24: rude words went
+## straight through); these are the messages the player can send. Each one
+## asks her to play the clip again.
+@export var chat_presets: PackedStringArray = PackedStringArray([
+	"แก้ไขแล้วครับ รบกวนครูลองเปิดคลิปฟังเสียงดูครับ",
+	"ครูลองเปิดคลิปอีกครั้งได้ไหมครับ",
+	"ตอนนี้เสียงเป็นอย่างไรบ้างครับ",
+])
 @export var chat_teacher_hello: String = "ต่อเข้ามาได้แล้วใช่ไหมคะ ครูไม่จับเมาส์นะคะ"
 ## The teacher plays the clip after each message from the player and says what she hears.
 @export var chat_reply_muted: String = "ลองเปิดคลิปแล้ว ยังเงียบอยู่เลยค่ะ"

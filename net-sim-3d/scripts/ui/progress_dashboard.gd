@@ -12,9 +12,11 @@ const MUTED := Color("526b81")
 const BLUE := Color("237db1")
 const PASS := Color("1f9a55")
 const FAIL := Color("d9584f")
+## The step that took longest (time per step card).
+const SLOW := Color("e08a1e")
 const IDLE := Color("8c9bab")
-const HEADING_FONT := preload("res://assets/fonts/Anuphan-Variable.ttf")
-const BODY_FONT := preload("res://assets/fonts/Sarabun-Regular.ttf")
+const HEADING_FONT := preload("res://assets/fonts/Mitr-Medium.ttf")
+const BODY_FONT := preload("res://assets/fonts/Mitr-Regular.ttf")
 const MONTHS := ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."]
 const MONTHS_EN := ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 ## Attempts drawn in the score chart of a level (newest on the right).
@@ -185,12 +187,18 @@ static func build_level(body: VBoxContainer, level: int) -> void:
 		var right := int(last.get("decisions_correct", 0))
 		_fact(facts, "การตัดสินใจ", "ถูก %d  •  ผิด %d  จาก %d" % [right, decisions - right, decisions], INK)
 
+	_step_times(body, attempts)
+
 	# Mistakes of the latest attempt, each on its own tinted line.
 	var mistakes: Variant = last.get("mistakes", [])
 	var clean: bool = not mistakes is Array or mistakes.is_empty()
 	var mistakes_box := _section(body, "จุดที่ผิดพลาด", PASS if clean else FAIL, "ครั้งล่าสุด" if clean else "ครั้งล่าสุด  •  %d จุด" % mistakes.size())
+	var log: Variant = last.get("mistake_log", [])
 	if clean:
 		_note(mistakes_box, "ไม่มี ทำได้ถูกต้องทุกขั้นตอน", PASS)
+	elif log is Array and (log as Array).size() == mistakes.size():
+		# Where, why and when for each one.
+		MistakeCards.build(mistakes_box, log, _new_label, INK, MUTED, 600.0)
 	else:
 		for line in mistakes:
 			var mistake := _note(mistakes_box, String(line), FAIL)
@@ -212,6 +220,64 @@ static func build_level(body: VBoxContainer, level: int) -> void:
 			clock(float(entry.get("elapsed_sec", 0.0))), "ผ่าน" if ok else "ไม่ผ่าน"], stripe, false, ok)
 	if total_attempts > attempts.size():
 		_text(history_box, "แสดง %d ครั้งล่าสุดจากทั้งหมด %d ครั้ง (ผลรายครั้งเริ่มเก็บตั้งแต่ 18 พ.ย. 2569)" % [attempts.size(), total_attempts], 14, MUTED)
+
+
+## Time on each step of the latest attempt (teacher's request 2026-11-24):
+## one bar per step, the longest in orange; under it the average over every
+## recorded attempt with the same steps, when there is more than one.
+static func _step_times(body: VBoxContainer, attempts: Array) -> void:
+	var last: Dictionary = attempts[attempts.size() - 1]
+	var steps: Variant = last.get("step_times", [])
+	var box := _section(body, "เวลาแต่ละขั้นตอน", SLOW, "ครั้งล่าสุด  •  สีส้ม = ขั้นที่ใช้เวลานานที่สุด")
+	box.get_parent().name = "StepTimes"
+	if not steps is Array or (steps as Array).is_empty():
+		_note(box, "ครั้งนี้ยังไม่มีเวลารายขั้นตอน (เริ่มเก็บตั้งแต่ 24 พ.ย. 2569)", MUTED)
+		return
+	var list: Array = steps
+	# Averages: attempts that recorded the same number of steps.
+	var sums := []
+	var counted := 0
+	for entry: Dictionary in attempts:
+		var other: Variant = entry.get("step_times", [])
+		if other is Array and (other as Array).size() == list.size():
+			counted += 1
+			for i in list.size():
+				if sums.size() <= i:
+					sums.append(0.0)
+				sums[i] = float(sums[i]) + float((other as Array)[i].get("sec", 0.0))
+	var longest := 0.0
+	var total := 0.0
+	for step: Dictionary in list:
+		longest = maxf(longest, float(step.get("sec", 0.0)))
+		total += float(step.get("sec", 0.0))
+	for i in list.size():
+		var step: Dictionary = list[i]
+		var sec := float(step.get("sec", 0.0))
+		var slow := sec >= longest and longest > 0.0
+		var row := HBoxContainer.new()
+		row.name = "StepTime%d" % (i + 1)
+		row.add_theme_constant_override("separation", 14)
+		box.add_child(row)
+		var name_label := _text(row, "%d. %s" % [int(step.get("step", i + 1)), String(step.get("name", ""))], 16, INK, slow)
+		name_label.name = "StepName"
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.custom_minimum_size.x = 330
+		var bar := _bar(roundi(sec * 10.0), maxi(roundi(longest * 10.0), 1), SLOW if slow else BLUE)
+		bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(bar)
+		var times := VBoxContainer.new()
+		times.add_theme_constant_override("separation", -2)
+		times.custom_minimum_size.x = 118
+		times.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(times)
+		var now := _text(times, clock(sec), 16, SLOW.darkened(0.2) if slow else INK, true)
+		now.name = "StepSeconds"
+		if counted > 1:
+			_text(times, "เฉลี่ย %s" % clock(float(sums[i]) / counted), 13, MUTED)
+	var foot := "รวมทุกขั้นตอน %s" % clock(total)
+	if counted > 1:
+		foot += "  •  ค่าเฉลี่ยจาก %d ครั้งที่เล่น" % counted
+	_text(box, foot, 14, MUTED)
 
 
 # ---------------------------------------------------------------- formatting
@@ -250,6 +316,16 @@ static func _text(parent: Control, text: String, size: int, colour: Color, headi
 	if parent is VBoxContainer:
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	parent.add_child(label)
+	return label
+
+
+## A label in the page's fonts, not yet placed (MistakeCards places it).
+static func _new_label(text: String, size: int, colour: Color, bold: bool) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_override("font", HEADING_FONT if bold else BODY_FONT)
+	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_color_override("font_color", colour)
 	return label
 
 

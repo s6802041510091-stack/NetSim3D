@@ -117,7 +117,7 @@ func _run() -> void:
 	mission.state = state
 	mission.elapsed_sec = 412.0
 	mission.finish(player)
-	await create_timer(1.8).timeout # stars pop in
+	await create_timer(2.6).timeout # stars pop in, then the red pen
 	await _shot("m1_summary")
 	mission.summary.show_details()
 	await _shot("m1_summary_details")

@@ -97,6 +97,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return state.mistakes()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -363,11 +365,71 @@ func report_lines() -> PackedStringArray:
 	return lines
 
 
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	return {
+		"stage": int(stage), "elapsed_sec": elapsed_sec, "state": LevelSave.pack(state),
+		"drawer_taken": drawer_taken.duplicate(), "drawer_seen": drawer_seen,
+		"crimp_end": crimp_panel.end_index, "strip_misses": crimp_panel.strip_misses,
+		"tester_cable": tester_panel.cable, "install_step": install_step,
+	}
+
+
+## Back to the start of the saved step: the stages before it are entered in
+## order (props laid out, prompts set) and the installed cables are plugged
+## in again as far as the player had got.
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	LevelSave.unpack(state, d.get("state", {}))
+	drawer_taken = (d.get("drawer_taken", {}) as Dictionary).duplicate()
+	drawer_seen = bool(d.get("drawer_seen", false))
+	var target := clampi(int(d.get("stage", 0)), Stage.BRIEFING, Stage.REPORT) as Stage
+	# Crimping goes on from the end being made (its colours are arranged again).
+	crimp_panel.end_index = clampi(int(d.get("crimp_end", 0)), 0, CrimpPanel.ENDS.size())
+	crimp_panel.strip_misses = int(d.get("strip_misses", 0))
+	crimp_panel.step_index = 0
+	if target == Stage.CRIMP and not crimp_panel.is_done():
+		state.ends.erase(crimp_panel.current_key())
+	tester_panel.cable = clampi(int(d.get("tester_cable", 1)), 1, 3)
+	tester_panel.step_index = 0
+	for s in range(Stage.GATHER, target + 1):
+		_enter(s as Stage)
+	_timing = target >= Stage.GATHER
+	if target == Stage.INSTALL:
+		var step := String(d.get("install_step", "rack"))
+		if step in ["pc", "leds"]:
+			_replay_rack(step == "leds")
+		_set_install_step(step if step in ["rack", "pc", "leds"] else "rack")
+	elif target == Stage.REPORT:
+		_replay_rack(true)
+
+
+## The rack (and the teacher PC) as they were after the install steps.
+func _replay_rack(pc_done: bool) -> void:
+	if rack == null or state.router_port == "":
+		return
+	_on_install_step("router", state.router_port)
+	_on_install_step("switch1", "")
+	_on_install_step("switch2", "")
+	if not pc_done or pc_port == null:
+		_on_install_step("route", "")
+		return
+	rack.drop_to_pc("switch_02", pc_port, true)
+	var works := state.installed_cable_works(2)
+	pc_port.set_link(works)
+	rack.set_link("switch_02", works)
+
+
 ## Builds the score, records it and shows the summary. Also used by tests.
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
-	var record := GameProgress.record_attempt(LEVEL, score, {
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes),
 		"cable_types": state.cable_types.duplicate(), "ends": state.ends.duplicate(true),
 		"tester_verdicts": state.tester_verdicts.duplicate(), "router_port": state.router_port,
 		"spare_cables": Array(state.spare_cables), "job_works": state.job_works(),

@@ -13,6 +13,14 @@ const BOB_SPEED := 2.6
 const SPIN_SPEED := 1.4
 ## Closer than this (camera to arrow, metres) the arrow is hidden.
 const HIDE_DISTANCE := 1.4
+## Size follows the distance (playtest 2026-11-24): small close by, so it does
+## not cover the person or device, and bigger far away so it can still be
+## found from another room. Scale 1 at SCALE_REF metres, clamped.
+const SCALE_REF := 6.0
+const SCALE_MIN := 0.45
+const SCALE_MAX := 2.6
+## How fast the size catches up (per second), so it does not jump.
+const SCALE_EASE := 6.0
 
 var target: Node3D
 ## Where the arrow tip sits, relative to the target's origin (or the point given).
@@ -21,6 +29,7 @@ var _point := Vector3.ZERO
 var _use_point := false
 var _time := 0.0
 var _arrow: Node3D
+var _scale := 0.0
 
 
 func _ready() -> void:
@@ -102,9 +111,24 @@ func tip_position() -> Vector3:
 func _process(delta: float) -> void:
 	if not is_active():
 		visible = false
+		_scale = 0.0
 		return
 	_time += delta
-	global_position = tip_position() + Vector3(0, BOB_HEIGHT * (0.5 + 0.5 * sin(_time * BOB_SPEED)), 0)
-	_arrow.rotation.y += SPIN_SPEED * delta
 	var camera := get_viewport().get_camera_3d()
-	visible = camera == null or camera.global_position.distance_to(global_position) > HIDE_DISTANCE
+	var tip := tip_position()
+	var distance := camera.global_position.distance_to(tip) if camera else SCALE_REF
+	var wanted := size_for_distance(distance)
+	# First frame after (re)appearing: take the size at once.
+	_scale = wanted if _scale <= 0.0 else lerpf(_scale, wanted, minf(1.0, SCALE_EASE * delta))
+	_arrow.scale = Vector3.ONE * _scale
+	# The tip stays on the target; the bob grows with the arrow.
+	global_position = tip + Vector3(0, BOB_HEIGHT * _scale * (0.5 + 0.5 * sin(_time * BOB_SPEED)), 0)
+	_arrow.rotation.y += SPIN_SPEED * delta
+	visible = camera == null or distance > HIDE_DISTANCE
+	if not visible:
+		_scale = 0.0
+
+
+## Arrow scale for a camera distance in metres.
+static func size_for_distance(distance: float) -> float:
+	return clampf(distance / SCALE_REF, SCALE_MIN, SCALE_MAX)

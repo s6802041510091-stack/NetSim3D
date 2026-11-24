@@ -169,7 +169,7 @@ func mistakes() -> PackedStringArray:
 			var names := []
 			for pin in pins:
 				names.append(str(pin))
-			out.append("สายเส้นที่ %s ปลายที่ %s: เรียงสีไม่ตรง T568B ที่ขา %s" % [key.substr(0, 1), "1" if key.ends_with("A") else "2", ", ".join(PackedStringArray(names))])
+			out.append("สายเส้นที่ %s ปลายที่ %s: เรียงสีไม่ตรง T568B ที่ขา %s — T568B ขา 1–8 คือ ขาว-ส้ม, ส้ม, ขาว-เขียว, น้ำเงิน, ขาว-น้ำเงิน, เขียว, ขาว-น้ำตาล, น้ำตาล" % [key.substr(0, 1), "1" if key.ends_with("A") else "2", ", ".join(PackedStringArray(names))])
 	for cable in [1, 2]:
 		if tester_verdicts.has(cable) and bool(tester_verdicts[cable]) != cable_good(cable):
 			if cable_good(cable):
@@ -179,7 +179,7 @@ func mistakes() -> PackedStringArray:
 	if router_port == "router_wan":
 		out.append("เสียบสายเส้นที่ 1 เข้าพอร์ต WAN ของ Router — พอร์ต WAN ใช้กับสายอินเทอร์เน็ต ต้องเสียบพอร์ต LAN ห้องคอมจึงไม่มีอินเทอร์เน็ต")
 	for cable in spare_cables:
-		out.append("สายเส้นที่ %d: สายที่เข้าหัวเองใช้งานไม่ได้ ต้องใช้สายสำรองแทน" % cable)
+		out.append("สายเส้นที่ %d: ต้องใช้สายสำรองแทนสายที่เข้าหัวเอง — สายที่เข้าหัวเองใช้งานไม่ได้" % cable)
 	if not job_works():
-		out.append("ผลงานจึงยังใช้งานไม่ได้จริง (คะแนนความถูกต้อง 0)")
+		out.append("ผลงานยังใช้งานไม่ได้จริง — มีสายหรือพอร์ตผิดตามรายการด้านบน คะแนนความถูกต้องจึงเป็น 0")
 	return out

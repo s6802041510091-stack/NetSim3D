@@ -11,7 +11,7 @@ signal used(player: Node, type: String)
 const COLLISION_LAYER := 8
 const SIZE := Vector3(0.34, 0.34, 0.34)
 const CARDBOARD := Color(0.66, 0.5, 0.32)
-const FONT := preload("res://assets/fonts/Sarabun-Bold.ttf")
+const FONT := preload("res://assets/fonts/Mitr-Medium.ttf")
 
 ## type -> [label title, end 1, end 2, stripe colour]
 const TYPES := {

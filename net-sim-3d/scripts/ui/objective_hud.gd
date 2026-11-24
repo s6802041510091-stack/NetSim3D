@@ -7,19 +7,32 @@ extends CanvasLayer
 ## missions can fold it automatically while the player uses a computer.
 ##
 ## The standard for every level is set_steps(): the whole mission as numbered
-## steps in order — done = green with ✓, the current step = blue (with a short
-## hint below it), steps not reached yet = faint grey.
+## steps in order — done = ticked box, the current step = amber, steps not
+## reached yet = faint grey.
+##
+## Look (playtest 2026-11-24: the old rounded blue glass card "looked AI-made"):
+## a dark work ticket with a square amber edge on the left, the same amber as
+## the objective arrow, and drawn check boxes instead of font glyphs.
+## The step's how-to hint is held back (playtest: it read like an answer key)
+## and only shows after the player has been on the same step for HINT_DELAY.
 
 signal collapsed_changed(collapsed: bool)
 
 const PANEL_WIDTH := 330.0
+## Mitr sets Thai lines tall: pull wrapped lines closer in the panel.
+const LINE_TIGHTEN := -6
 const STEP_DONE := "done"
 const STEP_ACTIVE := "active"
 const STEP_TODO := "todo"
-const COLOR_DONE := Color(0.5, 0.88, 0.6)
-const COLOR_ACTIVE := Color(0.5, 0.76, 1.0)
-const COLOR_TODO := Color(1, 1, 1, 0.38)
-const COLOR_HINT := Color(0.82, 0.87, 0.95)
+const COLOR_TICKET := Color(0.98, 0.74, 0.22)
+const COLOR_DONE := Color(0.56, 0.74, 0.60)
+const COLOR_ACTIVE := Color(1.0, 0.86, 0.55)
+const COLOR_TODO := Color(1, 1, 1, 0.36)
+const COLOR_HINT := Color(0.80, 0.78, 0.70)
+const PANEL_BG := Color(0.075, 0.08, 0.09, 0.93)
+## Seconds on one step before its hint appears.
+const HINT_DELAY := 75.0
+const BOX_SIZE := 13.0
 
 ## Space kept free on the right (e.g. for a SidePanel), so the panel moves left of it.
 var right_inset := 0.0:
@@ -48,6 +61,70 @@ var _objective_label: Label
 var _toggle: Button
 var _toast_panel: PanelContainer
 var _toast_label: Label
+var _rule: ColorRect
+## The held-back hint of the current step, and how long the player has been on it.
+var _hint_row: Control
+var _hint_key := ""
+var _step_time := 0.0
+## Time on each step (teacher's request 2026-11-24: which step takes a
+## student long): seconds of game time while that step was the current one
+## (index = step number - 1; a pause menu stops it), and the step's words as
+## last shown. Missions put step_report() in the attempt they record.
+var step_seconds: Array = []
+var step_names := PackedStringArray()
+var _active_index := -1
+
+## When each mistake happened (teacher's request 2026-11-24: where, why and
+## when). The mission gives `mistake_source` (its current mistake lines, e.g.
+## state.mistakes()); twice a second new lines are stamped with the step being
+## played and the level time (sum of step_seconds). Lines already there at
+## the start ("not attached yet") are not mistakes until the level ends, so
+## they get the time of hand-in if they are still there then.
+var mistake_source: Callable
+## line key -> {step, step_name, at}
+var mistake_seen := {}
+## Keys present at the first look (line key -> true).
+var mistake_baseline := {}
+var _mistakes_started := false
+var _mistake_clock := 0.0
+const MISTAKE_POLL := 0.5
+var _digits := RegEx.create_from_string("\\d+")
+
+
+## The ticket: square corners, a thick coloured edge on the left only.
+static func ticket_box(edge: Color, pad_x: int = 14, pad_y: int = 11) -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color = PANEL_BG
+	s.border_color = edge
+	s.border_width_left = 4
+	s.set_corner_radius_all(2)
+	s.content_margin_left = pad_x + 2
+	s.content_margin_right = pad_x
+	s.content_margin_top = pad_y
+	s.content_margin_bottom = pad_y
+	return s
+
+
+## A small drawn check box for a step (no ✓/▸ glyph needed in the font).
+static func _step_box(state: String) -> Control:
+	var box := Control.new()
+	box.name = "Box"
+	box.custom_minimum_size = Vector2(BOX_SIZE + 3, BOX_SIZE + 8)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.draw.connect(_draw_step_box.bind(box, state))
+	return box
+
+
+static func _draw_step_box(box: Control, state: String) -> void:
+	var r := Rect2(Vector2(1, 5), Vector2(BOX_SIZE, BOX_SIZE))
+	if state == STEP_DONE:
+		box.draw_rect(r, COLOR_DONE)
+		box.draw_polyline(PackedVector2Array([r.position + Vector2(3, 6.5), r.position + Vector2(5.5, 9.5), r.position + Vector2(10.5, 3.5)]), Color(PANEL_BG, 1.0), 2.0, true)
+	elif state == STEP_ACTIVE:
+		box.draw_rect(r, COLOR_TICKET, false, 2.0)
+		box.draw_rect(r.grow(-3.5), COLOR_TICKET)
+	else:
+		box.draw_rect(r, COLOR_TODO, false, 1.5)
 
 
 func _ready() -> void:
@@ -56,7 +133,7 @@ func _ready() -> void:
 	_objective_panel.name = "ObjectivePanel"
 	_objective_panel.position = Vector2(20, 20)
 	_objective_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_objective_panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.06, 0.08, 0.12, 0.78), Color(0.4, 0.6, 0.95, 0.6), 8, 12, 8))
+	_objective_panel.add_theme_stylebox_override("panel", ticket_box(COLOR_TICKET))
 	add_child(_objective_panel)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
@@ -70,23 +147,38 @@ func _ready() -> void:
 	title_row.add_theme_constant_override("separation", 6)
 	title_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(title_row)
-	_objective_title = GameUI.label("", 14, Color(0.6, 0.78, 1.0), true)
+	_objective_title = GameUI.label("", 13, COLOR_TICKET, true)
 	title_row.add_child(_objective_title)
-	_objective_hint = GameUI.label("", 13, Color(0.62, 0.65, 0.7))
+	_objective_hint = GameUI.label("", 12, Color(1, 1, 1, 0.38))
+	_objective_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_objective_hint.name = "HintLabel"
 	title_row.add_child(_objective_hint)
-	_objective_label = GameUI.label("", 18, Color.WHITE)
+	_objective_label = GameUI.label("", 16, Color.WHITE)
+	_objective_label.add_theme_constant_override("line_spacing", LINE_TIGHTEN)
 	_objective_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_objective_label.custom_minimum_size = Vector2(PANEL_WIDTH - 60, 0)
 	col.add_child(_objective_label)
-	_heading = GameUI.label("", 16, Color.WHITE, true)
+	_heading = GameUI.label("", 15, Color.WHITE, true)
+	_heading.add_theme_constant_override("line_spacing", LINE_TIGHTEN)
 	_heading.name = "Heading"
 	_heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_heading.custom_minimum_size = Vector2(PANEL_WIDTH - 60, 0)
 	col.add_child(_heading)
+	# A thin amber rule between the job's name and its steps.
+	_rule = ColorRect.new()
+	_rule.name = "Rule"
+	_rule.color = Color(COLOR_TICKET, 0.28)
+	_rule.custom_minimum_size = Vector2(0, 1)
+	_rule.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var rule_gap := MarginContainer.new()
+	rule_gap.add_theme_constant_override("margin_top", 5)
+	rule_gap.add_theme_constant_override("margin_bottom", 5)
+	rule_gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rule_gap.add_child(_rule)
+	col.add_child(rule_gap)
 	_steps_box = VBoxContainer.new()
 	_steps_box.name = "Steps"
-	_steps_box.add_theme_constant_override("separation", 3)
+	_steps_box.add_theme_constant_override("separation", 2)
 	_steps_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_steps_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_steps_scroll = ScrollContainer.new()
@@ -102,15 +194,15 @@ func _ready() -> void:
 	_toggle.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_toggle.focus_mode = Control.FOCUS_NONE
 	_toggle.tooltip_text = "ซ่อน/แสดงภารกิจ (Tab)"
-	_toggle.add_theme_stylebox_override("normal", GameUI.box(Color(1, 1, 1, 0.08), Color(0, 0, 0, 0), 6, 0, 0))
-	_toggle.add_theme_stylebox_override("hover", GameUI.box(Color(1, 1, 1, 0.2), Color(0, 0, 0, 0), 6, 0, 0))
-	_toggle.add_theme_stylebox_override("pressed", GameUI.box(Color(1, 1, 1, 0.28), Color(0, 0, 0, 0), 6, 0, 0))
+	_toggle.add_theme_stylebox_override("normal", GameUI.box(Color(1, 1, 1, 0.0), Color(1, 1, 1, 0.14), 2, 0, 0))
+	_toggle.add_theme_stylebox_override("hover", GameUI.box(Color(COLOR_TICKET, 0.16), Color(COLOR_TICKET, 0.5), 2, 0, 0))
+	_toggle.add_theme_stylebox_override("pressed", GameUI.box(Color(COLOR_TICKET, 0.26), Color(COLOR_TICKET, 0.6), 2, 0, 0))
 	# Chevron drawn (no font glyph needed). The panel sits on the right edge:
 	# open -> points right (fold away), folded -> points left (open out).
 	_toggle.draw.connect(func():
 		var c := _toggle.size * 0.5
 		var d := -5.0 if collapsed else 5.0
-		_toggle.draw_polyline(PackedVector2Array([c + Vector2(-d * 0.6, -7), c + Vector2(d * 0.6, 0), c + Vector2(-d * 0.6, 7)]), Color(0.85, 0.9, 1.0), 2.5, true))
+		_toggle.draw_polyline(PackedVector2Array([c + Vector2(-d * 0.6, -6), c + Vector2(d * 0.6, 0), c + Vector2(-d * 0.6, 6)]), Color(1, 1, 1, 0.75), 2.0, true))
 	_toggle.pressed.connect(toggle)
 	row.add_child(_toggle)
 	_objective_panel.visible = false
@@ -119,14 +211,14 @@ func _ready() -> void:
 	_toast_panel.name = "ToastPanel"
 	_toast_panel.anchor_left = 0.5
 	_toast_panel.anchor_right = 0.5
-	# Shifted left to stay clear of the objective panel (top-right) on a 1280 px screen.
-	_toast_panel.offset_left = -340
-	_toast_panel.offset_right = 240
+	# Shifted left to stay clear of the objective panel (top-right, 330 px + margins) on a 1280 px screen.
+	_toast_panel.offset_left = -400
+	_toast_panel.offset_right = 180
 	_toast_panel.offset_top = 24
 	_toast_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_toast_panel.add_theme_stylebox_override("panel", GameUI.box(Color(0.06, 0.32, 0.18, 0.94), Color(0.4, 0.85, 0.55), 8, 20, 12))
+	_toast_panel.add_theme_stylebox_override("panel", ticket_box(COLOR_DONE, 20, 12))
 	add_child(_toast_panel)
-	_toast_label = GameUI.label("", 20, Color.WHITE, true)
+	_toast_label = GameUI.label("", 18, Color.WHITE, true)
 	_toast_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_toast_panel.add_child(_toast_label)
@@ -192,36 +284,56 @@ func set_steps(step_list: Array, hint: String = "", heading: String = "", title:
 	_objective_label.text = ""
 	_heading.text = heading
 	_clear_steps()
+	# A new step (or a new mission) starts the hint's clock again; a changed
+	# count on the same step ("(1/2)") does not.
+	var active_index := -1
+	for i in step_list.size():
+		if step_list[i][1] == STEP_ACTIVE:
+			active_index = i
+			break
+	_active_index = active_index
+	while step_seconds.size() < step_list.size():
+		step_seconds.append(0.0)
+	step_names.resize(maxi(step_names.size(), step_list.size()))
+	for i in step_list.size():
+		step_names[i] = String(step_list[i][0])
+	var key := "%s#%d" % [heading, active_index]
+	if key != _hint_key:
+		_hint_key = key
+		_step_time = 0.0
 	for i in step_list.size():
 		var state: String = step_list[i][1]
 		var color := COLOR_DONE if state == STEP_DONE else (COLOR_ACTIVE if state == STEP_ACTIVE else COLOR_TODO)
 		var row := HBoxContainer.new()
 		row.name = "Step%d" % (i + 1)
-		row.add_theme_constant_override("separation", 6)
+		row.add_theme_constant_override("separation", 8)
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_steps_box.add_child(row)
 		if state == STEP_ACTIVE:
 			_active_row = row
-		var mark := GameUI.label("✓" if state == STEP_DONE else ("▸" if state == STEP_ACTIVE else ""), 16, color, true)
-		mark.custom_minimum_size = Vector2(16, 0)
-		row.add_child(mark)
-		var label := GameUI.label("%d. %s" % [i + 1, DialogueBox.keep_together(String(step_list[i][0])).replace("-", "-⁠")], 16, color, state == STEP_ACTIVE)
+		row.add_child(_step_box(state))
+		var label := GameUI.label("%d. %s" % [i + 1, DialogueBox.keep_together(String(step_list[i][0])).replace("-", "-⁠")], 14, color, state == STEP_ACTIVE)
+		label.add_theme_constant_override("line_spacing", LINE_TIGHTEN)
 		label.name = "Text"
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		label.custom_minimum_size = Vector2(PANEL_WIDTH - 82, 0)
+		label.custom_minimum_size = Vector2(PANEL_WIDTH - 86, 0)
 		row.add_child(label)
 		if state == STEP_ACTIVE and hint != "":
-			var hint_label := GameUI.label(DialogueBox.keep_together(hint).replace("-", "-⁠"), 14, COLOR_HINT)
+			var hint_label := GameUI.label("คำใบ้ · " + DialogueBox.keep_together(hint).replace("-", "-⁠"), 13, COLOR_HINT)
+			hint_label.add_theme_constant_override("line_spacing", LINE_TIGHTEN)
 			hint_label.name = "Hint"
 			hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			hint_label.custom_minimum_size = Vector2(PANEL_WIDTH - 82, 0)
+			hint_label.custom_minimum_size = Vector2(PANEL_WIDTH - 86, 0)
 			var indent := MarginContainer.new()
-			indent.add_theme_constant_override("margin_left", 40)
+			indent.name = "HintRow"
+			indent.add_theme_constant_override("margin_left", int(BOX_SIZE) + 11)
 			indent.add_theme_constant_override("margin_bottom", 3)
 			indent.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			indent.add_child(hint_label)
+			indent.visible = _step_time >= HINT_DELAY
 			_steps_box.add_child(indent)
+			_hint_row = indent
 	_refresh()
 	# Wrapped lines know their height only after layout: fit the panel again.
 	_refit_later()
@@ -245,6 +357,7 @@ func _clear_steps() -> void:
 	if _steps_box == null:
 		return
 	_active_row = null
+	_hint_row = null
 	for child in _steps_box.get_children():
 		_steps_box.remove_child(child)
 		child.queue_free()
@@ -292,6 +405,7 @@ func _refresh() -> void:
 	_objective_hint.text = "(กด Tab เพื่อเปิด)" if collapsed else ("(Tab ซ่อน • ล้อเมาส์เลื่อน)" if steps_scrollable() else "(กด Tab เพื่อซ่อน)")
 	_objective_label.visible = not collapsed and steps.is_empty()
 	_heading.visible = not collapsed and _heading.text != ""
+	_rule.get_parent().visible = _heading.visible and not steps.is_empty()
 	_steps_box.visible = not collapsed and not steps.is_empty()
 	_steps_scroll.visible = _steps_box.visible
 	_steps_scroll.custom_minimum_size = Vector2(PANEL_WIDTH - 60, minf(_steps_box.get_combined_minimum_size().y, STEPS_MAX_HEIGHT))
@@ -306,8 +420,118 @@ func _refresh() -> void:
 	_objective_panel.visible = objective_text != ""
 	_toggle.queue_redraw()
 	# The toast stays centred in the free part of the screen.
-	_toast_panel.offset_left = -340 - right_inset * 0.5
-	_toast_panel.offset_right = 240 - right_inset * 0.5
+	_toast_panel.offset_left = -400 - right_inset * 0.5
+	_toast_panel.offset_right = 180 - right_inset * 0.5
+
+
+## The held-back hint shows once the player has spent HINT_DELAY on the step
+## (game time: a pause menu stops the clock).
+func _process(delta: float) -> void:
+	if not steps.is_empty() and _active_index >= 0 and _active_index < step_seconds.size():
+		step_seconds[_active_index] = float(step_seconds[_active_index]) + delta
+	if mistake_source.is_valid() and not steps.is_empty():
+		_mistake_clock += delta
+		if _mistake_clock >= MISTAKE_POLL or not _mistakes_started:
+			_mistake_clock = 0.0
+			poll_mistakes()
+	if _hint_row == null or not is_instance_valid(_hint_row) or _hint_row.visible:
+		return
+	_step_time += delta
+	if _step_time >= HINT_DELAY:
+		_hint_row.visible = true
+		_refit_later()
+
+
+## Time per step for the attempt record: [{step, name, sec}, ...] in order
+## (sec rounded to 0.1 s). JSON-friendly, for the progress page now and the
+## teacher's report later.
+func step_report() -> Array:
+	var out := []
+	for i in step_seconds.size():
+		out.append({"step": i + 1, "name": step_names[i] if i < step_names.size() else "", "sec": snappedf(float(step_seconds[i]), 0.1)})
+	return out
+
+
+## Level time so far: every step's time added up (game time).
+func level_seconds() -> float:
+	var total := 0.0
+	for s in step_seconds:
+		total += float(s)
+	return total
+
+
+## A line's shape without its numbers: "ผิด 2 ครั้ง" becoming "ผิด 3 ครั้ง"
+## is the same mistake counted again, so it keeps its first time.
+func _shape(line: String) -> String:
+	return _digits.sub(line, "#", true)
+
+
+## Looks at the mission's mistakes now: new ones are stamped, ones that went
+## away are forgotten (if they come back they count from then). Keys are the
+## exact lines.
+func poll_mistakes() -> void:
+	if not mistake_source.is_valid():
+		return
+	var lines: Variant = mistake_source.call()
+	if not (lines is PackedStringArray or lines is Array):
+		return
+	var now := {}
+	for line in lines:
+		now[String(line)] = true
+	if not _mistakes_started:
+		_mistakes_started = true
+		for key in now:
+			if not mistake_seen.has(key):
+				mistake_baseline[key] = true
+		return
+	var gone := {}
+	for key: String in mistake_seen.keys():
+		if not now.has(key):
+			gone[_shape(key)] = mistake_seen[key]
+			mistake_seen.erase(key)
+	for key in mistake_baseline.keys():
+		if not now.has(key):
+			mistake_baseline.erase(key)
+	for key: String in now:
+		if mistake_seen.has(key) or mistake_baseline.has(key):
+			continue
+		var before: Variant = gone.get(_shape(key))
+		if before is Dictionary:
+			mistake_seen[key] = before
+		else:
+			mistake_seen[key] = {"step": _active_index + 1, "step_name": step_names[_active_index] if _active_index >= 0 and _active_index < step_names.size() else "", "at": snappedf(level_seconds(), 0.1)}
+
+
+## The mistakes of the attempt for the record, in the order of `final_lines`
+## (score.mistakes): [{text, what, why, step, step_name, at_sec, at_end}].
+## "what" is the line before " — " (where and what was done), "why" after it.
+func mistake_report(final_lines: PackedStringArray) -> Array:
+	poll_mistakes()
+	var last_step := _active_index
+	if last_step < 0:
+		last_step = step_seconds.size() - 1
+	var out := []
+	for line in final_lines:
+		var parts := line.split(" — ", true, 1)
+		var entry := {"text": line, "what": parts[0], "why": parts[1] if parts.size() > 1 else ""}
+		var seen: Variant = mistake_seen.get(line)
+		if seen is Dictionary:
+			entry["step"] = int(seen["step"])
+			entry["step_name"] = String(seen["step_name"])
+			entry["at_sec"] = float(seen["at"])
+			entry["at_end"] = false
+		else:
+			entry["step"] = last_step + 1
+			entry["step_name"] = step_names[last_step] if last_step >= 0 and last_step < step_names.size() else ""
+			entry["at_sec"] = snappedf(level_seconds(), 0.1)
+			entry["at_end"] = true
+		out.append(entry)
+	return out
+
+
+## True when the current step's hint is on screen.
+func hint_shown() -> bool:
+	return _hint_row != null and is_instance_valid(_hint_row) and _hint_row.visible
 
 
 func _input(event: InputEvent) -> void:

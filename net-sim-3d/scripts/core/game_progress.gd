@@ -14,7 +14,7 @@ const LEVEL_COUNT := 6
 const FILE_NAME := "progress.json"
 ## Attempts kept per level for the progress dashboard (oldest dropped first).
 const HISTORY_LIMIT := 30
-const HISTORY_KEYS := ["total", "stars", "passed", "correctness", "process", "time", "elapsed_sec", "decisions_correct", "decisions_total", "mistakes", "finished_at"]
+const HISTORY_KEYS := ["total", "stars", "passed", "correctness", "process", "time", "elapsed_sec", "decisions_correct", "decisions_total", "mistakes", "finished_at", "step_times", "mistake_log"]
 
 ## Tests point this somewhere else so they never touch real progress.
 static var save_path: String = SavePaths.file(FILE_NAME)

@@ -60,6 +60,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return Mission01Validator.mistakes(state, data) if state != null else PackedStringArray()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -207,6 +209,38 @@ func _on_design_passed(_final: int, _checks: int, _wrong: int, netplan: NetPlanE
 		design_passed.emit()
 
 
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	var design := {}
+	if state != null:
+		design = state.to_dict()
+	elif Mission01SaveStore.has_save():
+		var saved := Mission01State.new()
+		Mission01SaveStore.load_into(saved, data)
+		design = saved.to_dict()
+	return {"stage": int(stage), "elapsed_sec": elapsed_sec, "design": design}
+
+
+## _ready() cleared NetPlan EDU's own save; put the design back into it so
+## the program opens where the player left it.
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	var design: Dictionary = d.get("design", {})
+	if not design.is_empty():
+		state = Mission01State.new()
+		state.from_dict(design, data)
+		Mission01SaveStore.save(state)
+	var next := clampi(int(d.get("stage", 0)), Stage.BRIEFING, Stage.REPORT) as Stage
+	_set_app_installed(next >= Stage.DESIGN)
+	_timing = next >= Stage.DESIGN
+	_enter(next)
+
+
 ## Builds the score, records it and shows the summary. Also used by tests.
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
@@ -214,7 +248,7 @@ func finish(player: Node = null) -> MissionScore:
 		state = Mission01State.new()
 		Mission01SaveStore.load_into(state, data)
 	score = Mission01Validator.mission_score(state, data, elapsed_sec)
-	var record := GameProgress.record_attempt(LEVEL, score, {"check_count": state.check_count, "scored_reasons": state.scored_reasons.duplicate(true)})
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes), "check_count": state.check_count, "scored_reasons": state.scored_reasons.duplicate(true)})
 	_enter(Stage.DONE)
 	if player and player.has_method("set_controls_locked"):
 		player.set_controls_locked(true)

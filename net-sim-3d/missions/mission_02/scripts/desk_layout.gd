@@ -10,7 +10,7 @@ extends Node3D
 ## Local axes as CrimpStation: the player sits on -X, +Z is their right.
 ## The desk top spans x -0.255..0.595 and z -0.95..0.95 from the station.
 
-const FONT := preload("res://assets/fonts/Sarabun-Bold.ttf")
+const FONT := preload("res://assets/fonts/Mitr-Medium.ttf")
 const TOOL_CATALOG := preload("res://scripts/held_item_catalog.gd")
 const MAT_SIZE := Vector2(0.6, 0.5) # x (depth) by z (width), metres
 const MAT_CENTER := Vector3(0.07, 0.0, 0.0)

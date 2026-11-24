@@ -18,6 +18,15 @@ const CARD_BORDER := Color(0.8, 0.83, 0.88)
 ## When each star pops in (seconds after showing); the chime plays with it.
 const STAR_DELAY := 0.9
 const STAR_STEP := 0.28
+## The teacher's red-pen word beside the score (user 2026-11-24), by score,
+## high to low; one of the group at random.
+const PRAISE_TOP := ["ยอดเยี่ยม", "2/10", "ปังมากแม่"] # 3 stars / rainbow (70+)
+const PRAISE_PASS := ["ยินดีด้วย", "เก่งมาก"] # 2 stars (60-69)
+const PRAISE_ONE := ["ครั้งหน้าพยายามให้มากขึ้นนะ", "พยายามต่อไปนะ"] # 1 star (50-59)
+const PRAISE_TRY := ["ควรพยายามให้มากกว่านี้นะ"] # not passed (0 stars)
+const PEN_FONT := preload("res://assets/fonts/Charm-Bold.ttf")
+
+var pen_mark: PenMark
 
 var next_button: Button
 var replay_button: Button
@@ -146,6 +155,27 @@ func _build_main(title: String, score: MissionScore, next_available: bool) -> vo
 	details_button.pressed.connect(show_details)
 	footer.add_child(details_button)
 
+	# Red pen beside the score, over the whole card (a PanelContainer gives
+	# every child the full card, so the mark can sit anywhere).
+	pen_mark = PenMark.new()
+	pen_mark.name = "PenMark"
+	pen_mark.word = praise_for(score)
+	pen_mark.score_label = total
+	_main.add_child(pen_mark)
+
+
+## The red-pen word for a score: top group at 3 stars and up, then 2 stars,
+## then 1 star, then not passed.
+static func praise_for(score: MissionScore) -> String:
+	var group: Array = PRAISE_TRY
+	if score.stars() >= 3:
+		group = PRAISE_TOP
+	elif score.stars() == 2:
+		group = PRAISE_PASS
+	elif score.stars() == 1:
+		group = PRAISE_ONE
+	return String(group.pick_random())
+
 
 # ---------------------------------------------------------------- details card
 
@@ -187,12 +217,18 @@ func _build_details(title: String, score: MissionScore, record: Dictionary, extr
 	_details_body.add_child(GameUI.label("จุดที่ผิดพลาด", 18, GameUI.INK, true))
 	if score.mistakes.is_empty():
 		_details_body.add_child(GameUI.label("ไม่มี ทำได้ถูกต้องทุกขั้นตอน", 15, GameUI.OK))
-	for line in score.mistakes:
-		var l := GameUI.label("•  " + line, 15, GameUI.INK)
-		l.name = "Mistake"
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size = Vector2(660, 0)
-		_details_body.add_child(l)
+	# Where, why and when for each one (the attempt's mistake_log).
+	var last: Variant = record.get("last", {})
+	var log: Variant = (last as Dictionary).get("mistake_log", []) if last is Dictionary else []
+	if log is Array and (log as Array).size() == score.mistakes.size() and not score.mistakes.is_empty():
+		MistakeCards.build(_details_body, log, GameUI.label, GameUI.INK, GameUI.INK_SOFT, 540.0)
+	else:
+		for line in score.mistakes:
+			var l := GameUI.label("•  " + line, 15, GameUI.INK)
+			l.name = "Mistake"
+			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			l.custom_minimum_size = Vector2(660, 0)
+			_details_body.add_child(l)
 
 	var footer := HBoxContainer.new()
 	col.add_child(footer)
@@ -258,6 +294,8 @@ func _play_result(score: MissionScore) -> void:
 		var pitch := 1.0 + i * 0.12
 		get_tree().create_timer(STAR_DELAY + i * STAR_STEP, true).timeout.connect(func(): Sound.play("star", null, 0.0, pitch))
 	stars.animate(STAR_DELAY, STAR_STEP)
+	# The teacher writes once the stars are in.
+	pen_mark.animate(STAR_DELAY + (mini(maxi(score.stars(), 1), 3) - 1) * STAR_STEP + 0.3)
 
 
 static func _clock(seconds: float) -> String:
@@ -265,16 +303,102 @@ static func _clock(seconds: float) -> String:
 	return "%d:%02d นาที" % [s / 60, s % 60]
 
 
+## The teacher's word in red pen beside the score, a little tilted, like a
+## mark on a checked exam paper: it lands with a small stamp after the stars,
+## then a swoosh is drawn under it.
+class PenMark:
+	extends Control
+
+	const INK := Color(0.84, 0.08, 0.12)
+	const SIZE := 46
+	const MIN_SIZE := 24
+	const TILT := -0.17 # radians, up to the right
+	const GAP := 22.0 # from the end of the score
+
+	var word := ""
+	var score_label: Label
+	## 0..1: the word landing (scale and fade), then the underline being drawn.
+	var land := 0.0
+	var underline := 0.0
+
+	func _ready() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+		resized.connect(queue_redraw)
+
+	func animate(delay: float) -> void:
+		land = 0.0
+		underline = 0.0
+		var tween := create_tween()
+		tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tween.tween_interval(delay)
+		tween.tween_method(_set_land, 0.0, 1.0, 0.32).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_method(_set_underline, 0.0, 1.0, 0.28).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	func _set_land(value: float) -> void:
+		land = value
+		queue_redraw()
+
+	func _set_underline(value: float) -> void:
+		underline = value
+		queue_redraw()
+
+	func shown_word() -> String:
+		return GameLocale.text(word)
+
+	func _draw() -> void:
+		if word == "" or score_label == null or land <= 0.0:
+			return
+		var text := shown_word()
+		# Where the score's text ends (the label is centred across the card).
+		var to_local := get_global_transform().affine_inverse()
+		var rect := to_local * score_label.get_global_rect()
+		var label_font := score_label.get_theme_font("font")
+		var score_width := label_font.get_string_size(score_label.text, HORIZONTAL_ALIGNMENT_LEFT, -1, score_label.get_theme_font_size("font_size")).x
+		var start := Vector2(rect.get_center().x + score_width * 0.5 + GAP, rect.get_center().y + 2.0)
+		# One line (user 2026-11-24); a long word gets smaller to stay on the card.
+		var room := size.x - start.x - 8.0
+		var font_size := SIZE
+		while font_size > MIN_SIZE and PEN_FONT.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > room:
+			font_size -= 2
+		var width := PEN_FONT.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x
+		var scale := lerpf(1.7, 1.0, land)
+		var ink := Color(INK, clampf(land * 1.4, 0.0, 0.95))
+		draw_set_transform(start + Vector2(width * 0.5, 0), TILT, Vector2(scale, scale))
+		draw_string(PEN_FONT, Vector2(-width * 0.5, 0), text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size, ink)
+		# The swoosh under the word, drawn left to right.
+		if underline > 0.0:
+			var points := PackedVector2Array()
+			var steps := 18
+			for i in steps + 1:
+				var t := float(i) / steps * underline
+				var x := -width * 0.55 + width * 1.15 * t
+				var y := font_size * 0.28 + sin(t * PI) * -4.0 + t * t * 6.0
+				points.append(Vector2(x, y))
+			if points.size() >= 2:
+				draw_polyline(points, ink, maxf(2.0, font_size * 0.07), true)
+		draw_set_transform(Vector2.ZERO)
+
+
 ## Three big stars drawn as shapes (the game fonts have no star glyph).
 ## `earned` 0-3 gold stars; 4 = all three in rainbow colours.
+## 3D look (user 2026-11-24): each arm is a ridge with a lit and a shaded
+## face (light from the top left), a darker rim below shows the thickness, a
+## soft shadow sits under it and a shine on the top left. Popping in, a star
+## turns round on its vertical axis like a coin.
 class SummaryStars:
 	extends Control
 
 	const EMPTY_FILL := Color(0.86, 0.88, 0.92)
-	const EMPTY_EDGE := Color(0.74, 0.77, 0.83)
-	const GOLD_EDGE := Color(0.85, 0.55, 0.05)
+	const GOLD := Color(0.99, 0.76, 0.16)
 	const RADIUS := 52.0
 	const SIDE_DROP := 12.0 # outer stars sit a little lower
+	const INNER := 0.47 # inner corners, share of the radius
+	## Where the light comes from (screen space, towards the light).
+	const LIGHT := Vector2(-0.6, -0.8)
+	## How thick the star looks (share of the radius).
+	const DEPTH := 0.1
+	## Half-turns a star makes while popping in.
+	const SPIN_TURNS := 1.0
 
 	var earned := 0
 	## 0..1 per star: how far it has popped in (1 = shown).
@@ -318,29 +442,144 @@ class SummaryStars:
 		for i in 3:
 			var center := mid + Vector2((i - 1) * gap, SIDE_DROP if i != 1 else -4.0)
 			var radius := RADIUS * (1.12 if i == 1 else 1.0)
-			# Empty slot underneath, earned star pops in on top.
-			_star(center, radius, EMPTY_FILL, EMPTY_EDGE, false)
-			if i < mini(earned, 3) or is_rainbow():
+			var earned_here := i < mini(earned, 3) or is_rainbow()
+			# A grey star in every slot; the earned star pops in on top of it.
+			_star3d(center, radius, 1.0, i, true)
+			if earned_here:
 				var s := shown[i]
 				# The pop-in starts from nothing: a star a pixel wide has all
 				# its points on top of each other and cannot be filled
 				# ("Invalid polygon data, triangulation failed").
 				if radius * s >= 1.5:
-					_star(center, radius * s, GameUI.GOLD, GOLD_EDGE, is_rainbow(), i)
+					# Turning round while it grows: the width follows the turn.
+					var turn := cos((1.0 - clampf(s, 0.0, 1.0)) * PI * SPIN_TURNS)
+					_star3d(center, radius * s, turn, i)
+				if is_rainbow() and s >= 0.99:
+					_sparkles(center, radius, i)
 
-	func _star(center: Vector2, radius: float, fill: Color, edge: Color, rainbow: bool, index: int = 0) -> void:
+	## Rainbow stars twinkle: small four-point glints that come and go around
+	## each star, each at its own pace.
+	func _sparkles(center: Vector2, radius: float, index: int) -> void:
+		for j in 4:
+			var phase := _time * 2.4 + j * 1.7 + index * 0.9
+			var glow := sin(phase)
+			if glow <= 0.0:
+				continue
+			var angle := -PI * 0.75 + j * PI * 0.5 + index * 0.4 + sin(phase * 0.3) * 0.15
+			var at := center + Vector2(cos(angle), sin(angle)) * radius * (1.08 + 0.08 * float(j % 2))
+			var arm := radius * 0.22 * glow
+			if arm < 1.5:
+				continue # too small to fill (triangulation would fail)
+			var waist := arm * 0.22
+			var colour := Color.from_hsv(fposmod(j * 0.25 + index * 0.11 + _time * 0.12, 1.0), 0.25, 1.0, glow)
+			draw_colored_polygon(PackedVector2Array([at + Vector2(0, -arm), at + Vector2(waist, -waist), at + Vector2(arm, 0), at + Vector2(waist, waist),
+				at + Vector2(0, arm), at + Vector2(-waist, waist), at + Vector2(-arm, 0), at + Vector2(-waist, -waist)]), colour)
+			draw_circle(at, waist * 0.9, Color(1, 1, 1, glow))
+
+	## The ten corners (tips at even indices), `squash` = width (-1..1) of a
+	## star turned round its vertical axis.
+	func _corners(center: Vector2, radius: float, squash: float) -> PackedVector2Array:
 		var points := PackedVector2Array()
 		for k in 10:
-			var r := radius if k % 2 == 0 else radius * 0.47
+			var r := radius if k % 2 == 0 else radius * INNER
 			var a := -PI / 2.0 + k * PI / 5.0
-			points.append(center + Vector2(cos(a), sin(a)) * r)
+			points.append(center + Vector2(cos(a) * squash, sin(a)) * r)
+		return points
+
+	## Colour of arm `arm` (0..4): gold, or a rainbow hue moving with time.
+	func _arm_colour(arm: int, index: int, empty := false) -> Color:
+		if empty:
+			return EMPTY_FILL
+		if is_rainbow():
+			return Color.from_hsv(fmod(arm / 5.0 + index * 0.18 + _time * 0.25, 1.0), 0.62, 1.0)
+		return GOLD
+
+	## Rainbow colour at point p of a star: the hue follows the angle round
+	## the centre (a full rainbow once round) and drifts slowly with time.
+	func _hue_at(p: Vector2, center: Vector2, index: int) -> Color:
+		var angle := atan2(p.y - center.y, p.x - center.x)
+		var hue := fposmod(angle / TAU + index * 0.11 + _time * 0.12, 1.0)
+		return Color.from_hsv(hue, 0.58, 1.0)
+
+	## Brighter towards the light (lit > 0), darker away from it.
+	static func _shade(colour: Color, lit: float) -> Color:
+		return colour.lightened(0.35 * lit) if lit > 0.0 else colour.darkened(-0.32 * lit)
+
+	func _star3d(center: Vector2, radius: float, turn: float, index: int, empty := false) -> void:
+		# Edge-on during the turn: too thin to fill (triangulation would fail).
+		if radius * absf(turn) < 3.0:
+			return
+		var squash := maxf(absf(turn), 0.06) * signf(turn if turn != 0.0 else 1.0)
+		var light := LIGHT.normalized()
+		# Seen from behind (half-way through the turn) the light is on the other side.
+		if turn < 0.0:
+			light.x = -light.x
+		var depth := radius * DEPTH
+		# Soft shadow on the card under the star.
+		var shadow := PackedVector2Array()
+		for k in 24:
+			var a := k * TAU / 24.0
+			shadow.append(center + Vector2(cos(a) * radius * 0.78 * absf(squash) + 2.0, sin(a) * radius * 0.16 + radius * 0.98))
+		draw_colored_polygon(shadow, Color(0.1, 0.12, 0.2, 0.12))
+		# The rim: the same star a little lower and darker under the face, and
+		# the side walls between them.
+		var face := _corners(center, radius, squash)
+		var rim := _corners(center + Vector2(0, depth), radius, squash)
+		var rainbow := is_rainbow() and not empty
 		if rainbow:
-			var colors := PackedColorArray()
-			for k in 10:
-				colors.append(Color.from_hsv(fmod(k / 10.0 + index * 0.18 + _time * 0.25, 1.0), 0.65, 1.0))
-			draw_polygon(points, colors)
+			var rim_colours := PackedColorArray()
+			for p in rim:
+				rim_colours.append(_hue_at(p, center, index).darkened(0.4))
+			draw_polygon(rim, rim_colours)
 		else:
-			draw_colored_polygon(points, fill)
-		var outline := points.duplicate()
-		outline.append(points[0])
-		draw_polyline(outline, Color.WHITE if rainbow else edge, 3.0, true)
+			draw_colored_polygon(rim, _arm_colour(0, index, empty).darkened(0.2 if empty else 0.45))
+		for k in 10:
+			var arm := int((k + 1) / 2.0) % 5
+			var wall := PackedVector2Array([face[k], face[(k + 1) % 10], rim[(k + 1) % 10], rim[k]])
+			if absf((wall[1] - wall[0]).cross(wall[3] - wall[0])) <= 1.0:
+				continue
+			if rainbow:
+				var a := _hue_at(face[k], center, index).darkened(0.32)
+				var b := _hue_at(face[(k + 1) % 10], center, index).darkened(0.32)
+				draw_polygon(wall, PackedColorArray([a, b, b.darkened(0.15), a.darkened(0.15)]))
+			else:
+				draw_colored_polygon(wall, _arm_colour(arm, index, empty).darkened(0.18 if empty else 0.42))
+		# The face: two facets per arm meeting on the ridge from the centre
+		# to the tip. A facet's slope faces out across its outer edge; the
+		# more that faces the light, the brighter it is.
+		var top := center + Vector2(0, -depth * 0.2)
+		for arm in 5:
+			var tip := face[arm * 2]
+			var base := _arm_colour(arm, index, empty)
+			for side in [-1, 1]:
+				var inner := face[(arm * 2 + side + 10) % 10]
+				var out := ((tip + inner) * 0.5 - center).normalized()
+				var lit := out.dot(light)
+				var strength := 0.5 if empty else 1.0
+				if rainbow:
+					# Hues flow round the star corner to corner; the middle is
+					# pearl-white, so every facet blends from white into its colours.
+					var pearl := _hue_at((tip + inner) * 0.5, center, index).lerp(Color.WHITE, 0.62)
+					draw_polygon(PackedVector2Array([top, tip, inner]), PackedColorArray([
+						_shade(pearl, lit * 0.6), _shade(_hue_at(tip, center, index), lit), _shade(_hue_at(inner, center, index), lit)]))
+					continue
+				var colour := _shade(base, lit * strength)
+				draw_colored_polygon(PackedVector2Array([top, tip, inner]), colour)
+		# Edge and shine.
+		var outline := face.duplicate()
+		outline.append(face[0])
+		if rainbow:
+			var edge := PackedColorArray()
+			for p in outline:
+				edge.append(_hue_at(p, center, index).darkened(0.38))
+			draw_polyline_colors(outline, edge, 1.5, true)
+		else:
+			draw_polyline(outline, _arm_colour(0, index, empty).darkened(0.22 if empty else 0.5), 1.5, true)
+		if empty:
+			return
+		var shine := top + Vector2(-radius * 0.22 * squash, -radius * 0.2)
+		var spot := PackedVector2Array()
+		for k in 16:
+			var a := k * TAU / 16.0
+			spot.append(shine + Vector2(cos(a) * radius * 0.09 * absf(squash), sin(a) * radius * 0.05).rotated(-0.6))
+		draw_colored_polygon(spot, Color(1, 1, 1, 0.75))

@@ -212,6 +212,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return state.mistakes()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -1359,11 +1361,52 @@ func _replace_auto(player: Node) -> void:
 
 # ---------------------------------------------------------------- finish
 
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	return {
+		"stage": int(stage), "elapsed_sec": elapsed_sec, "state": LevelSave.pack(state),
+		"saw_screen": saw_screen, "saw_port": saw_port, "has_spare": has_spare,
+	}
+
+
+## Back to the start of the saved step. The cable is in her PC again (a test
+## with STAFF-PC-03 half done starts over); after the replacement her new
+## card has a link. She waits beside her desk from the meeting until she is
+## told the result.
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	LevelSave.unpack(state, d.get("state", {}))
+	saw_screen = bool(d.get("saw_screen", false))
+	saw_port = bool(d.get("saw_port", false))
+	has_spare = bool(d.get("has_spare", false))
+	cable_home_pending = false
+	var next := clampi(int(d.get("stage", 0)), Stage.CALL, Stage.REPORT) as Stage
+	if next > Stage.CALL and phone:
+		phone.ringing = false
+	_timing = next > Stage.CALL
+	if next > Stage.MEET and next <= Stage.TELL and teacher:
+		var to_desk := TOWER_1 - TEACHER_WAIT
+		teacher.stand_at(TEACHER_WAIT, atan2(to_desk.x, to_desk.z))
+		if station:
+			station.collision_layer = ComputerStation.COLLISION_LAYER
+	if next >= Stage.VERIFY:
+		if station:
+			station.network_connected = true
+		tower.set_power(true)
+		tower.port.set_link(true)
+	_enter(next)
+
+
 ## Builds the score, records it and shows the summary. Also used by tests.
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
-	var record := GameProgress.record_attempt(LEVEL, score, {
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes),
 		"tool_first": state.tool_first, "verdict_first": state.verdict_first,
 		"swap_first": state.swap_first, "fix_choices": Array(state.fix_choices),
 		"part_first": state.part_first, "ping_target": state.ping_target})

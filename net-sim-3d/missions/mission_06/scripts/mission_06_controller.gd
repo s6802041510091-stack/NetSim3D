@@ -77,6 +77,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return state.mistakes()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -162,7 +164,7 @@ func _show_steps() -> void:
 		Stage.FIX:
 			hint = "หาสาเหตุที่เครื่องห้องประชุมไม่มีเสียง แล้วแก้ไขบนเครื่องปลายทาง"
 		Stage.CONFIRM:
-			hint = "พิมพ์ในแชท (Chat) ให้ครูลองเปิดคลิปฟังเสียง แล้วรอครูตอบ"
+			hint = "ส่งข้อความในแชท (Chat) ให้ครูลองเปิดคลิปฟังเสียง แล้วรอครูตอบ"
 		Stage.END:
 			hint = "จบ Remote Session ให้ถูกวิธี"
 		Stage.CLOSE:
@@ -292,7 +294,7 @@ func _on_shutdown() -> void:
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
-	var record := GameProgress.record_attempt(LEVEL, score, {
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes),
 		"wrong_id": state.wrong_id_count, "wrong_password": state.wrong_password_count,
 		"opened_private_file": state.opened_private_file, "disruptive": Array(state.disruptive),
 		"ended_before_confirm": state.ended_before_confirm,
@@ -325,6 +327,43 @@ func finish(player: Node = null) -> MissionScore:
 	summary.show_result(SUMMARY_TITLE, score, record, next_available, rows)
 	finished.emit(score)
 	return score
+
+
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	return {"stage": int(stage), "elapsed_sec": elapsed_sec, "state": LevelSave.pack(state)}
+
+
+## TeamViewer was closed by leaving the game: a session that was on has
+## dropped (connect again with the same ID / Password). Her last e-mail is
+## in the Mail app again; e-mails still on their way are sent again.
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	LevelSave.unpack(state, d.get("state", {}))
+	state.session_active = false
+	var answered := state.call_answered
+	if answered and phone:
+		phone.ringing = false
+	_timing = answered
+	if state.mails_delivered > 0 and state.partner_online and manager and manager.desktop and station:
+		var again := state.mails_delivered > 1
+		manager.desktop.deliver_mail(station, {
+			"from": data.mail_from, "to": data.mail_to,
+			"subject": data.mail_subject_after_restart if again else data.mail_subject,
+			"body": data.mail_text(data.mail_body_after_restart if again else data.mail_body, state.partner_password),
+		})
+	_enter(Stage.MAIL if answered else Stage.CALL)
+	if answered:
+		if state.mails_delivered == 0:
+			_send_mail_later(data.mail_delay, false)
+		elif not state.partner_online:
+			_send_mail_later(data.restart_mail_delay, true)
+		_sync()
 
 
 # ---------------------------------------------------------------- helpers

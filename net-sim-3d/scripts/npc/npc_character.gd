@@ -511,6 +511,28 @@ func stand_up() -> void:
 	set_process(true)
 
 
+## Already up and standing at `pos` facing `yaw`, with no animation (a saved
+## game resumed after the character had got up). sit_down() still takes it
+## back to the seat it was on.
+func stand_at(pos: Vector3, yaw: float) -> void:
+	if seated and skeleton:
+		_seated_pose = _current_pose()
+		_seat_xform = global_transform
+		seated = false
+		var standing := _standing_pose()
+		for bone in standing:
+			skeleton.set_bone_pose_rotation(bone, standing[bone])
+		var visual := get_node_or_null("Visual") as Node3D
+		if visual:
+			visual.position = Vector3.ZERO
+	walking = false
+	_path.clear()
+	global_position = Vector3(pos.x, pos.y, pos.z)
+	rotation.y = yaw
+	_reset_turn_base()
+	set_process(true)
+
+
 ## Back onto the seat it stood up from (walk to near it first): turns to the
 ## desk, lowers into the chair and goes back to work.
 func sit_down() -> void:

@@ -31,7 +31,7 @@ window/stretch/aspect="expand"
 
 [gui]
 
-theme/custom_font="res://assets/fonts/Sarabun-Regular.ttf"
+theme/custom_font="res://assets/fonts/Mitr-Regular.ttf"
 
 [input]
 

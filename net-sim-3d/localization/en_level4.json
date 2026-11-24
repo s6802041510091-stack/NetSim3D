@@ -142,7 +142,7 @@
   "เลือกเครื่องมือตรวจสายผิดในครั้งแรก — การตรวจว่าสาย LAN ส่งสัญญาณได้ครบต้องใช้ LAN Cable Tester": "Chose the wrong cable testing tool at first — checking every wire of a LAN cable needs a LAN Cable Tester",
   "อ่านผล LAN Cable Tester ผิด — ไฟตัวแม่และตัวลูกติดตรงกันครบ 1–8 แปลว่าสายใช้งานได้": "Misread the LAN Cable Tester — main and remote lights matching on 1–8 means the cable works",
   "สรุปผลการทดลองสลับสายผิด — เครื่องอื่นใช้สายเส้นเดิมได้ แปลว่าสายและพอร์ตปกติ ปัญหาอยู่ที่เครื่องครู": "Wrong conclusion from the cable swap — another computer works on the same cable, so the cable and port are fine and the problem is in the teacher's computer",
-  "เลือกวิธีแก้ไขที่ไม่สอดคล้องกับหลักฐานก่อน: ": "First chose a fix that doesn't match the evidence: ",
+  "เลือกวิธีแก้ไขที่ไม่สอดคล้องกับหลักฐานก่อน: %s — หลักฐานชี้ว่าสายและพอร์ตปกติ ปัญหาอยู่ที่การ์ดเครือข่ายของเครื่องครู": "First chose a fix that doesn't match the evidence: %s — the evidence shows the cable and port are fine; the problem is the teacher PC's network card",
   "หยิบอะไหล่ผิดในครั้งแรก — อุปกรณ์ที่ต้องเปลี่ยนคือ Network Interface Card (NIC)": "Took the wrong part at first — the part to replace is the Network Interface Card (NIC)",
   "ทดสอบหลังแก้ไขด้วยการ ping \"%s\" — ควร ping ไปที่ Default Gateway ของเครื่อง": "Tested the fix by pinging \"%s\" — you should ping the computer's Default Gateway",
 

@@ -8,7 +8,7 @@ const INK := Color("20364c")
 const MUTED := Color("526b81")
 const OUTLINE := Color("577181")
 const GOLD := Color("f5bd58")
-const BODY_FONT := preload("res://assets/fonts/Sarabun-Regular.ttf")
+const BODY_FONT := preload("res://assets/fonts/Mitr-Regular.ttf")
 
 var mail_progress := 0.0:
 	set(value):

@@ -186,7 +186,7 @@ func mistakes() -> PackedStringArray:
 	}
 	for id: String in QUESTION_ORDER:
 		if question_answers[id].is_empty() and id in CHAT_QUESTIONS and computer_off:
-			out.append("จบ Session ก่อนตอบคำถามของครูในแชท (%s)" % lessons[id].split(" — ")[1])
+			out.append("จบ Session ก่อนตอบคำถามของครูในแชท — %s" % lessons[id].split(" — ")[1])
 		elif not question_answers[id].is_empty() and not question_first_right(id):
 			out.append(lessons[id])
 	return out

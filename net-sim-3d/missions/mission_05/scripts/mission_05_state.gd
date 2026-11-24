@@ -372,7 +372,7 @@ func mistakes() -> PackedStringArray:
 	if firewall_off_count > 0:
 		out.append("ปิด Microsoft Defender Firewall — การปิด Firewall ทำให้เครื่องไม่มีการป้องกันการเชื่อมต่อ")
 	if report_submitted and not rules_checked:
-		out.append("ไม่ได้เปิด Allow an app through firewall ตรวจว่ากฎของ Firewall เป็นไปตามที่ตั้งใจ")
+		out.append("ไม่ได้เปิด Allow an app through firewall ก่อนส่งผล — ควรตรวจว่ากฎของ Firewall เป็นไปตามที่ตั้งใจ")
 	if file_tool_first != "" and file_tool_first != TOOL_VIRUS:
 		out.append("เปิดส่วนอื่นก่อน Virus & threat protection — Firewall ไม่ได้กำจัดไฟล์อันตราย การตรวจหาไฟล์เป็นหน้าที่ของ Anti-Virus")
 	if "remove" in threat_choices:
@@ -391,7 +391,7 @@ func mistakes() -> PackedStringArray:
 	if submit_first == "early":
 		out.append("กดส่งผลการตรวจสอบก่อนทุกส่วนเป็นสีเขียว — ควรตรวจสถานะหลังแก้ไขก่อนส่งผล")
 	if report_submitted and not history_checked:
-		out.append("ไม่ได้เปิด Protection history ยืนยันว่ากักกันไฟล์แล้วก่อนส่งผล")
+		out.append("ไม่ได้เปิด Protection history ก่อนส่งผล — ควรยืนยันว่ากักกันไฟล์แล้วจริง")
 	if question_answers["report"].size() > 0 and not question_first_right("report"):
 		out.append("รายงานผลให้ครูไม่ตรงกับสิ่งที่ทำ — ควรบอกสิ่งที่ทำจริง (อนุญาต SchoolLab, ปิดกั้นโปรแกรมแปลก, กักกันไฟล์) และฝากครูเตือนนักเรียนเรื่องโปรแกรมเถื่อน")
 	return out

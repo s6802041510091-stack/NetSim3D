@@ -4,7 +4,7 @@ extends RefCounted
 ## Small shared look for in-world game UI (dialogue, objectives, summaries).
 ## Mission programs (NetPlan EDU, Windows Security, TeamViewer) keep their own themes.
 
-const FONT_BOLD := preload("res://assets/fonts/Sarabun-Bold.ttf")
+const FONT_BOLD := preload("res://assets/fonts/Mitr-Medium.ttf")
 const INK := Color(0.11, 0.13, 0.18)
 const INK_SOFT := Color(0.36, 0.40, 0.48)
 const ACCENT := Color(0.16, 0.47, 0.86)

@@ -1,8 +1,10 @@
 extends Node
 
 ## Lightweight front door: the school is loaded only after a level is selected.
-## Continue restores the last level, not the player's exact position. Mission
-## programs retain their existing independent autosave files.
+## Continue resumes the last level from its mid-level save (LevelSave: the
+## step the player was on, where they stood), written by "บันทึกและออก" on the
+## pause page, by the 30 s autosave and when the window closes. Without a
+## save it starts that level from the beginning.
 const MAP := "res://scenes/main.tscn"
 const MENU := "res://scenes/start_menu.tscn"
 var save_file := SavePaths.file("menu.cfg")
@@ -84,14 +86,20 @@ var _world_prepared := false
 var _awaiting_start := false
 var _load_saved := true
 var _controls_help: ControlsHelpPopup
+## The mid-level save being loaded ({} = a fresh start) and, while playing,
+## the autosave clock; a level that has reached its summary is not saved.
+var _resume := {}
+var _autosave_clock := 0.0
+var _level_finished := false
+const AUTOSAVE_SEC := 30.0
 
 const INK := Color("20364c")
 const MUTED := Color("526b81")
 const SKY := Color("e9f6ff")
 const BLUE := Color("237db1")
 const CORAL := Color("e97775")
-const HEADING_FONT := preload("res://assets/fonts/Anuphan-Variable.ttf")
-const BODY_FONT := preload("res://assets/fonts/Sarabun-Regular.ttf")
+const HEADING_FONT := preload("res://assets/fonts/Mitr-Medium.ttf")
+const BODY_FONT := preload("res://assets/fonts/Mitr-Regular.ttf")
 ## 21:9 (1916x821). The older 16:9 school_spring_background.png is still
 ## used by the in-game college website (college_browser.gd).
 const MENU_BACKGROUND := preload("res://assets/ui/school_spring_background-new.png")
@@ -119,6 +127,7 @@ func _ready() -> void:
 	_controls_help.dismissed.connect(resume_game)
 	L10n.language_changed.connect(_refresh_language)
 	_hook_browser_unlock()
+	_hook_browser_hide()
 	# Direct F6/test scene launches must retain their original behavior.
 	call_deferred("_show_initial_menu")
 
@@ -507,7 +516,7 @@ func show_home() -> void:
 	_show_art(HOME_TH if L10n.locale == "th" else HOME_REFERENCE, "home")
 	# Five painted buttons (tools/relayout_home_buttons.gd, 2026-11-18).
 	_home_hotspot("PLAY", 383, 454, show_levels)
-	_home_hotspot("CONTINUE", 466, 537, func(): start_level(last_level), last_level == 0)
+	_home_hotspot("CONTINUE", 466, 537, func(): start_level(last_level, LevelSave.exists(last_level)), last_level == 0)
 	_home_hotspot("SETTINGS", 549, 620, show_settings)
 	_home_hotspot("PROGRESS", 632, 703, show_progress)
 	_home_hotspot("EXIT TO LOBBY", 715, 786, confirm_exit)
@@ -554,8 +563,20 @@ func show_levels() -> void:
 			hint = "ผ่านด่านก่อนหน้าเพื่อปลดล็อก" if L10n.locale == "th" else "Complete the previous level to unlock"
 		var x: float = [312.0, 660.0, 1007.0][(level - 1) % 3]
 		var y := 368.0 if level <= 3 else 598.0
-		_art_button("Level%d" % level, Rect2(x, y, 326, 211), start_level.bind(level), not is_level_unlocked(level), hint)
+		_art_button("Level%d" % level, Rect2(x, y, 326, 211), choose_level.bind(level), not is_level_unlocked(level), hint)
 	_art_button("Back", Rect2(265, 829, 204, 58), show_home)
+
+
+## A level picked from the list (or "next level"): with a mid-level save the
+## player chooses to go on from it or to start again.
+func choose_level(level: int) -> void:
+	if not LevelSave.exists(level):
+		start_level(level)
+		return
+	_page("ด่าน %d มีเกมที่บันทึกไว้" % level, "เล่นต่อจากที่บันทึกไว้ หรือเริ่มด่านนี้ใหม่ตั้งแต่ต้น", SMALL_CARD_WIDTH)
+	_button("เล่นต่อจากที่บันทึกไว้", func(): start_level(level, true)).grab_focus()
+	_quiet_button(_button("เริ่มใหม่", func(): start_level(level), false, false))
+	_quiet_button(_button("ยกเลิก", show_levels, false, false))
 
 
 ## Built and (outside the editor) unlocked by passing the previous built level.
@@ -758,8 +779,12 @@ func configure_level(world: Node, level: int) -> void:
 	if level == 3:
 		# Inspect three sample computers in the computer room with ipconfig / ping.
 		var mission_03_script: GDScript = load("res://missions/mission_03/scripts/mission_03_controller.gd")
-		# The male teacher works at TEACHER-PC until the player talks to him.
-		mission_03_script.call("seat_teacher", world)
+		# The male teacher works at TEACHER-PC until the player talks to him
+		# (a resumed game where he had left: at his desk in the teachers' room).
+		if bool(mission_03_script.call("teacher_left", _resume.get("mission", {}))):
+			mission_03_script.call("seat_teacher_away", world)
+		else:
+			mission_03_script.call("seat_teacher", world)
 		var mission_03: Node = mission_03_script.new()
 		mission_03.name = "Mission03"
 		world.add_child(mission_03)
@@ -798,12 +823,23 @@ func _connect_level_end(mission: Node, level: int) -> void:
 	mission.connect("next_requested", func():
 		var next := next_level(level)
 		if next != 0:
-			start_level(next))
+			choose_level(next))
+	# The summary is on screen: this play is over, its save goes.
+	mission.connect("finished", func(_score: MissionScore):
+		_level_finished = true
+		LevelSave.clear(level))
 
 
-func start_level(level: int) -> void:
+## `resume`: go on from the level's mid-level save; otherwise the level starts
+## from the beginning and an old save of it is removed.
+func start_level(level: int, resume := false) -> void:
 	if loading or not is_level_unlocked(level):
 		return
+	_resume = LevelSave.read(level) if resume else {}
+	if _resume.is_empty():
+		LevelSave.clear(level)
+	_level_finished = false
+	_autosave_clock = 0.0
 	current_level = level
 	Sound.music("menu")
 	_controls_help.hide()
@@ -832,6 +868,12 @@ func _process(delta: float) -> void:
 	# The loading/start screen owns it until the player chooses to enter.
 	if _controls_help.visible or ((loading or _awaiting_start) and _layer.visible):
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	# Autosave while playing (game time: not while paused or on a menu).
+	if current_level != 0 and not loading and not _awaiting_start and not get_tree().paused:
+		_autosave_clock += delta
+		if _autosave_clock >= AUTOSAVE_SEC:
+			_autosave_clock = 0.0
+			save_level()
 	if not loading:
 		return
 	_load_clock += delta
@@ -879,6 +921,8 @@ func _enter_loaded_level() -> void:
 	var old := get_tree().current_scene
 	get_tree().root.add_child(world)
 	apply_world_quality(world)
+	if not _resume.is_empty():
+		_restore_level(world)
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	get_tree().current_scene = world
 	if old:
@@ -889,6 +933,59 @@ func _enter_loaded_level() -> void:
 	get_tree().paused = true
 	_world_prepared = true
 	_load_target = 100.0
+
+
+## The level's controller ("Mission0N" in the world), or null.
+func _mission(world: Node = null) -> Node:
+	var root := world if world else get_tree().current_scene
+	if root == null or current_level == 0:
+		return null
+	var node := root.get_node_or_null("Mission%02d" % current_level)
+	return node if node and node.has_method("save_snapshot") else null
+
+
+## Puts the saved game back once the controller is ready (the tree is still
+## paused behind the start page).
+func _restore_level(world: Node) -> void:
+	var mission := _mission(world)
+	if mission == null:
+		_resume = {}
+		return
+	mission.call("restore_snapshot", _resume.get("mission", {}))
+	# Time per step goes on from where it was.
+	var hud := mission.get("hud") as ObjectiveHUD
+	var saved_steps: Variant = _resume.get("step_seconds", [])
+	if hud and saved_steps is Array:
+		for i in (saved_steps as Array).size():
+			if i < hud.step_seconds.size():
+				hud.step_seconds[i] = float(saved_steps[i])
+			else:
+				hud.step_seconds.append(float(saved_steps[i]))
+	# When the mistakes so far happened (and which lines were there from the start).
+	if hud and _resume.get("mistake_seen") is Dictionary:
+		hud.mistake_seen = (_resume["mistake_seen"] as Dictionary).duplicate(true)
+		hud.mistake_baseline = (_resume.get("mistake_baseline", {}) as Dictionary).duplicate()
+		hud._mistakes_started = true
+	LevelSave.place_player(world.get_node_or_null("ITSupportPlayer") as Node3D, _resume.get("player", {}))
+
+
+## Writes the level in progress to its save. False when nothing was saved
+## (no level, the summary is up, or the file could not be written).
+func save_level() -> bool:
+	if current_level == 0 or loading or _awaiting_start or _level_finished:
+		return false
+	var mission := _mission()
+	if mission == null or not bool(mission.call("can_save")):
+		return false
+	var world := get_tree().current_scene
+	var hud := mission.get("hud") as ObjectiveHUD
+	return LevelSave.write(current_level, {
+		"player": LevelSave.player_snapshot(world.get_node_or_null("ITSupportPlayer") as Node3D),
+		"mission": mission.call("save_snapshot"),
+		"step_seconds": hud.step_seconds.duplicate() if hud else [],
+		"mistake_seen": hud.mistake_seen.duplicate(true) if hud else {},
+		"mistake_baseline": hud.mistake_baseline.duplicate() if hud else {},
+	})
 
 
 func _show_start_prompt(saved: bool) -> void:
@@ -910,6 +1007,10 @@ func _begin_level() -> void:
 	_layer.hide()
 	Sound.music("level")
 	var hints := {4: "รับโทรศัพท์ที่โต๊ะของคุณในห้อง IT Support แล้วไปช่วยครูสาวที่ห้องพักครู", 1: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support", 2: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วอ่านใบงาน", 3: "เริ่มจากคุยกับหัวหน้างาน Data Center ในห้อง IT Support แล้วไปตรวจเครื่องในห้องคอมพิวเตอร์",5: "ใช้ Windows Security บนคอม PC-R3-L2 ในห้องเรียน", 6: "รับโทรศัพท์ที่โต๊ะในห้อง IT Support แล้วใช้ TeamViewer"}
+	if not _resume.is_empty():
+		_controls_help.open("เล่นต่อจากที่บันทึกไว้ — ดูขั้นตอนที่ต้องทำต่อในแท็บภารกิจ (Tab)")
+		_resume = {}
+		return
 	_controls_help.open(String(hints.get(current_level, "")))
 
 func _input(event: InputEvent) -> void:
@@ -956,6 +1057,26 @@ func _hook_browser_unlock() -> void:
 })();
 """, true)
 
+## Web: the tab is hidden or the page is closing (closing the browser, going
+## back to the lobby by the address bar): save the level, like the window
+## close on desktop. Best effort: the browser may not wait for it.
+var _browser_hide_callback: JavaScriptObject
+
+func _hook_browser_hide() -> void:
+	if not OS.has_feature("web"):
+		return
+	_browser_hide_callback = JavaScriptBridge.create_callback(func(_args: Array): save_level())
+	JavaScriptBridge.get_interface("window").netsimOnPageHide = _browser_hide_callback
+	JavaScriptBridge.eval("""
+(function () {
+	if (window.netsimHideHooked) return;
+	window.netsimHideHooked = true;
+	var save = function () { if (window.netsimOnPageHide) window.netsimOnPageHide(); };
+	document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') save(); });
+	window.addEventListener('pagehide', save);
+})();
+""", true)
+
 func _on_browser_unlock(_args: Array) -> void:
 	call_deferred("_pause_after_unlock")
 
@@ -977,9 +1098,13 @@ func show_pause() -> void:
 	_page("พักเกม / ด่าน %d" % current_level, "พักเกม • ภารกิจจะหยุดระหว่างเปิดเมนู", SMALL_CARD_WIDTH)
 	# Only "play on" is blue; the rest are grey-white (user 2026-11-18). The
 	# lobby is reached from the main menu, so it is not offered here.
+	# "บันทึกและออก" (teacher's request 2026-11-24) saves the level and goes
+	# to the main menu, where "เล่นต่อ" comes back to it.
 	_button("เล่นต่อ", resume_game).grab_focus()
 	_quiet_button(_button("ตั้งค่า", show_settings, false, false))
-	_quiet_button(_button("กลับเมนูหลัก", confirm_menu, false, false))
+	var save_quit := _button("บันทึกและออก", save_and_quit, false, false)
+	save_quit.name = "SaveAndQuit"
+	_quiet_button(save_quit)
 
 ## Grey-white look for a secondary menu button.
 func _quiet_button(button: Button) -> void:
@@ -1000,6 +1125,28 @@ func resume_game() -> void:
 	_layer.hide()
 	get_tree().paused = false
 	Input.mouse_mode = mode
+
+## Pause page: save the level and leave to the main menu. After the summary
+## there is nothing to save; it just leaves. If writing fails the player
+## chooses to leave anyway or stay.
+func save_and_quit() -> void:
+	if _level_finished or _mission() == null or not bool(_mission().call("can_save")):
+		return_to_menu()
+		return
+	if save_level():
+		return_to_menu()
+		return
+	_page("บันทึกไม่สำเร็จ", "ถ้าออกตอนนี้ ความคืบหน้าในด่านนี้จะหายไป", SMALL_CARD_WIDTH)
+	_button("ลองอีกครั้ง", save_and_quit).grab_focus()
+	_quiet_button(_button("ออกโดยไม่บันทึก", return_to_menu, false, false))
+	_quiet_button(_button("ยกเลิก", show_pause, false, false))
+
+
+## Closing the window (desktop) saves the level first.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save_level()
+
 
 func confirm_menu() -> void:
 	_page("กลับเมนูหลัก?", "เก็บเฉพาะความคืบหน้าที่ระบบภารกิจบันทึกไว้\nตำแหน่งยืนและหน้าต่างที่เปิดจะไม่ถูกเก็บ", SMALL_CARD_WIDTH)

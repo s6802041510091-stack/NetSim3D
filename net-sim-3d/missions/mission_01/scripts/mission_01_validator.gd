@@ -81,19 +81,32 @@ static func check(state: Mission01State, data: Mission01Data) -> Result:
 static func mission_score(state: Mission01State, data: Mission01Data, elapsed_sec: float) -> MissionScore:
 	var counts := state.decision_counts()
 	var score := MissionScore.compute(state.total_score(), counts.x, counts.y, elapsed_sec, data.time_full_sec, data.time_zero_sec)
+	score.mistakes = mistakes(state, data)
+	return score
+
+
+## Each line: where (the point and its name), what was chosen — why it is
+## wrong (the right device, the misconception behind the reason picked).
+static func mistakes(state: Mission01State, data: Mission01Data) -> PackedStringArray:
+	var out := PackedStringArray()
 	for q in data.questions:
 		var id := q.point_id
+		# Kept in Thai (it goes into the history); en_patterns.json translates it.
+		var where := "จุดที่ %d (%s)" % [id, q.title]
 		if id in state.ever_wrong:
-			score.mistakes.append("จุดที่ %d: ตรวจแบบแล้วยังไม่ถูกต้อง (ถูกหักคะแนนความถูกต้อง)" % id)
+			out.append("%s: กดตรวจแบบตอนที่จุดนี้ยังไม่ถูกต้อง — ถูกหักคะแนนความถูกต้องทุกครั้งที่ตรวจแล้วผิด" % where)
 		var point_scored: Dictionary = state.scored_reasons.get(id, {})
 		for device in point_scored:
 			var entry: Dictionary = point_scored[device]
 			if bool(entry.get("correct", false)):
 				continue
-			var line := "จุดที่ %d: เลือก %s" % [id, device]
-			line += " — อุปกรณ์นี้ไม่เหมาะกับจุดนี้" if device != q.correct_option else " — อุปกรณ์ถูก แต่เหตุผลไม่ถูก"
+			var line := "%s: เลือก %s" % [where, device]
+			if device != q.correct_option:
+				line += " — จุดนี้ต้องใช้ %s" % q.correct_option
+			else:
+				line += " — อุปกรณ์ถูก แต่เหตุผลไม่ถูก"
 			var misconception := String(entry.get("misconception", ""))
 			if misconception != "":
 				line += " (เข้าใจผิดว่า: %s)" % misconception
-			score.mistakes.append(line)
-	return score
+			out.append(line)
+	return out

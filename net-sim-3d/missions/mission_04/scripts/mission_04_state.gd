@@ -128,7 +128,7 @@ func mistakes() -> PackedStringArray:
 		if id != FIX_RIGHT:
 			wrong.append(String(FIXES[id][0]))
 	if not wrong.is_empty():
-		out.append("เลือกวิธีแก้ไขที่ไม่สอดคล้องกับหลักฐานก่อน: " + ", ".join(wrong))
+		out.append("เลือกวิธีแก้ไขที่ไม่สอดคล้องกับหลักฐานก่อน: %s — หลักฐานชี้ว่าสายและพอร์ตปกติ ปัญหาอยู่ที่การ์ดเครือข่ายของเครื่องครู" % ", ".join(wrong))
 	if part_first != "" and part_first != PART_RIGHT:
 		out.append("หยิบอะไหล่ผิดในครั้งแรก — อุปกรณ์ที่ต้องเปลี่ยนคือ Network Interface Card (NIC)")
 	if ping_target != "" and not ping_right:

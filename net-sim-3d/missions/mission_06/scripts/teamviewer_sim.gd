@@ -51,6 +51,13 @@ const CONNECT_DELAY := 1.2
 ## The teacher's first chat message after the session starts / her replies.
 const HELLO_DELAY := 2.0
 const REPLY_DELAY := 1.6
+## Chat look, messenger style: the player's bubbles blue, hers light grey.
+const CHAT_MINE := Color(0.0, 0.52, 1.0)
+const CHAT_THEIRS := Color(0.91, 0.92, 0.94)
+const CHAT_AVATAR := Color(0.85, 0.36, 0.55)
+## The quick-reply tray under the log: a darker grey than the bubbles.
+const CHAT_TRAY := Color(0.94, 0.95, 0.97)
+const CHAT_BUBBLE_MAX := 196.0
 
 enum View { HOME, SESSION, ENDED }
 
@@ -95,7 +102,8 @@ var _sheet: PanelContainer
 var _chat: PanelContainer
 var _chat_log: VBoxContainer
 var _chat_scroll: ScrollContainer
-var _chat_edit: LineEdit
+## Preset message buttons (no free typing).
+var _chat_presets: VBoxContainer
 var _chat_button: Button
 var _chat_history: Array = [] # [speaker, text] kept across views
 ## The teacher's question waiting in the chat ("" when none), its reply
@@ -258,18 +266,16 @@ func open_chat() -> void:
 	_chat.visible = true
 	_chat_unread = 0
 	_refresh_chat_button()
-	_chat_edit.grab_focus.call_deferred()
 
 
-## Sends a chat message. The teacher plays the clip and answers with what she
-## hears (any message is a request to test). True when sent.
+## Sends a chat message (one of data.chat_presets from the buttons; tools may
+## pass any text). The teacher plays the clip and answers with what she hears
+## (any message is a request to test). True when sent.
 func send_chat(text: String) -> bool:
 	var message := text.strip_edges()
 	if message == "" or not state.session_active or view != View.SESSION:
 		return false
 	_add_chat("คุณ", message)
-	if _chat_edit:
-		_chat_edit.clear()
 	chat_sent.emit(message)
 	get_tree().create_timer(REPLY_DELAY).timeout.connect(func():
 		if not is_inside_tree() or not state.session_active:
@@ -345,26 +351,21 @@ func _refresh_replies() -> void:
 		child.queue_free()
 	var q := data.get_question(chat_question)
 	_reply_box.visible = q != null
+	# Her question waits for an answer: the preset messages step aside.
+	if _chat_presets and is_instance_valid(_chat_presets):
+		_chat_presets.visible = q == null
 	if q == null:
 		return
-	# The question stays in sight above the buttons (the log above is short now).
-	var asked := _label("%s: %s" % [data.teacher_name, q.prompt], 13, RemoteTheme.OK, true)
+	# Her question is the last bubble above; the tray says what to do with it.
+	var asked := _label("ตอบคำถามของ%s · เลือก 1 ข้อ" % data.teacher_name, 12, RemoteTheme.INK_SOFT, true)
 	asked.name = "ReplyQuestion"
 	asked.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	asked.custom_minimum_size = Vector2(270, 0)
+	asked.custom_minimum_size = Vector2(250, 0)
 	_reply_box.add_child(asked)
 	_scroll_chat.call_deferred()
 	for i in reply_order:
-		var b := Button.new()
+		var b := _chat_pill(q.options[i])
 		b.name = "Reply%d" % i
-		b.text = q.options[i]
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(270, 0)
-		b.add_theme_font_size_override("font_size", 13)
-		b.add_theme_stylebox_override("normal", RemoteTheme.box(Color(0.93, 0.96, 1.0), Color(0.7, 0.8, 0.95), 6, 10, 6))
-		b.add_theme_stylebox_override("hover", RemoteTheme.box(Color(0.85, 0.92, 1.0), Color(0.5, 0.65, 0.9), 6, 10, 6))
 		b.pressed.connect(answer_chat_question.bind(i))
 		_reply_box.add_child(b)
 
@@ -528,7 +529,13 @@ func _receive_chat(text: String) -> void:
 
 
 func _scroll_chat() -> void:
-	if _chat_scroll:
+	# The tray below can grow in the same frame (answer buttons), shrinking the
+	# log: scroll once the layout has settled so the newest bubble is in view.
+	for i in 2:
+		if not is_inside_tree():
+			return
+		await get_tree().process_frame
+	if _chat_scroll and is_instance_valid(_chat_scroll):
 		_chat_scroll.scroll_vertical = int(_chat_scroll.get_v_scroll_bar().max_value)
 
 
@@ -645,7 +652,7 @@ func _show_view(target: View) -> void:
 	for child in _body.get_children():
 		_body.remove_child(child)
 		child.queue_free()
-	for n in ["_flyout", "_home_msg", "_start_menu", "_sheet", "_chat", "_chat_log", "_chat_edit", "_chat_button", "_chat_scroll", "_power_menu", "_speaker_button", "_video_status", "_reply_box"]:
+	for n in ["_flyout", "_home_msg", "_start_menu", "_sheet", "_chat", "_chat_log", "_chat_presets", "_chat_button", "_chat_scroll", "_power_menu", "_speaker_button", "_video_status", "_reply_box"]:
 		set(n, null)
 	match target:
 		View.HOME:
@@ -891,28 +898,27 @@ func _build_session() -> void:
 	split.add_child(screen)
 	_chat = _build_chat()
 	split.add_child(_chat)
-	var wallpaper := TextureRect.new()
-	var gradient := Gradient.new()
-	gradient.set_color(0, Color(0.13, 0.32, 0.38))
-	gradient.set_color(1, Color(0.45, 0.68, 0.62))
-	var tex := GradientTexture2D.new()
-	tex.gradient = gradient
-	tex.fill_to = Vector2(1, 1)
-	wallpaper.texture = tex
-	wallpaper.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	# The teacher's own desktop (playtest 2026-11-24: it was a bare gradient
+	# with coloured squares): a drawn dusk landscape, her sticky note and
+	# drawn file icons.
+	var wallpaper := Control.new()
+	wallpaper.name = "Wallpaper"
 	wallpaper.set_anchors_preset(Control.PRESET_FULL_RECT)
+	wallpaper.draw.connect(func(): _draw_wallpaper(wallpaper))
+	wallpaper.resized.connect(wallpaper.queue_redraw)
 	wallpaper.gui_input.connect(func(e):
 		if e is InputEventMouseButton and e.pressed:
 			_flyout.visible = false
 			_start_menu.visible = false)
 	screen.add_child(wallpaper)
+	screen.add_child(_sticky_note())
 	var icons := VBoxContainer.new()
-	icons.position = Vector2(14, 14)
-	icons.add_theme_constant_override("separation", 12)
+	icons.position = Vector2(10, 12)
+	icons.add_theme_constant_override("separation", 6)
 	screen.add_child(icons)
-	icons.add_child(_remote_icon("VideoFile", "MP4", Color(0.85, 0.3, 0.3), data.video_file))
-	icons.add_child(_remote_icon("PrivateFile", "XLSX", Color(0.13, 0.55, 0.3), data.private_file))
-	icons.add_child(_remote_icon("RecycleBin", "BIN", Color(0.55, 0.6, 0.65), "Recycle Bin"))
+	icons.add_child(_remote_icon("VideoFile", "video", data.video_file))
+	icons.add_child(_remote_icon("PrivateFile", "sheet", data.private_file))
+	icons.add_child(_remote_icon("RecycleBin", "bin", "Recycle Bin"))
 	screen.add_child(_video_window())
 	_sheet = _build_sheet()
 	screen.add_child(_sheet)
@@ -926,16 +932,16 @@ func _build_session() -> void:
 
 
 ## A desktop icon of the remote computer: a click selects it, a double-click opens it.
-func _remote_icon(node_name: String, glyph: String, color: Color, caption: String) -> Control:
+func _remote_icon(node_name: String, kind: String, caption: String) -> Control:
 	var b := Button.new()
 	b.name = node_name
 	b.flat = true
 	b.toggle_mode = true
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(120, 78)
+	b.custom_minimum_size = Vector2(120, 92)
 	b.tooltip_text = caption
-	b.add_theme_stylebox_override("hover", RemoteTheme.box(Color(1, 1, 1, 0.14), Color(0, 0, 0, 0), 4))
-	b.add_theme_stylebox_override("pressed", RemoteTheme.box(Color(1, 1, 1, 0.24), Color(1, 1, 1, 0.4), 4))
+	b.add_theme_stylebox_override("hover", RemoteTheme.box(Color(1, 1, 1, 0.16), Color(1, 1, 1, 0.22), 4))
+	b.add_theme_stylebox_override("pressed", RemoteTheme.box(Color(0.6, 0.8, 1.0, 0.30), Color(0.7, 0.85, 1.0, 0.6), 4))
 	b.gui_input.connect(func(e):
 		if e is InputEventMouseButton and e.double_click and e.button_index == MOUSE_BUTTON_LEFT:
 			open_remote_file(caption))
@@ -944,23 +950,135 @@ func _remote_icon(node_name: String, glyph: String, color: Color, caption: Strin
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	b.add_child(box)
-	var tile := PanelContainer.new()
-	tile.custom_minimum_size = Vector2(44, 34)
-	tile.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	tile.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tile.add_theme_stylebox_override("panel", RemoteTheme.box(color, Color(0, 0, 0, 0), 6, 4, 4))
-	var g := _label(glyph, 12, Color.WHITE, true)
-	g.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tile.add_child(g)
-	box.add_child(tile)
+	var art := Control.new()
+	art.name = "Art"
+	art.custom_minimum_size = Vector2(48, 48)
+	art.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	art.draw.connect(func(): _draw_file_icon(art, kind))
+	box.add_child(art)
 	var c := _label(caption, 12, Color.WHITE)
 	c.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	c.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	c.custom_minimum_size = Vector2(116, 0)
-	c.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
-	c.add_theme_constant_override("outline_size", 3)
+	c.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.75))
+	c.add_theme_constant_override("shadow_offset_x", 1)
+	c.add_theme_constant_override("shadow_offset_y", 1)
+	c.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.35))
+	c.add_theme_constant_override("outline_size", 2)
 	box.add_child(c)
 	return b
+
+
+## File icons drawn in code (no image files, no brand logos), 48 x 48.
+## video: a page with a film frame and a play mark; sheet: a page with a
+## green header and a grid; bin: a see-through waste bin.
+func _draw_file_icon(c: Control, kind: String) -> void:
+	var o := Vector2((c.size.x - 48.0) * 0.5, 0)
+	if kind == "bin":
+		var glass := Color(0.86, 0.92, 0.98, 0.55)
+		var rim := Color(0.95, 0.98, 1.0, 0.95)
+		var body := PackedVector2Array([o + Vector2(12, 12), o + Vector2(36, 12), o + Vector2(33, 44), o + Vector2(15, 44)])
+		c.draw_colored_polygon(body, glass)
+		c.draw_polyline(PackedVector2Array([body[0], body[1], body[2], body[3], body[0]]), rim, 1.5, true)
+		for x in [19.0, 24.0, 29.0]:
+			c.draw_line(o + Vector2(x, 16), o + Vector2(x + (24.0 - x) * 0.12, 40), Color(1, 1, 1, 0.7), 1.2, true)
+		c.draw_rect(Rect2(o + Vector2(9, 7), Vector2(30, 5)), rim)
+		c.draw_rect(Rect2(o + Vector2(20, 4), Vector2(8, 3)), rim)
+		return
+	# A page with a folded top-right corner and a soft shadow.
+	var page := PackedVector2Array([o + Vector2(9, 3), o + Vector2(31, 3), o + Vector2(40, 12), o + Vector2(40, 45), o + Vector2(9, 45)])
+	var shadow := PackedVector2Array()
+	for p in page:
+		shadow.append(p + Vector2(1.5, 2))
+	c.draw_colored_polygon(shadow, Color(0, 0, 0, 0.25))
+	c.draw_colored_polygon(page, Color(0.99, 0.99, 1.0))
+	c.draw_colored_polygon(PackedVector2Array([o + Vector2(31, 3), o + Vector2(40, 12), o + Vector2(31, 12)]), Color(0.80, 0.83, 0.88))
+	var font: Font = RemoteTheme.FONT_BOLD
+	if kind == "video":
+		var frame := Rect2(o + Vector2(12, 15), Vector2(25, 18))
+		c.draw_rect(frame, Color(0.12, 0.14, 0.22))
+		for i in 4:
+			c.draw_rect(Rect2(frame.position + Vector2(2 + i * 6.2, 1.5), Vector2(3, 2)), Color(1, 1, 1, 0.55))
+			c.draw_rect(Rect2(frame.position + Vector2(2 + i * 6.2, 14.5), Vector2(3, 2)), Color(1, 1, 1, 0.55))
+		var m := frame.get_center()
+		c.draw_colored_polygon(PackedVector2Array([m + Vector2(-3.5, -4.5), m + Vector2(5, 0), m + Vector2(-3.5, 4.5)]), Color(1.0, 0.45, 0.38))
+		_icon_badge(c, o + Vector2(5, 35), "MP4", Color(0.90, 0.30, 0.28), font)
+	else:
+		c.draw_rect(Rect2(o + Vector2(12, 14), Vector2(25, 5)), Color(0.13, 0.58, 0.32))
+		for row in 4:
+			c.draw_line(o + Vector2(12, 22 + row * 4), o + Vector2(37, 22 + row * 4), Color(0.13, 0.58, 0.32, 0.45), 1.0)
+		for col in [20.0, 28.0]:
+			c.draw_line(o + Vector2(col, 14), o + Vector2(col, 34), Color(0.13, 0.58, 0.32, 0.45), 1.0)
+		_icon_badge(c, o + Vector2(5, 35), "XLSX", Color(0.13, 0.55, 0.30), font)
+
+
+func _icon_badge(c: Control, at: Vector2, text: String, color: Color, font: Font) -> void:
+	var w := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x + 8.0
+	c.draw_style_box(RemoteTheme.box(color, Color(0, 0, 0, 0), 3, 0, 0), Rect2(at, Vector2(w, 12)))
+	c.draw_string(font, at + Vector2(4, 9.5), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9, Color.WHITE)
+
+
+## Dusk over hills: a sky gradient, a low sun and three layers of hills.
+func _draw_wallpaper(c: Control) -> void:
+	var s := c.size
+	if s.x <= 0.0 or s.y <= 0.0:
+		return
+	var top := Color(0.16, 0.20, 0.42)
+	var mid := Color(0.55, 0.42, 0.62)
+	var low := Color(0.98, 0.70, 0.52)
+	c.draw_polygon(PackedVector2Array([Vector2(0, 0), Vector2(s.x, 0), Vector2(s.x, s.y * 0.45), Vector2(0, s.y * 0.45)]), PackedColorArray([top, top, mid, mid]))
+	c.draw_polygon(PackedVector2Array([Vector2(0, s.y * 0.45), Vector2(s.x, s.y * 0.45), Vector2(s.x, s.y), Vector2(0, s.y)]), PackedColorArray([mid, mid, low, low]))
+	var sun := Vector2(s.x * 0.72, s.y * 0.66)
+	for i in 4:
+		c.draw_circle(sun, 70.0 - i * 14.0, Color(1.0, 0.86, 0.62, 0.10 + i * 0.06))
+	c.draw_circle(sun, 22.0, Color(1.0, 0.93, 0.78))
+	var layers := [
+		[0.62, 26.0, 0.011, 0.0, Color(0.46, 0.38, 0.58)],
+		[0.72, 22.0, 0.008, 1.7, Color(0.33, 0.30, 0.50)],
+		[0.84, 18.0, 0.013, 3.1, Color(0.20, 0.22, 0.38)],
+	]
+	for layer in layers:
+		var ridge := PackedVector2Array([Vector2(0, s.y)])
+		var x := 0.0
+		while x <= s.x + 8.0:
+			var y: float = s.y * float(layer[0]) - float(layer[1]) * (sin(x * float(layer[2]) + float(layer[3])) + 0.5 * sin(x * float(layer[2]) * 2.3 + float(layer[3]) * 1.9))
+			ridge.append(Vector2(x, y))
+			x += 8.0
+		ridge.append(Vector2(s.x + 8.0, s.y))
+		c.draw_colored_polygon(ridge, layer[4])
+	# A few early stars in the top of the sky.
+	var stars := [Vector2(0.12, 0.08), Vector2(0.34, 0.15), Vector2(0.58, 0.06), Vector2(0.81, 0.12), Vector2(0.93, 0.27), Vector2(0.47, 0.24)]
+	for p: Vector2 in stars:
+		c.draw_circle(Vector2(p.x * s.x, p.y * s.y), 1.3, Color(1, 1, 1, 0.65))
+
+
+## The teacher's reminder stuck on her desktop (top right).
+func _sticky_note() -> Control:
+	var note := PanelContainer.new()
+	note.name = "StickyNote"
+	note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	note.anchor_left = 1.0
+	note.anchor_right = 1.0
+	note.offset_left = -190
+	note.offset_right = -18
+	note.offset_top = 16
+	note.rotation_degrees = 2.0
+	var style := RemoteTheme.box(Color(1.0, 0.93, 0.55), Color(0, 0, 0, 0), 2, 12, 10)
+	style.shadow_color = Color(0, 0, 0, 0.3)
+	style.shadow_size = 6
+	style.shadow_offset = Vector2(2, 3)
+	note.add_theme_stylebox_override("panel", style)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 2)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	note.add_child(col)
+	col.add_child(_label("วันนี้ 13:00", 15, Color(0.45, 0.30, 0.05), true))
+	var body := _label("นำเสนอผลการจัดการเรียนรู้\nที่ห้องประชุมเล็ก", 13, Color(0.35, 0.27, 0.10))
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.custom_minimum_size = Vector2(148, 0)
+	col.add_child(body)
+	return note
 
 
 func _video_window() -> Control:
@@ -1190,15 +1308,29 @@ func _build_chat() -> PanelContainer:
 	panel.name = "ChatPanel"
 	panel.custom_minimum_size = Vector2(300, 0)
 	panel.visible = false
-	panel.add_theme_stylebox_override("panel", RemoteTheme.box(Color(1, 1, 1), RemoteTheme.BORDER, 0, 12, 10))
+	panel.add_theme_stylebox_override("panel", RemoteTheme.box(Color(1, 1, 1), RemoteTheme.BORDER, 0, 0, 0))
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
+	col.add_theme_constant_override("separation", 0)
 	panel.add_child(col)
+	# Header: her face, name and the machine, like a messenger conversation.
+	var head_pad := MarginContainer.new()
+	for side in ["left", "right"]:
+		head_pad.add_theme_constant_override("margin_" + side, 12)
+	head_pad.add_theme_constant_override("margin_top", 8)
+	head_pad.add_theme_constant_override("margin_bottom", 8)
+	col.add_child(head_pad)
 	var head := HBoxContainer.new()
-	col.add_child(head)
-	var title := _label("Chat — %s (%s)" % [data.teacher_name, data.partner_name], 15, RemoteTheme.INK, true)
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(title)
+	head.add_theme_constant_override("separation", 8)
+	head_pad.add_child(head)
+	head.add_child(_chat_avatar(data.teacher_name, 32))
+	var who := VBoxContainer.new()
+	who.add_theme_constant_override("separation", -2)
+	who.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(who)
+	var title := _label(data.teacher_name, 15, RemoteTheme.INK, true)
+	title.name = "ChatTitle"
+	who.add_child(title)
+	who.add_child(_label("Chat · %s" % data.partner_name, 12, RemoteTheme.OK))
 	var hide := Button.new()
 	hide.name = "ChatHide"
 	hide.text = " – "
@@ -1206,50 +1338,130 @@ func _build_chat() -> PanelContainer:
 	hide.focus_mode = Control.FOCUS_NONE
 	hide.pressed.connect(func(): panel.visible = false)
 	head.add_child(hide)
+	var line := ColorRect.new()
+	line.color = RemoteTheme.BORDER
+	line.custom_minimum_size = Vector2(0, 1)
+	col.add_child(line)
+	# The conversation.
+	var log_pad := MarginContainer.new()
+	log_pad.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	for side in ["left", "right", "top", "bottom"]:
+		log_pad.add_theme_constant_override("margin_" + side, 10)
+	col.add_child(log_pad)
 	_chat_scroll = ScrollContainer.new()
 	_chat_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_chat_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	col.add_child(_chat_scroll)
+	log_pad.add_child(_chat_scroll)
 	_chat_log = VBoxContainer.new()
 	_chat_log.name = "ChatLog"
 	_chat_log.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_chat_log.add_theme_constant_override("separation", 8)
-	_chat_scroll.add_child(_chat_log)
+	# Room on the right so the scroll bar never covers the blue bubbles.
+	var log_inset := MarginContainer.new()
+	log_inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	log_inset.add_theme_constant_override("margin_right", 14)
+	_chat_scroll.add_child(log_inset)
+	log_inset.add_child(_chat_log)
 	for entry in _chat_history:
 		_chat_log.add_child(_chat_line(entry[0], entry[1]))
+	# The tray: what the player can send. A grey strip with its own heading,
+	# kept apart from the conversation above.
+	var tray := PanelContainer.new()
+	tray.name = "ChatComposer"
+	var tray_style := RemoteTheme.box(CHAT_TRAY, Color(0, 0, 0, 0), 0, 12, 10)
+	tray_style.border_color = RemoteTheme.BORDER
+	tray_style.border_width_top = 1
+	tray.add_theme_stylebox_override("panel", tray_style)
+	col.add_child(tray)
+	var tray_col := VBoxContainer.new()
+	tray_col.add_theme_constant_override("separation", 0)
+	tray.add_child(tray_col)
 	_reply_box = VBoxContainer.new()
 	_reply_box.name = "ReplyBox"
-	_reply_box.add_theme_constant_override("separation", 4)
+	_reply_box.add_theme_constant_override("separation", 5)
 	_reply_box.visible = false
-	col.add_child(_reply_box)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 6)
-	col.add_child(row)
-	_chat_edit = LineEdit.new()
-	_chat_edit.name = "ChatEdit"
-	_chat_edit.placeholder_text = data.chat_placeholder
-	_chat_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_chat_edit.text_submitted.connect(func(t): send_chat(t))
-	row.add_child(_chat_edit)
-	var send := Button.new()
-	send.name = "ChatSend"
-	send.text = "Send"
-	RemoteTheme.primary(send)
-	send.pressed.connect(func(): send_chat(_chat_edit.text))
-	row.add_child(send)
+	tray_col.add_child(_reply_box)
+	# No free typing: the player picks one of the prepared messages.
+	_chat_presets = VBoxContainer.new()
+	_chat_presets.name = "ChatPresets"
+	_chat_presets.add_theme_constant_override("separation", 5)
+	_chat_presets.visible = chat_question == ""
+	tray_col.add_child(_chat_presets)
+	_chat_presets.add_child(_label("ข้อความด่วน · กดเพื่อส่ง", 12, RemoteTheme.INK_SOFT, true))
+	for i in data.chat_presets.size():
+		var b := _chat_pill(data.chat_presets[i])
+		b.name = "ChatPreset%d" % i
+		b.pressed.connect(func(): send_chat(data.chat_presets[i]))
+		_chat_presets.add_child(b)
 	return panel
 
 
+## One chat message as a bubble (playtest 2026-11-24: the log and the preset
+## buttons looked alike). Hers: grey, on the left under her name with a round
+## initial; the player's: blue, on the right.
 func _chat_line(speaker: String, text: String) -> Control:
-	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 0)
 	var mine := speaker == "คุณ"
-	col.add_child(_label(speaker, 12, RemoteTheme.ACCENT if mine else RemoteTheme.OK, true))
-	var l := _label(text, 14, RemoteTheme.INK)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	row.alignment = BoxContainer.ALIGNMENT_END if mine else BoxContainer.ALIGNMENT_BEGIN
+	if not mine:
+		var face := _chat_avatar(speaker, 26)
+		face.size_flags_vertical = Control.SIZE_SHRINK_END
+		row.add_child(face)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 1)
+	row.add_child(col)
+	if not mine:
+		var who := _label(speaker, 11, RemoteTheme.INK_SOFT)
+		col.add_child(who)
+	var bubble := PanelContainer.new()
+	bubble.add_theme_stylebox_override("panel", RemoteTheme.box(CHAT_MINE if mine else CHAT_THEIRS, Color(0, 0, 0, 0), 16, 12, 7))
+	bubble.size_flags_horizontal = Control.SIZE_SHRINK_END if mine else Control.SIZE_SHRINK_BEGIN
+	col.add_child(bubble)
+	var l := _label(text, 14, Color.WHITE if mine else RemoteTheme.INK)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size = Vector2(260, 0)
-	col.add_child(l)
-	return col
+	# Short messages get a short bubble; long ones wrap at CHAT_BUBBLE_MAX.
+	var shown := GameLocale.text(text)
+	var width := RemoteTheme.FONT_REGULAR.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+	l.custom_minimum_size = Vector2(minf(ceilf(width) + 2.0, CHAT_BUBBLE_MAX), 0)
+	bubble.add_child(l)
+	return row
+
+
+## A round face with the first letter of the name (no photo).
+func _chat_avatar(person: String, size: float) -> Control:
+	var face := Control.new()
+	face.custom_minimum_size = Vector2(size, size)
+	face.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var initial := GameLocale.text(person).left(1)
+	face.draw.connect(func():
+		var r := size * 0.5
+		face.draw_circle(Vector2(r, r), r, CHAT_AVATAR)
+		var font: Font = RemoteTheme.FONT_BOLD
+		var fs := int(size * 0.5)
+		var w := font.get_string_size(initial, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		face.draw_string(font, Vector2(r - w * 0.5, r + fs * 0.36), initial, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, Color.WHITE))
+	return face
+
+
+## A quick-reply pill: white with a blue edge and blue words, so it reads as
+## something to press, not as a message already sent.
+func _chat_pill(text: String) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(250, 0)
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.add_theme_font_size_override("font_size", 13)
+	for state in ["normal", "hover", "pressed"]:
+		var s := RemoteTheme.box(Color(1, 1, 1) if state == "normal" else (Color(0.90, 0.95, 1.0) if state == "hover" else Color(0.82, 0.90, 1.0)), CHAT_MINE, 16, 12, 6)
+		s.set_border_width_all(2 if state == "hover" else 1)
+		b.add_theme_stylebox_override(state, s)
+	for c in ["font_color", "font_hover_color", "font_pressed_color"]:
+		b.add_theme_color_override(c, CHAT_MINE.darkened(0.15))
+	return b
 
 
 func _refresh_sound() -> void:

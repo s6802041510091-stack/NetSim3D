@@ -221,7 +221,8 @@ func _test_data_and_rules() -> void:
 	var score := Mission01Validator.mission_score(s, data, 200.0)
 	_check(15, score.correctness == 15 and score.process == 20 and score.time == 20 and score.total() == 55 and score.stars() == 1, "mission score %s" % score.to_dict())
 	var joined := "\n".join(score.mistakes)
-	_check(15, joined.contains("จุดที่ 2: เลือก Shared Hub 24 Port — อุปกรณ์นี้ไม่เหมาะกับจุดนี้") and joined.contains("จุดที่ 3: เลือก Wireless Access Point — อุปกรณ์ถูก แต่เหตุผลไม่ถูก") and joined.contains("เข้าใจผิดว่า"), "mistakes list:\n" + joined)
+	# Where (point + name), what was chosen — why (the right device / the reason).
+	_check(15, joined.contains("จุดที่ 2 (อุปกรณ์ศูนย์กลางภายใน Wall Rack): เลือก Shared Hub 24 Port — จุดนี้ต้องใช้ Switched Hub 24 Port") and joined.contains("จุดที่ 3 (จุดให้บริการเครือข่ายไร้สาย): เลือก Wireless Access Point — อุปกรณ์ถูก แต่เหตุผลไม่ถูก") and joined.contains("เข้าใจผิดว่า"), "mistakes list:\n" + joined)
 
 	# Never below zero.
 	var z := Mission01State.new()

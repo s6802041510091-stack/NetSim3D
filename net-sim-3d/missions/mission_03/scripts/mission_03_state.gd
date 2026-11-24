@@ -157,15 +157,15 @@ func mistakes() -> PackedStringArray:
 	for host: String in TARGETS:
 		var name := "%s (%s)" % [TITLES[host], host]
 		if not records.has(host):
-			out.append("%s: ยังไม่ได้แนบผลการตรวจ" % name)
+			out.append("%s: ยังไม่ได้แนบผลการตรวจ — ต้องตรวจและแนบผลให้ครบทุกเครื่องก่อนส่งรายงาน" % name)
 			continue
 		var e: Dictionary = expected[host]
 		if not pinged_gateway(host):
-			out.append("%s: ไม่ได้ ping ไปที่ Default Gateway (%s) ที่อ่านได้จาก ipconfig" % [name, e["gateway"]])
+			out.append("%s: ไม่ได้ ping ไปที่ Default Gateway (%s) ที่อ่านได้จาก ipconfig — การ ping Default Gateway ใช้ยืนยันว่าเครื่องติดต่อเครือข่ายได้" % [name, e["gateway"]])
 		var r: Dictionary = records[host]
 		for field: Array in [["ip", "IP Address"], ["mask", "Subnet Mask"], ["gateway", "Default Gateway"]]:
 			if r[field[0]] != e[field[0]]:
-				out.append("%s: บันทึก %s เป็น \"%s\" แต่ผลคำสั่งคือ %s" % [name, field[1], r[field[0]], e[field[0]]])
+				out.append("%s: บันทึก %s เป็น \"%s\" แต่ผลคำสั่งคือ %s — ต้องบันทึกตามค่าที่คำสั่ง ipconfig แสดงจริง" % [name, field[1], r[field[0]], e[field[0]]])
 		if not ping_right(host):
 			out.append("%s: บันทึกผล ping ผิด — ผลจริงคือ %s" % [name, "ได้รับการตอบกลับ (Reply)" if bool(e["reply"]) else "หมดเวลา (Request timed out)"])
 		if not status_right(host):

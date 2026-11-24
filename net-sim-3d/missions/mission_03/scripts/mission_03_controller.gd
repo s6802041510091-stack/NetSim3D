@@ -125,6 +125,8 @@ func _ready() -> void:
 	hud = ObjectiveHUD.new()
 	hud.name = "ObjectiveHUD"
 	add_child(hud)
+	# Mistakes are stamped with the step and time they happen (ObjectiveHUD).
+	hud.mistake_source = func() -> PackedStringArray: return state.mistakes()
 	dialogue = DialogueBox.new()
 	dialogue.name = "DialogueBox"
 	add_child(dialogue)
@@ -284,6 +286,9 @@ func _refresh_inspect() -> void:
 		marker.point_at(teacher, 1.75)
 	elif next != "" and stations.has(next):
 		marker.point_at_position((stations[next] as ComputerStation).global_position, 0.45)
+	elif next == "" and not state.report_confirmed and stations.has(Mission03State.TARGETS[-1]):
+		# Resumed before confirming the report: it opens at a sample computer.
+		marker.point_at_position((stations[Mission03State.TARGETS[-1]] as ComputerStation).global_position, 0.45)
 	else:
 		marker.clear()
 
@@ -351,6 +356,11 @@ func _current_host() -> String:
 func _on_desktop_ready() -> void:
 	var host := _current_host()
 	marker.clear()
+	# Resumed after all three rows were attached but before confirming: the
+	# report comes back at any of the sample computers.
+	if stage == Stage.INSPECT and state.all_attached() and not state.report_confirmed and host in Mission03State.TARGETS:
+		report.open(state)
+		return
 	if stage != Stage.INSPECT or not host in Mission03State.TARGETS or state.records.has(host):
 		return
 	var next := next_target()
@@ -537,11 +547,54 @@ func report_lines() -> PackedStringArray:
 	return lines
 
 
+# ---------------------------------------------------------------- save / resume (LevelSave)
+
+func can_save() -> bool:
+	return stage != Stage.DONE
+
+
+func save_snapshot() -> Dictionary:
+	return {
+		"stage": int(stage), "elapsed_sec": elapsed_sec, "state": LevelSave.pack(state),
+		"teacher_met": _teacher_met,
+		# Walking away counts as gone: on resume he is already at his desk.
+		"teacher_place": "desk" if teacher_place == "desk" else "staff_room",
+	}
+
+
+## Whether the saved game had the teacher leave TEACHER-PC (GameFlow seats
+## him in the teachers' room instead of at TEACHER-PC before _ready).
+static func teacher_left(mission: Dictionary) -> bool:
+	return String(mission.get("teacher_place", "desk")) != "desk"
+
+
+## The male teacher at his own desk in the teachers' room (before the world
+## enters the tree), as after teacher_leave().
+static func seat_teacher_away(world: Node) -> void:
+	var person := world.get_node_or_null("TeacherMale") as CharacterBody3D
+	if person:
+		StaffRoomLife._seat(world, person, StaffRoomLife.TEACHERS["male"])
+
+
+func restore_snapshot(d: Dictionary) -> void:
+	elapsed_sec = float(d.get("elapsed_sec", 0.0))
+	LevelSave.unpack(state, d.get("state", {}))
+	_teacher_met = bool(d.get("teacher_met", false))
+	if teacher_left(d):
+		teacher_place = "staff_room"
+		if teacher_talk:
+			teacher_talk.prompt = "กด E เพื่อทักทาย" + TEACHER
+	var next := clampi(int(d.get("stage", 0)), Stage.BRIEFING, Stage.RETURN) as Stage
+	_timing = next >= Stage.INSPECT
+	checklist.refresh()
+	_enter(next)
+
+
 ## Builds the score, records it and shows the summary. Also used by tests.
 func finish(player: Node = null) -> MissionScore:
 	_timing = false
 	score = state.mission_score(elapsed_sec, TIME_FULL_SEC, TIME_ZERO_SEC)
-	var record := GameProgress.record_attempt(LEVEL, score, {
+	var record := GameProgress.record_attempt(LEVEL, score, {"step_times": hud.step_report(), "mistake_log": hud.mistake_report(score.mistakes),
 		"records": state.records.duplicate(true), "activity": state.activity.duplicate(true),
 		"altered": state.altered, "harm_attempts": Array(state.harm_attempts)})
 	_enter(Stage.DONE)

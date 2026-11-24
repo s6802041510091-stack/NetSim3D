@@ -71,7 +71,7 @@ func _mark_drawer() -> void:
 	_box(root, Vector3(0.17, 0.045, 0.003), Vector3(0, -0.025, -0.1075), Color(0.98, 0.84, 0.25))
 	var label := Label3D.new()
 	label.text = "ชุดเข้าหัวสาย"
-	label.font = preload("res://assets/fonts/Sarabun-Bold.ttf")
+	label.font = preload("res://assets/fonts/Mitr-Medium.ttf")
 	label.font_size = 64
 	label.pixel_size = 0.00042
 	label.outline_size = 0
