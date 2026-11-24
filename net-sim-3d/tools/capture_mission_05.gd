@@ -120,14 +120,6 @@ func _run() -> void:
 	var app := desktop.open_windows_security() as WindowsSecurity
 	await create_timer(0.3).timeout
 	await _shot("m5_05_home")
-	# The Virus page before the alerts: Quick scan locked, the Thai hint says why.
-	# Opening Virus first is a process mistake; undo it so the later shots
-	# (summary, mistake cards) stay those of a clean run.
-	var conn_first := app.state.conn_tool_first
-	app.open_page(WindowsSecurity.Page.VIRUS)
-	await _shot("m5_05b_virus_scan_locked")
-	app.state.conn_tool_first = conn_first
-	app.open_page(WindowsSecurity.Page.HOME)
 
 	# 4. Firewall page: the two alerts come up (SchoolLab in front).
 	app.open_page(WindowsSecurity.Page.FIREWALL)

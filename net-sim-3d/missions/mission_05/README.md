@@ -19,7 +19,7 @@
   - แถบซ้ายครบทุกเมนูแบบของจริง ส่วนที่ไม่เกี่ยวกับภารกิจเป็นตัวหลอก (เขียวทั้งหมด)
   - Firewall: เครือข่ายที่ใช้งานคือ `Private network (active)` (SCHOOL-LAN) แบนเนอร์ + ปุ่ม Review จนกว่าจะตอบหน้าต่างครบ สวิตช์ Microsoft Defender Firewall (ปิด = ผิด แล้วเด้งกลับเป็น On)
   - Allowed apps (ลิงก์ "Allow an app through firewall"): รายการกฎแบบอ่านอย่างเดียว แสดงผลของหน้าต่างแจ้งเตือน (SchoolLab อนุญาต, Unknown_Update.exe ไม่อนุญาต)
-  - Virus: Quick scan กดได้หลังตอบหน้าต่างครบ (ถ้าเปิดหน้านี้ก่อน แผงคำใบ้จะอธิบายเป็นภาษาไทยว่าต้องจัดการการเชื่อมต่อใน Firewall ก่อนสแกน ซึ่งไม่นับเป็นความผิดเพิ่ม) → `HackTool:Win32/GameCrack.A` มี Affected items 2 ไฟล์ (GTA7 real.exe และ Unknown_Update.exe ที่แคร็กสร้างขึ้น) เลือก Remove / Quarantine / Allow on device แล้วกด Start actions กับดักเพิ่มเติม: Real-time protection Off, Add an exclusion → File
+  - Virus: Quick scan กดได้หลังตอบหน้าต่างครบ → `HackTool:Win32/GameCrack.A` มี Affected items 2 ไฟล์ (GTA7 real.exe และ Unknown_Update.exe ที่แคร็กสร้างขึ้น) เลือก Remove / Quarantine / Allow on device แล้วกด Start actions กับดักเพิ่มเติม: Real-time protection Off, Add an exclusion → File
   - Protection history: รายการ Threat quarantined (Affected items: 2) ใช้ยืนยันผลก่อนส่ง
   - คำใบ้ภาษาไทยและปุ่ม "ส่งผลการตรวจสอบ" เป็นแผงของเกม แยกจากหน้าต่าง Windows
 - `data/mission_05_data.tres` + `scripts/mission_05_data.gd`, `scripts/security_choice.gd`, `scripts/security_question.gd` — ข้อความ ตัวเลือก คำใบ้ ตัวเลือกการรายงานผล ชื่อโปรแกรม (แก้ใน Inspector ได้)

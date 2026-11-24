@@ -296,13 +296,6 @@ func _run() -> void:
 	_check(mission.state.conn_tool_first == "virus", "opened Virus first: process 1 lost")
 	var quick := app.find_child("QuickScanButton", true, false) as Button
 	_check(quick != null and quick.disabled and not app.start_scan(), "Quick scan waits for the firewall alerts")
-	var mistakes_before := mission.state.mistakes().size()
-	_check(app.current_hint() == WindowsSecurity.SCAN_LOCKED_HINT and (app.find_child("HintPanel", true, false) as Control).visible, "Virus page explains (in Thai) why Quick scan waits")
-	_check(_text_of(app).contains(WindowsSecurity.SCAN_LOCKED_FOOTER), "the hint says to handle Firewall first")
-	_check(not WindowsSecurity.SCAN_LOCKED_HINT.contains("ปิดกั้น"), "the lock hint does not give the answer (SchoolLab must be allowed)")
-	app.open_page(WindowsSecurity.Page.HOME)
-	_check(app.current_hint() == "" and mission.state.mistakes().size() == mistakes_before, "leaving Virus clears that hint; it is not a mistake")
-	app.open_page(WindowsSecurity.Page.VIRUS)
 
 	# 4. Firewall page: the alerts come up here.
 	app.open_page(WindowsSecurity.Page.FIREWALL)
@@ -372,7 +365,6 @@ func _run() -> void:
 	_check(app.page == WindowsSecurity.Page.VIRUS and mission.state.file_tool_first == "virus", "file problem -> Virus first: process 3")
 	quick = app.find_child("QuickScanButton", true, false) as Button
 	_check(quick != null and not quick.disabled, "Quick scan enabled")
-	_check(app.current_hint() != WindowsSecurity.SCAN_LOCKED_HINT, "no lock hint once the alerts are answered")
 	quick.pressed.emit()
 	_check(app.scanning, "scan starts")
 	await create_timer(2.0).timeout
