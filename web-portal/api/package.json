@@ -1,0 +1,29 @@
+{
+  "name": "netsim-api",
+  "private": true,
+  "description": "NetSim main website API: login, roles, student profile, classes",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "node --env-file-if-exists=../.env.local --watch src/server.ts",
+    "test": "node --env-file-if-exists=../.env.local --test --test-concurrency=1 test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "express": "^5.3.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.3.2",
+    "typescript": "^7.0.2"
+  }
+}

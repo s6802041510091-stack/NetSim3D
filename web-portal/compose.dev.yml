@@ -1,0 +1,6 @@
+# ใช้ตอนพัฒนาบนเครื่องตัวเองเท่านั้น: เปิดพอร์ตฐานข้อมูลให้ API ที่รันนอก Docker และชุดทดสอบเข้าถึงได้
+#   docker compose -f docker-compose.yml -f compose.dev.yml up -d db
+services:
+  db:
+    ports:
+      - "127.0.0.1:${DB_PORT:-5433}:5432"

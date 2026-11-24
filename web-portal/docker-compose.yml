@@ -1,0 +1,64 @@
+# NetSim ทั้งระบบ: เปิดด้วย  docker compose up -d --build
+# ค่าตั้งอยู่ในไฟล์ .env (คัดลอกจาก .env.example)
+name: netsim
+
+services:
+  # ฐานข้อมูลของเว็บหลัก (ไม่เปิดพอร์ตออกนอกเครื่อง)
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: netsim
+      POSTGRES_USER: netsim
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?ตั้ง POSTGRES_PASSWORD ในไฟล์ .env ก่อน}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netsim -d netsim"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # API กลาง (Express) อยู่ที่ /api/
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://netsim:${POSTGRES_PASSWORD}@db:5432/netsim
+      TEACHER_EMAILS: ${TEACHER_EMAILS:-}
+      DEV_LOGIN: ${DEV_LOGIN:-false}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Simulation (Net-Desktop) สร้างจากรีโปของเพื่อน อยู่ที่ /sim/
+  sim:
+    build:
+      context: ./sim
+      args:
+        SIM_REF: ${SIM_REF:-main}
+    restart: unless-stopped
+    environment:
+      DB_FILE: /data/cai-net.db
+      TEACHER_PASSWORD: ${SIM_TEACHER_PASSWORD:-teacher1234}
+    volumes:
+      - simdata:/data
+
+  # ด่านหน้า: หน้าเว็บหลัก, /game/, และส่งต่อ /api/ กับ /sim/
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - ./game-build:/srv/game:ro
+    depends_on:
+      - api
+      - sim
+
+volumes:
+  pgdata:
+  simdata:
