@@ -1,0 +1,560 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>สถาปัตยกรรมระบบ NetSim</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=Sarabun:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column of numbered chapters (the order the system is explained in), wide diagrams and tables scroll inside their own frames. Two products get two hues: Simulation amber, Game teal. */
+:root {
+  --bg: #f3f6f9;
+  --paper: #ffffff;
+  --ink: #17293b;
+  --muted: #586b7d;
+  --line: #d8e1ea;
+  --accent: #1b6fb0;
+  --accent-soft: #e2eef8;
+  --sim: #b7740e;
+  --sim-soft: #fbf0dc;
+  --game: #11807a;
+  --game-soft: #dcf2ef;
+  --warn: #a1452f;
+  --warn-soft: #f9e6e1;
+  --code-bg: #eef2f6;
+  --font-display: "Anuphan", "Sarabun", system-ui, sans-serif;
+  --font-body: "Sarabun", "Anuphan", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1820; --paper: #16222d; --ink: #e3ecf4; --muted: #95a8b9; --line: #2a3a49;
+    --accent: #63b2ea; --accent-soft: #183247; --sim: #e7ae4f; --sim-soft: #3a2c13;
+    --game: #4fc7bd; --game-soft: #133632; --warn: #ef8f78; --warn-soft: #3d221c; --code-bg: #1d2b38;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1820; --paper: #16222d; --ink: #e3ecf4; --muted: #95a8b9; --line: #2a3a49;
+  --accent: #63b2ea; --accent-soft: #183247; --sim: #e7ae4f; --sim-soft: #3a2c13;
+  --game: #4fc7bd; --game-soft: #133632; --warn: #ef8f78; --warn-soft: #3d221c; --code-bg: #1d2b38;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16.5px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 34px 80px; display: flex; flex-direction: column; gap: 46px; }
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(1.9rem, 4.6vw, 2.7rem); font-weight: 700; }
+h2 { font-size: 1.55rem; font-weight: 700; display: flex; gap: 12px; align-items: baseline; }
+h2 .num { font-family: var(--font-mono); font-size: 0.95rem; color: var(--accent); font-weight: 500; }
+h3 { font-size: 1.12rem; font-weight: 600; }
+p { margin: 0; max-width: 70ch; }
+.lead { color: var(--muted); font-size: 1.05rem; margin-top: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.chip { font-size: 0.85rem; padding: 3px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--muted); }
+.chip b { color: var(--ink); font-weight: 600; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.frame { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; }
+.frame pre.mermaid { margin: 0; min-width: 640px; text-align: center; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.sim { border-top: 4px solid var(--sim); }
+.card.game { border-top: 4px solid var(--game); }
+.card.student { border-top: 4px solid var(--accent); }
+.card.teacher { border-top: 4px solid var(--warn); }
+.tag { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.04em; padding: 1px 9px; border-radius: 6px; }
+.tag.sim { background: var(--sim-soft); color: var(--sim); }
+.tag.game { background: var(--game-soft); color: var(--game); }
+.tag.new { background: var(--accent-soft); color: var(--accent); }
+.tag.keep { background: var(--code-bg); color: var(--muted); }
+ol.steps { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 6px; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 0.95rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font-family: var(--font-display); font-weight: 600; font-size: 0.86rem; color: var(--muted); letter-spacing: 0.03em; background: var(--code-bg); }
+td code, p code, li code { font-family: var(--font-mono); font-size: 0.86em; background: var(--code-bg); padding: 1px 5px; border-radius: 5px; overflow-wrap: anywhere; }
+.method { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 500; padding: 1px 7px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); }
+.method.post { background: var(--game-soft); color: var(--game); }
+.method.put { background: var(--sim-soft); color: var(--sim); }
+.method.del { background: var(--warn-soft); color: var(--warn); }
+.note { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 10px 10px 0; }
+.note.warn { border-color: var(--warn); background: var(--warn-soft); }
+.open-q { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.open-q .card h3 { font-size: 1rem; }
+.muted { color: var(--muted); }
+footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 18px; }
+a { color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>สถาปัตยกรรมระบบ NetSim</h1>
+    <p class="lead">ร่างกรอบการทำงานของทั้งระบบ ตั้งแต่เข้าสู่ระบบด้วย Google จนครูเปิดดูคะแนนและดาวน์โหลด CSV ใช้คุยกับอาจารย์ที่ปรึกษาและเพื่อนร่วมโปรเจกต์ก่อนลงมือสร้าง ทุกส่วนวางบนเซิร์ฟเวอร์ของภาควิชา</p>
+    <div class="chips">
+      <span class="chip">ร่างวันที่ <b>20 พ.ย. 2569</b></span>
+      <span class="chip">ส่วนที่มีแล้ว: <b>เกม NetSim3D (Godot 4, เล่นบนเว็บ)</b></span>
+      <span class="chip">ส่วนที่ต้องสร้าง: <b>หน้าเว็บหลัก, Simulation, API, ฐานข้อมูล</b></span>
+    </div>
+  </header>
+
+  <section id="overview">
+    <h2><span class="num">01</span>ภาพรวมทั้งระบบ</h2>
+    <p>ผู้ใช้ทุกคนเข้าทางหน้าเว็บหลักที่เดียว ล็อกอินด้วยบัญชี Google แล้วระบบพาไปตามบทบาท นักเรียนเลือกได้ว่าจะเข้า <span class="tag sim">Simulation</span> หรือ <span class="tag game">Game</span> ส่วนครูเข้าหลังบ้านเพื่อดูคะแนน ทุกส่วนเรียก API ตัวเดียวกัน และเก็บข้อมูลในฐานข้อมูลเดียวกัน</p>
+    <div class="frame">
+<pre class="mermaid">
+flowchart LR
+  U["ผู้ใช้<br/>(เบราว์เซอร์)"] --> P["หน้าเว็บหลัก<br/>ล็อกอิน · เลือกบทบาท · คลาส"]
+  P <-->|"ล็อกอิน"| G["Google<br/>Sign-In"]
+  P -->|"นักเรียน"| S["Simulation<br/>workspace"]
+  P -->|"นักเรียน"| N["เกม NetSim3D<br/>(Godot บนเว็บ)"]
+  P -->|"ครู"| T["หลังบ้านครู<br/>Dashboard · CSV"]
+  S --> A["API กลาง"]
+  N --> A
+  T --> A
+  P --> A
+  A --> D[("ฐานข้อมูล<br/>PostgreSQL")]
+  subgraph SRV["เซิร์ฟเวอร์ภาควิชา"]
+    P
+    S
+    N
+    T
+    A
+    D
+  end
+</pre>
+    </div>
+  </section>
+
+  <section id="journeys">
+    <h2><span class="num">02</span>ผู้ใช้แต่ละบทบาททำอะไรบ้าง</h2>
+    <div class="cols">
+      <div class="card student">
+        <h3>นักเรียน</h3>
+        <ol class="steps">
+          <li>กด “เข้าสู่ระบบด้วย Google”</li>
+          <li>ครั้งแรก: เลือกบทบาท “นักเรียน”</li>
+          <li>กรอก <b>Class ID</b> และ <b>รหัสผ่านคลาส</b> ที่ครูให้ เพื่อเข้าคลาส (เข้าได้หลายคลาส)</li>
+          <li>เลือก <span class="tag sim">Simulation</span> เข้าหน้า workspace หรือ <span class="tag game">Game</span> เข้าเมนูเกม</li>
+          <li>เล่นเกมเรียงด่าน 1 ถึง 6 (ด่านถัดไปเปิดเมื่อผ่านด่านก่อน) และกลับไปเล่นด่านที่ผ่านแล้วซ้ำได้ ทั้งสองอย่างเกมทำได้อยู่แล้ว</li>
+          <li>เล่นจบด่าน เกมส่งคะแนนขึ้นระบบให้เอง หน้า “ความคืบหน้า” ในเกมเห็นผลของตัวเองทุกครั้ง ไม่ว่าเล่นจากเครื่องไหน</li>
+        </ol>
+      </div>
+      <div class="card teacher">
+        <h3>ครู</h3>
+        <ol class="steps">
+          <li>กด “เข้าสู่ระบบด้วย Google”</li>
+          <li>ครั้งแรก: เลือกบทบาท “ครู” (ใช้ได้เฉพาะอีเมลที่ภาคอนุญาต ดูหัวข้อ 09)</li>
+          <li>สร้างคลาส ระบบสร้าง <b>Class ID</b> ให้ ครูตั้ง <b>รหัสผ่านคลาส</b> แล้วแจ้งนักเรียน</li>
+          <li>กด <span class="tag sim">Simulation</span> หรือ <span class="tag game">Game</span> เข้าหลังบ้านของส่วนนั้น</li>
+          <li>Dashboard: คะแนนทุกคนในคลาส ราย ด่าน/แล็บ ราย ครั้ง จุดที่ผิดพลาด แล้วกด <b>Export CSV</b></li>
+          <li>จัดการคลาส: แก้ชื่อ เปลี่ยนรหัสผ่าน หรือลบคลาส</li>
+        </ol>
+      </div>
+    </div>
+    <h3>โครงหน้าเว็บฝั่งครู (จากร่างของผู้พัฒนา)</h3>
+    <div class="frame">
+<pre class="mermaid">
+flowchart TB
+  W["หน้าเว็บ"] --> L["ล็อกอิน (Google)"] --> LB["Lobby"]
+  LB --> CC["Create Class"]
+  LB --> MC["My Class"]
+  CC --> CC1["ตั้งชื่อคลาส<br/>ได้ Class ID อัตโนมัติ<br/>ตั้ง Class password"]
+  CC1 -->|"สร้างเสร็จ"| LB
+  MC --> E1["แก้ชื่อคลาส"]
+  MC --> E2["เปลี่ยน Class password"]
+  MC --> DB["Dashboard"]
+  MC --> DEL["ลบคลาส"]
+  DB --> D1["ภาพรวม: ชื่อนักเรียน · คะแนน"]
+  DB --> D2["เลือกด่าน 1 ถึง 6:<br/>ใครเล่นแล้วบ้าง ได้คะแนนเท่าไร"]
+  DB --> D3["ประวัติการเล่นทุกครั้ง:<br/>ใคร เล่นด่านไหน วันเวลา<br/>ใช้เวลาเท่าไร ได้กี่คะแนน"]
+  DB --> D4["Export CSV"]
+</pre>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <h3>Dashboard แสดงคะแนนอย่างไร</h3>
+        <ul class="plain">
+          <li>บันทึกทุกครั้งที่เล่น พร้อมวันเวลา จึงรู้ว่าครั้งไหนเป็น <b>ครั้งแรก</b></li>
+          <li>ตารางสรุปแต่ละคน แสดง 3 ค่า: <b>ครั้งแรก</b> (วัดความเข้าใจตอนเริ่ม), <b>ดีที่สุด</b>, <b>ล่าสุด</b> และจำนวนครั้งที่เล่น</li>
+          <li>เลือกด่าน 1 ถึง 6 เพื่อดูว่าใครเล่นแล้ว ใครยังไม่เล่น</li>
+          <li>กดชื่อนักเรียนเพื่อดูประวัติทุกครั้ง และจุดที่ผิดพลาดแต่ละครั้ง</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>เรื่องที่ควรตกลงเพิ่ม</h3>
+        <ul class="plain">
+          <li><b>ลบคลาส:</b> ให้ยืนยันก่อน และเก็บคะแนนไว้ในระบบแบบซ่อน (กู้คืนได้) ดีกว่าลบทิ้งทันที</li>
+          <li><b>เปลี่ยนรหัสผ่านคลาส:</b> มีผลกับคนที่จะเข้าใหม่เท่านั้น นักเรียนที่อยู่ในคลาสแล้วไม่ถูกถอดออก</li>
+          <li><b>“สร้างบัญชี”:</b> ล็อกอิน Google ครั้งแรกถือเป็นการสร้างบัญชี ไม่ต้องตั้งรหัสผ่านเอง</li>
+          <li><b>ฝั่งนักเรียน:</b> Lobby มี Join Class, เลือกคลาส, เข้าเกม และดูคะแนนตัวเอง</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="stack">
+    <h2><span class="num">03</span>Framework และเทคโนโลยีที่แนะนำ</h2>
+    <p>เลือกให้ทั้งระบบเขียนด้วย JavaScript/TypeScript ภาษาเดียว (ยกเว้นเกมที่เป็น Godot อยู่แล้ว) ทีมเล็กดูแลง่าย และรันบนเซิร์ฟเวอร์ Linux ทั่วไปด้วย Docker</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ส่วน</th><th>หน้าที่</th><th>แนะนำ</th><th>ทางเลือก</th></tr></thead>
+        <tbody>
+          <tr><td><b>หน้าเว็บหลัก</b><br/><span class="tag new">สร้างใหม่</span></td><td>ล็อกอิน, เลือกบทบาท, สร้าง/เข้าคลาส, เมนู Simulation/Game, หลังบ้านครู</td><td>React + Vite + TypeScript, React Router</td><td>Next.js (ถ้าอยากรวมหน้าเว็บกับ API ไว้โปรเจกต์เดียว)</td></tr>
+          <tr><td><b>Simulation workspace</b><br/><span class="tag sim">Simulation</span></td><td>ลากวางอุปกรณ์ ต่อสาย ตั้งค่า IP ทดสอบ ping แบบ Cisco Packet Tracer</td><td>React + React Flow (ผังเครือข่ายลากวาง) + ตัวจำลองเครือข่ายเขียนเองใน TypeScript</td><td>Konva/Canvas ถ้าต้องวาดเองทั้งหมด</td></tr>
+          <tr><td><b>เกม NetSim3D</b><br/><span class="tag game">Game</span> <span class="tag keep">มีแล้ว</span></td><td>6 ด่าน คะแนน 30/50/20 ประวัติการเล่น จุดที่ผิดพลาด</td><td>Godot 4.7 ส่งออกเป็น Web (HTML5) วางเป็นไฟล์ static</td><td>—</td></tr>
+          <tr><td><b>API กลาง</b><br/><span class="tag new">สร้างใหม่</span></td><td>ตรวจตัวตน, สิทธิ์ตามบทบาท, คลาส, รับคะแนน, ส่งข้อมูลให้ Dashboard, สร้าง CSV</td><td>Node.js + Fastify (หรือ Express) + Prisma ORM</td><td>Python FastAPI + SQLAlchemy</td></tr>
+          <tr><td><b>ฐานข้อมูล</b><br/><span class="tag new">สร้างใหม่</span></td><td>ผู้ใช้ คลาส สมาชิก คะแนนเกม คะแนน Simulation</td><td>PostgreSQL 16</td><td>MySQL/MariaDB ถ้าภาคมีให้อยู่แล้ว</td></tr>
+          <tr><td><b>เข้าสู่ระบบ</b></td><td>บัญชี Google</td><td>Google Identity Services (OpenID Connect) ตรวจ ID token ที่ API แล้วออก session cookie</td><td>Auth.js / Passport</td></tr>
+          <tr><td><b>เว็บเซิร์ฟเวอร์</b></td><td>HTTPS, แบ่งเส้นทางไปแต่ละส่วน, ส่งไฟล์เกมแบบบีบอัด</td><td>Nginx + Let's Encrypt (หรือใบรับรองของมหาวิทยาลัย)</td><td>Caddy</td></tr>
+          <tr><td><b>ติดตั้ง</b></td><td>ยกทั้งระบบขึ้นเซิร์ฟเวอร์ด้วยคำสั่งเดียว</td><td>Docker Compose (nginx, api, db)</td><td>ติดตั้งตรงบนเครื่อง ถ้าภาคไม่ให้ใช้ Docker</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">ทุกส่วนอยู่โดเมนเดียวกัน แบ่งด้วยเส้นทาง: <code>/</code> หน้าเว็บหลัก · <code>/sim/</code> Simulation · <code>/game/</code> เกม · <code>/api/</code> API คุกกี้ล็อกอินจึงใช้ร่วมกันได้ทันที เกมไม่ต้องล็อกอินซ้ำ</p>
+  </section>
+
+  <section id="login">
+    <h2><span class="num">04</span>ขั้นตอนเข้าสู่ระบบและเลือกบทบาท</h2>
+    <div class="frame">
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor U as ผู้ใช้
+  participant P as หน้าเว็บหลัก
+  participant G as Google
+  participant A as API
+  participant D as ฐานข้อมูล
+  U->>P: กด "เข้าสู่ระบบด้วย Google"
+  P->>G: ขอล็อกอิน
+  G-->>P: ID token (อีเมล ชื่อ รูป)
+  P->>A: POST /api/auth/google (ID token)
+  A->>G: ตรวจลายเซ็น token
+  A->>D: หาผู้ใช้จาก google_sub หรือสร้างใหม่
+  A-->>P: ตั้ง session cookie (HttpOnly, Secure)
+  alt ยังไม่เคยเลือกบทบาท
+    P->>U: ให้เลือก ครู / นักเรียน
+    U->>P: เลือกบทบาท
+    P->>A: POST /api/me/role
+    A->>D: ครู: ตรวจว่าอีเมลอยู่ในรายชื่อที่ภาคอนุญาต
+  end
+  P->>U: เปิดเมนู Simulation / Game ตามบทบาท
+</pre>
+    </div>
+  </section>
+
+  <section id="score-flow">
+    <h2><span class="num">05</span>นักเรียนเล่นเกม แล้วคะแนนไปถึงครูอย่างไร</h2>
+    <p>เกมคำนวณคะแนนเหมือนเดิมทุกอย่าง (ความถูกต้อง 30 · กระบวนการ 50 · เวลา 20 ดาว และจุดที่ผิดพลาด) ที่เพิ่มคือส่งผลแต่ละครั้งขึ้น API ถ้าเน็ตหลุด เกมเก็บไว้ในเครื่องก่อนแล้วส่งใหม่ภายหลัง</p>
+    <div class="frame">
+<pre class="mermaid">
+sequenceDiagram
+  autonumber
+  actor S as นักเรียน
+  participant N as เกม NetSim3D
+  participant A as API
+  participant D as ฐานข้อมูล
+  actor T as ครู
+  S->>N: เปิด /game/ จากหน้าเว็บหลัก
+  N->>A: GET /api/me (คุกกี้ส่งไปเอง)
+  A-->>N: ชื่อ บทบาท คลาสที่เลือก
+  S->>N: เล่นด่าน 3 จนจบ
+  N->>N: คำนวณ MissionScore เก็บสำรองในเครื่อง
+  N->>A: POST /api/game/attempts
+  A->>D: บันทึก game_attempts
+  A-->>N: บันทึกแล้ว (ครั้งที่ 2)
+  T->>A: GET /api/classes/:id/game-results
+  A->>D: รวมคะแนนรายคน ราย ด่าน
+  A-->>T: ตาราง Dashboard
+  T->>A: GET /api/classes/:id/export.csv
+  A-->>T: ไฟล์ CSV
+</pre>
+    </div>
+  </section>
+
+  <section id="database">
+    <h2><span class="num">06</span>ฐานข้อมูล</h2>
+    <p>ตารางคะแนนเกมเก็บตรงกับที่เกมบันทึกอยู่แล้วในเครื่อง (<code>GameProgress</code> และ <code>MissionScore</code>) จึงย้ายขึ้นเซิร์ฟเวอร์ได้โดยไม่ต้องเปลี่ยนวิธีคิดคะแนน ส่วน Simulation เว้นช่องรายละเอียดเป็น JSON ไว้ จนกว่าจะตกลงกันว่าเก็บคะแนนแบบไหน</p>
+    <div class="frame">
+<pre class="mermaid">
+erDiagram
+  users ||--o{ classes : "ครูสร้าง"
+  users ||--o{ enrollments : "นักเรียนเข้า"
+  classes ||--o{ enrollments : "มีสมาชิก"
+  users ||--o{ game_attempts : "เล่น"
+  classes ||--o{ game_attempts : "อยู่ในคลาส"
+  users ||--o{ sim_submissions : "ส่งงาน"
+  classes ||--o{ sim_submissions : "อยู่ในคลาส"
+  sim_labs ||--o{ sim_submissions : "ของแล็บ"
+  users {
+    uuid id PK
+    string google_sub UK "รหัสบัญชี Google"
+    string email
+    string name
+    string role "teacher หรือ student"
+    timestamp created_at
+  }
+  teacher_allowlist {
+    string email PK "อีเมลครูที่ภาคอนุญาต"
+  }
+  classes {
+    uuid id PK
+    string code UK "Class ID ที่ให้นักเรียน"
+    string join_password_hash "เก็บแบบ hash"
+    string name
+    uuid teacher_id FK
+    boolean open "รับสมาชิกใหม่ได้ไหม"
+    timestamp deleted_at "ลบแล้ว (ซ่อน กู้คืนได้)"
+  }
+  enrollments {
+    uuid class_id FK
+    uuid student_id FK
+    timestamp joined_at
+  }
+  game_attempts {
+    uuid id PK
+    uuid student_id FK
+    uuid class_id FK
+    int level "1 ถึง 6"
+    int total "0 ถึง 100"
+    int correctness "เต็ม 30"
+    int process "เต็ม 50"
+    int time_score "เต็ม 20"
+    int stars "0 ถึง 4 (4 คือสีรุ้ง)"
+    boolean passed "ผ่านที่ 50"
+    float elapsed_sec
+    int decisions_correct
+    int decisions_total
+    json mistakes "จุดที่ผิดพลาด"
+    timestamp finished_at
+  }
+  sim_labs {
+    uuid id PK
+    string title
+    json checks "เกณฑ์ตรวจ"
+  }
+  sim_submissions {
+    uuid id PK
+    uuid student_id FK
+    uuid class_id FK
+    uuid lab_id FK
+    int score
+    json details "ผลตรวจแต่ละข้อ"
+    timestamp submitted_at
+  }
+</pre>
+    </div>
+  </section>
+
+  <section id="api">
+    <h2><span class="num">07</span>API ที่ต้องมี</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>คำขอ</th><th>เส้นทาง</th><th>ใครเรียก</th><th>ทำอะไร</th></tr></thead>
+        <tbody>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/auth/google</code></td><td>ทุกคน</td><td>รับ ID token จาก Google ตรวจแล้วออก session</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/auth/logout</code></td><td>ทุกคน</td><td>ออกจากระบบ</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/me</code></td><td>ทุกคน, เกม</td><td>ชื่อ บทบาท คลาสที่อยู่</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/me/role</code></td><td>ผู้ใช้ใหม่</td><td>เลือกบทบาทครั้งแรก (ครูต้องอยู่ใน allowlist)</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/classes</code></td><td>ครู</td><td>สร้างคลาส ได้ Class ID ตั้งรหัสผ่าน</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/classes</code></td><td>ครู, นักเรียน</td><td>คลาสของฉัน</td></tr>
+          <tr><td><span class="method put">PATCH</span></td><td><code>/api/classes/:id</code></td><td>ครูเจ้าของคลาส</td><td>แก้ชื่อคลาส, เปลี่ยนรหัสผ่าน, เปิด/ปิดรับสมาชิก</td></tr>
+          <tr><td><span class="method del">DELETE</span></td><td><code>/api/classes/:id</code></td><td>ครูเจ้าของคลาส</td><td>ลบคลาส (ซ่อนไว้ กู้คืนได้)</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/classes/join</code></td><td>นักเรียน</td><td>เข้าคลาสด้วย Class ID + รหัสผ่าน</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/game/attempts</code></td><td>เกม</td><td>ส่งผลการเล่นหนึ่งครั้ง</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/game/attempts/me</code></td><td>เกม</td><td>ประวัติของฉัน (หน้า “ความคืบหน้า” ในเกม)</td></tr>
+          <tr><td><span class="method post">POST</span></td><td><code>/api/sim/submissions</code></td><td>Simulation</td><td>ส่งผลแล็บ</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/classes/:id/game-results</code></td><td>ครูเจ้าของคลาส</td><td>Dashboard เกม</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/classes/:id/sim-results</code></td><td>ครูเจ้าของคลาส</td><td>Dashboard Simulation</td></tr>
+          <tr><td><span class="method">GET</span></td><td><code>/api/classes/:id/export.csv</code></td><td>ครูเจ้าของคลาส</td><td>ดาวน์โหลด CSV (เลือกได้: เกม, Simulation, ทั้งหมด)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">CSV หนึ่งแถวต่อการเล่นหนึ่งครั้ง: รหัสนักศึกษา/อีเมล, ชื่อ, ด่าน, ครั้งที่, คะแนนรวม, ความถูกต้อง, กระบวนการ, เวลา, ดาว, ผ่าน/ไม่ผ่าน, เวลาที่ใช้, จุดที่ผิดพลาด, วันเวลา บันทึกเป็น UTF-8 แบบมี BOM เพื่อให้ Excel เปิดภาษาไทยได้ถูก</p>
+  </section>
+
+  <section id="game-changes">
+    <h2><span class="num">08</span>สิ่งที่ต้องเพิ่มในเกม NetSim3D</h2>
+    <p>ด่าน ภารกิจ และวิธีคิดคะแนนไม่เปลี่ยน เพิ่มเฉพาะการเชื่อมกับระบบ</p>
+    <div class="cols">
+      <div class="card game">
+        <h3>ตอนเปิดเกม</h3>
+        <ul class="plain">
+          <li>เรียก <code>GET /api/me</code> ถ้ามี session แสดงชื่อและคลาสที่มุมเมนู</li>
+          <li>ถ้าไม่มี session (เปิดเกมตรง ๆ) ขึ้นปุ่ม “เข้าสู่ระบบ” พากลับหน้าเว็บหลัก</li>
+          <li>ตั้งค่าเกม (ภาษา เสียง ภาพ) ยังเก็บในเครื่องเหมือนเดิม</li>
+        </ul>
+      </div>
+      <div class="card game">
+        <h3>ตอนเล่นจบด่าน</h3>
+        <ul class="plain">
+          <li><code>GameProgress.record_attempt</code> เก็บในเครื่องเหมือนเดิม แล้วส่ง <code>POST /api/game/attempts</code></li>
+          <li>ส่งไม่สำเร็จ: เข้าคิวในเครื่อง แล้วลองส่งใหม่ตอนเปิดเกมหรือจบด่านถัดไป</li>
+          <li>ใช้ <code>HTTPRequest</code> ของ Godot เรียก API โดเมนเดียวกัน คุกกี้ไปเอง</li>
+        </ul>
+      </div>
+      <div class="card game">
+        <h3>หน้า “ความคืบหน้า”</h3>
+        <ul class="plain">
+          <li>อ่านประวัติจาก <code>GET /api/game/attempts/me</code> เห็นผลเดียวกันทุกเครื่อง</li>
+          <li>หน้าตาเดิมทั้งหมด (กราฟ ตาราง จุดที่ผิดพลาด)</li>
+          <li>ถ้าออฟไลน์ แสดงจากข้อมูลในเครื่อง</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="security">
+    <h2><span class="num">09</span>ความปลอดภัยและข้อมูลส่วนบุคคล</h2>
+    <div class="note warn"><p><b>เรื่องที่ต้องตัดสินใจ:</b> ถ้าใครก็กดเลือกบทบาทครูได้ นักเรียนจะสร้างคลาสหรือเข้าไปดูคะแนนคนอื่นได้ แนะนำให้บทบาทครูใช้ได้เฉพาะอีเมลในรายชื่อที่ภาคกำหนด (ตาราง <code>teacher_allowlist</code>) หรือให้แอดมินอนุมัติ</p></div>
+    <ul class="plain">
+      <li>รหัสผ่านคลาสเก็บแบบ hash (bcrypt) และจำกัดจำนวนครั้งที่ลองผิด เช่น 5 ครั้งต่อ 10 นาที</li>
+      <li>ครูเห็นเฉพาะคลาสของตัวเอง นักเรียนเห็นเฉพาะผลของตัวเอง ตรวจสิทธิ์ที่ API ทุกคำขอ ไม่พึ่งการซ่อนปุ่มในหน้าเว็บ</li>
+      <li>Session cookie แบบ <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite=Lax</code> ทุกอย่างผ่าน HTTPS</li>
+      <li>เก็บข้อมูลส่วนตัวเท่าที่ต้องใช้ (ชื่อ อีเมล) อยู่บนเซิร์ฟเวอร์ภาค สอดคล้อง PDPA และแจ้งนักเรียนในหน้าแรกว่าเก็บอะไรบ้าง</li>
+      <li>สำรองฐานข้อมูลอัตโนมัติทุกวัน</li>
+    </ul>
+  </section>
+
+  <section id="deploy">
+    <h2><span class="num">10</span>ติดตั้งบนเซิร์ฟเวอร์ภาควิชา</h2>
+    <div class="frame">
+<pre class="mermaid">
+flowchart TB
+  I(("อินเทอร์เน็ต")) -->|"HTTPS 443"| NG["Nginx<br/>ใบรับรอง HTTPS"]
+  NG -->|"/"| WEB["ไฟล์หน้าเว็บหลัก<br/>(React build)"]
+  NG -->|"/sim/"| SIM["ไฟล์ Simulation<br/>(React build)"]
+  NG -->|"/game/"| GAME["ไฟล์เกม Godot Web<br/>index.pck · .wasm (บีบอัด gzip/brotli)"]
+  NG -->|"/api/"| API["คอนเทนเนอร์ API<br/>Node.js"]
+  API --> DB[("คอนเทนเนอร์ PostgreSQL<br/>+ สำรองรายวัน")]
+</pre>
+    </div>
+    <div class="cols">
+      <div class="card">
+        <h3>ถ้าเซิร์ฟเวอร์รัน Docker ได้ (แผน A)</h3>
+        <p>ยกทั้งระบบด้วย <code>docker compose up -d</code> ข้อมูลทั้งหมดอยู่ในภาค ดูแลและย้ายเครื่องง่าย</p>
+      </div>
+      <div class="card">
+        <h3>ถ้าวางได้แค่ไฟล์เว็บ (แผน B)</h3>
+        <p>หน้าเว็บ เกม และ Simulation วางบนเซิร์ฟเวอร์ภาค ส่วนล็อกอินและฐานข้อมูลใช้ Supabase (มี Google login ในตัว) แต่ข้อมูลนักเรียนจะอยู่บนคลาวด์นอกมหาวิทยาลัย ต้องถามอาจารย์ก่อน</p>
+      </div>
+    </div>
+    <p class="muted">ไฟล์เกมรวมราว 180 MB (index.pck 141 MB + wasm 40 MB) ตั้ง Nginx ให้บีบอัดและแคชไว้ในเบราว์เซอร์ นักเรียนโหลดเต็มแค่ครั้งแรก</p>
+  </section>
+
+  <section id="roadmap">
+    <h2><span class="num">11</span>ลำดับการสร้าง</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ระยะ</th><th>งาน</th><th>เสร็จแล้วได้อะไร</th></tr></thead>
+        <tbody>
+          <tr><td><b>1</b></td><td>ตั้งเซิร์ฟเวอร์: Nginx, HTTPS, Docker, ฐานข้อมูลเปล่า, วางเกมที่ <code>/game/</code></td><td>เปิดเกมจากเซิร์ฟเวอร์ภาคได้ (ยังเก็บผลในเครื่อง)</td></tr>
+          <tr><td><b>2</b></td><td>API + Google login + เลือกบทบาท + allowlist ครู</td><td>ล็อกอินได้ แยกครูกับนักเรียน</td></tr>
+          <tr><td><b>3</b></td><td>คลาส: สร้าง, Class ID + รหัสผ่าน, เข้าคลาส, แก้ชื่อ, เปลี่ยนรหัสผ่าน, ลบ</td><td>ครูมีนักเรียนในคลาส จัดการคลาสได้</td></tr>
+          <tr><td><b>4</b></td><td>เกมส่งผลขึ้น API + หน้าความคืบหน้าอ่านจากเซิร์ฟเวอร์</td><td>คะแนนเกมเข้าฐานข้อมูลจริง</td></tr>
+          <tr><td><b>5</b></td><td>หลังบ้านครู: Dashboard เกม + Export CSV</td><td>ครูดูและส่งออกคะแนนเกมได้</td></tr>
+          <tr><td><b>6</b></td><td>Simulation workspace + ส่งผลแล็บ + Dashboard Simulation</td><td>ครบทั้งสองส่วน</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="questions">
+    <h2><span class="num">12</span>คำถามที่ต้องได้คำตอบก่อนเริ่ม</h2>
+    <div class="open-q">
+      <div class="card"><h3>เซิร์ฟเวอร์ภาค</h3><p>รัน Docker หรือโปรแกรมฝั่งเซิร์ฟเวอร์ได้ไหม มีฐานข้อมูลแบบไหน มี HTTPS และโดเมนหรือยัง เข้าจัดการทาง SSH ได้ไหม</p></div>
+      <div class="card"><h3>บัญชี Google</h3><p>บังคับให้ใช้เฉพาะอีเมลมหาวิทยาลัยไหม ใครเป็นคนสร้าง OAuth Client ใน Google Cloud (ภาค หรือนักศึกษา)</p></div>
+      <div class="card"><h3>บทบาทครู</h3><p>ใช้ allowlist อีเมล หรือให้แอดมินอนุมัติ ใครเป็นแอดมิน</p></div>
+      <div class="card"><h3>คะแนน Simulation</h3><p>แต่ละแล็บตรวจอะไร ให้คะแนนแบบไหน ต้องมีประวัติรายครั้งเหมือนเกมไหม</p></div>
+      <div class="card"><h3>ใครทำส่วนไหน</h3><p>หน้าเว็บหลัก Simulation API และเกม แบ่งงานกันอย่างไร</p></div>
+      <div class="card"><h3>ข้อมูลใน CSV</h3><p>ต้องมีรหัสนักศึกษาไหม (บัญชี Google อาจไม่มี) ถ้าต้องมี ให้นักเรียนกรอกครั้งแรกตอนเข้าคลาส</p></div>
+    </div>
+  </section>
+
+  <footer>
+    ร่างนี้ยังไม่ใช่สเปกสุดท้าย เทคโนโลยีในหัวข้อ 03 เป็นข้อแนะนำ ปรับได้ตามที่เซิร์ฟเวอร์ภาคมีให้ ส่วนเกม NetSim3D ใช้ของที่มีอยู่แล้วทั้งหมด
+  </footer>
+</div>
+
+<!--claude-mermaid-runtime-begin:3477-->
+<style>.mermaid-diagram{margin-block:4px}.mermaid-diagram svg{display:block;margin:0 auto;max-width:100%;height:auto}</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<script>(function(){
+var CFG={"palettes":{"light":{"surface":"#f4efe4","text":"#42392e","line":"#8a7f6d","border":"#7a6c52","bg":"#fffdf8"},"dark":{"surface":"#262b34","text":"#f2f3f5","line":"#a8adb8","border":"#9aa4b8","bg":"#1f232b"}}};
+if(typeof mermaid==='undefined')return;
+var pres=Array.prototype.slice.call(document.querySelectorAll('pre.mermaid')).filter(function(p){if(p.hasAttribute('data-claude-mermaid-claimed'))return false;p.setAttribute('data-claude-mermaid-claimed','1');return true;});
+if(!pres.length)return;
+var mq=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+var root=document.documentElement;
+var items=pres.map(function(pre){
+var mount=document.createElement('div');mount.className='mermaid-diagram';
+return {pre:pre,mount:mount,src:pre.textContent||''};
+});
+var seq=0;
+var renderGen=0;
+var lastKey='';
+function pageBg(fallback){
+var els=[document.body,document.documentElement];
+for(var i=0;i<els.length;i++){
+var c=els[i]&&getComputedStyle(els[i]).backgroundColor;
+if(c&&c!=='transparent'&&c!=='rgba(0, 0, 0, 0)')return c;
+}
+return fallback;
+}
+function render(){
+var theme=root.getAttribute('data-theme');
+var dark=theme==='dark'||(!!(mq&&mq.matches)&&theme!=='light');
+var pal=dark?CFG.palettes.dark:CFG.palettes.light;
+var bg=pageBg(pal.bg);
+var key=(dark?'d':'l')+'|'+bg;
+if(key===lastKey)return;
+lastKey=key;
+var gen=++renderGen;
+var font=getComputedStyle(document.body).fontFamily||'sans-serif';
+var nat={useMaxWidth:false};
+mermaid.initialize({
+startOnLoad:false,securityLevel:'strict',theme:'base',
+flowchart:nat,sequence:nat,er:nat,state:nat,class:nat,pie:nat,
+gantt:nat,journey:nat,timeline:nat,gitGraph:nat,mindmap:nat,xyChart:nat,
+quadrantChart:nat,sankey:nat,c4:nat,requirement:nat,block:nat,
+packet:nat,kanban:nat,architecture:nat,radar:nat,
+themeVariables:{background:bg,mainBkg:pal.surface,primaryColor:pal.surface,
+primaryTextColor:pal.text,lineColor:pal.line,primaryBorderColor:pal.border,
+nodeBorder:pal.border,clusterBorder:pal.border,edgeLabelBackground:bg,
+clusterBkg:'rgba(127,127,127,0.07)',titleColor:pal.text,
+darkMode:dark,rowOdd:bg,rowEven:'rgba(127,127,127,0.07)',
+attributeBackgroundColorOdd:bg,attributeBackgroundColorEven:'rgba(127,127,127,0.07)',
+fontSize:'16px',fontFamily:font},
+themeCSS:'.node rect, .node circle, .node polygon, .node path, .cluster rect { stroke-width: 2px; }'
+});
+items.forEach(function(it){
+var id='claude-mermaid-'+seq++;
+mermaid.render(id,it.src).then(function(r){
+if(gen!==renderGen)return;
+var prev=it.pre.previousElementSibling;
+if(prev&&prev.className==='mermaid-diagram'&&prev!==it.mount)return;
+it.mount.innerHTML=r.svg;
+if(!it.mount.parentNode)it.pre.parentNode.insertBefore(it.mount,it.pre);
+it.pre.style.display='none';
+},function(){
+var scratch=document.getElementById(id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+scratch=document.getElementById('d'+id);
+if(scratch)scratch.parentNode.removeChild(scratch);
+if(gen!==renderGen)return;
+if(it.mount.parentNode)it.mount.parentNode.removeChild(it.mount);
+it.pre.style.display='';
+});
+});
+}
+render();
+if(mq&&mq.addEventListener)mq.addEventListener('change',render);
+if(typeof MutationObserver!=='undefined')new MutationObserver(render).observe(root,{attributes:true,attributeFilter:['data-theme']});
+})();</script>
+<!--claude-mermaid-runtime-end-->
+
+</body></html>
