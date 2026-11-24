@@ -134,6 +134,12 @@ const BUILTIN_RULES := [
 	["Remote Desktop", false, false],
 ]
 const SUBMIT_EARLY_HINT := "ยังมีส่วนที่ต้องดำเนินการอยู่ ตรวจสอบสถานะในหน้า Home ให้ทุกส่วนเป็นสีเขียวก่อนส่งผล"
+## Shown (not a mistake) on Virus & threat protection while a firewall alert
+## still waits: why Quick scan is locked. v2 has two alerts (SchoolLab must be
+## allowed, Unknown_Update.exe blocked), so it says "handle", not "block".
+const SCAN_LOCKED_HINT := "ตอนนี้ Firewall ยังมีโปรแกรมที่ขอเชื่อมต่อผ่านเครือข่ายรอให้ตัดสินใจอยู่ ถ้าสแกนก่อน โปรแกรมที่ไม่ควรได้รับอนุญาตอาจส่งข้อมูลออกไปหรือดาวน์โหลดไฟล์อันตรายเพิ่มระหว่างสแกน จึงต้องจัดการการเชื่อมต่อด้วย Firewall ก่อน"
+const SCAN_LOCKED_FOOTER := "จัดการ Firewall & network protection ก่อน แล้วค่อยกลับมาสแกน"
+const RETRY_FOOTER := "ลองเลือกใหม่อีกครั้ง"
 
 ## Made-up paths shown while the scan runs.
 const SCAN_PATHS := [
@@ -218,6 +224,7 @@ var _picker_mode := "file"
 var _add_menu_open := false
 var _hint_panel: PanelContainer
 var _hint_label: Label
+var _hint_footer: Label
 var _submit_button: Button
 var _submit_note: Label
 var _exit_timer: SceneTreeTimer
@@ -299,11 +306,17 @@ func open_page(target: Page) -> void:
 	# Like v1: the alerts come up on the Firewall page (user 2026-11-15).
 	if target == Page.FIREWALL and firewall_pending():
 		show_alerts()
+	if target == Page.VIRUS and firewall_pending():
+		_info(SCAN_LOCKED_HINT)
+	elif _hint == SCAN_LOCKED_HINT:
+		_clear_hint()
 	_refresh()
 
 
 ## Redraws the current page (the alerts on the desktop changed the state).
 func refresh() -> void:
+	if _hint == SCAN_LOCKED_HINT and not firewall_pending():
+		_clear_hint()
 	_refresh()
 	_after_fix()
 
@@ -453,6 +466,12 @@ func _wrong(hint: String) -> void:
 	_hint = hint
 	_refresh_game_panels()
 	mistake_made.emit(hint)
+
+
+## A hint that explains, not a mistake (no mistake_made).
+func _info(hint: String) -> void:
+	_hint = hint
+	_refresh_game_panels()
 
 
 func _clear_hint() -> void:
@@ -1825,7 +1844,9 @@ func _build_game_panels() -> void:
 	_hint_label = GameUI.label("", 16, Color.WHITE)
 	_hint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hint_col.add_child(_hint_label)
-	hint_col.add_child(GameUI.label("ลองเลือกใหม่อีกครั้ง", 13, Color(0.75, 0.8, 0.9)))
+	_hint_footer = GameUI.label(RETRY_FOOTER, 13, Color(0.75, 0.8, 0.9))
+	_hint_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint_col.add_child(_hint_footer)
 	var hide := Button.new()
 	hide.name = "HintClose"
 	hide.text = " x "
@@ -1875,6 +1896,7 @@ func _refresh_game_panels() -> void:
 	if _hint_panel == null:
 		return
 	_hint_label.text = _hint
+	_hint_footer.text = SCAN_LOCKED_FOOTER if _hint == SCAN_LOCKED_HINT else RETRY_FOOTER
 	_hint_panel.visible = _hint != ""
 	_submit_button.disabled = state.report_submitted
 	_submit_note.text = data.submitted_message if state.report_submitted else "เมื่อทุกส่วนเป็นสีเขียวแล้ว"

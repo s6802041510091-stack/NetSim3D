@@ -13,6 +13,8 @@
   "โปรแกรมไม่ทราบผู้ผลิตและกำลังขอรับการเชื่อมต่อจากเครือข่ายเข้ามาโดยไม่ได้รับการยืนยัน จึงไม่ควรอนุญาตหรือปิดระบบป้องกัน แต่ควรปิดกั้นไว้ — Firewall ใช้ควบคุมว่าโปรแกรมใดเชื่อมต่อได้: อนุญาตโปรแกรมที่จำเป็นและเชื่อถือได้ ปิดกั้นโปรแกรมที่ไม่ทราบที่มา": "The program has an unknown publisher and is asking to accept incoming network connections without verification, so don't allow it or turn protection off — keep it blocked. The firewall controls which programs may connect: allow the programs you need and trust, block programs of unknown origin.",
   "คำใบ้": "Hint",
   "ลองเลือกใหม่อีกครั้ง": "Try again",
+  "ตอนนี้ Firewall ยังมีโปรแกรมที่ขอเชื่อมต่อผ่านเครือข่ายรอให้ตัดสินใจอยู่ ถ้าสแกนก่อน โปรแกรมที่ไม่ควรได้รับอนุญาตอาจส่งข้อมูลออกไปหรือดาวน์โหลดไฟล์อันตรายเพิ่มระหว่างสแกน จึงต้องจัดการการเชื่อมต่อด้วย Firewall ก่อน": "The firewall still has programs asking to connect over the network, waiting for your decision. If you scan first, a program that shouldn't be allowed could send data out or download more harmful files during the scan, so handle the connections in the firewall first.",
+  "จัดการ Firewall & network protection ก่อน แล้วค่อยกลับมาสแกน": "Handle Firewall & network protection first, then come back to scan.",
   "หมายเหตุ": "Note",
 
   "ได้รับภารกิจ: ตรวจสอบความปลอดภัยของคอมพิวเตอร์นักเรียน": "New mission: check a student computer's security",
