@@ -4,24 +4,22 @@ import { api } from './api';
 import { useI18n } from './i18n';
 import { useSession } from './session';
 
-/** NetSim logo: a laptop showing a small network, like the game's. */
+/** NetSim logo: three linked nodes in a rounded square (same mark as the home page). */
 export function Logo({ size = 'md' }: { size?: 'md' | 'lg' }) {
   return (
     <span className={`logo logo-${size}`}>
-      <svg viewBox="0 0 64 56" aria-hidden="true" className="logo-mark">
-        <rect x="6" y="4" width="52" height="36" rx="5" fill="#14234f" />
-        <rect x="10" y="8" width="44" height="28" rx="2" fill="#1f7aec" />
-        <g fill="#fff" stroke="#fff" strokeWidth="2.5">
-          <circle cx="32" cy="15" r="3.2" />
-          <circle cx="22" cy="29" r="3.2" />
-          <circle cx="42" cy="29" r="3.2" />
-          <path d="M32 18v5M22 26v-3h20v3" fill="none" />
+      <svg viewBox="0 0 32 32" aria-hidden="true" className="logo-mark">
+        <rect x="1" y="1" width="30" height="30" rx="9" fill="currentColor" />
+        <g stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round">
+          <path d="M16 11v5M10.5 21.5 16 16l5.5 5.5" />
         </g>
-        <path d="M2 44h60l-4 6H6z" fill="#14234f" />
+        <g fill="#fff">
+          <circle cx="16" cy="9.5" r="2.6" />
+          <circle cx="9.5" cy="22.5" r="2.6" />
+          <circle cx="22.5" cy="22.5" r="2.6" />
+        </g>
       </svg>
-      <span className="logo-word">
-        Net<span className="logo-accent">Sim</span>
-      </span>
+      <span className="logo-word">NetSim</span>
     </span>
   );
 }

@@ -1,0 +1,109 @@
+/* Log-in page in the home page's "Bright" look (shares .bright tokens and bar
+   from landing.css): a paper card on dotted paper, colour shapes around,
+   a chunky Google button, the test-mode note as a sticky note. */
+
+.auth-main { flex: 1; display: grid; place-items: center; padding: clamp(12px, 3vw, 32px) 0 clamp(40px, 6vw, 72px); }
+.auth-stage { position: relative; width: min(460px, calc(100% - 40px)); }
+
+.auth-shape { position: absolute; z-index: 0; }
+.auth-shape-yellow { width: 150px; height: 150px; top: -50px; right: -90px; color: var(--b-yellow); }
+.auth-shape-blue { width: 90px; height: 90px; bottom: 60px; left: -80px; color: var(--b-blue); rotate: 14deg; }
+.auth-shape-red { width: 56px; height: 56px; top: 30px; left: -60px; color: var(--b-red); rotate: -12deg; }
+.auth-shape-green { width: 44px; height: 44px; bottom: 10px; right: -56px; color: var(--b-green); rotate: 10deg; }
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: clamp(26px, 5vw, 40px);
+  border-radius: 20px;
+  background: var(--b-paper);
+  border: 1.5px solid rgba(28, 18, 51, 0.1);
+  box-shadow: 0 8px 0 rgba(28, 18, 51, 0.08), 0 30px 60px -28px rgba(28, 18, 51, 0.4);
+}
+.auth-note {
+  position: absolute;
+  top: -44px;
+  left: 14px;
+  color: var(--b-pen);
+  font-family: 'Charm', var(--b-font);
+  font-size: 1.8rem;
+  font-weight: 700;
+  rotate: -5deg;
+}
+.auth-chip { margin: 0; }
+.auth-title { margin: 0; color: var(--b-ink); font-family: var(--b-font); font-size: clamp(2rem, 1.6rem + 1.4vw, 2.6rem); font-weight: 700; line-height: 1.2; }
+.auth-lead { margin: -0.3rem 0 0.4rem; color: var(--b-muted); font-weight: 500; }
+
+.auth-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 56px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(28, 18, 51, 0.14);
+  background: #fff;
+  color: var(--b-ink);
+  font-family: var(--b-font);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 -4px 0 rgba(28, 18, 51, 0.08);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+.auth-google:hover:not(:disabled) { background: #faf8ff; }
+.auth-google:active:not(:disabled) { transform: translateY(3px); box-shadow: inset 0 -1px 0 rgba(28, 18, 51, 0.08); }
+.auth-google:disabled { cursor: not-allowed; opacity: 0.55; }
+.auth-hint { margin: -0.4rem 0 0; text-align: center; color: #8a8399; font-size: 0.88rem; }
+
+.auth-divider { display: flex; align-items: center; gap: 0.8rem; color: #8a8399; font-size: 0.9rem; font-weight: 600; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; border-top: 2px dashed rgba(28, 18, 51, 0.14); }
+
+.auth-form { display: flex; flex-direction: column; gap: 0.9rem; }
+.auth-sticky {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.8rem 0.95rem;
+  border-radius: 4px 4px 14px 4px;
+  background: #fff3c4;
+  color: #6b4b00;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-shadow: 0 10px 18px -12px rgba(107, 75, 0, 0.6);
+  rotate: -1.2deg;
+}
+.auth-sticky strong { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; color: #9a6a00; }
+
+.auth-field { display: flex; flex-direction: column; gap: 0.35rem; color: var(--b-ink); font-size: 0.95rem; font-weight: 600; }
+.auth-field input {
+  min-height: 50px;
+  padding: 0 0.9rem;
+  border-radius: 12px;
+  border: 2px solid rgba(28, 18, 51, 0.14);
+  background: #fff;
+  color: var(--b-ink);
+  font: 500 1rem var(--b-font);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.auth-field input:focus { outline: none; border-color: var(--b-purple); box-shadow: 0 0 0 4px rgba(75, 31, 168, 0.15); }
+.auth-submit { width: 100%; min-height: 56px; margin-top: 0.2rem; border: 0; font-size: 1.1rem; cursor: pointer; }
+.auth-submit:disabled { cursor: wait; filter: grayscale(0.3) opacity(0.75); }
+.auth .notice { margin: 0; border-radius: 12px; }
+
+.auth-back { display: inline-block; margin-top: 1.2rem; color: var(--b-muted); font-weight: 600; text-decoration: none; }
+.auth-back:hover { color: var(--b-purple); }
+
+@media (max-width: 640px) {
+  .auth-shape-yellow { width: 96px; height: 96px; top: -40px; right: -24px; }
+  .auth-shape-blue { width: 56px; height: 56px; left: -20px; bottom: 40px; }
+  .auth-shape-red, .auth-shape-green { display: none; }
+  .auth-note { font-size: 1.5rem; top: -38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-google, .auth-field input { transition: none; }
+}
