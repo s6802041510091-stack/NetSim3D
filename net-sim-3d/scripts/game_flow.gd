@@ -372,6 +372,14 @@ func _fit_card() -> void:
 	var needed := _body.get_combined_minimum_size().y
 	_scroll.custom_minimum_size.y = maxf(minf(needed, available), 0.0)
 
+## Keeps the page card clear of something drawn at the top of the window (the
+## website login badge, ServerSync): `bottom` is that thing's lowest y, 0 for none.
+func make_room_at_top(bottom: float) -> void:
+	if not is_instance_valid(_page_area):
+		return
+	_page_area.add_theme_constant_override("margin_top", maxi(20, ceili(bottom) + 10))
+	_fit_card()
+
 func _style_scrollbar(bar: VScrollBar) -> void:
 	var track := _panel(Color("dfe8f1aa"), 5)
 	track.content_margin_left = 4

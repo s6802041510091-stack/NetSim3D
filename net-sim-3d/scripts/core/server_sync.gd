@@ -38,6 +38,7 @@ var _badge_layer: CanvasLayer
 var _badge: PanelContainer
 var _badge_text: Label
 var _badge_login: Button
+var _badge_room := 0.0 # space last asked of GameFlow above its page card
 var _toast: Label
 
 
@@ -345,6 +346,12 @@ func _update_badge_visibility() -> void:
 	var scene := get_tree().current_scene
 	var on_menu := scene != null and scene.scene_file_path == GameFlow.MENU and not GameFlow.loading
 	_badge.visible = on_menu and not state in ["off", "checking"]
+	# The menu's page card starts below the badge, so the badge never covers
+	# the card's back button (it did on the progress page, 2026-11-25).
+	var bottom := _badge.position.y + _badge.get_combined_minimum_size().y if _badge.visible else 0.0
+	if bottom != _badge_room:
+		_badge_room = bottom
+		GameFlow.make_room_at_top(bottom)
 
 
 func _show_toast(message: String) -> void:
