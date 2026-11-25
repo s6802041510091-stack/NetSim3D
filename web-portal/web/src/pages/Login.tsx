@@ -33,7 +33,12 @@ export default function Login() {
 
       <main className="auth-main">
         <div className="auth-stage">
-          <Link to="/" className="auth-back">‹ {t('nav.home')}</Link>
+          <Link to="/" className="auth-back">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M19 12H6M11 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {t('nav.home')}
+          </Link>
           <Shape kind="circle" className="auth-shape auth-shape-yellow" />
           <Shape kind="diamond" className="auth-shape auth-shape-blue" />
           <Shape kind="tri" className="auth-shape auth-shape-red" />
