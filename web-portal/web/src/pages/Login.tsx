@@ -33,13 +33,13 @@ export default function Login() {
 
       <main className="auth-main">
         <div className="auth-stage">
+          <Link to="/" className="auth-back">‹ {t('nav.home')}</Link>
           <Shape kind="circle" className="auth-shape auth-shape-yellow" />
           <Shape kind="diamond" className="auth-shape auth-shape-blue" />
           <Shape kind="tri" className="auth-shape auth-shape-red" />
           <Shape kind="square" className="auth-shape auth-shape-green" />
 
           <section className="auth-card">
-            <span className="auth-note" aria-hidden="true">{t('login.welcome')}</span>
             <p className="bright-chip auth-chip">
               <Shape kind="tri" className="bright-chip-shape bcs-red" />
               <Shape kind="diamond" className="bright-chip-shape bcs-blue" />
@@ -93,7 +93,6 @@ export default function Login() {
             )}
           </section>
 
-          <Link to="/" className="auth-back">‹ {t('nav.home')}</Link>
         </div>
       </main>
 

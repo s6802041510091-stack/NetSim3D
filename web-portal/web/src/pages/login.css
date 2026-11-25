@@ -1,6 +1,7 @@
 /* Log-in page in the home page's "Bright" look (shares .bright tokens and bar
    from landing.css): a paper card on dotted paper, colour shapes around,
-   a chunky Google button, the test-mode note as a sticky note. */
+   a chunky Google button, the test-mode note as a sticky note, and the link
+   back home above the card. */
 
 .auth-main { flex: 1; display: grid; place-items: center; padding: clamp(12px, 3vw, 32px) 0 clamp(40px, 6vw, 72px); }
 .auth-stage { position: relative; width: min(460px, calc(100% - 40px)); }
@@ -22,16 +23,6 @@
   background: var(--b-paper);
   border: 1.5px solid rgba(28, 18, 51, 0.1);
   box-shadow: 0 8px 0 rgba(28, 18, 51, 0.08), 0 30px 60px -28px rgba(28, 18, 51, 0.4);
-}
-.auth-note {
-  position: absolute;
-  top: -44px;
-  left: 14px;
-  color: var(--b-pen);
-  font-family: 'Charm', var(--b-font);
-  font-size: 1.8rem;
-  font-weight: 700;
-  rotate: -5deg;
 }
 .auth-chip { margin: 0; }
 .auth-title { margin: 0; color: var(--b-ink); font-family: var(--b-font); font-size: clamp(2rem, 1.6rem + 1.4vw, 2.6rem); font-weight: 700; line-height: 1.2; }
@@ -95,14 +86,13 @@
 .auth-submit:disabled { cursor: wait; filter: grayscale(0.3) opacity(0.75); }
 .auth .notice { margin: 0; border-radius: 12px; }
 
-.auth-back { display: inline-block; margin-top: 1.2rem; color: var(--b-muted); font-weight: 600; text-decoration: none; }
+.auth-back { position: relative; z-index: 2; display: inline-block; margin-bottom: 1rem; color: var(--b-muted); font-weight: 600; text-decoration: none; }
 .auth-back:hover { color: var(--b-purple); }
 
 @media (max-width: 640px) {
   .auth-shape-yellow { width: 96px; height: 96px; top: -40px; right: -24px; }
   .auth-shape-blue { width: 56px; height: 56px; left: -20px; bottom: 40px; }
   .auth-shape-red, .auth-shape-green { display: none; }
-  .auth-note { font-size: 1.5rem; top: -38px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .auth-google, .auth-field input { transition: none; }

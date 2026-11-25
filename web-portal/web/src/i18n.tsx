@@ -45,7 +45,6 @@ const th = {
   'role.student': 'นักเรียน',
 
   'login.title': 'เข้าสู่ระบบ',
-  'login.welcome': 'ยินดีต้อนรับ!',
   'login.google': 'เข้าสู่ระบบด้วย Google',
   'login.googleSoon': 'เปิดใช้เมื่อติดตั้งบนเซิร์ฟเวอร์จริง',
   'login.or': 'หรือ',
@@ -262,7 +261,6 @@ const en: Record<Key, string> = {
   'role.student': 'Student',
 
   'login.title': 'Log in',
-  'login.welcome': 'Welcome!',
   'login.google': 'Sign in with Google',
   'login.googleSoon': 'Available once the site is on the real server',
   'login.or': 'or',
