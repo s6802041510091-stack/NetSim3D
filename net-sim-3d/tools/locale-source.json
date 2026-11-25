@@ -2870,11 +2870,6 @@
     "source": "scripts/computer/apps/network_designer.gd"
   },
   {
-    "id": 574,
-    "th": "เชื่อมสาย %s (%s) ↔ %s (%s) แล้ว",
-    "source": "scripts/computer/apps/network_designer.gd"
-  },
-  {
     "id": 575,
     "th": "ต่อสายจากอุปกรณ์เข้าตัวเองไม่ได้",
     "source": "scripts/computer/apps/network_designer.gd"
@@ -3157,11 +3152,6 @@
   {
     "id": 631,
     "th": "\nกำลังพัฒนา",
-    "source": "scripts/game_flow.gd"
-  },
-  {
-    "id": 632,
-    "th": "\n🔒 ผ่านด่านก่อนหน้าก่อน",
     "source": "scripts/game_flow.gd"
   },
   {
