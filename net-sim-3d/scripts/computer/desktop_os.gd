@@ -76,6 +76,9 @@ var _mail_selected := -1
 ## Address the browser opens first.
 const HOME_URL := "www.college.ac.th"
 const COLLEGE_BROWSER := preload("res://scripts/computer/college_browser.gd")
+## Command Prompt text: Cascadia Mono (OFL), the Windows Terminal font; Thai
+## falls back to Sarabun (set in the font's import settings).
+const CMD_FONT := preload("res://assets/fonts/CascadiaMono-Regular.woff2")
 var _session := 0
 var _tween: Tween
 ## Set by a mission to check actions first: func(action: String, args:
@@ -1167,11 +1170,21 @@ func _open_cmd() -> void:
 		_cmd_output.add_theme_stylebox_override("normal", console_style)
 		_cmd_output.add_theme_color_override("default_color", Color(0.85, 0.9, 0.85))
 		_cmd_output.add_theme_font_size_override("normal_font_size", 15)
-		var mono := SystemFont.new()
-		mono.font_names = PackedStringArray(["Consolas", "Cascadia Mono", "Courier New", "monospace"])
-		_cmd_output.add_theme_font_override("normal_font", mono)
+		# Bundled console font: a SystemFont found nothing in the browser build.
+		_cmd_output.add_theme_font_override("normal_font", CMD_FONT)
 		column.add_child(_cmd_output)
 		_cmd_input = LineEdit.new()
+		_cmd_input.add_theme_font_override("font", CMD_FONT)
+		_cmd_input.add_theme_font_size_override("font_size", 15)
+		_cmd_input.add_theme_color_override("font_color", Color(0.85, 0.9, 0.85))
+		_cmd_input.add_theme_color_override("caret_color", Color(0.85, 0.9, 0.85))
+		_cmd_input.add_theme_color_override("font_placeholder_color", Color(0.55, 0.6, 0.55))
+		var input_style := _flat(Color(0.05, 0.05, 0.07), 2)
+		input_style.content_margin_left = 8
+		input_style.content_margin_top = 6
+		input_style.content_margin_bottom = 6
+		for state in ["normal", "focus"]:
+			_cmd_input.add_theme_stylebox_override(state, input_style)
 		_cmd_input.placeholder_text = "พิมพ์คำสั่ง เช่น ipconfig, ping <IP address>, help"
 		_cmd_input.text_submitted.connect(_on_cmd_submitted)
 		column.add_child(_cmd_input))
