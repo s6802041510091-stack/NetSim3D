@@ -2,8 +2,8 @@
 	"_note": "Mission 1 reasoning (v2, 2026-11-09): clicking a device means choosing it, then 'why choose it?' with 4 options of similar length. point -> device -> 4 options. The right device has exactly 1 option with 'correct': true; every other option (and every option of a wrong device) carries a 'misconception' label used in the summary. Review copy: ภารกิจ/ด่าน_01/คำถามเหตุผล_ร่าง.md",
 	"1": {
 		"Router": [
-			{"text": "เชื่อมเครือข่ายภายในห้องเข้ากับเครือข่ายภายนอก และหาเส้นทางส่งข้อมูลระหว่างสองเครือข่าย", "correct": true},
-			{"text": "กระจายสัญญาณไร้สายให้คอมพิวเตอร์ทุกเครื่องในห้องเชื่อมต่ออินเทอร์เน็ตได้พร้อมกัน", "misconception": "Router คืออุปกรณ์กระจาย Wi-Fi"},
+			{"text": "รับสายจาก ONU แล้วหาเส้นทางส่งข้อมูลระหว่างวง 192.168.10.x กับอินเทอร์เน็ต", "correct": true},
+			{"text": "กระจายสัญญาณไร้สายให้คอมพิวเตอร์ทุกเครื่องในห้องเชื่อมต่ออินเทอร์เน็ตได้พร้อมกัน", "misconception": "สับสนหน้าที่ Router กับ Access Point"},
 			{"text": "มีพอร์ตมากพอให้ต่อคอมพิวเตอร์ทั้ง 21 เครื่องเข้ากับอุปกรณ์ตัวนี้ได้โดยตรง", "misconception": "Router ทำหน้าที่อุปกรณ์ศูนย์กลางของห้อง"},
 			{"text": "ขยายสัญญาณที่อ่อนลงจากสายยาวให้แรงขึ้นก่อนส่งต่อไปยังคอมพิวเตอร์ในห้อง", "misconception": "สับสน Router กับ Repeater"}
 		],
@@ -59,7 +59,7 @@
 			{"text": "เพิ่มจำนวนพอร์ตสาย LAN ให้คอมพิวเตอร์ในห้องที่ต่อกับอุปกรณ์ศูนย์กลางไม่ทัน", "misconception": "Access Point ทำหน้าที่ Switched Hub"},
 			{"text": "ขยายสัญญาณ Wi-Fi จากห้องอื่นให้แรงขึ้น โดยไม่ต้องต่อสาย LAN เข้ากับเครือข่าย", "misconception": "Access Point คือตัวขยายสัญญาณ"}
 		],
-		"Router": [
+		"Wireless Router": [
 			{"text": "สัญญาณ Wi-Fi ทุกชนิดต้องมาจาก Router จึงต้องติดตั้ง Router เพิ่มอีกตัวในจุดนี้", "misconception": "สัญญาณ Wi-Fi มาจาก Router เท่านั้น"},
 			{"text": "Router กับ Access Point ทำงานเหมือนกันทุกอย่าง จะเลือกตัวไหนก็ได้ผลเหมือนกัน", "misconception": "Access Point คือ Router แบบไร้สาย"},
 			{"text": "ติดตั้ง Router หลายตัวในห้องเดียวกันจะช่วยให้อินเทอร์เน็ตทั้งห้องเร็วขึ้น", "misconception": "จำนวน Router เพิ่มความเร็วอินเทอร์เน็ต"},

@@ -9,7 +9,7 @@ const APP_SCENE := "res://missions/mission_01/scenes/netplan_edu.tscn"
 const TEST_SAVE := "user://test_validate_mission_01.json"
 const TEST_PROGRESS := "user://test_validate_progress.json"
 const FULL_NAMES := ["Router", "Wireless Access Point", "Switched Hub 24 Port", "Shared Hub 24 Port",
-	"Switched Hub 16 Port", "Switched Hub 8 Port", "Repeater", "Bridge"]
+	"Switched Hub 16 Port", "Switched Hub 8 Port", "Repeater", "Bridge", "Wireless Router"]
 const FORBIDDEN_WORDS := ["Topology", "Straight-Through", "Crossover", "Half-Duplex", "Full-Duplex",
 	"IP Address", "Subnet", "Server", "Firewall", "Load Balancer", "Patch Panel"]
 
@@ -191,7 +191,7 @@ func _test_data_and_rules() -> void:
 	_check(7, _answer(s, 2, "Shared Hub 24 Port", true), "change back to Shared Hub")
 	_check(7, s.scored_reasons[2].size() == 2 and not bool(s.scored_reasons[2]["Shared Hub 24 Port"].correct), "each device is scored once, on its first answer")
 	_check(13, s.total_score() == 30, "changing an answer cost points")
-	_answer(s, 3, "Router")
+	_answer(s, 3, "Wireless Router")
 	r = Mission01Validator.check(s, data)                      # P2, P3 wrong
 	_check(12, r.checked and r.wrong == [2, 3] and r.correct == [1], "first check result")
 	_check(13, s.get_point_score(2) == 5 and s.get_point_score(3) == 5 and s.total_score() == 20, "first check score %d" % s.total_score())
@@ -229,7 +229,7 @@ func _test_data_and_rules() -> void:
 	z.reset(data)
 	_answer(z, 1, "Wireless Access Point")
 	_answer(z, 2, "Shared Hub 24 Port")
-	_answer(z, 3, "Router")
+	_answer(z, 3, "Wireless Router")
 	for i in 12:
 		Mission01Validator.check(z, data)
 	_check(14, z.total_score() == 0 and z.get_point_score(1) == 0 and z.get_point_score(2) == 0, "score went below 0 or did not reach 0: %d" % z.total_score())
@@ -359,7 +359,7 @@ func _test_program() -> void:
 	_check(10, not r.checked and app.status_message.begins_with(NetPlanEdu.MSG_MISSING) and app.status_message.contains("3"), "missing-point warning: " + app.status_message)
 	_check(10, app.state.check_count == 0, "incomplete check was counted")
 
-	app.choose_answer(3, "Router")
+	app.choose_answer(3, "Wireless Router")
 	_check(9, app.get_node("%ProgressLabel").text == "3/3 จุด", "progress should be 3/3")
 	_check(11, app.get_point_status(3) == Mission01State.PointStatus.SELECTED, "point 3 revealed before check")
 
