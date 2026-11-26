@@ -59,7 +59,7 @@
 			{"text": "เพิ่มจำนวนพอร์ตสาย LAN ให้คอมพิวเตอร์ในห้องที่ต่อกับอุปกรณ์ศูนย์กลางไม่ทัน", "misconception": "Access Point ทำหน้าที่ Switched Hub"},
 			{"text": "ขยายสัญญาณ Wi-Fi จากห้องอื่นให้แรงขึ้น โดยไม่ต้องต่อสาย LAN เข้ากับเครือข่าย", "misconception": "Access Point คือตัวขยายสัญญาณ"}
 		],
-		"Router": [
+		"Wireless Router": [
 			{"text": "สัญญาณ Wi-Fi ทุกชนิดต้องมาจาก Router จึงต้องติดตั้ง Router เพิ่มอีกตัวในจุดนี้", "misconception": "สัญญาณ Wi-Fi มาจาก Router เท่านั้น"},
 			{"text": "Router กับ Access Point ทำงานเหมือนกันทุกอย่าง จะเลือกตัวไหนก็ได้ผลเหมือนกัน", "misconception": "Access Point คือ Router แบบไร้สาย"},
 			{"text": "ติดตั้ง Router หลายตัวในห้องเดียวกันจะช่วยให้อินเทอร์เน็ตทั้งห้องเร็วขึ้น", "misconception": "จำนวน Router เพิ่มความเร็วอินเทอร์เน็ต"},

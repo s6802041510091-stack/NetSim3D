@@ -7,6 +7,8 @@ extends Resource
 
 const REASON_COUNT := 4
 const ICON_DIR := "res://assets/ui/devices/"
+## Devices that share another device's picture.
+const ICON_NAMES := {"Wireless Router": "router"}
 
 @export var mission_id: String = "mission_01"
 @export var mission_title: String = "ภารกิจที่ 1"
@@ -73,7 +75,7 @@ func correct_reason(point_id: int, device: String) -> int:
 ## res://assets/ui/devices/switched_hub_24_port.png, rendered from the 3D models
 ## by 3Dmodel/scripts/render_device_thumbnails.py (null when missing).
 static func device_icon(device: String) -> Texture2D:
-	var path := ICON_DIR + device.to_lower().replace(" ", "_") + ".png"
+	var path: String = ICON_DIR + ICON_NAMES.get(device, device.to_lower().replace(" ", "_")) + ".png"
 	return load(path) as Texture2D if ResourceLoader.exists(path) else null
 
 
