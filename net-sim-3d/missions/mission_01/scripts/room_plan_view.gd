@@ -33,7 +33,7 @@ const AISLE_X := 385.0
 
 ## Fixed LAN cable routes (polylines in plan units). View only.
 const LAN_ROUTES := [
-	# External network -> point 1 (wall) -> Wall Rack 9U
+	# Internet (ISP ONU) -> point 1 (wall) -> Wall Rack 9U
 	[Vector2(915, 150), Vector2(800, 150), Vector2(800, 68), Vector2(770, 68)],
 	# Wall Rack -> cable trunk along the front wall -> left wall
 	[Vector2(690, 80), Vector2(60, 80), Vector2(60, 595)],
@@ -147,9 +147,10 @@ func _draw_room() -> void:
 func _draw_external() -> void:
 	draw_style_box(NetPlanTheme.box(Color(0.90, 0.95, 1.0), NetPlanTheme.LAN, int(14 * _scale)), _r(EXTERNAL))
 	var english: bool = get_node("/root/L10n").locale == "en"
-	_text("External" if english else "เครือข่าย", EXTERNAL.get_center() + Vector2(0, -12), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
-	_text("Network" if english else "ภายนอก", EXTERNAL.get_center() + Vector2(0, 8), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
-	_text("(Internet)", EXTERNAL.get_center() + Vector2(0, 28), 13, NetPlanTheme.INK_SOFT)
+	# The ISP's internet line arrives at the ONU box; point 1 connects to it.
+	_text("Internet" if english else "อินเทอร์เน็ต", EXTERNAL.get_center() + Vector2(0, -12), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
+	_text("ISP", EXTERNAL.get_center() + Vector2(0, 8), 15, NetPlanTheme.INK, HORIZONTAL_ALIGNMENT_CENTER, true)
+	_text("(ONU)", EXTERNAL.get_center() + Vector2(0, 28), 13, NetPlanTheme.INK_SOFT)
 
 
 func _draw_rack_and_teacher() -> void:
