@@ -173,5 +173,7 @@
   "711": "Current Objective",
   "712": "Objectives",
   "713": "(Press Tab to open)",
-  "714": "(Press Tab to hide)"
+  "714": "(Press Tab to hide)",
+  "715": "The internet service provider (ISP) has already installed the ONU box. The device at point 1 connects to the ONU and feeds the 9U wall rack.",
+  "716": "The computer room uses the 192.168.10.x network, a different network from the internet. Mobile devices on Wi-Fi must be on the room's network."
 }
